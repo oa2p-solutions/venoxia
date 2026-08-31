@@ -1,0 +1,7 @@
+[
+  {
+    "attack": "Cumpliendo el requisito al pie de la letra, el sistema puede responder 200 con una reserva vacía cuando ninguna línea tiene stock: el cliente cree que ha reservado su pedido y no ha reservado nada.",
+    "requirement_id": "R-CHK-012",
+    "severity": "high"
+  }
+]

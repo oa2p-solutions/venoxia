@@ -1,0 +1,17 @@
+{
+  "description": "El guardián de Venoxia: ante una edición de código sin especificación validada, deniega con un mensaje que dice qué falta y qué comando lo arregla. Fail-open: cualquier error interno permite.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/guardian.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

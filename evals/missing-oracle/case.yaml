@@ -1,0 +1,90 @@
+schema_version: "1.0"
+name: missing-oracle
+description: >-
+  Un delta cuyo requisito R-INV-002 nace sin `verifies:`. El validador tiene que
+  rechazarlo, y tiene que rechazarlo por V06 en concreto: no vale cualquier fallo.
+tags: [validator, oracle, must-fail]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Trabajas sobre un proyecto que usa Venoxia. Su raíz es el directorio `project/`, que
+    se te ha añadido a esta sesión como directorio de trabajo adicional; dentro tiene su
+    especificación en `.venoxia/`. Localízalo antes de nada si no lo tienes a la vista.
+
+    Valida la especificación de ese proyecto y guarda la salida JSON íntegra del
+    validador en `validation-result.json`, dentro de tu directorio de trabajo actual.
+    Cópiala tal cual: sin editarla, sin resumirla y sin reformatearla.
+
+    No arregles la especificación ni toques nada bajo `project/`: aquí solo se valida.
+    Que la validación termine con un código de salida distinto de cero no es un fallo
+    de la herramienta: es justo el resultado que se te pide capturar.
+
+    Termina con dos frases como mucho: si la especificación cumple el contrato y, si no
+    lo cumple, qué regla la rechaza y sobre qué requisito.
+  max_turns: 14
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Skill]
+runs: 2
+expected_outcome: >-
+  El validador rechaza la especificación (ok false) con exactamente un error, de regla
+  V06, sobre el requisito R-INV-002, y sin ningún aviso ni ningún fallo de parseo.
+graders:
+  - type: tool_used
+    name: validator-script-ran
+    tool: Bash
+    input_match: 'validate\.py'
+    min: 1
+  - type: file_exists
+    name: validation-result-written
+    path: validation-result.json
+  - type: regex
+    name: spec-rejected
+    target:
+      source: file
+      path: validation-result.json
+    pattern: '"version":\s*1,\s*"ok":\s*false'
+    flags: "s"
+  - type: regex
+    name: rule-v06-fired
+    target:
+      source: file
+      path: validation-result.json
+    pattern: '"rule":\s*"V06"'
+  - type: regex
+    name: v06-is-an-error
+    target:
+      source: file
+      path: validation-result.json
+    pattern: '"rule":\s*"V06",\s*"severity":\s*"error"'
+    flags: "s"
+  - type: regex
+    name: v06-names-the-requirement
+    target:
+      source: file
+      path: validation-result.json
+    pattern: '"requirement_id":\s*"R-INV-002"'
+  - type: regex
+    name: only-v06-fired
+    target:
+      source: file
+      path: validation-result.json
+    pattern: '"rule":\s*"(?!V06")'
+    match: not_contains
+  - type: regex
+    name: exactly-one-error-and-no-warning
+    target:
+      source: file
+      path: validation-result.json
+    pattern: '"counts":\s*\{\s*"error":\s*1,\s*"warning":\s*0'
+    flags: "s"
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only

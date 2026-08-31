@@ -1,0 +1,123 @@
+schema_version: "1.0"
+name: ambiguous-partial-effect
+description: >-
+  El requisito dice que el sistema «reserva lo que puede» cuando una línea se queda sin
+  stock. Una lectura reserva el pedido completo y la otra solo las unidades disponibles.
+  La divergencia dura en `side_effects` tiene que detectarse.
+tags: [divergence, ambiguity, must-detect]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Trabajas sobre un proyecto que usa Venoxia. Su raíz es el directorio `project/`, que
+    se te ha añadido a esta sesión como directorio de trabajo adicional; dentro tiene su
+    especificación en `.venoxia/`. Localízalo antes de nada si no lo tienes a la vista.
+
+    El change `2026-08-31-partial-reservation` ya tiene grabadas las lecturas
+    independientes de su delta en
+    `.venoxia/changes/2026-08-31-partial-reservation/readings/`. No lances lectores
+    nuevos: usa esas lecturas tal como están.
+
+    Compáralas entre sí y guarda la salida JSON íntegra del análisis de divergencia en
+    `divergence-result.json`, dentro de tu directorio de trabajo actual. Cópiala tal
+    cual: sin editarla, sin resumirla y sin reformatearla.
+
+    Que el análisis termine con un código de salida distinto de cero no es un fallo de la
+    herramienta: es justo el resultado que se te pide capturar.
+
+    Termina con dos frases como mucho: si las dos lecturas convergen y, si no, sobre qué
+    discrepan exactamente.
+  max_turns: 14
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Skill]
+runs: 2
+expected_outcome: >-
+  El análisis no converge: una divergencia dura en `side_effects` y una blanda en
+  `effect`, ambas en el escenario «One line short of stock», con la reserva del pedido
+  completo enfrentada a la reserva de solo las unidades con stock.
+graders:
+  - type: tool_used
+    name: divergence-script-ran
+    tool: Bash
+    input_match: 'diff_readings\.py'
+    min: 1
+  - type: file_exists
+    name: divergence-result-written
+    path: divergence-result.json
+  - type: regex
+    name: readings-do-not-converge
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"converged":\s*false'
+  - type: regex
+    name: side-effects-field-flagged
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"field":\s*"side_effects"'
+  - type: regex
+    name: divergence-is-hard
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"hardness":\s*"hard"'
+  - type: regex
+    name: one-hard-one-soft-no-gap
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"counts":\s*\{\s*"hard":\s*1,\s*"soft":\s*1,\s*"gaps":\s*0'
+    flags: "s"
+  - type: regex
+    name: scenario-named-literally
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: 'One line short of stock'
+  - type: regex
+    name: total-reservation-reading-confronted
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: 'pedido completo'
+  - type: regex
+    name: partial-reservation-reading-confronted
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: 'unidades con stock'
+  - type: regex
+    name: converging-scenario-not-flagged
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: 'Every line has stock'
+    match: not_contains
+  - type: regex
+    name: closed-question-with-options
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"options":\s*\['
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains
+  - type: llm
+    name: question-confronts-total-versus-partial
+    focus:
+      source: file
+      path: divergence-result.json
+    criteria: >-
+      El JSON contiene una pregunta cerrada que enfrenta las dos lecturas del escenario
+      «One line short of stock»: una reserva el pedido completo y la otra solo las
+      unidades con stock, y la pregunta obliga a elegir entre esas dos opciones
+      concretas. No vale una pregunta abierta del tipo «¿hay algo ambiguo aquí?».
+    weight: 0.5
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only

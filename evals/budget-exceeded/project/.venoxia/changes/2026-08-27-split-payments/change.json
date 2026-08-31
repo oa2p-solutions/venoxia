@@ -1,0 +1,7 @@
+{
+  "id": "2026-08-27-split-payments",
+  "state": "specified",
+  "via": "spec",
+  "capabilities": ["payments"],
+  "created": "2026-08-27T16:40:00Z"
+}

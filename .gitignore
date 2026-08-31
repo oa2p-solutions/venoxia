@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+evals/results/
+.DS_Store
+
+# El .venoxia/ de pruebas no se versiona…
+.venoxia/
+# …pero los fixtures de los evals sí: son el contenido de los casos.
+!evals/*/project/.venoxia/

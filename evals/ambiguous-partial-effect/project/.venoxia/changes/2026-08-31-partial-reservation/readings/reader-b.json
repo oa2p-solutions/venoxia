@@ -1,0 +1,18 @@
+[
+  {
+    "scenario": "Every line has stock",
+    "effect": "reserva las tres líneas del pedido",
+    "status_code": "200",
+    "side_effects": ["reserva creada para el pedido completo"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "One line short of stock",
+    "effect": "reserva parcial de las unidades con stock",
+    "status_code": "200",
+    "side_effects": ["reserva creada solo para las unidades con stock"],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

@@ -1,0 +1,121 @@
+schema_version: "1.0"
+name: clean-spec
+description: >-
+  Un delta sin ambigüedad y conforme a las dieciséis reglas. Mide el falso positivo:
+  el validador tiene que aceptarlo sin un solo aviso y el motor de divergencia tiene
+  que declarar convergencia. Es el caso que detecta que el sistema grita cuando no debe.
+tags: [validator, divergence, false-positive, regression]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Trabajas sobre un proyecto que usa Venoxia. Su raíz es el directorio `project/`, que
+    se te ha añadido a esta sesión como directorio de trabajo adicional; dentro tiene su
+    especificación en `.venoxia/`. Localízalo antes de nada si no lo tienes a la vista.
+
+    Haz estas dos cosas:
+
+    1. Valida la especificación de ese proyecto y guarda la salida JSON íntegra del
+       validador en `validation-result.json`, dentro de tu directorio de trabajo actual.
+       Cópiala tal cual: sin editarla, sin resumirla y sin reformatearla.
+    2. Compara entre sí las lecturas ya grabadas en
+       `.venoxia/changes/2026-08-31-stock-reservation/readings/` y guarda la salida JSON
+       íntegra del análisis de divergencia en `divergence-result.json`, también dentro de
+       tu directorio de trabajo actual y también tal cual.
+
+    Termina con dos frases como mucho: si la especificación cumple el contrato y si las
+    dos lecturas convergen.
+  max_turns: 16
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Skill]
+runs: 2
+expected_outcome: >-
+  El validador acepta la especificación (ok true, cero errores y cero avisos, findings
+  vacío, presupuesto 0 de 4 requisitos en low) y el motor de divergencia declara
+  convergencia (converged true, cero divergencias duras y cero lagunas sobre dos lectores).
+graders:
+  - type: tool_used
+    name: validator-script-ran
+    tool: Bash
+    input_match: 'validate\.py'
+    min: 1
+  - type: tool_used
+    name: divergence-script-ran
+    tool: Bash
+    input_match: 'diff_readings\.py'
+    min: 1
+  - type: file_exists
+    name: validation-result-written
+    path: validation-result.json
+  - type: file_exists
+    name: divergence-result-written
+    path: divergence-result.json
+  - type: regex
+    name: spec-accepted
+    target:
+      source: file
+      path: validation-result.json
+    pattern: '"version":\s*1,\s*"ok":\s*true'
+    flags: "s"
+  - type: regex
+    name: no-errors-and-no-warnings
+    target:
+      source: file
+      path: validation-result.json
+    pattern: '"counts":\s*\{\s*"error":\s*0,\s*"warning":\s*0'
+    flags: "s"
+  - type: regex
+    name: findings-list-is-empty
+    target:
+      source: file
+      path: validation-result.json
+    pattern: '"findings":\s*\[\s*\]'
+    flags: "s"
+  - type: regex
+    name: uncertainty-budget-clear
+    target:
+      source: file
+      path: validation-result.json
+    pattern: '"budget":\s*\{\s*"low":\s*0,\s*"total":\s*4'
+    flags: "s"
+  - type: regex
+    name: no-rule-fired-at-all
+    target:
+      source: file
+      path: validation-result.json
+    pattern: '"rule":'
+    match: not_contains
+  - type: regex
+    name: readings-converge
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"converged":\s*true'
+  - type: regex
+    name: no-hard-divergence
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"hard":\s*0'
+  - type: regex
+    name: no-declared-gap
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"gaps":\s*0'
+  - type: regex
+    name: both-readers-compared
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"readers":\s*2'
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only

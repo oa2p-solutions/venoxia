@@ -1,0 +1,7 @@
+{
+  "id": "2026-08-31-partial-reservation",
+  "state": "specified",
+  "via": "spec",
+  "capabilities": ["checkout"],
+  "created": "2026-08-31T10:05:00Z"
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "scenario": "Stock available on every line",
+    "effect": "crea la reserva con TTL de 15 minutos",
+    "status_code": "201",
+    "side_effects": ["reserva creada", "stock comprometido durante 15 minutos"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Insufficient stock on one line",
+    "effect": "rechaza la petición y no crea la reserva",
+    "status_code": "422",
+    "side_effects": ["ninguna reserva creada", "stock intacto"],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

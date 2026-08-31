@@ -1,0 +1,122 @@
+schema_version: "1.0"
+name: ambiguous-status-code
+description: >-
+  El escenario «Insufficient stock on one line» dice que la petición «se rechaza» sin
+  fijar con qué respuesta. Las dos lecturas prefabricadas la resuelven como 409 y como
+  422. La divergencia dura tiene que detectarse y salir como pregunta cerrada.
+tags: [divergence, ambiguity, must-detect]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Trabajas sobre un proyecto que usa Venoxia. Su raíz es el directorio `project/`, que
+    se te ha añadido a esta sesión como directorio de trabajo adicional; dentro tiene su
+    especificación en `.venoxia/`. Localízalo antes de nada si no lo tienes a la vista.
+
+    El change `2026-08-31-stock-reservation` ya tiene grabadas las lecturas
+    independientes de su delta en
+    `.venoxia/changes/2026-08-31-stock-reservation/readings/`. No lances lectores nuevos:
+    usa esas lecturas tal como están.
+
+    Compáralas entre sí y guarda la salida JSON íntegra del análisis de divergencia en
+    `divergence-result.json`, dentro de tu directorio de trabajo actual. Cópiala tal
+    cual: sin editarla, sin resumirla y sin reformatearla.
+
+    Que el análisis termine con un código de salida distinto de cero no es un fallo de la
+    herramienta: es justo el resultado que se te pide capturar.
+
+    Termina con dos frases como mucho: si las dos lecturas convergen y, si no, sobre qué
+    discrepan exactamente.
+  max_turns: 14
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Skill]
+runs: 2
+expected_outcome: >-
+  El análisis no converge: una única divergencia dura en el campo `status_code` del
+  escenario «Insufficient stock on one line», con 409 y 422 enfrentados y una pregunta
+  cerrada entre ambas opciones.
+graders:
+  - type: tool_used
+    name: divergence-script-ran
+    tool: Bash
+    input_match: 'diff_readings\.py'
+    min: 1
+  - type: file_exists
+    name: divergence-result-written
+    path: divergence-result.json
+  - type: regex
+    name: readings-do-not-converge
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"converged":\s*false'
+  - type: regex
+    name: status-code-field-flagged
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"field":\s*"status_code"'
+  - type: regex
+    name: divergence-is-hard
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"hardness":\s*"hard"'
+  - type: regex
+    name: exactly-one-hard-no-soft-no-gap
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"counts":\s*\{\s*"hard":\s*1,\s*"soft":\s*0,\s*"gaps":\s*0'
+    flags: "s"
+  - type: regex
+    name: scenario-named-literally
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: 'Insufficient stock on one line'
+  - type: regex
+    name: reading-409-confronted
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '409'
+  - type: regex
+    name: reading-422-confronted
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '422'
+  - type: regex
+    name: closed-question-with-options
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"options":\s*\['
+  - type: regex
+    name: devils-advocate-attack-carried
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"attack":'
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains
+  - type: llm
+    name: question-confronts-both-readings
+    focus:
+      source: file
+      path: divergence-result.json
+    criteria: >-
+      El JSON contiene una pregunta cerrada que enfrenta las dos lecturas del escenario
+      «Insufficient stock on one line»: una responde 409 y la otra 422, y la pregunta
+      obliga a elegir entre esas dos opciones concretas. No vale una pregunta abierta del
+      tipo «¿hay algo ambiguo aquí?».
+    weight: 0.5
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "venoxia",
+  "description": "Marketplace de un solo plugin: Venoxia, el núcleo verificable de especificación para Claude Code.",
+  "owner": {
+    "name": "Oscar Arocha",
+    "email": "oscar.arocha@b2bcarts.com"
+  },
+  "plugins": [
+    {
+      "name": "venoxia",
+      "version": "0.1.0",
+      "description": "Convierte la especificación en un contrato que falla en CI cuando miente. Cada requisito nace con su oráculo de verificación y su nivel de confianza declarado; sin oráculo, no compila. Incluye validador determinista, guardián PreToolUse y motor de divergencia con lectores aislados.",
+      "author": {
+        "name": "Oscar Arocha",
+        "email": "oscar.arocha@b2bcarts.com"
+      },
+      "category": "development",
+      "keywords": [
+        "spec-driven",
+        "specification",
+        "requirements",
+        "ears",
+        "verification",
+        "oracle",
+        "traceability",
+        "divergence",
+        "drift"
+      ],
+      "source": {
+        "source": "url",
+        "url": "https://github.com/oa2p-solutions/venoxia.git"
+      },
+      "homepage": "https://github.com/oa2p-solutions/venoxia",
+      "license": "MIT"
+    }
+  ]
+}
