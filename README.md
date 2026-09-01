@@ -10,7 +10,7 @@ La tesis es corta y cabe en tres frases. **Una especificación es una apuesta so
 
 En la práctica eso significa que cada requisito nace con dos campos que ninguna otra herramienta exige: `verifies:`, la ruta del test que resuelve la apuesta, y `confidence:`, el nivel de confianza declarado. Sin oráculo, no compila. Y como el validador es un script de Python sin modelo detrás, el veredicto es el mismo en tu portátil, en el CI y dentro de la conversación.
 
-Esta entrega cubre el **núcleo verificable**: el formato del requisito, el validador de 16 reglas, el guardián y el motor de divergencia.
+Esta entrega cubre el **núcleo verificable**: el acta del proyecto y su linter, el formato del requisito, el validador de 16 reglas, el guardián y el motor de divergencia.
 
 ## Instalación
 
@@ -19,7 +19,144 @@ claude plugin marketplace add oa2p-solutions/venoxia
 claude plugin install venoxia@venoxia
 ```
 
-Requiere Python 3 en el `PATH` (probado con 3.14). Los scripts usan **sólo la biblioteca estándar**: no hay `pip install`, ni entorno virtual, ni dependencias que mantener. `pytest` hace falta únicamente para ejecutar la suite de tests del propio plugin.
+Requiere Python 3 en el `PATH` (probado con 3.14). Los scripts usan **sólo la biblioteca estándar**: no hay `pip install`, ni entorno virtual, ni dependencias que mantener. La suite de tests del propio plugin tampoco pide nada: es `unittest`, de la biblioteca estándar.
+
+## Empezar un proyecto desde cero
+
+Venoxia empieza donde ya sabes qué comportamiento quieres, y durante la primera versión eso dejó fuera el caso más común de todos: el proyecto que todavía no existe. `/venoxia:specify` pide «el cambio, en una frase», y esa pregunta da por supuesto un sistema anterior del que esto es el delta. Sin producto no hay delta, y la primera media hora del plugin era un callejón sin salida.
+
+`/venoxia:charter` es el paso que faltaba. Éste es el recorrido completo, en el orden real en que ocurre.
+
+**1 · Monta el esqueleto del proyecto antes de adoptar Venoxia.** El `package.json`, el `tsconfig.json`, el `Cargo.toml`, la carpeta de tests, el linter, el primer commit: todo eso primero, y por dos razones distintas que apuntan al mismo sitio. La operativa es que **el guardián se activa en cuanto existe `.venoxia/`**, así que crear el acta antes que el andamiaje convierte cada escritura de configuración en una pelea con el hook. La de fondo es que **el andamiaje no es comportamiento**: nadie lo observa desde fuera, ningún test de aceptación lo comprueba y mañana se puede cambiar entero sin que ningún usuario note nada, que es exactamente la prueba que decide si algo pertenece a la spec. Especificar el `tsconfig.json` produce requisitos que se vuelven mentira en el primer refactor.
+
+**2 · `/venoxia:charter` — la entrevista.** Pregunta y no rellena: a qué problema se dedica el proyecto, quién lo va a usar y qué hace hoy esa gente sin él, qué queda fuera y por qué, y qué se está dando por supuesto sin haberlo comprobado. De ahí salen dos ficheros: `.venoxia/charter.md`, el acta, con el propósito, los usuarios, la lista **priorizada** de capabilities y las apuestas; y `.venoxia/principles.md`, las restricciones que toda spec de este proyecto respetará. El acta pasa por `charter_lint.py` antes de que la skill devuelva el control, igual que un delta pasa por `validate.py`: no es un documento de intenciones, es un documento que puede estar mal. Y termina dándote escrito el comando exacto del paso siguiente.
+
+**3 · `/venoxia:specify "<la capability de prioridad 1>"`.** Una sola, la primera de la tabla, con el texto de su columna «Qué podrá hacer». Escribe el `change.json`, la propuesta y el delta en EARS, cada requisito con su `verifies:` y su `confidence:` desde el primer borrador. Las capabilities 2 y 3 esperan: especificarlas ahora es escribir contra un sistema que todavía no ha contestado nada.
+
+**4 · `/venoxia:validate` — y falla en `V07`. Eso es lo correcto.** El fichero de test que la spec nombra en `verifies:` todavía no existe, el disco contradice a la spec y el validador lo dice. **Ese rojo no es un problema de configuración: es la tesis del plugin funcionando en tu proyecto el primer día.** Si aquí saliera verde, `verifies:` sería un campo decorativo y la spec podría prometer un oráculo inexistente sin coste. No crees un fichero de test vacío para apagarlo: eso es escribir el oráculo para que el validador calle, que es precisamente lo que el campo existe para impedir.
+
+**5 · Escribes el test, con su `@covers`.** En la ruta exacta que dice `verifies:`, con el comentario `@covers R-XXX-000` dentro. El test falla, claro que falla: todavía no hay implementación. Lo que tiene que estar verde en este punto es el validador, no la suite. Vuelve a pasar `/venoxia:validate` hasta que salga `0`.
+
+**6 · `/venoxia:diverge`.** Dos lectores aislados con consignas distintas y el abogado del diablo leen el delta sin haber estado en la conversación donde nació, y el script calcula la divergencia y formula las preguntas cerradas. Con el validador y la divergencia los dos en `0`, y sólo entonces, el `change.json` pasa a `"state": "validated"`.
+
+**7 · El guardián te deja escribir código.** La misma escritura bajo `src/` que en el paso 1 habría sido una pelea, y que sin change validado se habría denegado con un mensaje diciendo qué falta, ahora entra por el tercer camino del guardián: hay contrato firmado y hay delta al lado que lo acredita. A partir de aquí el bucle es el corto —`/venoxia:specify` de la capability 2, y otra vez—, y el acta sólo se vuelve a abrir para añadir una fila o resolver una apuesta.
+
+En comandos, la primera media hora entera:
+
+```text
+# 1 · el esqueleto primero: sin .venoxia/, el guardián no estorba
+npm create vite@latest . && git init && git add -A && git commit -m "esqueleto"
+
+# 2 · la entrevista: escribe .venoxia/charter.md y .venoxia/principles.md
+/venoxia:charter
+
+# 3-7 · una vuelta por capability, empezando por la de prioridad 1
+/venoxia:specify "reservar una mesa para una fecha y hora"
+/venoxia:validate     # falla en V07: el test no existe todavía. Correcto.
+#   … escribes test/booking/reserve.spec.ts con «@covers R-BOO-001» dentro
+/venoxia:validate     # verde
+/venoxia:diverge      # si converge, change.json → "state": "validated"
+#   … y ahora sí, el guardián deja escribir src/
+```
+
+## El acta del proyecto
+
+`.venoxia/charter.md` es al proyecto lo que la capability es a un trozo de comportamiento: el documento que vive para siempre y contra el que se contrasta todo lo que venga después. Encabezados y claves en inglés, prosa en español, igual que el resto del plugin. Parseable con expresiones regulares, legible sin herramientas.
+
+```markdown
+# Reservas Bistró · Acta del proyecto
+
+## Purpose
+
+Que un restaurante pequeño deje de perder mesas por reservas apuntadas en un
+cuaderno que sólo entiende quien lo escribió.
+
+## Users
+
+### owner · Dueño del restaurante
+- **hoy:** apunta las reservas en un cuaderno y las repasa cada mañana.
+- **con esto:** ve la ocupación de la noche desde el móvil sin llamar a nadie.
+
+### diner · Cliente que reserva
+- **hoy:** llama por teléfono y espera a que alguien coja.
+- **con esto:** reserva desde el enlace del perfil, a cualquier hora.
+
+## Capabilities
+
+| # | Capability | Qué podrá hacer | Done when | Risk |
+|---|---|---|---|---|
+| 1 | `booking` | reservar una mesa para una fecha y hora | un cliente reserva y recibe la confirmación con su hora | high |
+| 2 | `availability` | ver qué queda libre esta noche | el dueño abre el móvil y ve las mesas libres de hoy | medium |
+
+## Out of scope
+
+- **Pagos y señales.** No se cobra nada en la v1; el riesgo regulatorio no compensa
+  hasta que haya reservas de verdad.
+- **App nativa.** La web basta para lo que promete el propósito.
+
+## Bets
+
+### B-001 · Nadie anula por WhatsApp
+
+Damos por hecho que un cliente que quiere anular usará el enlace y no el
+teléfono del restaurante.
+
+confidence: low
+  why:      no lo hemos comprobado con ningún restaurante real
+  revisit:  2026-12-15
+  fatal:    no
+```
+
+### Qué dice cada sección
+
+| Sección | Qué contiene | Por qué existe |
+|---|---|---|
+| `## Purpose` | De una a tres frases en prosa: qué cambia en el mundo cuando esto exista. | Un propósito escrito en términos de lo que se programa —«una API REST con autenticación»— no permite decidir nada; uno escrito en términos de lo que cambia sí, y es lo que zanja las discusiones de alcance seis semanas después. |
+| `## Users` | Uno o más `### <slug> · <Nombre del rol>`, cada uno con las viñetas `**hoy:**` y `**con esto:**`. El slug va en kebab-case. | El «hoy» es la parte que nadie escribe y la que más decide: si no sabes decir qué hace esa persona ahora mismo sin tu producto, no sabes qué le vas a quitar de encima, y probablemente estés construyendo para nadie. |
+| `## Capabilities` | La tabla priorizada, con las cinco columnas exactas `#`, `Capability`, `Qué podrá hacer`, `Done when` y `Risk`. La prioridad es un entero que empieza en 1 y no se repite; `Risk` es `high`, `medium` o `low`. | Es el plan de trabajo y a la vez el índice de `.venoxia/capabilities/`: el slug de cada fila, en kebab-case y entre acentos graves, es el mismo nombre del directorio que creará `/venoxia:specify`. |
+| `## Out of scope` | Una o más viñetas `- **<Qué>.** <por qué no>`. | Un proyecto se define tanto por lo que no hace como por lo que hace. Sin esta lista escrita, todo está dentro. |
+| `## Bets` | Cero o más `### B-NNN · <título>`, cada una con su prosa y un bloque de metadatos con `confidence`, `why`, `revisit` y `fatal`. Misma forma que el bloque de metadatos de un requisito. | Es lo que `confidence:` hace por un requisito, un escalón más arriba: qué se está suponiendo, cuánto se confía, cuándo se vuelve a mirar y si equivocarse mata el proyecto o sólo cuesta una semana. |
+
+### Por qué `Done when` y `Out of scope` son obligatorios
+
+Son las dos casillas que la entrevista no deja en blanco, y las dos por el mismo motivo por el que un requisito no puede quedarse sin `verifies:`.
+
+**`Done when` es el oráculo de la capability.** Una capability sin criterio de terminación se termina cuando alguien se cansa, y eso convierte la tabla de prioridades en una lista de temas. Lo que se pide no es «la funcionalidad está completa», que no se puede comprobar, sino una escena observable: *un cliente reserva y recibe la confirmación con su hora*. Escrito así, a la pregunta «¿ya está?» contesta cualquiera mirando la pantalla, y no hace falta que la conteste quien la implementó, que es justo la persona con menos criterio para hacerlo.
+
+**`Out of scope` es la frontera.** Un proyecto sin fronteras escritas las tiene igualmente: las descubre tarde, de una en una y en mitad de una entrega. Y cada viñeta lleva el porqué, no sólo el qué, porque un «pagos, no» a secas se vuelve a discutir la semana que viene, mientras que un «pagos no, porque el riesgo regulatorio no compensa hasta que haya reservas de verdad» se puede revisar el día en que esa condición cambie. Una frontera sin razón no es una decisión, es un capricho, y los caprichos no sobreviven a la primera reunión.
+
+### Las 16 reglas del linter del acta
+
+Todas deterministas, igual que las del validador: ninguna consulta a un modelo. `scripts/charter_lint.py` sale con `0` si el acta cumple, `1` si no y `2` ante un error de uso. Con `--strict`, los avisos también hacen fallar.
+
+| Regla | Qué comprueba | Severidad |
+|---|---|---|
+| `C01` | Están las cinco secciones: `## Purpose`, `## Users`, `## Capabilities`, `## Out of scope` y `## Bets`. Un encabezado escrito en español (`## Propósito`) se reconoce para poder decírtelo en la pista, pero no cuenta como sección: los estructurales van en inglés porque los lee el linter. | error |
+| `C02` | El propósito no está vacío y no pasa de tres frases. | error |
+| `C03` | Hay al menos un usuario, y cada uno declara sus dos viñetas —`**hoy:**` y `**con esto:**`— sin dejar ninguna vacía. | error |
+| `C04` | La tabla de capabilities trae al menos una fila, bajo las cinco columnas exactas `# \| Capability \| Qué podrá hacer \| Done when \| Risk`. | error |
+| `C05` | El slug de cada capability es kebab-case en minúsculas y no se repite. Es el nombre del directorio bajo `.venoxia/capabilities/`. | error |
+| `C06` | Las prioridades son enteros que cubren de 1 a N: sin huecos y sin repetidos. | error |
+| `C07` | Cada capability declara su `Done when`. **Es lo que `verifies:` es a un requisito, una fase antes.** | error |
+| `C08` | Ese `Done when` no **empieza** por un verbo de implementación (`implementar`, `crear la tabla`, `usar`, `refactorizar`, `montar`, `configurar`, `integrar`, `desplegar`). Mencionar uno de pasada no cuenta: la regla mira sólo el arranque de la frase, para no convertirse en el falso positivo que haría que alguien la apagara entera. | error |
+| `C09` | `Risk` vale exactamente `high`, `medium` o `low`. | error |
+| `C10` | `## Out of scope` trae al menos una entrada. Un proyecto que todavía no le ha dicho que no a nada no ha decidido nada. | error |
+| `C11` | Cada apuesta declara `confidence:` con uno de los tres niveles. | error |
+| `C12` | Una apuesta en `low` obliga a `revisit:` con fecha ISO `YYYY-MM-DD` estrictamente futura. Misma exigencia que `V10` le hace a un requisito. | error |
+| `C13` | El identificador de la apuesta casa `B-NNN` y es único en el acta. | error |
+| `C14` | `fatal:`, cuando está, vale `yes` o `no`. | warning |
+| `C15` | El acta declara alguna capability de riesgo `high` y no declara ninguna apuesta: una suposición que nadie ha escrito es una suposición que nadie va a revisar. | warning |
+| `C16` | El orden en que se está construyendo no es el que el acta declara: alguna capability con `spec.md` vivo va detrás de otra que todavía no tiene ninguno. Aviso y no error, porque adelantarse puede estar justificado; lo que no puede es quedarse sin decir. | warning |
+
+Y como en el validador, el parseo tiene su propio código: `P01` (error) es un acta que no se ha podido leer, y es un fallo de Venoxia, no del acta.
+
+```bash
+python3 scripts/charter_lint.py                       # .venoxia/charter.md bajo el directorio actual
+python3 scripts/charter_lint.py --root /ruta/proyecto --strict
+python3 scripts/charter_lint.py --json --no-color
+```
+
+Ni un proyecto sin `.venoxia/` ni un `.venoxia/` sin acta son un error: el linter lo dice y sale con `0`. Un proyecto que no ha adoptado Venoxia no falla por no haberlo adoptado, y uno que la adoptó antes de que existiera el acta tampoco.
 
 ## El formato del requisito
 
@@ -60,13 +197,14 @@ El ID vive en el encabezado (`### R-CHK-014 · Título`): estable, linkable y pa
 
 El vínculo con el test es **doble**: la spec apunta al fichero con `verifies:`, y el fichero apunta de vuelta al requisito con un comentario `@covers R-CHK-014`. El validador comprueba las dos direcciones (`V07`, `V08`, `V16`), de modo que borrar el test rompe la spec y renombrar el requisito rompe el test.
 
-## Las tres skills
+## Las cuatro skills
 
 Se usan en este orden:
 
-1. **`/venoxia:specify "…"`** — lee los principios y las capabilities existentes, escribe la `proposal.md` y el delta en EARS, con `verifies:` y `confidence:` en cada requisito desde el primer borrador.
-2. **`/venoxia:validate`** — ejecuta el validador determinista sobre `.venoxia/` y presenta los findings agrupados por severidad, con la corrección concreta de cada uno.
-3. **`/venoxia:diverge`** — despacha dos lectores aislados y un abogado del diablo sobre el delta, y enfrenta sus lecturas para convertir cada desacuerdo en una pregunta cerrada.
+1. **`/venoxia:charter`** — la entrevista que define el proyecto antes de que exista código: propósito, usuarios, capabilities priorizadas, fuera de alcance y apuestas. Escribe `.venoxia/charter.md` y `.venoxia/principles.md`, y entrega el `/venoxia:specify` exacto de la capability de prioridad 1. Se usa una vez por proyecto; después sólo se vuelve al acta para añadir una fila o resolver una apuesta.
+2. **`/venoxia:specify "…"`** — lee el acta, los principios y las capabilities existentes, escribe la `proposal.md` y el delta en EARS, con `verifies:` y `confidence:` en cada requisito desde el primer borrador.
+3. **`/venoxia:validate`** — ejecuta el validador determinista sobre `.venoxia/` y presenta los findings agrupados por severidad, con la corrección concreta de cada uno.
+4. **`/venoxia:diverge`** — despacha dos lectores aislados y un abogado del diablo sobre el delta, y enfrenta sus lecturas para convertir cada desacuerdo en una pregunta cerrada.
 
 El `change.json` pasa a `"state": "validated"` sólo cuando validador **y** divergencia pasan.
 
@@ -142,21 +280,23 @@ Y uno que **ya no** permite: un `change.json` que existe y cuyo **contenido** es
 ## Verificar regresiones
 
 ```bash
-python3 -m pytest tests/ -q
+python3 -m unittest discover -s tests -q
 claude plugin validate . --strict
 claude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *)' Write
 ```
 
-- `pytest` cubre el núcleo determinista: un caso en positivo y otro en negativo por cada regla `V01`–`V16`, más la gramática del parser, el esquema JSON del informe, los cinco caminos del guardián y la aritmética de divergencia. Es la parte con cobertura obligatoria: de ella depende la credibilidad del resto.
+- La suite cubre el núcleo determinista: un caso en positivo y otro en negativo por cada regla `V01`–`V16` del validador y por cada regla `C01`–`C16` del linter del acta, más la gramática del parser, el esquema JSON del informe, los cinco caminos del guardián y la aritmética de divergencia. Es la parte con cobertura obligatoria: de ella depende la credibilidad del resto. Y es `unittest` de la biblioteca estándar a propósito: si para ejecutarla hiciera falta instalar algo, habría un día en que nadie la ejecutaría.
 - `claude plugin validate . --strict` comprueba la estructura del plugin: manifiesto, frontmatter de skills y agentes, y el hook declarado.
 - `claude plugin eval venoxia --ablation with-without …` mide lo único que no se puede probar con asserts: que el plugin cambia el resultado. El `--allow-tools` no es decorativo: `Bash` y `Write` están con verja, y sin ese permiso de operador los cinco casos fallan por falta de permisos en vez de por regresión (el detalle, en [`evals/README.md`](evals/README.md)). Compara la ejecución con y sin él sobre casos que deben detectarse (código de estado ambiguo, efecto parcial ambiguo, oráculo ausente, presupuesto de incertidumbre excedido) y uno que no debe dar falso positivo (spec limpia).
+
+Y los ejemplos de este README no son decorado: el acta y el requisito que enseña se extraen a ficheros reales y se pasan por `charter_lint.py` y `validate.py` antes de publicarlos. Un README que muestra un ejemplo que su propio linter rechazaría es exactamente el fallo que este plugin existe para impedir, y ya pasó una vez, con un `SHALL` que la regla `V14` marcaba.
 
 ## Qué queda fuera de esta entrega
 
 Diseñado, documentado y pospuesto hasta que el núcleo se use en una feature real:
 
 - Triaje por riesgo de tres vías (DIRECTA / NORMAL / CRÍTICA).
-- PR/FAQ y el bucle de promesas con fecha de revisión.
+- PR/FAQ como documento de origen enlazable desde `from:`. El bucle de promesas con fecha de revisión ya no está aquí: lo cubre el bloque `## Bets` del acta, con su `revisit:` y su `fatal:`.
 - `trocear` / `construir` / `revisar` con git worktrees.
 - Diario de deriva con estadística acumulada que reescribe las plantillas.
 - Panel de salud de capabilities.

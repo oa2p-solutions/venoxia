@@ -17,7 +17,7 @@ allowed-tools:
 
 El cambio a especificar: **$ARGUMENTS**
 
-Si llega vacío, pregunta por él en una sola frase y espera. Sin cambio no hay nada que especificar y adivinarlo produce una spec que nadie pidió.
+Si llega vacío, mira primero qué hay en el proyecto. Cuando no existe `.venoxia/charter.md` **ni** ninguna capability bajo `.venoxia/capabilities/`, preguntar por «el cambio, en una frase» no tiene respuesta posible: no hay comportamiento previo que cambiar, así que no hay cambio. Remite entonces a **`/venoxia:charter`**, que es la entrevista que define el propósito, los usuarios y la lista priorizada de capabilities, y que termina entregando el `/venoxia:specify` exacto de la primera. Con acta escrita o con capabilities vivas sí hay de dónde partir: pregunta por el cambio en una sola frase y espera. Sin cambio no hay nada que especificar y adivinarlo produce una spec que nadie pidió.
 
 Produces tres cosas y sólo tres, todas bajo `.venoxia/`: un `change.json`, un `proposal.md` y uno o más ficheros de delta. **Nunca tocas código de producción desde esta skill.** Escribir la spec y escribir la implementación en el mismo impulso es exactamente lo que el guardián existe para impedir.
 
@@ -41,19 +41,22 @@ Produces tres cosas y sólo tres, todas bajo `.venoxia/`: un `change.json`, un `
 
 No se propone nada hasta que este inventario existe. Especificar sin leer lo que ya hay produce duplicados —el mismo comportamiento con dos IDs y dos redacciones distintas— y contradicciones, que son peores: dos requisitos vivos que se niegan el uno al otro y un validador que no puede detectarlo porque los dos están bien formados.
 
-1. **`.venoxia/principles.md`**, entero. Son las restricciones que toda spec de este proyecto respeta. Si el fichero no existe pero `.venoxia/` sí, sigue adelante y dilo en la entrega: estás redactando sin principios declarados.
-2. **Todas las capabilities vivas**: `Glob` sobre `.venoxia/capabilities/*/spec.md` y `Read` de **cada** fichero completo. No basta con `grep`, ni con leer la que crees que toca. Un requisito de `billing` puede contradecir el que vas a escribir en `checkout`, y sólo lo ves si lo has leído.
-3. **Los changes en vuelo**: `Glob` sobre `.venoxia/changes/*/change.json`. Un change con `state` distinto de `archived` que toque la misma capability es un conflicto que hay que resolver **antes** de escribir: o se continúa aquel change, o se dice explícitamente en la propuesta por qué este va aparte.
+1. **`.venoxia/charter.md`**, si existe. El acta dice para qué existe el proyecto, quién lo usa, qué capabilities están previstas y en qué orden, qué se declaró fuera de alcance y qué se está dando por supuesto. Es el marco dentro del cual el cambio que te piden cae o no cae, y saberlo antes de escribir sale mucho más barato que descubrirlo después. Si no existe, sigue: los proyectos que adoptaron Venoxia antes que el acta no la tienen, y su ausencia no bloquea nada.
+2. **`.venoxia/principles.md`**, entero. Son las restricciones que toda spec de este proyecto respeta. Si el fichero no existe pero `.venoxia/` sí, sigue adelante y dilo en la entrega: estás redactando sin principios declarados.
+3. **Todas las capabilities vivas**: `Glob` sobre `.venoxia/capabilities/*/spec.md` y `Read` de **cada** fichero completo. No basta con `grep`, ni con leer la que crees que toca. Un requisito de `billing` puede contradecir el que vas a escribir en `checkout`, y sólo lo ves si lo has leído.
+4. **Los changes en vuelo**: `Glob` sobre `.venoxia/changes/*/change.json`. Un change con `state` distinto de `archived` que toque la misma capability es un conflicto que hay que resolver **antes** de escribir: o se continúa aquel change, o se dice explícitamente en la propuesta por qué este va aparte.
 
 Con eso, construye un inventario mental: qué capabilities existen, qué promete cada una, qué IDs están ocupados y dónde está la frontera de cada una.
 
-**Si `.venoxia/` no existe**, el proyecto no ha adoptado Venoxia. Dilo antes de escribir nada y pide al usuario los principios en dos o tres frases; con ellos escribes `.venoxia/principles.md`, y el resto del árbol lo van creando los `Write` de los pasos siguientes. No inventes principios: unos fabricados por ti son peores que ninguno, porque parecen acordados.
+**Si `.venoxia/` no existe**, el proyecto no ha adoptado Venoxia. Dilo antes de escribir nada, y distingue dos situaciones que no se arreglan igual. Si el proyecto está **en cero** —no hay producto todavía y lo que falta no es una spec, sino saber qué se construye—, éste no es el camino: es `/venoxia:charter`, que hace la entrevista, escribe el acta y los principios, y sale con la primera capability ya nombrada y priorizada. Si el proyecto **ya tiene producto** y sólo le falta adoptar Venoxia, pide al usuario los principios en dos o tres frases; con ellos escribes `.venoxia/principles.md`, y el resto del árbol lo van creando los `Write` de los pasos siguientes. No inventes principios: unos fabricados por ti son peores que ninguno, porque parecen acordados.
 
 ## Paso 2 · Decidir el alcance y escribir la propuesta
 
 **Capability nueva o modificación de una existente.** El criterio no es el tamaño del cambio, es el propósito: una capability es un conjunto coherente de comportamiento observable con una sola razón de existir. Si el cambio cabe bajo el propósito que la capability ya declara, es una **modificación**. Sólo si exige escribir un propósito nuevo es una **capability nueva**.
 
 Ante la duda, modifica. Una capability nueva que se solapa con una existente es el error más caro de esta fase: parte en dos la verdad sobre un mismo comportamiento y a partir de ahí las dos mitades divergen sin que nada lo señale.
+
+**Si hay acta, la capability debería estar en su tabla.** Busca el slug en `## Capabilities` de `.venoxia/charter.md`. Si está, úsalo tal cual: el acta y `.venoxia/capabilities/<slug>/spec.md` nombran la misma cosa, y bautizarla distinto aquí parte la trazabilidad en dos sin que ninguna regla pueda verlo. Si **no** está, dilo y pregunta si se añade al acta antes de seguir. Puede que el acta se quedara corta, y entonces se añade una fila y listo; o puede que este cambio esté fuera de lo que el proyecto declaró que iba a hacer, y ésa es exactamente la conversación que conviene tener antes de escribir la spec y no después de implementarla.
 
 Después:
 

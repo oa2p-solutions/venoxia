@@ -11,7 +11,7 @@
 
 Lo que distingue a Venoxia de las herramientas existentes: la spec deja de ser prosa y pasa a ser un contrato que **falla en CI cuando miente**. Cada requisito nace con su oráculo de verificación y su nivel de confianza; sin oráculo, no compila.
 
-Esta entrega cubre el **núcleo verificable** (fases 01-03 del diseño): formato del requisito, validador determinista, guardián que lo hace inevitable, y motor de divergencia. Es el 70% del valor y se prueba contra una feature real en días.
+Esta entrega cubre el **núcleo verificable** (fases 01-03 del diseño): formato del requisito, validador determinista, guardián que lo hace inevitable, y motor de divergencia. La Fase 7 le añade la puerta de entrada que faltaba: el acta del proyecto y su linter, para que el plugin sirva también antes de que exista la primera línea de código. Es el 70% del valor y se prueba contra una feature real en días.
 
 Greenfield: no hay código previo. `~/Developments/ia/spec/` contiene los clones de `github/spec-kit` y `Fission-AI/OpenSpec` usados como investigación. Referencias de formato útiles:
 
@@ -35,7 +35,7 @@ Greenfield: no hay código previo. `~/Developments/ia/spec/` contiene los clones
 
 ### Cambio respecto al documento de diseño
 
-Las skills de plugin se invocan como `/<plugin>:<skill>`, así que el prefijo `vx-` sería redundante. **Nombres definitivos:** `/venoxia:specify`, `/venoxia:validate`, `/venoxia:diverge`. Actualizar el artifact al cerrar la entrega.
+Las skills de plugin se invocan como `/<plugin>:<skill>`, así que el prefijo `vx-` sería redundante. **Nombres definitivos:** `/venoxia:charter`, `/venoxia:specify`, `/venoxia:validate`, `/venoxia:diverge`. Actualizar el artifact al cerrar la entrega.
 
 ---
 
@@ -48,6 +48,7 @@ venoxia/
 │   └── marketplace.json          marketplace de un solo plugin
 │
 ├── skills/
+│   ├── charter/SKILL.md          entrevistar y escribir el acta del proyecto
 │   ├── specify/SKILL.md          redactar capability + delta + oráculos
 │   ├── diverge/SKILL.md          despachar lectores y reportar divergencia
 │   └── validate/SKILL.md         envoltorio legible de validate.py
@@ -63,6 +64,7 @@ venoxia/
 │   ├── validate.py               EL CONTRATO · determinista, sin LLM
 │   ├── guardian.py               PreToolUse · fail-open
 │   ├── diff_readings.py          compara lecturas · aritmética en código
+│   ├── charter_lint.py           EL ACTA · 16 reglas C01–C16, sin LLM
 │   └── venoxia/
 │       ├── parser.py
 │       ├── model.py
@@ -70,11 +72,12 @@ venoxia/
 │
 ├── templates/
 │   ├── capability.md
+│   ├── charter.md
 │   ├── delta.md
 │   └── proposal.md
 │
 ├── evals/                        casos para `claude plugin eval`
-├── tests/                        pytest sobre validate.py y el parser
+├── tests/                        unittest de la stdlib sobre scripts y parser
 ├── README.md
 └── LICENSE
 ```
@@ -83,6 +86,7 @@ venoxia/
 
 ```
 .venoxia/
+├── charter.md                    acta del proyecto · propósito, usuarios, capabilities
 ├── principles.md
 ├── capabilities/<name>/spec.md    estado actual · vive para siempre
 ├── changes/<id>/
@@ -163,7 +167,7 @@ El ID vive en el encabezado: estable, linkable, parseable. El bloque de metadato
 | `V16` | Test con `@covers` de un ID inexistente → comportamiento no especificado | warning |
 
 - [x] Flag `--strict` (warnings cuentan como fallo) y códigos de salida `0` / `1`
-- [x] `tests/` con pytest: un fixture por regla, en positivo y negativo. **Única parte con cobertura obligatoria** — de este componente depende la credibilidad de todo lo demás
+- [x] `tests/` con `unittest` de la stdlib: un fixture por regla, en positivo y negativo. **Única parte con cobertura obligatoria** — de este componente depende la credibilidad de todo lo demás
 - [x] `skills/validate/SKILL.md` — envoltorio que ejecuta el script y agrupa findings por severidad. `disable-model-invocation: false`, `allowed-tools: Bash(python3 *)`
 
 ---
@@ -255,6 +259,28 @@ El ID vive en el encabezado: estable, linkable, parseable. El bloque de metadato
 
 ---
 
+## Fase 7 · La puerta de entrada
+
+> Venoxia empezaba donde ya sabes qué comportamiento quieres, y ése resultó ser el hueco. El primer usuario que lo probó contra un proyecto en cero lo dijo entero:
+>
+> > «eso no define el proyecto, ni dice qué es lo que quiero construir. Este plugin es para alguien que está creando un proyecto de cero y necesita definir todo antes de que se escriba la primera línea de código.»
+>
+> Y tenía razón. `/venoxia:specify` pide «el cambio, en una frase»: una pregunta que da por supuesto un sistema anterior del que esto es el delta. Sin producto no hay delta, así que la primera media hora del plugin era un callejón sin salida. Faltaba el paso cero.
+
+**Qué se ha construido.** `/venoxia:charter`, la entrevista que define el proyecto antes de que exista una línea de código y produce un acta verificable: propósito, usuarios con su «hoy» y su «con esto», capabilities priorizadas con su criterio de terminación, fuera de alcance razonado y apuestas con fecha de revisión. El acta no es un documento de intenciones: tiene su propio linter determinista, igual que el requisito tiene el suyo. Y termina entregando el `/venoxia:specify` exacto de la capability de prioridad 1, que es la costura con todo lo demás.
+
+**Por qué el acta se valida y no se limita a existir.** Un documento de visión que nadie comprueba se convierte en decoración en tres semanas. Las dos casillas que no se pueden dejar en blanco son `Done when` y `Out of scope`: sin criterio de terminación, una capability se termina cuando alguien se cansa; sin fuera de alcance escrito, todo está dentro y la primera entrega no llega nunca. Las dos son la versión, a escala de proyecto, de lo que `verifies:` es a escala de requisito.
+
+- [x] `templates/charter.md` — encabezados estructurales y claves en inglés, prosa y comentarios guía en español, como el resto de plantillas
+- [x] `scripts/charter_lint.py` — 16 reglas `C01`–`C16` sobre `.venoxia/charter.md`, deterministas y sin modelo detrás. Mismos códigos de salida y mismas convenciones (`--json`, `--no-color`, `--strict`) que `validate.py`
+- [x] `skills/charter/SKILL.md` — la entrevista: pregunta, no rellena; escribe `.venoxia/charter.md` y `.venoxia/principles.md`; pasa el linter hasta verde antes de devolver el control, y entrega el `/venoxia:specify` de la primera capability
+- [x] `tests/test_charter_lint.py` — un caso en positivo y otro en negativo por cada regla `C01`–`C16`, con `unittest.TestCase` como el resto de la suite
+- [x] `skills/specify/SKILL.md` — lee el acta en el paso 1 junto con los principios; si no hay ni acta ni capabilities, remite a `/venoxia:charter` en vez de pedir «el cambio, en una frase»; si hay acta, comprueba que la capability figura en su tabla y pregunta antes de inventarse una fila
+- [x] `README.md` — «Empezar un proyecto desde cero» con el recorrido de siete pasos (esqueleto → acta → spec → el rojo correcto de `V07` → test → divergencia → código) y «El acta del proyecto» con las secciones y la tabla de las 16 reglas
+- [x] Verificar: los ejemplos de markdown del README pasados por `validate.py` y `charter_lint.py` **como ficheros reales**, no como bloques que nadie ejecuta. El README ya coló una vez un `SHALL` que su propia regla `V14` marcaba
+
+---
+
 ## Verificación de extremo a extremo
 
 Sobre un proyecto real, no un fixture:
@@ -266,7 +292,7 @@ Sobre un proyecto real, no un fixture:
 - [x] 5. Crear el test con `@covers R-CHK-014` → `/venoxia:validate` en verde
 - [x] 6. `/venoxia:diverge` → sobre la spec ambigua a propósito devuelve la pregunta con las dos lecturas enfrentadas; sobre la corregida, converge
 - [x] 7. Reintentar el `Write` de código → **ahora el guardián permite**
-- [x] 8. `python3 -m pytest tests/ -q` en verde
+- [x] 8. `python3 -m unittest discover -s tests -q` en verde
 - [x] 9. `claude plugin validate . --strict` y `claude plugin eval venoxia` en verde
 
 ---
@@ -276,7 +302,7 @@ Sobre un proyecto real, no un fixture:
 Diseñado, documentado y pospuesto hasta que el núcleo se use en una feature real:
 
 - Triaje por riesgo de tres vías (DIRECTA / NORMAL / CRÍTICA)
-- PR/FAQ y el bucle de promesas con fecha de revisión
+- PR/FAQ como documento de origen enlazable desde `from:`. El **bucle de promesas con fecha de revisión** ya no está aquí: lo cubre el bloque `## Bets` del acta, con su `revisit:` y su `fatal:` (Fase 7)
 - `trocear` / `construir` / `revisar` con git worktrees
 - Diario de deriva con estadística acumulada que reescribe las plantillas
 - Panel de salud de capabilities
