@@ -39,7 +39,11 @@ Venoxia empieza donde ya sabes qué comportamiento quieres, y durante la primera
 
 **6 · `/venoxia:diverge`.** Dos lectores aislados con consignas distintas y el abogado del diablo leen el delta sin haber estado en la conversación donde nació, y el script calcula la divergencia y formula las preguntas cerradas. Con el validador y la divergencia los dos en `0`, y sólo entonces, el `change.json` pasa a `"state": "validated"`.
 
-**7 · El guardián te deja escribir código.** La misma escritura bajo `src/` que en el paso 1 habría sido una pelea, y que sin change validado se habría denegado con un mensaje diciendo qué falta, ahora entra por el tercer camino del guardián: hay contrato firmado y hay delta al lado que lo acredita. A partir de aquí el bucle es el corto —`/venoxia:specify` de la capability 2, y otra vez—, y el acta sólo se vuelve a abrir para añadir una fila o resolver una apuesta.
+**7 · `/venoxia:verify` graba el rojo.** El test ya existe y ya está enlazado con `@covers`, pero todavía no hay implementación: es el momento exacto de dejar constancia de que el oráculo está en rojo, antes de escribir una sola línea de código de producción. El primer run de `.venoxia/changes/<id>/oracle.json` queda con `all_green: false` y, casi siempre, con todos los requisitos en `missing` o `red` — el punto de partida documentado, no una inferencia de memoria. *(Esta skill —`DEF-007`— no forma parte todavía de esta entrega; hasta que exista, el mismo rojo se graba a mano con `python3 scripts/oracle.py --change <id> --record`.)*
+
+**8 · El guardián te deja escribir código.** La misma escritura bajo `src/` que en el paso 1 habría sido una pelea, y que sin change validado se habría denegado con un mensaje diciendo qué falta, ahora entra por el tercer camino del guardián: hay contrato firmado y hay delta al lado que lo acredita.
+
+**9 · `/venoxia:verify` graba el verde.** El código hace pasar el test, y un segundo run de `oracle.json` lo deja en `all_green: true`: el ciclo rojo→verde queda escrito, no sólo recordado. A partir de aquí el bucle es el corto —`/venoxia:specify` de la capability 2, y otra vez—, y el acta sólo se vuelve a abrir para añadir una fila o resolver una apuesta.
 
 En comandos, la primera media hora entera:
 
@@ -50,13 +54,15 @@ npm create vite@latest . && git init && git add -A && git commit -m "esqueleto"
 # 2 · la entrevista: escribe .venoxia/charter.md y .venoxia/principles.md
 /venoxia:charter
 
-# 3-7 · una vuelta por capability, empezando por la de prioridad 1
+# 3-9 · una vuelta por capability, empezando por la de prioridad 1
 /venoxia:specify "reservar una mesa para una fecha y hora"
 /venoxia:validate     # falla en V07: el test no existe todavía. Correcto.
 #   … escribes test/booking/reserve.spec.ts con «@covers R-BOO-001» dentro
 /venoxia:validate     # verde
 /venoxia:diverge      # si converge, change.json → "state": "validated"
+python3 scripts/oracle.py --change <id> --record   # graba el rojo (hasta que exista /venoxia:verify)
 #   … y ahora sí, el guardián deja escribir src/
+python3 scripts/oracle.py --change <id> --record   # graba el verde
 ```
 
 ## El acta del proyecto
@@ -260,6 +266,60 @@ python3 scripts/validate.py --json --no-color
 ```
 
 Si el proyecto no tiene `.venoxia/`, el validador lo dice y sale con `0`: un proyecto que no ha adoptado Venoxia no falla por no haberlo adoptado.
+
+## Ejecutar el oráculo
+
+`validate.py` comprueba que cada requisito **declare** su oráculo en `verifies:` y que el fichero exista (`V07`); no lo ejecuta. `scripts/oracle.py` es la otra mitad: corre de verdad el test de cada requisito de un change y atribuye el resultado —`green`, `red`, `missing` o `timeout`— al requisito exacto, en vez de dejar que «¿pasa el test?» siga siendo una pregunta que sólo contesta la memoria de quien lo escribió.
+
+El proyecto declara cómo se corren sus tests una sola vez, en `.venoxia/venoxia.json`:
+
+```json
+{
+  "version": 1,
+  "test_command": "python3 -m unittest {files}",
+  "cwd": "."
+}
+```
+
+`{files}` se sustituye por las rutas de `verifies:` del requisito —todas, si declara varias—, separadas por un espacio y entrecomilladas con `shlex.quote`; `cwd` es relativo a la raíz del proyecto. Hay una plantilla en `templates/venoxia.json`. Sin este fichero, o con un `test_command` que no trae `{files}`, `oracle.py` no adivina nada: sale con el código `2` y un mensaje que nombra lo que falta.
+
+Uso directo, sobre un change concreto:
+
+```bash
+python3 scripts/oracle.py --change 2026-08-31-checkout --dry-run   # el comando de cada requisito, sin ejecutar nada
+python3 scripts/oracle.py --change 2026-08-31-checkout --json      # ejecuta y no graba
+python3 scripts/oracle.py --change 2026-08-31-checkout --record    # ejecuta y añade el run a oracle.json
+```
+
+Es **una invocación por requisito**, nunca una sola para todo el change: es lo único que permite decir cuál falló, no sólo cuántos. Un fichero de `verifies:` que no existe en disco no se invoca —queda `missing`, no `red`—, y un runner que se cuelga más allá de `--timeout` (600 s por omisión) se corta y queda `timeout`, sin traza en `stderr`.
+
+El esquema JSON, versión 1 y estable como el de `validate.py`:
+
+```json
+{
+  "version": 1,
+  "change": "2026-08-31-checkout",
+  "ran_at": "2026-09-04T18:00:00Z",
+  "runner": {"command": "python3 -m unittest {files}", "cwd": "/ruta/al/proyecto"},
+  "results": [
+    {
+      "requirement_id": "R-CHK-014",
+      "verifies": ["test/checkout/reservation.spec.ts"],
+      "status": "green",
+      "exit_code": 0,
+      "duration_ms": 42,
+      "output_tail": ""
+    }
+  ],
+  "counts": {"green": 1, "red": 0, "missing": 0, "timeout": 0, "total": 1},
+  "all_green": true,
+  "all_red": false
+}
+```
+
+Códigos de salida: `0` todos los requisitos en `green` (o `--dry-run`) · `1` alguno en `red`, `missing` o `timeout` · `2` error de uso.
+
+`--record` añade la ejecución a `.venoxia/changes/<id>/oracle.json` —`{"version": 1, "change": "<id>", "runs": [...]}`, con un tope de 50 runs— en vez de sustituirlo: así el historial de un change cuenta su propio ciclo rojo→verde. Un `oracle.json` que no se deja interpretar no detiene el registro: se avisa por `stderr` y se empieza un historial nuevo, con el mismo criterio que el guardián aplica a un `change.json` corrupto.
 
 ## El modelo de confianza del guardián
 

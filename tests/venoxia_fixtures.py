@@ -82,6 +82,10 @@ VALIDATE_PY = SCRIPTS_DIR / "validate.py"
 CHARTER_LINT_PY = SCRIPTS_DIR / "charter_lint.py"
 GUARDIAN_PY = SCRIPTS_DIR / "guardian.py"
 DIFF_READINGS_PY = SCRIPTS_DIR / "diff_readings.py"
+ORACLE_PY = SCRIPTS_DIR / "oracle.py"
+
+#: El runner falso que `oracle.py` invoca en los tests de `test_oracle.py`.
+FAKE_RUNNER_PY = TESTS_DIR / "fake_runner.py"
 
 # Segundos que se le conceden a cualquier subproceso antes de darlo por colgado.
 RUN_TIMEOUT = 30
@@ -768,11 +772,23 @@ class Project:
             chunks.extend(blocks)
         return self.write(relpath, "\n\n".join(chunks) + "\n" if chunks else "")
 
-    def test_file(self, relpath: str | Path, covers: Sequence[str] | str = ()) -> Path:
+    def test_file(
+        self,
+        relpath: str | Path,
+        covers: Sequence[str] | str = (),
+        *,
+        result: str | None = None,
+    ) -> Path:
         """Escribe un fichero de test de mentira con sus comentarios «@covers <ID>».
 
         `covers` admite un ID suelto o una lista. Con la lista vacía el fichero
         existe pero no cubre nada: es el caso negativo de V08.
+
+        `result` es el marcador que lee `tests/fake_runner.py` cuando
+        `oracle.py` lo invoca de verdad: `"red"` hace que el runner falso salga
+        con `1`, `"sleep 2"` hace que duerma dos segundos antes de decidir.
+        `None` (por defecto) no escribe marcador, así que el runner falso sale
+        con `0` — es el caso «green».
         """
         ids = [covers] if isinstance(covers, str) else list(covers)
         lines = [
@@ -781,6 +797,8 @@ class Project:
             "// tenga un fichero al que apuntar.",
         ]
         lines.extend(f"// @covers {identifier}" for identifier in ids)
+        if result:
+            lines.append(f"// RESULT: {result}")
         lines.extend(
             [
                 "",
@@ -792,7 +810,9 @@ class Project:
         )
         return self.write(relpath, "\n".join(lines))
 
-    def oracle(self, requirement_id: str, path: str | None = None) -> str:
+    def oracle(
+        self, requirement_id: str, path: str | None = None, *, result: str | None = None
+    ) -> str:
         """Crea el fichero de test que cubre `requirement_id` y devuelve su ruta relativa.
 
         Pensado para usarse dentro de la propia llamada a `requirement()`::
@@ -800,10 +820,13 @@ class Project:
             req = requirement(id="R-CHK-999", verifies=project.oracle("R-CHK-999"))
 
         Así V07 y V08 quedan satisfechas y el test rompe sólo lo que quería
-        romper.
+        romper. `result` se reenvía a `test_file()`: sirve para que
+        `tests/test_oracle.py` fabrique un requisito cuyo oráculo de verdad
+        —el runner falso de `fake_runner.py`— salga en rojo o se quede
+        dormido, sin dejar de cumplir V07/V08.
         """
         relpath = path or f"test/generated/{requirement_id.lower()}.spec.ts"
-        self.test_file(relpath, covers=[requirement_id])
+        self.test_file(relpath, covers=[requirement_id], result=result)
         return relpath
 
     def filler(
@@ -873,6 +896,22 @@ class Project:
         """Ruta absoluta del `readings/` de un change."""
         return self.path(f".venoxia/changes/{change_id}/readings")
 
+    def oracle_config(self, command: str, cwd: str = ".") -> Path:
+        """Escribe `.venoxia/venoxia.json` con el `test_command` y `cwd` dados.
+
+        Sin llamar a esto, un proyecto de `Project()` no tiene `venoxia.json`:
+        `oracle.py` sale con el error de uso que le corresponde (V-ORC-005).
+        """
+        return self.write(
+            ".venoxia/venoxia.json",
+            _json.dumps(
+                {"version": 1, "test_command": command, "cwd": cwd},
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+        )
+
     # -- Ejecución de los scripts -------------------------------------------
 
     def run(
@@ -882,15 +921,21 @@ class Project:
         stdin: str | None = None,
         cwd: str | Path | None = None,
         timeout: int = RUN_TIMEOUT,
+        env: Mapping[str, str] | None = None,
     ) -> CompletedRun:
         """Ejecuta un script de `scripts/` en un subproceso y devuelve su salida.
 
-        Es el escape hatch: `validate`, `guardian` y `diff` son atajos sobre
-        esto. El subproceso corre con `sys.executable`, con `cwd` dentro del
-        temporal, con un `HOME` falso y con `PYTHONDONTWRITEBYTECODE=1` para no
-        dejar `__pycache__` en el repositorio.
+        Es el escape hatch: `validate`, `guardian`, `diff` y `run_oracle` son
+        atajos sobre esto. El subproceso corre con `sys.executable`, con `cwd`
+        dentro del temporal, con un `HOME` falso y con
+        `PYTHONDONTWRITEBYTECODE=1` para no dejar `__pycache__` en el
+        repositorio. `env` añade o sobrescribe variables sobre ese entorno base
+        — lo usa `run_oracle` para pasarle `FAKE_RUNNER_LOG` al runner falso.
         """
         argv = [sys.executable, str(script), *[str(arg) for arg in args]]
+        full_env = self._env()
+        if env:
+            full_env.update(env)
         completed = subprocess.run(
             argv,
             input=stdin if stdin is not None else "",
@@ -898,7 +943,7 @@ class Project:
             text=True,
             timeout=timeout,
             cwd=str(cwd) if cwd is not None else str(self.root),
-            env=self._env(),
+            env=full_env,
         )
         return CompletedRun(
             returncode=completed.returncode,
@@ -978,6 +1023,29 @@ class Project:
         """Ejecuta `diff_readings.py --readings .venoxia/changes/<change_id>/readings/`."""
         return self.run(DIFF_READINGS_PY, "--readings", str(self.readings_dir(change_id)), *args)
 
+    def run_oracle(
+        self,
+        *args: str,
+        cwd: str | Path | None = None,
+        env: Mapping[str, str] | None = None,
+    ) -> CompletedRun:
+        """Ejecuta `oracle.py --root <root>` con los argumentos que se le pasen.
+
+        Hermano de `validate()`: mismos argumentos, mismo `CompletedRun`. `env`
+        llega tal cual a `run()` — pásale `{"FAKE_RUNNER_LOG": str(ruta)}` para
+        comprobar qué invocó `tests/fake_runner.py` y qué no.
+        """
+        return self.run(ORACLE_PY, "--root", str(self.root), *args, cwd=cwd, env=env)
+
+    def run_oracle_json(
+        self,
+        *args: str,
+        cwd: str | Path | None = None,
+        env: Mapping[str, str] | None = None,
+    ) -> CompletedRun:
+        """Atajo de `run_oracle("--json", …)`, que es lo que necesita `.json`."""
+        return self.run_oracle("--json", *args, cwd=cwd, env=env)
+
     # -- Interior ------------------------------------------------------------
 
     def _env(self) -> dict[str, str]:
@@ -1040,7 +1108,9 @@ __all__ = [
     "DEFAULT_SCENARIOS",
     "DEFAULT_VERIFIES",
     "DIFF_READINGS_PY",
+    "FAKE_RUNNER_PY",
     "GUARDIAN_PY",
+    "ORACLE_PY",
     "LIVE_FROM",
     "LIVE_NARRATIVE",
     "LIVE_REQUIREMENT_ID",

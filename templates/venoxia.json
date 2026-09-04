@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "test_command": "npx vitest run {files}",
+  "cwd": "."
+}

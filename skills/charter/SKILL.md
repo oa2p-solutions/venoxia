@@ -187,6 +187,8 @@ Una apuesta con `fatal: yes` y `confidence: low` es la línea más importante de
 
 Los que fuiste anotando durante la entrevista, más las convenciones técnicas. Va en el Paso 4, porque no se pregunta igual que lo demás.
 
+Aprovecha la misma tanda para una pregunta más, corta y de una sola vez: **«¿con qué comando corren los tests de este proyecto?»** («`npm test`», «`pytest`», «`npx vitest run`»…). No es un principio ni una convención: es lo que necesita `oracle.py` para ejecutar de verdad el oráculo de cada requisito, y preguntarlo aquí evita una segunda entrevista sólo para eso. Si el proyecto todavía no tiene tests —o el usuario no lo sabe todavía porque el esqueleto ni siquiera está montado—, no insistas ni lo inventes: se deja para más adelante y se dice en la entrega. Ver Paso 8.
+
 ### Cuando la respuesta no es una respuesta
 
 Cuatro casos, y los cuatro se arreglan con la pregunta siguiente, no señalando el error:
@@ -345,6 +347,16 @@ Si una de las dos secciones quedó vacía, bórrala en vez de dejar el hueco con
 
 Con una excepción, y es la que `C17` va a señalar: **si alguna fila de la tabla arbitra, la sección de dominio no se borra por vacía.** O lleva el desempate, o la entrevista todavía no ha terminado. Vuelve al Paso 4 y haz la pregunta con la tensión concreta delante.
 
+### El comando de test, si lo hay
+
+Con la respuesta de la Tanda F, escribe `.venoxia/venoxia.json` a partir de `${CLAUDE_PLUGIN_ROOT}/templates/venoxia.json`, sustituyendo `test_command` por el comando literal que dio el usuario y dejando `{files}` tal cual —es el marcador que sustituye `oracle.py`, no algo que se rellena aquí—:
+
+```json
+{"version": 1, "test_command": "npm test -- {files}", "cwd": "."}
+```
+
+Si el usuario no dio un comando —no lo sabe todavía, o el esqueleto del proyecto ni siquiera existe—, **no se inventa uno**: `.venoxia/venoxia.json` se deja sin crear y se dice en la entrega. `charter_lint.py` no lo echa en falta —no es un fichero suyo— y `oracle.py` seguirá dando su error de uso, con su propio remedio, hasta que alguien lo escriba.
+
 ## Paso 9 · Pasar el linter y corregir hasta verde
 
 ```bash
@@ -388,7 +400,7 @@ Termina con un informe corto, sin adornos:
 - **Las apuestas con `fatal: yes`, delante y por su nombre**, con el hecho que las resuelve. Si alguna es además `confidence: low`, ésa es la primera frase de la entrega.
 - **El desempate, si alguna fila arbitra**: el principio de dominio tal como quedó escrito, o —si el usuario prefirió no decidirlo hoy— la apuesta en la que se aparcó y el hecho que la resuelve. Es la línea del acta que más lejos llega: la va a leer cada `/venoxia:specify` de aquí en adelante, y es la única que decide comportamiento sin estar en ningún requisito.
 - El veredicto literal del linter.
-- Lo que quedó sin cerrar y qué haría falta para cerrarlo. Una casilla vacía se dice; no se disimula.
+- Lo que quedó sin cerrar y qué haría falta para cerrarlo. Una casilla vacía se dice; no se disimula. Si `.venoxia/venoxia.json` no se escribió porque nadie dio el comando de test todavía, dilo aquí explícitamente: sin él, `oracle.py` no puede correr el oráculo de ningún requisito.
 - Toda decisión que tomaste tú porque la entrevista no la cubría, marcada como tal. Una asunción tuya que el usuario no ve es una asunción que nadie revisa.
 - **El siguiente paso, tecleado.** Literalmente la celda «Qué podrá hacer» de la fila 1, entre comillas:
 

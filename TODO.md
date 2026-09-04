@@ -281,6 +281,23 @@ El ID vive en el encabezado: estable, linkable, parseable. El bloque de metadato
 
 ---
 
+## Fase 8 · El oráculo se ejecuta
+
+> `validate.py` comprueba que cada requisito **declare** su oráculo en `verifies:` y que el fichero exista; nunca lo ejecuta. La mitad de TDD que faltaba —correr el test y anotar si pasa— seguía siendo manual y de memoria, requisito a requisito, cada vez que alguien quería saber si un change ya estaba implementado de verdad.
+
+**Qué se ha construido (`DEF-004`).** `scripts/oracle.py`: ejecuta el `test_command` que el proyecto declara en `.venoxia/venoxia.json` una vez por requisito de un change, sustituyendo `{files}` por sus rutas de `verifies:`, y atribuye `green`/`red`/`missing`/`timeout` a cada uno. `--record` deja el historial en `.venoxia/changes/<id>/oracle.json`, con un tope de 50 runs. Mismo criterio que el resto del núcleo: determinista, sin modelo, códigos `0`/`1`/`2`.
+
+- [x] `scripts/oracle.py` — `load_config`, `collect_requirements` (reutiliza `venoxia.parser.parse_delta`), `run_one`/`run_all`, `analyse`, `build_payload`, `record`, `render_text`, `build_parser`/`main`; nunca lanza por los datos del proyecto
+- [x] `tests/fake_runner.py` — runner de mentira que lee un marcador (`RESULT: red` / `RESULT: sleep N`) de los ficheros que recibe y registra cada invocación, para poder comprobar qué se llamó y qué no
+- [x] `tests/test_oracle.py` — un caso por criterio de aceptación: todo en verde, un rojo nombrado, un `verifies:` inexistente que no se invoca, un timeout sin traceback, los dos errores de uso (`venoxia.json` ausente, `{files}` ausente), `--dry-run`, `--record` acumulando y sobreviviendo a un historial corrupto, el esquema estable y varias rutas en una sola invocación
+- [x] `tests/venoxia_fixtures.py` — `Project.oracle_config(command, cwd)`, `Project.run_oracle(*args)`/`run_oracle_json(*args)`, y `test_file(..., result=…)` para fabricar el marcador del runner falso
+- [x] `templates/venoxia.json` y `README.md` («## Ejecutar el oráculo», y el recorrido de siete pasos gana el rojo y el verde grabados)
+- [x] `skills/charter/SKILL.md` — la Tanda F pregunta el comando de test y el Paso 8 escribe `.venoxia/venoxia.json`; sin respuesta, se deja sin crear y se dice en la entrega
+- [ ] `DEF-006` — pendiente, fuera del alcance de esta tarea
+- [ ] `DEF-007` — la skill `/venoxia:verify` que envuelve `oracle.py` y mueve `change.json` a `verified`; pendiente, fuera del alcance de esta tarea. Hasta que exista, el mismo rojo y el mismo verde se graban a mano con `python3 scripts/oracle.py --change <id> --record`
+
+---
+
 ## Verificación de extremo a extremo
 
 Sobre un proyecto real, no un fixture:
