@@ -79,6 +79,7 @@ ensure_import_paths()
 
 # Los scripts de entrada, por si un test quiere invocarlos a mano.
 VALIDATE_PY = SCRIPTS_DIR / "validate.py"
+CHARTER_LINT_PY = SCRIPTS_DIR / "charter_lint.py"
 GUARDIAN_PY = SCRIPTS_DIR / "guardian.py"
 DIFF_READINGS_PY = SCRIPTS_DIR / "diff_readings.py"
 
@@ -918,6 +919,18 @@ class Project:
         """Atajo de `validate("--json", …)`, que es lo que necesitan `.rules()` y `.json`."""
         return self.validate("--json", *args, cwd=cwd)
 
+    def lint(self, *args: str, cwd: str | Path | None = None) -> CompletedRun:
+        """Ejecuta `charter_lint.py --root <root>` con los argumentos que se le pasen.
+
+        Hermano de `validate()`: mismos argumentos, mismo `CompletedRun`, sólo que
+        sobre `.venoxia/charter.md` en vez de sobre capabilities y deltas.
+        """
+        return self.run(CHARTER_LINT_PY, "--root", str(self.root), *args, cwd=cwd)
+
+    def lint_json(self, *args: str, cwd: str | Path | None = None) -> CompletedRun:
+        """Atajo de `lint("--json", …)`, que es lo que necesitan `.rules()` y `.json`."""
+        return self.lint("--json", *args, cwd=cwd)
+
     def guardian(
         self,
         tool_name: str = "Write",
@@ -1017,6 +1030,7 @@ __all__ = [
     "BLOCK_NAMES",
     "CAPABILITY_NAME",
     "CHANGE_ID",
+    "CHARTER_LINT_PY",
     "CompletedRun",
     "DEFAULT_CONFIDENCE",
     "DEFAULT_FROM",

@@ -103,7 +103,7 @@ teléfono del restaurante.
 
 confidence: low
   why:      no lo hemos comprobado con ningún restaurante real
-  revisit:  2026-12-15
+  revisit:  cuando hayamos hablado con tres restaurantes que ya reserven por enlace
   fatal:    no
 ```
 
