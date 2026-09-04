@@ -7,6 +7,3 @@ evals/results/
 # Salida de tools/coverage.py: counts/ y los .cover de trace, regenerables.
 /coverage/
 
-# Artefactos de sesión/orquestador, ajenos al contenido versionado del repo.
-/CLAUDE.md
-/notas.md
