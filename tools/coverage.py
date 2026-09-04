@@ -8,18 +8,35 @@ subprocess**, nunca importados. Una medida de cobertura ingenua —correr
 pasa dentro de esos subprocesos quedaría sin contar. Este script resuelve eso
 en dos mitades que se buscan la una a la otra:
 
-1. Aquí abajo se lanza la suite entera bajo::
-
-       python3 -m trace --count --file <dir>/counts --coverdir <dir> \\
-           --missing --ignore-dir <sys.prefix> --module unittest discover -s tests -q
-
-   con `VENOXIA_TRACE_DIR=<dir>` en el entorno del proceso de `unittest`.
+1. Aquí abajo se lanza la suite entera bajo `tools/trace_run.py`, el
+   envoltorio de `trace` de este mismo repositorio (no `python3 -m trace`
+   directamente — véase por qué en su docstring), con `VENOXIA_TRACE_DIR=<dir>`
+   en el entorno del proceso de `unittest`.
 
 2. `Project.run` (en `tests/venoxia_fixtures.py`) mira esa misma variable: si
-   está puesta, antepone el mismo `python3 -m trace --count --file <dir>/counts
-   --coverdir <dir> --missing --ignore-dir <sys.prefix>` a cada subproceso que
-   lanza. Como hereda el entorno del proceso de `unittest` (que ya la tiene),
-   esto ocurre sin que ningún test declare nada.
+   está puesta, antepone `[sys.executable, tools/trace_run.py]` a cada
+   subproceso que lanza. Como hereda el entorno del proceso de `unittest`
+   (que ya la tiene), esto ocurre sin que ningún test declare nada.
+
+`tools/trace_run.py` existe porque `python3 -m trace` tiene dos huecos que
+rompían esta medición:
+
+* `trace.main()` atrapa el `SystemExit` de lo que ejecuta con un
+  `except SystemExit: pass` explícito y nunca lo relanza: bajo esa medición,
+  cualquier script que sale con `sys.exit(N)` para `N != 0` devuelve `0` al
+  proceso que lo lanzó, así que un test que comprueba `returncode == 1` de
+  `validate.py` fallaba sólo por estar bajo `trace`, no por una regresión.
+* `scripts/guardian.py` termina siempre con `os._exit(0)` en su `finally`
+  fail-open — algo que ningún ajuste de este proyecto toca —, y `os._exit`
+  salta el volcado de resultados de `trace`, que sólo ocurre al retornar de
+  la ejecución que envuelve. `guardian.py` medía 0 % para siempre por esta
+  vía.
+
+`tools/trace_run.py` ejecuta el script en el mismo proceso con
+`runpy.run_path` dentro de `Trace.runctx`, captura el `SystemExit` real y
+sustituye `os._exit` por una función que vuelca las cuentas acumuladas antes
+de llamar al `os._exit` original — así los dos huecos se cierran sin tocar
+ni `guardian.py` ni ningún otro script medido.
 
 El fichero de cuentas (`<dir>/counts`) es uno solo: `trace` lo usa a la vez
 como `infile` y como `outfile`, así que cada proceso —el principal y cada
@@ -39,29 +56,10 @@ por debajo de 85 para los cinco scripts del núcleo determinista
 `oracle.py`). Las siguientes ejecuciones comparan contra ese fichero y fallan
 (código 1) si algún fichero baja de su umbral.
 
-El hueco conocido: `scripts/guardian.py`
------------------------------------------
-`guardian.py` termina **siempre** con `os._exit(0)` en un `finally` — es la
-garantía fail-open documentada en el README y una de las cosas que ningún
-ajuste de este proyecto puede tocar. `os._exit` salta la finalización del
-intérprete, y con ella el propio volcado de resultados de `trace`
-(`CoverageResults.write_results`, que sólo se llama **después** de que
-`Trace.runctx` retorne). Cuando el código bajo trace llama a `os._exit`, ese
-retorno nunca ocurre: ni el `.cover` de ese proceso ni su aportación al
-fichero de cuentas compartido llegan a escribirse. Comprobado a mano: tras
-cientos de invocaciones de `guardian.py` por la suite bajo
-`VENOXIA_TRACE_DIR`, `<dir>/guardian.cover` no existe nunca.
-
-Esto no es un hueco de qué líneas se ejecutan: es que **ninguna** medición de
-`guardian.py` por este camino puede superar el 0 %, para siempre, mientras
-`guardian.py` conserve el `os._exit` que el contrato de este proyecto exige
-conservar. Este script no lo esconde: lo reporta como «sin datos (os._exit
-antes de volcar)» en la tabla y, como el umbral de los cinco scripts del
-núcleo nunca baja de 85, `guardian.py` sale en rojo en cualquier ejecución.
-Es una tensión real entre dos exigencias del mismo encargo (no tocar el
-fail-open de `guardian.py`; medir su cobertura con `trace` sin excepciones) y
-se ha dejado documentada en vez de resuelta por un atajo — ver la tarea
-correspondiente en `TODO.md`.
+Con el envoltorio de `tools/trace_run.py`, `scripts/guardian.py` ya deja
+`.cover` como cualquier otro script: el hueco que documentaba esta sección
+(medía 0 % por el `os._exit` sin volcar) está cerrado, y su umbral se trata
+igual que el de los otros cuatro scripts del núcleo.
 
 Uso
 ---
@@ -94,6 +92,7 @@ TOOLS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TOOLS_DIR.parent
 SCRIPTS_DIR = REPO_ROOT / "scripts"
 TESTS_DIR = REPO_ROOT / "tests"
+TRACE_RUN_PY = TOOLS_DIR / "trace_run.py"
 
 DEFAULT_OUT_DIR = REPO_ROOT / "coverage"
 DEFAULT_THRESHOLD_FILE = TOOLS_DIR / "coverage-threshold.json"
@@ -200,34 +199,24 @@ class FileCoverage:
 
 
 def run_suite_under_trace(out_dir: Path) -> int:
-    """Lanza la suite bajo `trace --count`, con `VENOXIA_TRACE_DIR=out_dir`.
+    """Lanza la suite bajo `tools/trace_run.py -m unittest`, con `VENOXIA_TRACE_DIR=out_dir`.
 
-    Devuelve el código de salida de `unittest`, sólo a título informativo: no
-    decide el resultado de este script. Bajo `trace`, cualquier script que
-    termine con `sys.exit(N)` para `N != 0` sale con código `0` de todos
-    modos —`trace.main()` atrapa el `SystemExit` con un `except SystemExit:
-    pass` explícito y nunca lo relanza (verificado en el `trace.py` de la
-    stdlib) — así que un test que comprueba `returncode == 1` de un script
-    del núcleo falla bajo esta traza aunque el script decida bien. Eso hace
-    que `unittest` informe fallos aquí que no existen fuera de `trace`: es un
-    artefacto de la instrumentación, no una regresión, y por eso este script
-    no usa este código de salida para nada más que el aviso que imprime.
+    Devuelve el código de salida real de `unittest` (0 si `OK`, 1 si `FAILED`)
+    — a diferencia de `python3 -m trace`, que lo enmascaraba siempre a `0`
+    (véase el docstring de `tools/trace_run.py`). Ese código ya no es sólo
+    informativo: `main()` lo usa para hacer fallar la ejecución si la suite no
+    terminó en `OK` bajo medición, porque ahora un `FAILED` aquí es la suite
+    de verdad fallando, no un artefacto de la instrumentación.
+
+    `Project.run` (en `tests/venoxia_fixtures.py`) hereda `VENOXIA_TRACE_DIR`
+    de este entorno para todos los subprocesos que la suite lanza, así que
+    también ellos pasan por `tools/trace_run.py`.
     """
     out_dir.mkdir(parents=True, exist_ok=True)
-    counts_file = out_dir / "counts"
     argv = [
         sys.executable,
+        str(TRACE_RUN_PY),
         "-m",
-        "trace",
-        "--count",
-        "--file",
-        str(counts_file),
-        "--coverdir",
-        str(out_dir),
-        "--missing",
-        "--ignore-dir",
-        sys.prefix,
-        "--module",
         "unittest",
         "discover",
         "-s",
@@ -322,14 +311,7 @@ def print_gap_notes(coverage: dict[str, FileCoverage], thresholds: dict[str, int
         threshold = thresholds.get(key)
         if fc.has_data or threshold is None:
             continue
-        if key == "scripts/guardian.py":
-            print(
-                f"\n{key}: sin `.cover` — `os._exit(0)` en el fail-open impide que "
-                "`trace` vuelque resultados de este proceso. Ver el docstring de "
-                "este script y la tarea correspondiente en TODO.md."
-            )
-        else:
-            print(f"\n{key}: sin `.cover` en {DEFAULT_OUT_DIR} — ¿algún test lo ejercita?")
+        print(f"\n{key}: sin `.cover` en {DEFAULT_OUT_DIR} — ¿algún test lo ejercita?")
 
 
 def print_missing_for_failures(coverage: dict[str, FileCoverage], thresholds: dict[str, int]) -> None:
@@ -380,11 +362,15 @@ def main(argv: list[str] | None = None) -> int:
     threshold_file = Path(args.threshold_file)
 
     suite_returncode = run_suite_under_trace(out_dir)
-    print(
-        f"\n(la suite bajo trace devolvió {suite_returncode}; con VENOXIA_TRACE_DIR puesta, "
-        "un script que sale con sys.exit(N!=0) informa returncode 0 igualmente — ver el "
-        "docstring de este script. No se usa este código para nada más.)"
-    )
+    if suite_returncode != 0:
+        print(
+            f"\nLa suite no terminó en OK bajo medición (código {suite_returncode}): "
+            "esto ya no es un artefacto de la instrumentación — con tools/trace_run.py "
+            "el código de salida es el real de unittest. Corrige la suite antes de fiarte "
+            "de la tabla de abajo."
+        )
+    else:
+        print("\nLa suite terminó en OK bajo medición.")
 
     coverage = measure(out_dir)
 
@@ -417,7 +403,7 @@ def main(argv: list[str] | None = None) -> int:
     print_gap_notes(coverage, thresholds)
     print_missing_for_failures(coverage, thresholds)
 
-    return 0 if ok else 1
+    return 0 if ok and suite_returncode == 0 else 1
 
 
 if __name__ == "__main__":

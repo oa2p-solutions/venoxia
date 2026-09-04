@@ -1892,6 +1892,42 @@ class GuardianIoFailOpenTest(GuardianTestCase):
 
 
 # ---------------------------------------------------------------------------
+# La línea de comandos: «--help» y argumentos que no debería recibir
+# ---------------------------------------------------------------------------
+
+
+class GuardianCliArgumentsTest(GuardianTestCase):
+    """`main()` no sólo lee el payload por stdin: también mira `sys.argv`.
+
+    Ningún otro test de este fichero pasa argumentos —todos invocan por
+    stdin, que es como Claude Code llama al hook de verdad—, así que
+    `write_text`, `warn` y la rama de ayuda quedaban sin ejercitar.
+    """
+
+    def test_help_flag_prints_help_text_and_exits_zero_without_reading_stdin(self):
+        project = self.make_project()
+        run = project.run(GUARDIAN_PY, "--help", stdin="")
+        self.assertEqual(0, run.returncode, run.describe())
+        self.assertIn("guardian.py", run.stdout)
+        self.assertIn("PreToolUse", run.stdout)
+        self.assertEqual("", run.stderr)
+
+    def test_short_help_flag_is_recognised_too(self):
+        project = self.make_project()
+        run = project.run(GUARDIAN_PY, "-h", stdin="")
+        self.assertEqual(0, run.returncode, run.describe())
+        self.assertIn("guardian.py", run.stdout)
+
+    def test_unexpected_arguments_warn_on_stderr_but_still_decide(self):
+        """Un argumento que no es «--help» no detiene al guardián: sólo avisa."""
+        project = self.make_project()
+        run = project.run(GUARDIAN_PY, "--esto-no-existe", stdin="{}")
+        self.assert_allow(run, "argumento inesperado: sigue decidiendo, sólo avisa")
+        self.assertIn("no acepta argumentos", run.stderr)
+        self.assertIn("--esto-no-existe", run.stderr)
+
+
+# ---------------------------------------------------------------------------
 # El manifiesto del hook
 # ---------------------------------------------------------------------------
 

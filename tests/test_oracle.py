@@ -7,20 +7,37 @@ los ficheros de test con `project.test_file(..., result=…)`, que es lo que el
 runner falso lee para decidir su código de salida. `FAKE_RUNNER_LOG` deja
 constancia de cada invocación, para comprobar que un requisito «missing» no
 llega a invocar nada.
+
+Las clases a partir de `OracleConfigDetailErrorsTest` cierran el hueco de
+cobertura documentado en `TODO.md` (Fase 9, DEF-013): ramas de error poco
+frecuentes de `load_config`, `run_one`, `main`, `_load_history` y `record`
+que ni el CLI en su uso normal ni las pruebas de arriba llegan a ejercitar.
+Las que necesitan forzar un `OSError` en un método concreto de `Path` (un
+disco que falla, no un fichero mal escrito) importan `scripts/oracle.py`
+directamente y parchean ese método sólo durante la llamada — no hay forma de
+provocar esas condiciones por subproceso sin depender de permisos de SO.
 """
 
 from __future__ import annotations
 
 import json
+import pathlib
+import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
 
 from tests.venoxia_fixtures import (
     CHANGE_ID,
     FAKE_RUNNER_PY,
+    ORACLE_PY,
     Project,
+    ensure_import_paths,
     requirement,
 )
+
+ensure_import_paths()
+import oracle  # noqa: E402 — necesita que sys.path ya traiga scripts/
 
 FAKE_RUNNER_COMMAND = f"python3 {FAKE_RUNNER_PY} {{files}}"
 
@@ -355,6 +372,324 @@ class OracleHostileInputsTest(unittest.TestCase):
             self.assertEqual(run.json["counts"]["total"], 0)
             self.assertFalse(run.json["all_green"])
             self.assertFalse(run.json["all_red"])
+
+
+class OracleConfigDetailErrorsTest(unittest.TestCase):
+    """R-ORC-005 · más formas de una configuración que no se adivina."""
+
+    def test_invalid_json_in_venoxia_json(self):
+        """@covers R-ORC-005"""
+        with Project() as project:
+            project.write(".venoxia/venoxia.json", "{ esto no es JSON")
+            run = project.run_oracle("--change", CHANGE_ID)
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("JSON válido", run.stderr)
+            self.assertNotIn("Traceback", run.stderr)
+
+    def test_venoxia_json_is_not_an_object(self):
+        """@covers R-ORC-005"""
+        with Project() as project:
+            project.write(".venoxia/venoxia.json", "[]")
+            run = project.run_oracle("--change", CHANGE_ID)
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("objeto JSON", run.stderr)
+            self.assertNotIn("Traceback", run.stderr)
+
+    def test_test_command_key_is_absent(self):
+        """@covers R-ORC-005"""
+        with Project() as project:
+            project.write(".venoxia/venoxia.json", json.dumps({"version": 1, "cwd": "."}))
+            run = project.run_oracle("--change", CHANGE_ID)
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("test_command", run.stderr)
+
+    def test_test_command_is_an_empty_string(self):
+        """@covers R-ORC-005"""
+        with Project() as project:
+            project.oracle_config("")
+            run = project.run_oracle("--change", CHANGE_ID)
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("test_command", run.stderr)
+
+    def test_cwd_that_does_not_exist_is_rejected(self):
+        """@covers R-ORC-005"""
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND, cwd="no-such-directory")
+            run = project.run_oracle("--change", CHANGE_ID)
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("no existe", run.stderr)
+
+    def test_cwd_that_is_not_a_string_falls_back_to_the_default(self):
+        """Un `cwd` de tipo raro no revienta: se trata como si no estuviera escrito."""
+        with Project() as project:
+            project.write(
+                ".venoxia/venoxia.json",
+                json.dumps({"version": 1, "test_command": FAKE_RUNNER_COMMAND, "cwd": 5}),
+            )
+            reqs = [requirement(id="R-ORC-051", title="Uno", verifies=project.oracle("R-ORC-051"))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertEqual(run.json["runner"]["cwd"], str(project.root))
+
+
+class OracleRunOneDetailBranchesTest(unittest.TestCase):
+    """Ramas de `run_one` fuera de las ya cubiertas por R-ORC-002/003/004."""
+
+    def test_requirement_without_any_verifies_is_missing_outside_dry_run(self):
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            reqs = [
+                requirement(id="R-ORC-052", title="Sin oráculo", omit=("verifies",)),
+                requirement(
+                    id="R-ORC-053", title="Con oráculo", verifies=project.oracle("R-ORC-053")
+                ),
+            ]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 1, run.describe())
+            by_id = {result["requirement_id"]: result for result in run.json["results"]}
+            self.assertEqual(by_id["R-ORC-052"]["status"], "missing")
+            self.assertIsNone(by_id["R-ORC-052"]["exit_code"])
+            self.assertEqual(by_id["R-ORC-053"]["status"], "green")
+
+    def test_unbalanced_quotes_in_test_command_are_reported_as_red(self):
+        """@covers R-ORC-002"""
+        with Project() as project:
+            project.oracle_config('python3 -m unittest {files} "sin cerrar')
+            reqs = [requirement(id="R-ORC-054", title="Uno", verifies=project.oracle("R-ORC-054"))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 1, run.describe())
+            result = run.json["results"][0]
+            self.assertEqual(result["status"], "red")
+            self.assertIn("no se pudo interpretar", result["output_tail"])
+
+    def test_a_runner_binary_that_does_not_exist_is_reported_as_red(self):
+        """@covers R-ORC-002"""
+        with Project() as project:
+            project.oracle_config("/no/existe/en-absoluto-xyz {files}")
+            reqs = [requirement(id="R-ORC-055", title="Uno", verifies=project.oracle("R-ORC-055"))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 1, run.describe())
+            result = run.json["results"][0]
+            self.assertEqual(result["status"], "red")
+            self.assertIn("no se pudo lanzar", result["output_tail"])
+
+
+class OracleDryRunDetailBranchesTest(unittest.TestCase):
+    """Ramas de `dry_run_lines` con requisitos de verdad en la lista."""
+
+    def test_requirement_without_verifies_in_a_nonempty_dry_run(self):
+        """@covers R-ORC-006"""
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            reqs = [
+                requirement(id="R-ORC-056", title="Sin oráculo", omit=("verifies",)),
+                requirement(
+                    id="R-ORC-057", title="Con oráculo", verifies=project.oracle("R-ORC-057")
+                ),
+            ]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle("--change", CHANGE_ID, "--dry-run")
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertIn("R-ORC-056: (sin «verifies:»", run.stdout)
+            self.assertIn("R-ORC-057", run.stdout)
+
+
+class OracleMainCliBranchesTest(unittest.TestCase):
+    """Ramas de `main` que ni `run_oracle` ni el resto de la suite ejercitan."""
+
+    def test_root_that_is_not_a_directory(self):
+        """@covers R-ORC-005"""
+        with Project() as project:
+            missing_root = str(project.path("no-existe-en-absoluto"))
+            run = project.run(ORACLE_PY, "--root", missing_root, "--change", CHANGE_ID)
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("no existe", run.stderr)
+            self.assertNotIn("Traceback", run.stderr)
+
+    def test_root_without_venoxia_adoption(self):
+        """@covers R-ORC-005"""
+        with Project() as project:
+            with tempfile.TemporaryDirectory() as bare:
+                run = project.run(ORACLE_PY, "--root", bare, "--change", CHANGE_ID)
+                self.assertEqual(run.returncode, 2, run.describe())
+                self.assertIn(".venoxia", run.stderr)
+                self.assertNotIn("Traceback", run.stderr)
+
+
+class OracleTextReportMissingVerdictTest(unittest.TestCase):
+    """`render_text`/`_status_color`: el veredicto «incompleto» en modo texto."""
+
+    def test_missing_requirement_renders_the_incomplete_verdict(self):
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            reqs = [requirement(id="R-ORC-058", title="Sin oráculo", omit=("verifies",))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle("--change", CHANGE_ID, "--no-color")
+
+            self.assertEqual(run.returncode, 1, run.describe())
+            self.assertIn("Oráculo incompleto", run.stdout)
+            self.assertIn("missing", run.stdout)
+
+
+class OracleInternalErrorPathsTest(unittest.TestCase):
+    """Ramas que ni el CLI ni `Project` alcanzan sin forzar un fallo de E/S.
+
+    Llaman a las funciones de `scripts/oracle.py` directamente, parcheando
+    durante la llamada un único método de `pathlib.Path` para la ruta exacta
+    que interesa —el resto del sistema de ficheros sigue funcionando con
+    normalidad—, igual que `tests/test_report.py` parchea `sys.stdout` para
+    simular un terminal que falla.
+    """
+
+    def test_color_enabled_returns_false_when_isatty_raises(self):
+        class FlakyStdout:
+            def isatty(self):
+                raise RuntimeError("sin terminal de verdad")
+
+        with unittest.mock.patch("sys.stdout", FlakyStdout()):
+            self.assertFalse(oracle.color_enabled(no_color=False))
+
+    def test_load_config_treats_is_file_oserror_as_missing_config(self):
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            root = project.root
+            config_path = root / oracle.VENOXIA_DIR / oracle.CONFIG_FILENAME
+            original_is_file = pathlib.Path.is_file
+
+            def flaky_is_file(self):
+                if self == config_path:
+                    raise OSError("disco caído")
+                return original_is_file(self)
+
+            with unittest.mock.patch.object(pathlib.Path, "is_file", flaky_is_file):
+                with self.assertRaises(oracle.UsageError) as ctx:
+                    oracle.load_config(root)
+            self.assertIn("venoxia.json", str(ctx.exception))
+
+    def test_load_config_reports_read_text_oserror(self):
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            root = project.root
+            config_path = root / oracle.VENOXIA_DIR / oracle.CONFIG_FILENAME
+            original_read_text = pathlib.Path.read_text
+
+            def flaky_read_text(self, *args, **kwargs):
+                if self == config_path:
+                    raise OSError("no se pudo leer")
+                return original_read_text(self, *args, **kwargs)
+
+            with unittest.mock.patch.object(pathlib.Path, "read_text", flaky_read_text):
+                with self.assertRaises(oracle.UsageError) as ctx:
+                    oracle.load_config(root)
+            self.assertIn("no se pudo leer", str(ctx.exception))
+
+    def test_load_config_reports_cwd_is_dir_oserror(self):
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND, cwd=".")
+            root = project.root
+            original_is_dir = pathlib.Path.is_dir
+
+            def flaky_is_dir(self):
+                if self == root:
+                    raise OSError("no se puede comprobar")
+                return original_is_dir(self)
+
+            with unittest.mock.patch.object(pathlib.Path, "is_dir", flaky_is_dir):
+                with self.assertRaises(oracle.UsageError):
+                    oracle.load_config(root)
+
+    def test_collect_requirements_survives_change_dir_is_dir_oserror(self):
+        with Project() as project:
+            reqs = [requirement(id="R-ORC-059", verifies=project.oracle("R-ORC-059"))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+            root = project.root
+            change_dir = root / oracle.VENOXIA_DIR / oracle.CHANGES_DIR / CHANGE_ID
+            original_is_dir = pathlib.Path.is_dir
+
+            def flaky_is_dir(self):
+                if self == change_dir:
+                    raise OSError("boom")
+                return original_is_dir(self)
+
+            with unittest.mock.patch.object(pathlib.Path, "is_dir", flaky_is_dir):
+                with self.assertRaises(oracle.UsageError):
+                    oracle.collect_requirements(root, CHANGE_ID)
+
+    def test_collect_requirements_survives_delta_glob_oserror(self):
+        with Project() as project:
+            reqs = [requirement(id="R-ORC-060", verifies=project.oracle("R-ORC-060"))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+            root = project.root
+            delta_dir = (
+                root / oracle.VENOXIA_DIR / oracle.CHANGES_DIR / CHANGE_ID / oracle.DELTA_DIR
+            )
+            original_glob = pathlib.Path.glob
+
+            def flaky_glob(self, *args, **kwargs):
+                if self == delta_dir:
+                    raise OSError("boom")
+                return original_glob(self, *args, **kwargs)
+
+            with unittest.mock.patch.object(pathlib.Path, "glob", flaky_glob):
+                result = oracle.collect_requirements(root, CHANGE_ID)
+            self.assertEqual(result, [])
+
+    def test_load_history_reports_unreadable_file_without_raising(self):
+        """@covers R-ORC-007"""
+        with Project() as project:
+            history_path = project.path(f".venoxia/changes/{CHANGE_ID}/oracle.json")
+            history_path.parent.mkdir(parents=True, exist_ok=True)
+            history_path.write_text('{"version": 1, "runs": []}', encoding="utf-8")
+            original_read_text = pathlib.Path.read_text
+
+            def flaky_read_text(self, *args, **kwargs):
+                if self == history_path:
+                    raise OSError("boom")
+                return original_read_text(self, *args, **kwargs)
+
+            with unittest.mock.patch.object(pathlib.Path, "read_text", flaky_read_text):
+                result = oracle._load_history(history_path)
+            self.assertEqual(result, [])
+
+    def test_load_history_reports_wrong_shape_without_raising(self):
+        with Project() as project:
+            history_path = project.path(f".venoxia/changes/{CHANGE_ID}/oracle.json")
+            history_path.parent.mkdir(parents=True, exist_ok=True)
+            history_path.write_text(
+                json.dumps({"version": 1, "runs": "no-es-una-lista"}), encoding="utf-8"
+            )
+            result = oracle._load_history(history_path)
+            self.assertEqual(result, [])
+
+    def test_record_reports_write_text_oserror_without_raising(self):
+        with Project() as project:
+            history_path = project.path(f".venoxia/changes/{CHANGE_ID}/oracle.json")
+            original_write_text = pathlib.Path.write_text
+
+            def flaky_write_text(self, *args, **kwargs):
+                if self == history_path:
+                    raise OSError("disco lleno")
+                return original_write_text(self, *args, **kwargs)
+
+            with unittest.mock.patch.object(pathlib.Path, "write_text", flaky_write_text):
+                # No debe reventar: llegar a la siguiente línea ya lo demuestra.
+                oracle.record(history_path, CHANGE_ID, {"version": 1, "results": []})
+            self.assertFalse(history_path.exists())
 
 
 if __name__ == "__main__":

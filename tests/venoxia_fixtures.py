@@ -84,6 +84,10 @@ GUARDIAN_PY = SCRIPTS_DIR / "guardian.py"
 DIFF_READINGS_PY = SCRIPTS_DIR / "diff_readings.py"
 ORACLE_PY = SCRIPTS_DIR / "oracle.py"
 
+#: El envoltorio de `tools/trace_run.py`, que `Project.run` antepone al argv
+#: cuando `VENOXIA_TRACE_DIR` está en el entorno efectivo (véase `Project.run`).
+TRACE_RUN_PY = REPO_ROOT / "tools" / "trace_run.py"
+
 #: El runner falso que `oracle.py` invoca en los tests de `test_oracle.py`.
 FAKE_RUNNER_PY = TESTS_DIR / "fake_runner.py"
 
@@ -1000,10 +1004,12 @@ class Project:
         Si `VENOXIA_TRACE_DIR` está definida en el entorno resultante (la real
         de `os.environ`, o la que llega por `env`), el subproceso deja de
         lanzar el script directamente y pasa a lanzarlo bajo
-        `python3 -m trace --count`, acumulando en `<dir>/counts` — el mismo
-        fichero que usa `tools/coverage.py` para medir la cobertura del
-        proceso principal. Sin la variable, el argv no cambia: éste es el
-        único punto de la suite que sabe de `trace`.
+        `tools/trace_run.py` (`TRACE_RUN_PY`), que acumula en `<dir>/counts`
+        — el mismo fichero que usa `tools/coverage.py` para medir la
+        cobertura del proceso principal — y conserva el código de salida
+        real del script incluso si éste termina con `os._exit` (véase el
+        docstring de `trace_run.py`). Sin la variable, el argv no cambia:
+        éste es el único punto de la suite que sabe de `trace_run.py`.
         """
         base_argv = [str(script), *[str(arg) for arg in args]]
         full_env = self._env()
@@ -1011,20 +1017,7 @@ class Project:
             full_env.update(env)
         trace_dir = full_env.get("VENOXIA_TRACE_DIR")
         if trace_dir:
-            argv = [
-                sys.executable,
-                "-m",
-                "trace",
-                "--count",
-                "--file",
-                str(Path(trace_dir) / "counts"),
-                "--coverdir",
-                str(trace_dir),
-                "--missing",
-                "--ignore-dir",
-                sys.prefix,
-                *base_argv,
-            ]
+            argv = [sys.executable, str(TRACE_RUN_PY), *base_argv]
         else:
             argv = [sys.executable, *base_argv]
         completed = subprocess.run(
@@ -1214,6 +1207,7 @@ __all__ = [
     "RUN_TIMEOUT",
     "SCRIPTS_DIR",
     "TESTS_DIR",
+    "TRACE_RUN_PY",
     "VALIDATE_PY",
     "default_readings",
     "ensure_import_paths",
