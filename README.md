@@ -39,11 +39,11 @@ Venoxia empieza donde ya sabes qué comportamiento quieres, y durante la primera
 
 **6 · `/venoxia:diverge`.** Dos lectores aislados con consignas distintas y el abogado del diablo leen el delta sin haber estado en la conversación donde nació, y el script calcula la divergencia y formula las preguntas cerradas. Con el validador y la divergencia los dos en `0`, y sólo entonces, el `change.json` pasa a `"state": "validated"`.
 
-**7 · `/venoxia:verify` graba el rojo.** El test ya existe y ya está enlazado con `@covers`, pero todavía no hay implementación: es el momento exacto de dejar constancia de que el oráculo está en rojo, antes de escribir una sola línea de código de producción. El primer run de `.venoxia/changes/<id>/oracle.json` queda con `all_green: false` y, casi siempre, con todos los requisitos en `missing` o `red` — el punto de partida documentado, no una inferencia de memoria. *(Esta skill —`DEF-007`— no forma parte todavía de esta entrega; hasta que exista, el mismo rojo se graba a mano con `python3 scripts/oracle.py --change <id> --record`.)*
+**7 · `/venoxia:verify` graba el rojo.** El test ya existe y ya está enlazado con `@covers`, pero todavía no hay implementación: es el momento exacto de dejar constancia de que el oráculo está en rojo, antes de escribir una sola línea de código de producción. El primer run de `.venoxia/changes/<id>/oracle.json` queda con `all_green: false` y, casi siempre, con todos los requisitos en `missing` o `red` — el punto de partida documentado, no una inferencia de memoria. Con el change en `draft` o `specified`, la skill remite a `/venoxia:validate` y `/venoxia:diverge` y para: no hay nada que grabar sin divergencia comprobada.
 
 **8 · El guardián te deja escribir código.** La misma escritura bajo `src/` que en el paso 1 habría sido una pelea, y que sin change validado se habría denegado con un mensaje diciendo qué falta, ahora entra por el tercer camino del guardián: hay contrato firmado y hay delta al lado que lo acredita.
 
-**9 · `/venoxia:verify` graba el verde.** El código hace pasar el test, y un segundo run de `oracle.json` lo deja en `all_green: true`: el ciclo rojo→verde queda escrito, no sólo recordado. A partir de aquí el bucle es el corto —`/venoxia:specify` de la capability 2, y otra vez—, y el acta sólo se vuelve a abrir para añadir una fila o resolver una apuesta.
+**9 · `/venoxia:verify` graba el verde.** El código hace pasar el test, y un segundo run de `oracle.json` lo deja en `all_green: true`. Con el historial mostrando ese mismo requisito en `red` o `missing` en el run del paso 7, la skill escribe `"state": "verified"` y lo dice: el ciclo rojo→verde queda escrito, no sólo recordado. Si el verde no tuviera un rojo detrás —un `venoxia.json` reescrito a mitad de camino, un cambio de test_command—, avisaría de «verde sin rojo» y pediría confirmación antes de escribirlo. A partir de aquí el bucle es el corto —`/venoxia:specify` de la capability 2, y otra vez—, y el acta sólo se vuelve a abrir para añadir una fila o resolver una apuesta.
 
 En comandos, la primera media hora entera:
 
@@ -60,9 +60,9 @@ npm create vite@latest . && git init && git add -A && git commit -m "esqueleto"
 #   … escribes test/booking/reserve.spec.ts con «@covers R-BOO-001» dentro
 /venoxia:validate     # verde
 /venoxia:diverge      # si converge, change.json → "state": "validated"
-python3 scripts/oracle.py --change <id> --record   # graba el rojo (hasta que exista /venoxia:verify)
+/venoxia:verify       # graba el rojo: todos los requisitos en red o missing, correcto
 #   … y ahora sí, el guardián deja escribir src/
-python3 scripts/oracle.py --change <id> --record   # graba el verde
+/venoxia:verify       # graba el verde y, con el rojo anterior acreditado, change.json → "state": "verified"
 ```
 
 ## El acta del proyecto
@@ -206,7 +206,7 @@ El ID vive en el encabezado (`### R-CHK-014 · Título`): estable, linkable y pa
 
 El vínculo con el test es **doble**: la spec apunta al fichero con `verifies:`, y el fichero apunta de vuelta al requisito con un comentario `@covers R-CHK-014`. El validador comprueba las dos direcciones (`V07`, `V08`, `V16`), de modo que borrar el test rompe la spec y renombrar el requisito rompe el test.
 
-## Las cuatro skills
+## Las cinco skills
 
 Se usan en este orden:
 
@@ -214,6 +214,7 @@ Se usan en este orden:
 2. **`/venoxia:specify "…"`** — lee el acta, los principios y las capabilities existentes, escribe la `proposal.md` y el delta en EARS, con `verifies:` y `confidence:` en cada requisito desde el primer borrador.
 3. **`/venoxia:validate`** — ejecuta el validador determinista sobre `.venoxia/` y presenta los findings agrupados por severidad, con la corrección concreta de cada uno.
 4. **`/venoxia:diverge`** — despacha dos lectores aislados y un abogado del diablo sobre el delta, y enfrenta sus lecturas para convertir cada desacuerdo en una pregunta cerrada.
+5. **`/venoxia:verify`** — envuelve `oracle.py`: graba el rojo antes de que exista el código, y el verde después. Sólo escribe `"state": "verified"` cuando el último run está en verde y el historial de `oracle.json` acredita que cada requisito estuvo antes en rojo o `missing`; con un verde que no tiene rojo detrás, avisa y pide confirmación explícita antes de escribirlo.
 
    Cómo se comparan las lecturas, que es de donde sale la utilidad del informe:
 

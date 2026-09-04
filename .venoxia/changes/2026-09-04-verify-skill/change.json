@@ -1,0 +1,7 @@
+{
+  "id": "2026-09-04-verify-skill",
+  "state": "specified",
+  "via": "spec",
+  "capabilities": ["oracle"],
+  "created": "2026-09-04T19:42:10Z"
+}

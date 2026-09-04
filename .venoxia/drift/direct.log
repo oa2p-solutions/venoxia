@@ -51,3 +51,11 @@
 {"ts": "2026-09-04T19:24:43Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_rules_oracle.py"}
 {"ts": "2026-09-04T19:26:26Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "scripts/validate.py"}
 {"ts": "2026-09-04T19:26:41Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "scripts/validate.py"}
+{"ts": "2026-09-04T19:44:46Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "tests/test_verify_skill.py"}
+{"ts": "2026-09-04T19:46:54Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "skills/verify/SKILL.md"}
+{"ts": "2026-09-04T19:47:01Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "skills/verify/SKILL.md"}
+{"ts": "2026-09-04T19:47:38Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
+{"ts": "2026-09-04T19:47:46Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
+{"ts": "2026-09-04T19:47:53Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
+{"ts": "2026-09-04T19:47:58Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
+{"ts": "2026-09-04T19:48:25Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}
