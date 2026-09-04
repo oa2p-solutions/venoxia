@@ -59,3 +59,11 @@
 {"ts": "2026-09-04T19:47:53Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
 {"ts": "2026-09-04T19:47:58Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
 {"ts": "2026-09-04T19:48:25Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}
+{"ts": "2026-09-04T19:59:34Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/venoxia_fixtures.py"}
+{"ts": "2026-09-04T20:12:12Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "tests/test_trace_wrapping.py"}
+{"ts": "2026-09-04T20:12:20Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_trace_wrapping.py"}
+{"ts": "2026-09-04T20:12:37Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_trace_wrapping.py"}
+{"ts": "2026-09-04T20:14:04Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "tools/coverage.py"}
+{"ts": "2026-09-04T20:33:38Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".gitignore"}
+{"ts": "2026-09-04T20:33:50Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
+{"ts": "2026-09-04T20:34:26Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}

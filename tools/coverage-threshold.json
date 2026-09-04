@@ -1,0 +1,11 @@
+{
+  "scripts/charter_lint.py": 93,
+  "scripts/diff_readings.py": 91,
+  "scripts/guardian.py": 85,
+  "scripts/oracle.py": 85,
+  "scripts/validate.py": 91,
+  "scripts/venoxia/__init__.py": 98,
+  "scripts/venoxia/model.py": 97,
+  "scripts/venoxia/parser.py": 81,
+  "scripts/venoxia/report.py": 91
+}

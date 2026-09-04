@@ -996,11 +996,37 @@ class Project:
         `PYTHONDONTWRITEBYTECODE=1` para no dejar `__pycache__` en el
         repositorio. `env` añade o sobrescribe variables sobre ese entorno base
         — lo usa `run_oracle` para pasarle `FAKE_RUNNER_LOG` al runner falso.
+
+        Si `VENOXIA_TRACE_DIR` está definida en el entorno resultante (la real
+        de `os.environ`, o la que llega por `env`), el subproceso deja de
+        lanzar el script directamente y pasa a lanzarlo bajo
+        `python3 -m trace --count`, acumulando en `<dir>/counts` — el mismo
+        fichero que usa `tools/coverage.py` para medir la cobertura del
+        proceso principal. Sin la variable, el argv no cambia: éste es el
+        único punto de la suite que sabe de `trace`.
         """
-        argv = [sys.executable, str(script), *[str(arg) for arg in args]]
+        base_argv = [str(script), *[str(arg) for arg in args]]
         full_env = self._env()
         if env:
             full_env.update(env)
+        trace_dir = full_env.get("VENOXIA_TRACE_DIR")
+        if trace_dir:
+            argv = [
+                sys.executable,
+                "-m",
+                "trace",
+                "--count",
+                "--file",
+                str(Path(trace_dir) / "counts"),
+                "--coverdir",
+                str(trace_dir),
+                "--missing",
+                "--ignore-dir",
+                sys.prefix,
+                *base_argv,
+            ]
+        else:
+            argv = [sys.executable, *base_argv]
         completed = subprocess.run(
             argv,
             input=stdin if stdin is not None else "",

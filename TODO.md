@@ -299,6 +299,34 @@ El ID vive en el encabezado: estable, linkable, parseable. El bloque de metadato
 
 ---
 
+## Fase 9 · Cobertura medida con subprocesos incluidos
+
+> `tests/venoxia_fixtures.py` (`Project.run`) ejecuta `validate.py`, `charter_lint.py`, `guardian.py`, `diff_readings.py` y `oracle.py` por subproceso, nunca importados. Medir cobertura sólo en el proceso de `unittest` vería una fracción de lo que la suite ejercita de verdad.
+
+**Qué se ha construido (`DEF-010`).** `tools/coverage.py`: lanza la suite entera bajo `python3 -m trace --count` con `VENOXIA_TRACE_DIR` puesta, y ese mismo ajuste hace que `Project.run` anteponga el mismo `trace --count` a cada subproceso que lanza — sin que ningún test declare nada. El proceso principal y todos los subprocesos acumulan en un único fichero de cuentas (la suite es secuencial: no hay carrera). El script calcula el porcentaje ejecutado por fichero de `scripts/**/*.py` a partir de los `.cover` de `trace`, lo compara contra `tools/coverage-threshold.json` y sale con código 1 si alguno baja de su umbral.
+
+- [x] `tools/coverage.py` — `run_suite_under_trace`, `measure`/`parse_cover_file`, `compute_threshold`/`build_thresholds`, `render_table`, `--init` para fijar el umbral la primera vez (medido menos 2 puntos, suelo de 85 para los cinco scripts del núcleo)
+- [x] `tools/coverage-threshold.json` — fijado con `--init` sobre este repo: `charter_lint.py` 93, `diff_readings.py` 91, `validate.py` 91, `venoxia/__init__.py` 98, `venoxia/model.py` 97, `venoxia/parser.py` 81, `venoxia/report.py` 91
+- [x] `tests/venoxia_fixtures.py` (`Project.run`) — el prefijo de `trace` es condicional a `VENOXIA_TRACE_DIR` en el entorno efectivo (el real de `os.environ`, o el que llega por `env=`); sin la variable, el argv no cambia. `tests/test_trace_wrapping.py` comprueba las dos ramas
+- [x] Hueco conocido y documentado, no atribuible a `tools/coverage.py`: **`scripts/guardian.py` mide 0 % siempre.** Su fail-open termina con `os._exit(0)` en un `finally` — la garantía que ningún ajuste de este proyecto puede tocar —, y `os._exit` salta la finalización del intérprete, que es cuando `trace` volcaría el `.cover` de ese proceso. No hay manera de medir la cobertura de `guardian.py` por este camino sin quitarle el `os._exit`, y quitárselo no está en el alcance de ninguna tarea de esta entrega. El umbral de `guardian.py` se queda en 85 (el suelo del núcleo) a propósito, en vez de bajarlo a 0: así la tabla seguirá marcando `FALLA` en cada ejecución, como recordatorio de que el hueco sigue abierto, y no como una regresión nueva
+- [x] Hueco conocido y documentado, no atribuible a `tools/coverage.py`: **`scripts/oracle.py` mide 81.3 %**, por debajo del suelo de 85 del núcleo. Las líneas sin ejecutar del `.cover`, agrupadas por función, son ramas de error poco frecuentes que `tests/test_oracle.py` no ejercita todavía:
+  - `color_enabled`: la rama `except Exception` cuando `sys.stdout.isatty()` lanza.
+  - `load_config`: `config_path.is_file()` lanzando `OSError`; `read_text` lanzando `OSError`; JSON inválido (`json.loads` lanzando `ValueError`); `venoxia.json` que no es un objeto; `test_command` ausente o vacío; `cwd` no-cadena que cae al valor por defecto; `cwd.is_dir()` lanzando `OSError`.
+  - `collect_requirements`: `change_dir.is_dir()` lanzando `OSError`; `delta_dir.glob()` lanzando `OSError`.
+  - `run_one`: un requisito sin `verifies:` en absoluto (status `missing` por esa vía, no por fichero ausente); `test_command` con comillas desparejadas (`shlex.split` lanzando `ValueError`); el runner lanzando `OSError` al arrancar (binario inexistente).
+  - `run_all`: la función entera — los tests llaman a `run_one` directamente, nunca a este envoltorio.
+  - `dry_run_lines`: las ramas de un requisito sin `verifies:` o con un fichero inexistente dentro de un `--dry-run` con requisitos no vacíos.
+  - `_load_history`: `oracle.json` ilegible (`OSError`) y `oracle.json` con una forma que no es la esperada (sin `runs` como lista).
+  - `record`: el `write_text` final lanzando `OSError`.
+  - `_status_color`: la rama de `STATUS_MISSING` (amarillo).
+  - `render_text`: el veredicto «Oráculo incompleto» cuando hay requisitos `missing`.
+  - `main`: `--root` que no es un directorio; `--root` sin `.venoxia/` (proyecto que no ha adoptado Venoxia).
+
+  Añadir esos casos es trabajo de `DEF-004` (el fichero es suyo), no de `DEF-010` (que sólo mide). Se deja aquí en vez de bajar el listón a 81 para que la brecha no se pierda de vista.
+- [ ] Cuando alguna de las dos tareas de arriba se resuelva (se le quita el `os._exit` a `guardian.py` por otra vía, o `tests/test_oracle.py` gana los casos que faltan), volver a `python3 tools/coverage.py --init` para fijar el umbral real y borrar la nota correspondiente
+
+---
+
 ## Verificación de extremo a extremo
 
 Sobre un proyecto real, no un fixture:
