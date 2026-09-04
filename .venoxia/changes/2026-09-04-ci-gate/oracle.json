@@ -228,6 +228,184 @@
       },
       "all_green": true,
       "all_red": false
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-04T22:02:27Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-001",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 35,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 106, in test_tests_job_covers_the_three_supported_python_versions\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n======================================================================\nFAIL: test_triggers_push_pull_request_and_dispatch_on_main (tests.test_ci_workflow.CiWorkflowTriggersAndJobsTest.test_triggers_push_pull_request_and_dispatch_on_main)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 80, in test_triggers_push_pull_request_and_dispatch_on_main\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n----------------------------------------------------------------------\nRan 15 tests in 0.002s\n\nFAILED (failures=8)"
+        },
+        {
+          "requirement_id": "R-CI-002",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 35,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 106, in test_tests_job_covers_the_three_supported_python_versions\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n======================================================================\nFAIL: test_triggers_push_pull_request_and_dispatch_on_main (tests.test_ci_workflow.CiWorkflowTriggersAndJobsTest.test_triggers_push_pull_request_and_dispatch_on_main)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 80, in test_triggers_push_pull_request_and_dispatch_on_main\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n----------------------------------------------------------------------\nRan 15 tests in 0.002s\n\nFAILED (failures=8)"
+        },
+        {
+          "requirement_id": "R-CI-003",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 35,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 106, in test_tests_job_covers_the_three_supported_python_versions\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n======================================================================\nFAIL: test_triggers_push_pull_request_and_dispatch_on_main (tests.test_ci_workflow.CiWorkflowTriggersAndJobsTest.test_triggers_push_pull_request_and_dispatch_on_main)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 80, in test_triggers_push_pull_request_and_dispatch_on_main\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n----------------------------------------------------------------------\nRan 15 tests in 0.002s\n\nFAILED (failures=8)"
+        },
+        {
+          "requirement_id": "R-CI-004",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 35,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 106, in test_tests_job_covers_the_three_supported_python_versions\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n======================================================================\nFAIL: test_triggers_push_pull_request_and_dispatch_on_main (tests.test_ci_workflow.CiWorkflowTriggersAndJobsTest.test_triggers_push_pull_request_and_dispatch_on_main)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 80, in test_triggers_push_pull_request_and_dispatch_on_main\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n----------------------------------------------------------------------\nRan 15 tests in 0.002s\n\nFAILED (failures=8)"
+        },
+        {
+          "requirement_id": "R-CI-005",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 35,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 106, in test_tests_job_covers_the_three_supported_python_versions\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n======================================================================\nFAIL: test_triggers_push_pull_request_and_dispatch_on_main (tests.test_ci_workflow.CiWorkflowTriggersAndJobsTest.test_triggers_push_pull_request_and_dispatch_on_main)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 80, in test_triggers_push_pull_request_and_dispatch_on_main\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n----------------------------------------------------------------------\nRan 15 tests in 0.002s\n\nFAILED (failures=8)"
+        },
+        {
+          "requirement_id": "R-CI-006",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 35,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 106, in test_tests_job_covers_the_three_supported_python_versions\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n======================================================================\nFAIL: test_triggers_push_pull_request_and_dispatch_on_main (tests.test_ci_workflow.CiWorkflowTriggersAndJobsTest.test_triggers_push_pull_request_and_dispatch_on_main)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 80, in test_triggers_push_pull_request_and_dispatch_on_main\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n----------------------------------------------------------------------\nRan 15 tests in 0.002s\n\nFAILED (failures=8)"
+        },
+        {
+          "requirement_id": "R-CI-007",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 35,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 106, in test_tests_job_covers_the_three_supported_python_versions\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n======================================================================\nFAIL: test_triggers_push_pull_request_and_dispatch_on_main (tests.test_ci_workflow.CiWorkflowTriggersAndJobsTest.test_triggers_push_pull_request_and_dispatch_on_main)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 80, in test_triggers_push_pull_request_and_dispatch_on_main\n    text = _read(CI_PATH, \"el workflow de CI del plugin\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 56, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «.github/workflows/ci.yml»: falta el workflow de CI del plugin.\n\n----------------------------------------------------------------------\nRan 15 tests in 0.002s\n\nFAILED (failures=8)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 7,
+        "missing": 0,
+        "timeout": 0,
+        "total": 7
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-04T22:02:27Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-001",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 34,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-002",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 34,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-003",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 34,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-004",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 35,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-005",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 34,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-006",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 34,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-007",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 35,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 7,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 7
+      },
+      "all_green": true,
+      "all_red": false
     }
   ]
 }
