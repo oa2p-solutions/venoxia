@@ -221,7 +221,7 @@ El ID vive en el encabezado: estable, linkable, parseable. El bloque de metadato
 - [x] `scripts/diff_readings.py` — **la aritmética la hace el código, no un modelo**. Normaliza (minúsculas, sin acentos ni puntuación), compara campo a campo por escenario:
   - `status_code` distinto → divergencia dura
   - `side_effects` con diferencia de conjunto → divergencia dura
-  - `effect` con similitud por tokens bajo umbral → divergencia blanda
+  - `effect` con similitud por tokens bajo umbral → divergencia blanda  **Corrección sobre el diseño:** la similitud se calculaba sobre tokens crudos y `side_effects` se comparaba como conjunto exacto de cadenas. Sobre prosa española escrita por dos modelos eso producía ruido masivo —en un delta real de 17 escenarios, 19 preguntas de las que ninguna era una ambigüedad: voz activa contra pasiva en las blandas, un artículo de diferencia en las duras—. Ahora se comparan tokens de contenido (sin palabras vacías ni conjugación, con las cifras blindadas) y los efectos se buscan por cobertura contra `effect` y `side_effects` juntos. El mismo delta pasó de 19 preguntas a 4, todas legítimas
   - cualquier `unclear: true` → laguna declarada
 - [x] Salida: por cada divergencia, **una pregunta cerrada con las dos lecturas enfrentadas**, nunca un "¿hay algo ambiguo?". Informe en `.venoxia/changes/<id>/divergence.md`
 - [x] Marcar `change.json` como `state: validated` solo cuando validador **y** divergencia pasan

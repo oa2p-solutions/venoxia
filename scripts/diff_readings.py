@@ -188,6 +188,88 @@ def tokens(s: object) -> set[str]:
     return set(normalize(s).split())
 
 
+#: Palabras que en español ocupan sitio y no dicen nada sobre el comportamiento.
+#: Comparar los efectos con ellas dentro hace que la voz pasiva parezca otra
+#: lectura: «registra el plazo como 21 días» y «el plazo queda registrado como
+#: 21 días» dicen lo mismo y comparten menos de la mitad de sus palabras.
+#:
+#: La lista es cerrada y sólo trae piezas gramaticales —artículos,
+#: preposiciones, conjunciones, pronombres y los auxiliares vacíos—. Ningún
+#: verbo que aporte comportamiento entra aquí: «rechaza», «guarda», «marca» y
+#: «compara» son exactamente lo que hay que comparar.
+STOPWORDS_ES = frozenset(
+    """
+    el la los las lo un una unos unas al del
+    de a en con por para sin sobre entre hasta desde tras ante bajo segun
+    y e o u ni que si como cuando donde porque pues mas pero aunque
+    se le les me te nos os su sus mi mis tu tus cuyo cuya
+    es son era eran ser sea sean siendo sido estar esta estan este esten
+    ha han haber hay habia hubiera
+    queda quedan quede queden quedar quedado
+    debe deben debera deberan deber
+    su ese esa eso esos esas aquel aquella
+    todo toda todos todas cada cualquier alguno alguna algun
+    """.split()
+)
+
+#: Sufijos de plural, en el orden en que hay que probarlos.
+_PLURAL_SUFFIXES = ("es", "s")
+
+#: Sufijos de conjugación y de género que hacen que la misma idea se escriba de
+#: seis maneras. Se prueban de más largo a más corto para que «registrado» pierda
+#: «ado» y no sólo la «o».
+_STEM_SUFFIXES = (
+    # El adverbio en «-mente» es el mismo adjetivo: «original» y «originalmente»
+    # decían lo mismo y contaban como dos palabras distintas.
+    "mente",
+    "andose", "iendose", "ando", "iendo",
+    "arse", "erse", "irse",
+    "ado", "ada", "ido", "ida",
+    "ar", "er", "ir", "an", "en",
+    "a", "o", "e",
+)
+
+#: Raíz más corta que se acepta. Por debajo, quitar el sufijo destruye la
+#: palabra en vez de normalizarla: «día» no puede quedarse en «dí».
+_MIN_STEM = 4
+
+
+def stem_es(word: str) -> str:
+    """Raíz aproximada de una palabra española, para comparar sin conjugación.
+
+    No es un lematizador: es el recorte de sufijos justo para que «registra»,
+    «registrado» y «registrar» cuenten como la misma palabra, que es lo que
+    separa una divergencia de vocabulario de una divergencia de verdad.
+
+    Conservador por diseño. Nunca deja una raíz de menos de `_MIN_STEM`
+    caracteres, así que las palabras cortas —«días», «pago», «dato»— pasan casi
+    intactas y no colisionan entre sí. Prefiere no normalizar a normalizar de
+    más: un falso «convergen» esconde una ambigüedad, que es peor que preguntar.
+    """
+    for suffix in _PLURAL_SUFFIXES:
+        if word.endswith(suffix) and len(word) - len(suffix) >= _MIN_STEM:
+            word = word[: -len(suffix)]
+            break
+    for suffix in _STEM_SUFFIXES:
+        if word.endswith(suffix) and len(word) - len(suffix) >= _MIN_STEM:
+            return word[: -len(suffix)]
+    return word
+
+
+def content_tokens(s: object) -> set[str]:
+    """Tokens que dicen algo: sin palabras vacías y sin conjugación.
+
+    Es lo que se compara en los campos de prosa libre. Si al quitar las
+    palabras vacías no queda nada —un efecto escrito entero con piezas
+    gramaticales—, se devuelven los tokens crudos: dos textos distintos que se
+    quedaran los dos vacíos darían similitud 1.0, y eso es un falso
+    «convergen» inventado por el filtro.
+    """
+    raw = set(normalize(s).split())
+    meaningful = {stem_es(word) for word in raw if word not in STOPWORDS_ES}
+    return meaningful or raw
+
+
 def jaccard(left: set[str], right: set[str]) -> float:
     """Índice de Jaccard entre dos conjuntos de tokens; dos vacíos son idénticos."""
     union = left | right
@@ -196,9 +278,41 @@ def jaccard(left: set[str], right: set[str]) -> float:
     return len(left & right) / len(union)
 
 
+def numeric_tokens(s: object) -> set[str]:
+    """Los tokens del texto que son cifras, sin ceros a la izquierda.
+
+    «21» y «021» son el mismo plazo escrito de dos maneras; «21» y «14» no lo
+    son de ninguna.
+    """
+    found = set()
+    for word in normalize(s).split():
+        if word.isdigit():
+            found.add(word.lstrip("0") or "0")
+    return found
+
+
 def similarity(left: object, right: object) -> float:
-    """Similitud de tokens entre dos textos, en el rango [0.0, 1.0]."""
-    return jaccard(tokens(left), tokens(right))
+    """Similitud entre dos textos de prosa, en el rango [0.0, 1.0].
+
+    Compara **tokens de contenido**, no palabras sueltas: los lectores escriben
+    el mismo comportamiento en voz activa y en pasiva, y contar los artículos
+    convertía cada diferencia de estilo en una divergencia que no existía.
+
+    **Las cifras no se diluyen.** Cuando los dos textos no nombran los mismos
+    números, la similitud es cero y no hay promedio que valga: «registra el
+    plazo como 21 días naturales» y «registra el plazo como 14 días naturales»
+    comparten cinco de sus seis palabras y describen escenarios distintos. Es la
+    clase de discrepancia que este motor existe para encontrar —el 409 contra el
+    422, los 15 minutos contra los 30—, y dejarla al arbitrio de un umbral la
+    escondería justo en las frases más parecidas.
+
+    Que uno cuantifique y el otro no cuenta igual como diferencia: si un lector
+    leyó «21 días» donde el otro leyó «tres semanas», conviene preguntar cuál de
+    las dos escribió el delta.
+    """
+    if numeric_tokens(left) != numeric_tokens(right):
+        return 0.0
+    return jaccard(content_tokens(left), content_tokens(right))
 
 
 # ---------------------------------------------------------------------------
@@ -1072,48 +1186,131 @@ def compare_status_code(group: ScenarioGroup, reader_names: list[str]) -> Diverg
     )
 
 
-def compare_side_effects(group: ScenarioGroup, reader_names: list[str]) -> Divergence | None:
-    """Compara el conjunto de efectos colaterales; cualquier diferencia de conjunto es dura."""
-    present = voters(group, reader_names, lambda reading: not reading.side_effects)
+def repertoire(reading: Reading) -> list[str]:
+    """Todo lo que un lector dice que pasa en el escenario, venga del campo que venga.
+
+    Los dos lectores reparten lo mismo entre `effect` y `side_effects` de forma
+    distinta y con igual derecho: ante «rechaza el fichero, indica los formatos
+    y no crea presupuesto», uno lo escribe entero en `effect` y el otro deja el
+    tercero como efecto colateral. Ninguno se ha equivocado, y compararlos campo
+    contra campo convertía ese reparto en una divergencia dura.
+
+    Lo que hay que contestar es si algún lector vio algo que el otro no vio **en
+    ninguna parte**, y para eso los dos campos se miran juntos.
+    """
+    everything = [reading.effect, *reading.side_effects]
+    return [item for item in everything if normalize(item)]
+
+
+def coverage(mine: object, theirs: object) -> float:
+    """Qué fracción de lo que yo digo aparece también en lo que dice el otro.
+
+    No es simetría, y ahí está el punto. Jaccard contesta «¿decís lo mismo?» y
+    castiga que uno sea más largo; la pregunta de los efectos colaterales es
+    otra: «¿lo que yo vi está recogido en lo que él vio?». Un lector que escribe
+    «rechaza el fichero, indica los formatos y no crea presupuesto» de una vez
+    recoge por completo el «no se crea ningún presupuesto» del otro, y Jaccard
+    lo puntuaba bajo sólo porque además dice más cosas.
+
+    Las cifras se blindan igual que en `similarity`: si el efecto nombra un
+    número que la otra frase no nombra, no está recogido por muy contenidas que
+    estén sus palabras.
+    """
+    mine_numbers, their_numbers = numeric_tokens(mine), numeric_tokens(theirs)
+    if mine_numbers - their_numbers:
+        return 0.0
+    my_tokens = content_tokens(mine)
+    if not my_tokens:
+        return 1.0
+    return len(my_tokens & content_tokens(theirs)) / len(my_tokens)
+
+
+def unmatched_effects(mine: list[str], theirs: list[str], threshold: float) -> list[str]:
+    """Los efectos míos que no aparecen recogidos en ninguna parte del repertorio ajeno."""
+    return [
+        item
+        for item in mine
+        if not any(coverage(item, other) >= threshold for other in theirs)
+    ]
+
+
+def compare_side_effects(
+    group: ScenarioGroup, reader_names: list[str], threshold: float
+) -> Divergence | None:
+    """Denuncia el efecto que un lector ve y el otro no ve en ningún campo.
+
+    Antes esta función comparaba los `side_effects` como conjuntos de cadenas y
+    llamaba divergencia dura a cualquier diferencia. Los efectos son prosa libre
+    escrita por dos modelos distintos: no coinciden nunca carácter a carácter, y
+    el resultado era que un artículo de más —«el texto del correo queda
+    guardado» frente a «texto del correo guardado»— producía la categoría más
+    alarmante del informe, la que afirma que las lecturas no pueden ser todas
+    correctas a la vez.
+
+    Ahora se emparejan por similitud y contra el repertorio completo del otro
+    lector. Queda como divergencia dura lo que de verdad lo es: que alguien haya
+    leído en el delta un efecto del que el otro no encuentra rastro. Eso sí
+    significa que una de las dos lecturas sobra, y por eso sigue siendo dura.
+    """
+    present = [name for name in reader_names if name in group.by_reader]
     if len(present) < 2:
         return None
-    effects: dict[str, object] = {name: group.by_reader[name].side_effects for name in present}
 
-    def key_of(items: object) -> tuple:
-        return tuple(sorted({normalize(item) for item in items if normalize(item)}))
-
-    buckets = group_readings(effects, key_of)
-    if len(buckets) < 2:
+    # Asimetría deliberada: se **juzgan** los efectos colaterales, y se les busca
+    # contraparte en el repertorio entero del otro lector. Meter también el
+    # `effect` propio en lo que se juzga convertía cualquier desacuerdo de
+    # redacción del efecto principal en una divergencia dura duplicada, encima
+    # de la blanda que `compare_effect` ya emite por el mismo motivo. El efecto
+    # principal es cosa de aquella función; ésta contesta a otra pregunta: si
+    # alguien vio un efecto **de más**.
+    judged = {
+        name: [item for item in group.by_reader[name].side_effects if normalize(item)]
+        for name in present
+    }
+    repertoires = {name: repertoire(group.by_reader[name]) for name in present}
+    if not any(judged.values()):
         return None
 
-    # Los efectos que no aparecen en todas las lecturas son los que están en discusión.
-    normalized_sets = [set(key_of(items)) for items, _ in buckets]
-    shared = set.intersection(*normalized_sets) if normalized_sets else set()
-    contested_display: dict[str, str] = {}
-    for items, _ in buckets:
-        for item in items:
-            key = normalize(item)
-            if key and key not in shared and key not in contested_display:
-                contested_display[key] = item
+    # Un efecto sin contraparte en el repertorio de **algún** otro lector es lo
+    # único que se denuncia. Se recorre por pares para que con tres lectores no
+    # baste con que uno cualquiera lo respalde.
+    orphans: dict[str, list[str]] = {}
+    for name in present:
+        missing: list[str] = []
+        for other in present:
+            if other == name:
+                continue
+            for item in unmatched_effects(judged[name], repertoires[other], threshold):
+                if item not in missing:
+                    missing.append(item)
+        if missing:
+            orphans[name] = missing
+
+    if not orphans:
+        return None
 
     clauses: list[str] = []
     options: list[str] = []
-    for items, names in buckets:
-        listed = list(items)
-        if listed:
-            clauses.append(f"{who(names)} registra {quote_list(listed)}")
-        else:
-            clauses.append(f"{who(names)} no registra ningún efecto")
-        options.append(describe_side_effects(listed))
+    for name, missing in orphans.items():
+        clauses.append(f"{who([name])} registra {quote_list(missing)} y ningún otro lector lo recoge")
+        options.append(describe_side_effects(missing))
+    options.append("Ninguno de esos efectos pertenece al escenario: sobran de la lectura")
+
     detail = "; ".join([clauses[0]] + [lower_first(clause) for clause in clauses[1:]]) + "."
-    if shared and contested_display:
-        detail += f" En discusión: {quote_list(list(contested_display.values()))}."
+    detail += (
+        " Se han comparado «effect» y «side_effects» juntos, así que no es una "
+        "diferencia de dónde colocó cada lector el mismo efecto."
+    )
 
     return Divergence(
         scenario=group.title,
         field=FIELD_SIDE_EFFECTS,
         hardness=HARDNESS_HARD,
-        readings={name: list(group.by_reader[name].side_effects) for name in present},
+        # Sólo lo enfrentado. Los efectos que los dos lectores recogen no están
+        # en discusión, y meterlos aquí ponía en la pregunta lecturas que
+        # ninguna opción ofrecía: quien la contesta tendría que elegir entre
+        # opciones que no cubren todo lo que el informe le acaba de enseñar.
+        readings={name: list(missing) for name, missing in orphans.items()},
         question=f"¿Qué efectos observables debe producir «{group.title}»?",
         options=options,
         detail=detail,
@@ -1130,11 +1327,10 @@ def compare_effect(group: ScenarioGroup, reader_names: list[str], threshold: flo
     if len(buckets) < 2:
         return None
 
-    token_sets = {name: tokens(text) for name, text in texts.items()}
     worst = 1.0
     for index, left in enumerate(present):
         for right in present[index + 1:]:
-            worst = min(worst, jaccard(token_sets[left], token_sets[right]))
+            worst = min(worst, similarity(texts[left], texts[right]))
     if worst >= threshold:
         return None
 
@@ -1151,7 +1347,14 @@ def compare_effect(group: ScenarioGroup, reader_names: list[str], threshold: flo
     options.append(f"{same} lo mismo con otras palabras, no hay divergencia real")
 
     detail = "; ".join([clauses[0]] + [lower_first(clause) for clause in clauses[1:]]) + "."
-    detail += f" Similitud de tokens {worst:.2f}, por debajo del umbral {threshold:.2f}."
+    if worst == 0.0 and numeric_tokens(texts[present[0]]) != numeric_tokens(texts[present[1]]):
+        detail += " Las dos lecturas no nombran las mismas cifras, así que no describen el mismo efecto."
+    else:
+        detail += (
+            f" Similitud de contenido {worst:.2f}, por debajo del umbral "
+            f"{threshold:.2f}. Se comparan las palabras que dicen algo, sin "
+            "artículos ni conjugación."
+        )
 
     return Divergence(
         scenario=group.title,
@@ -1225,7 +1428,7 @@ def analyse(
         for candidate in (
             compare_missing(group, reader_names),
             compare_status_code(group, reader_names),
-            compare_side_effects(group, reader_names),
+            compare_side_effects(group, reader_names, threshold),
             compare_effect(group, reader_names, threshold),
         ):
             if candidate is not None:

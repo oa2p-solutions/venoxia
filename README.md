@@ -209,6 +209,19 @@ Se usan en este orden:
 3. **`/venoxia:validate`** — ejecuta el validador determinista sobre `.venoxia/` y presenta los findings agrupados por severidad, con la corrección concreta de cada uno.
 4. **`/venoxia:diverge`** — despacha dos lectores aislados y un abogado del diablo sobre el delta, y enfrenta sus lecturas para convertir cada desacuerdo en una pregunta cerrada.
 
+   Cómo se comparan las lecturas, que es de donde sale la utilidad del informe:
+
+   | Campo | Cómo se compara | Qué produce |
+   |---|---|---|
+   | `scenario` | presencia | Un escenario que sólo ve un lector es divergencia **dura** |
+   | `status_code` | igualdad | Dos códigos distintos son divergencia **dura** |
+   | `side_effects` | cobertura contra el repertorio entero del otro lector —`effect` incluido— | Un efecto que nadie más recoge **en ningún campo** es divergencia **dura** |
+   | `effect` | Jaccard de tokens de contenido, umbral `0.6` | Por debajo, divergencia **blanda** |
+
+   La prosa se compara **sin palabras vacías y sin conjugación**: «registra el plazo como 21 días» y «el plazo queda registrado como 21 días» son la misma lectura, y contar los artículos convertía cada diferencia de estilo en una pregunta. Las cifras, en cambio, no se diluyen nunca: si las dos lecturas no nombran los mismos números, la similitud es cero por mucho que compartan el resto —«21 días» contra «14 días» comparten cinco palabras de seis y describen escenarios distintos—.
+
+   Y `side_effects` se mide contra los dos campos a la vez porque el reparto entre `effect` y `side_effects` varía de un lector a otro con igual derecho: ante «rechaza el fichero, indica los formatos y no crea presupuesto», uno lo escribe entero en `effect` y el otro deja el tercero aparte. Eso no es un desacuerdo sobre el comportamiento.
+
 El `change.json` pasa a `"state": "validated"` sólo cuando validador **y** divergencia pasan.
 
 ## Las 16 reglas del validador

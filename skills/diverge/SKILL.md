@@ -110,6 +110,8 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/diff_readings.py" \
 
 **La skill no decide si hay divergencia: eso lo calcula el script.** La normalización, el emparejado de escenarios, la comparación campo a campo y el umbral de similitud están en código precisamente para que no dependan del criterio de un modelo. Tú no tienes voto sobre si dos lecturas «vienen a decir lo mismo».
 
+El script compara la prosa sin palabras vacías y sin conjugación, así que la voz activa y la pasiva cuentan como la misma lectura; las cifras nunca se diluyen; y los efectos colaterales se buscan contra `effect` y `side_effects` juntos, porque el reparto entre esos dos campos es cosa de cada lector y no del delta. Si aun así el informe te trae una pregunta que es puro vocabulario, la opción «no hay divergencia real» está para eso —pero no la uses para despachar en bloque: cada pregunta que se cierra sin mirar es una ambigüedad que llega al código.
+
 | Código de salida | Significado | Qué dices |
 |---|---|---|
 | `0` | La ejecución no falla. Son **dos** veredictos distintos: `converged` (ni duras, ni blandas, ni lagunas) y `soft_only` (sólo divergencias blandas, que por sí solas no tumban la ejecución salvo con `--strict`) | Copia el titular del informe. Sólo dices «convergen» si el informe lo dice: con `soft_only` dice «Las lecturas casi convergen» y hay desacuerdo que presentar |

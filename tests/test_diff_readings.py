@@ -58,6 +58,18 @@ COUNT_KEYS = ["hard", "soft", "gaps", "scenarios", "readers"]
 DIVERGENCE_KEYS = ["scenario", "field", "hardness", "readings", "question", "options"]
 GAP_KEYS = ["scenario", "reader", "why"]
 
+#: El par de lecturas que diverge de forma **blanda**: dicen dos cosas
+#: distintas —si al caducar el stock vuelve a estar libre o no— sin que ninguna
+#: pieza estructurada (código, efectos) las separe.
+#:
+#: Antes este par era «reserva creada» contra «reserva creada con TTL», y dejó
+#: de servir cuando la similitud pasó a comparar contenido: dos redacciones de
+#: lo mismo tienen que converger, y ésa era la avería que se estaba arreglando.
+#: Un fixture blando tiene que discrepar de verdad, o el test aprueba porque el
+#: motor es ruidoso.
+SOFT_A = "la reserva caduca y el stock vuelve a estar libre"
+SOFT_B = "la reserva se marca vencida sin tocar el stock"
+
 #: Las preguntas abiertas que este componente existe para no cometer.
 OPEN_QUESTIONS = ("hay algo ambiguo", "algo que aclarar")
 
@@ -74,9 +86,14 @@ FLAT_KEY_RE = re.compile(r"^(?P<key>[A-Za-z][A-Za-z0-9_-]*):(?P<value>.*)$")
 def rich_readings() -> dict:
     """Dos lectores que disparan a la vez las cuatro divergencias y una laguna.
 
-    Escenario a escenario: código distinto (dura), conjunto de efectos distinto
-    (dura), efecto con Jaccard 0.5 (blanda), escenario que sólo ve un lector
-    (dura) y un `unclear: true` (laguna).
+    Escenario a escenario: código distinto (dura), un efecto que sólo ve un
+    lector (dura), efecto bajo el umbral de similitud (blanda), escenario que
+    sólo ve un lector (dura) y un `unclear: true` (laguna).
+
+    El par blando dice dos cosas distintas de verdad —si al caducar se libera el
+    stock o no—, no la misma con otras palabras. Desde que la similitud compara
+    contenido y no palabras sueltas, un par que sólo cambiaba de redacción
+    converge, que es justo lo que se quería.
     """
     return {
         "reader-a": [
@@ -87,14 +104,14 @@ def rich_readings() -> dict:
                 "201",
                 ["stock reservado", "evento emitido"],
             ),
-            reading("Reservation expires", "reserva creada", "200"),
+            reading("Reservation expires", SOFT_A, "200"),
             reading("Payment retried after expiry", "vuelve a reservar", "200"),
             reading("Partial reservation", "reserva parcial", "207"),
         ],
         "reader-b": [
             reading("Insufficient stock on one line", "rechaza la peticion", "422"),
             reading("Stock available on every line", "crea la reserva", "201", ["stock reservado"]),
-            reading("Reservation expires", "reserva creada con TTL", "200"),
+            reading("Reservation expires", SOFT_B, "200"),
             # «Payment retried after expiry» no está: divergencia missing_scenario.
             reading(
                 "Partial reservation",
@@ -127,8 +144,8 @@ def coherence_cases() -> tuple[tuple[str, dict, bool, int], ...]:
         (
             "solo-blandas",
             {
-                "a": [reading("Reservation created", "reserva creada", "201")],
-                "b": [reading("Reservation created", "reserva creada con TTL", "201")],
+                "a": [reading("Reservation created", SOFT_A, "201")],
+                "b": [reading("Reservation created", SOFT_B, "201")],
             },
             False,
             0,
@@ -248,8 +265,8 @@ def channel_cases() -> tuple[ChannelCase, ...]:
     """Los seis veredictos, con las variantes que antes hacían discrepar a los canales."""
     agreed = [reading("Stock available", "crea la reserva", "201", ["stock reservado"])]
     soft = {
-        "a": [reading("Reservation created", "reserva creada", "201")],
-        "b": [reading("Reservation created", "reserva creada con TTL", "201")],
+        "a": [reading("Reservation created", SOFT_A, "201")],
+        "b": [reading("Reservation created", SOFT_B, "201")],
     }
     return (
         ChannelCase("convergen", {"a": list(agreed), "b": list(agreed)}, "converged", 0, True),
@@ -407,16 +424,74 @@ class TestNormalize(unittest.TestCase):
             with self.subTest(left=left, right=right):
                 self.assertNotEqual(diff_readings.normalize(left), diff_readings.normalize(right))
 
-    def test_similarity_is_the_jaccard_index_of_the_normalized_tokens(self):
-        """La similitud es Jaccard exacto, no una heurística: 2/4 = 0.5 y 6/8 = 0.75."""
+    def test_similarity_is_the_jaccard_index_of_the_content_tokens(self):
+        """Jaccard exacto, pero sobre los tokens que dicen algo: 2/3 y 3/4."""
+        # {reserv, cre} vs {reserv, cre, ttl}: «con» es palabra vacía.
         self.assertAlmostEqual(
-            diff_readings.similarity("reserva creada", "reserva creada con TTL"), 0.5
+            diff_readings.similarity("reserva creada", "reserva creada con TTL"), 2 / 3
         )
+        # {reserv, marc, venc} vs {reserv, marc, venc, stock}.
         self.assertAlmostEqual(
             diff_readings.similarity(
-                "reserva creada con TTL de 15 minutos", "reserva creada con TTL de 15 min"
+                "la reserva se marca vencida", "la reserva se marca vencida sin stock"
             ),
-            0.75,
+            3 / 4,
+        )
+
+    def test_similarity_ignores_voice_and_conjugation(self):
+        """La misma frase en activa y en pasiva converge: era el ruido que había que quitar."""
+        for left, right in (
+            ("registra el plazo como 21 dias naturales",
+             "el plazo de entrega queda registrado como 21 dias naturales"),
+            ("marca el plazo de entrega como ausente",
+             "el plazo de entrega queda marcado como ausente"),
+            ("el valor extraido original sigue siendo consultable",
+             "el valor extraido originalmente sigue siendo consultable"),
+        ):
+            with self.subTest(left=left):
+                self.assertGreaterEqual(
+                    diff_readings.similarity(left, right), diff_readings.DEFAULT_THRESHOLD
+                )
+
+    def test_similarity_never_dilutes_a_different_number(self):
+        """Dos cifras distintas no describen el mismo efecto, compartan las palabras que compartan."""
+        for left, right in (
+            ("registra el plazo como 21 dias naturales",
+             "registra el plazo como 14 dias naturales"),
+            ("responde 409 y no crea la reserva", "responde 422 y no crea la reserva"),
+            ("el plazo se registra en 21 dias", "el plazo se registra en tres semanas"),
+        ):
+            with self.subTest(left=left):
+                self.assertEqual(diff_readings.similarity(left, right), 0.0)
+
+    def test_similarity_still_matches_the_same_number_written_alike(self):
+        """Blindar las cifras no puede romper el caso en que las dos lecturas coinciden."""
+        self.assertGreaterEqual(
+            diff_readings.similarity(
+                "registra 123456 unidades minimas con moneda EUR",
+                "el importe queda registrado como 123456 unidades minimas en EUR",
+            ),
+            diff_readings.DEFAULT_THRESHOLD,
+        )
+
+    def test_coverage_is_asymmetric_and_absorbs_a_grouped_effect(self):
+        """Un lector que agrupa varios efectos en una frase recoge el que el otro separó."""
+        grouped = "rechaza el fichero, indica los formatos validos y no crea presupuesto"
+        self.assertGreaterEqual(
+            diff_readings.coverage("no se crea ningun presupuesto", grouped),
+            diff_readings.DEFAULT_THRESHOLD,
+        )
+        # Al revés no: la frase larga dice cosas que la corta no recoge.
+        self.assertLess(
+            diff_readings.coverage(grouped, "no se crea ningun presupuesto"),
+            diff_readings.DEFAULT_THRESHOLD,
+        )
+
+    def test_coverage_does_not_absorb_an_effect_nobody_else_mentions(self):
+        """Lo que un lector ve de más sigue quedando fuera: es la divergencia que importa."""
+        self.assertLess(
+            diff_readings.coverage("evento emitido al bus", "crea la reserva y reserva el stock"),
+            diff_readings.DEFAULT_THRESHOLD,
         )
 
 
@@ -489,12 +564,72 @@ class TestComparisonTable(DiffCase):
         self.assertEqual(run.json["divergences"], [], run.describe())
         self.assertTrue(run.json["converged"])
 
-    def test_an_effect_below_the_threshold_is_a_soft_divergence(self):
-        """«reserva creada» vs «reserva creada con TTL»: Jaccard 2/4 = 0.5 < 0.6, blanda."""
+    def test_the_same_effects_split_between_fields_converge(self):
+        """El reparto entre «effect» y «side_effects» no es una divergencia.
+
+        Los dos lectores leen lo mismo y lo colocan distinto: uno escribe los
+        tres efectos seguidos en «effect» y el otro deja el tercero como efecto
+        colateral. Ninguno se ha equivocado. Cuando esto se comparaba campo
+        contra campo salía como divergencia **dura** —la categoría que afirma
+        que las lecturas no pueden ser todas correctas—, y era el ruido que
+        vaciaba de sentido el informe.
+        """
         run = self.diff(
             {
-                "a": [reading("Reservation created", "reserva creada", "201")],
-                "b": [reading("Reservation created", "reserva creada con TTL", "201")],
+                "a": [
+                    reading(
+                        "Unsupported format",
+                        "rechaza el fichero, indica los formatos validos y no crea presupuesto",
+                        "415",
+                    )
+                ],
+                "b": [
+                    reading(
+                        "Unsupported format",
+                        "rechaza el fichero e indica los formatos validos",
+                        "415",
+                        ["no se crea ningun presupuesto"],
+                    )
+                ],
+            },
+            "--json",
+        )
+        hard = [d for d in run.json["divergences"] if d["hardness"] == "hard"]
+        self.assertEqual(hard, [], run.describe())
+
+    def test_an_effect_that_nobody_else_mentions_is_still_hard(self):
+        """Lo que un lector ve y el otro no ve en ningún campo sigue siendo divergencia dura.
+
+        Es el contrapunto del test de arriba: aflojar el emparejamiento no puede
+        tragarse el caso que esta comparación existe para encontrar.
+        """
+        run = self.diff(
+            {
+                "a": [
+                    reading(
+                        "Stock available",
+                        "crea la reserva",
+                        "201",
+                        ["stock reservado", "evento emitido al bus"],
+                    )
+                ],
+                "b": [reading("Stock available", "crea la reserva", "201", ["stock reservado"])],
+            },
+            "--json",
+        )
+        hard = [d for d in run.json["divergences"] if d["hardness"] == "hard"]
+        self.assertEqual(len(hard), 1, run.describe())
+        self.assertEqual(hard[0]["field"], "side_effects", run.describe())
+        joined = " | ".join(hard[0]["options"])
+        self.assertIn("evento emitido al bus", joined, run.describe())
+        self.assertNotIn("stock reservado", joined, run.describe())
+
+    def test_an_effect_below_the_threshold_is_a_soft_divergence(self):
+        """Dos lecturas que discrepan sin que ninguna pieza estructurada las separe: blanda."""
+        run = self.diff(
+            {
+                "a": [reading("Reservation created", SOFT_A, "201")],
+                "b": [reading("Reservation created", SOFT_B, "201")],
             },
             "--json",
         )
@@ -808,8 +943,8 @@ class TestVerdictCoherence(DiffCase):
         self.project.readings(
             "blandas",
             {
-                "a": [reading("Reservation created", "reserva creada", "201")],
-                "b": [reading("Reservation created", "reserva creada con TTL", "201")],
+                "a": [reading("Reservation created", SOFT_A, "201")],
+                "b": [reading("Reservation created", SOFT_B, "201")],
             },
         )
         run = self.project.diff("blandas")
@@ -827,11 +962,11 @@ class TestVerdictCoherence(DiffCase):
             {
                 "a": [
                     reading("Stock available", "crea la reserva", "201"),
-                    reading("Reservation created", "reserva creada", "201"),
+                    reading("Reservation created", SOFT_A, "201"),
                 ],
                 "b": [
                     reading("Stock available", "crea la reserva", "201"),
-                    reading("Reservation created", "reserva creada con TTL", "201"),
+                    reading("Reservation created", SOFT_B, "201"),
                 ],
             },
         )
@@ -1036,13 +1171,13 @@ class TestChannelCoherence(DiffCase):
             {
                 "a": [
                     reading("Insufficient stock", "rechaza", "409"),
-                    reading("Reservation created", "reserva creada", "201"),
+                    reading("Reservation created", SOFT_A, "201"),
                     reading("Stock available", "crea la reserva", "201"),
                     reading("Partial reservation", "", None, unclear=True, unclear_why="no lo dice"),
                 ],
                 "b": [
                     reading("Insufficient stock", "rechaza", "422"),
-                    reading("Reservation created", "reserva creada con TTL", "201"),
+                    reading("Reservation created", SOFT_B, "201"),
                     reading("Stock available", "crea la reserva", "201"),
                     reading("Partial reservation", "", None, unclear=True, unclear_why="tampoco lo veo"),
                 ],
@@ -1427,8 +1562,8 @@ class TestStrictInEveryChannel(DiffCase):
     def soft_pair(self) -> dict:
         """Dos lecturas con una única divergencia blanda (Jaccard 0.5)."""
         return {
-            "a": [reading("Reservation created", "reserva creada", "201")],
-            "b": [reading("Reservation created", "reserva creada con TTL", "201")],
+            "a": [reading("Reservation created", SOFT_A, "201")],
+            "b": [reading("Reservation created", SOFT_B, "201")],
         }
 
     def test_strict_with_only_soft_divergences_reports_a_failure_not_a_warning(self):
@@ -1682,8 +1817,8 @@ class TestCliFlags(DiffCase):
         """Con `--strict` una blanda sola ya hace fallar con exit 1, y sigue sin converger."""
         run = self.diff(
             {
-                "a": [reading("Reservation created", "reserva creada", "201")],
-                "b": [reading("Reservation created", "reserva creada con TTL", "201")],
+                "a": [reading("Reservation created", SOFT_A, "201")],
+                "b": [reading("Reservation created", SOFT_B, "201")],
             },
             "--strict",
             "--json",
@@ -1700,8 +1835,8 @@ class TestCliFlags(DiffCase):
         """
         run = self.diff(
             {
-                "a": [reading("Reservation created", "reserva creada", "201")],
-                "b": [reading("Reservation created", "reserva creada con TTL", "201")],
+                "a": [reading("Reservation created", SOFT_A, "201")],
+                "b": [reading("Reservation created", SOFT_B, "201")],
             },
             "--json",
         )
