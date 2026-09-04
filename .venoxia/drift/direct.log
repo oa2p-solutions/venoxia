@@ -20,3 +20,7 @@
 {"ts": "2026-09-04T18:29:59Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "skills/charter/SKILL.md"}
 {"ts": "2026-09-04T18:30:04Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "skills/charter/SKILL.md"}
 {"ts": "2026-09-04T18:30:36Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}
+{"ts": "2026-09-04T18:53:51Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "scripts/oracle.py"}
+{"ts": "2026-09-04T18:53:59Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_oracle.py"}
+{"ts": "2026-09-04T18:54:21Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
+{"ts": "2026-09-04T18:54:32Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}

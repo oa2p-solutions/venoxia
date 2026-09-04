@@ -196,6 +196,19 @@ class OracleDryRunTest(unittest.TestCase):
             self.assertIn("R-ORC-602", run.stdout)
             self.assertEqual(_log_lines(log_path), [])
 
+    def test_dry_run_with_zero_requirements_explains_why(self):
+        """Un change sin requisitos (p. ej. sin «delta/») no se queda mudo en --dry-run."""
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            project.delta(CHANGE_ID, project.capability_name, raw="")
+
+            run = project.run_oracle("--change", CHANGE_ID, "--dry-run")
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertNotIn("Traceback", run.stderr)
+            self.assertIn("0 requisitos", run.stdout)
+            self.assertTrue(run.stdout.strip())
+
 
 class OracleRecordTest(unittest.TestCase):
     """R-ORC-007 · el historial se acumula y sobrevive a un fichero corrupto."""

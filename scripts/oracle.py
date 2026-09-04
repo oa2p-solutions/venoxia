@@ -369,7 +369,19 @@ def run_all(
 
 
 def dry_run_lines(requirements: list[Requirement], root: Path, cfg: OracleConfig) -> list[str]:
-    """El comando que se ejecutaría por requisito, sin ejecutar nada."""
+    """El comando que se ejecutaría por requisito, sin ejecutar nada.
+
+    Con cero requisitos no hay nada que listar —no es un error: un change sin
+    `delta/`, o con un `delta/` que no declara requisitos, produce
+    legítimamente una lista vacía—, pero quedarse callado es indistinguible
+    de un fallo silencioso. Se avisa con una sola línea que nombra la causa
+    más probable, en vez de no imprimir nada.
+    """
+    if not requirements:
+        return [
+            "(0 requisitos: este change no tiene «delta/» o su «delta/» no "
+            "declara requisitos; no hay ningún comando que listar)"
+        ]
     lines: list[str] = []
     for requirement in requirements:
         written = _verifies_paths(requirement)

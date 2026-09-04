@@ -293,6 +293,8 @@ python3 scripts/oracle.py --change 2026-08-31-checkout --record    # ejecuta y a
 
 Es **una invocación por requisito**, nunca una sola para todo el change: es lo único que permite decir cuál falló, no sólo cuántos. Un fichero de `verifies:` que no existe en disco no se invoca —queda `missing`, no `red`—, y un runner que se cuelga más allá de `--timeout` (600 s por omisión) se corta y queda `timeout`, sin traza en `stderr`.
 
+Un change sin `delta/`, o con un `delta/` que no declara ningún requisito, tiene legítimamente cero requisitos que ejecutar: `oracle.py` no lo trata como error (sale `0`), pero tampoco se queda callado —`--dry-run` imprime una línea que nombra la causa más probable en vez de no imprimir nada—. Es el caso de un change que adopta capabilities retroactivas escribiéndolas directamente en `.venoxia/capabilities/*/spec.md` sin pasar por `delta/`: `oracle.py` no tiene nada que atribuirle porque `collect_requirements` sólo lee `delta/*.md`, por diseño, para poder decir de qué change es cada rojo o verde.
+
 El esquema JSON, versión 1 y estable como el de `validate.py`:
 
 ```json
