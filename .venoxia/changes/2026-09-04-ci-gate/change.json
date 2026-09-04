@@ -1,0 +1,7 @@
+{
+  "id": "2026-09-04-ci-gate",
+  "state": "specified",
+  "via": "spec",
+  "capabilities": ["ci"],
+  "created": "2026-09-04T20:56:59Z"
+}

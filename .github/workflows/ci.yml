@@ -1,0 +1,97 @@
+name: ci
+
+# El CI del propio plugin. La tesis del README es que la spec «falla en CI
+# cuando miente»; este workflow es lo que la hace cumplible. Ver
+# «## Verificar en CI» en README.md para la explicación de cada job.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: tests (python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Suite completa (stdlib unittest, sin pytest)
+        run: python3 -m unittest discover -s tests -q
+
+  self-spec:
+    name: self-spec
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: El validador sobre el propio repo, en estricto
+        run: python3 scripts/validate.py --root . --strict --json
+      - name: El acta del propio repo, en estricto
+        run: python3 scripts/charter_lint.py --root . --strict --json
+
+  coverage:
+    name: coverage
+    runs-on: ubuntu-latest
+    # tools/coverage.py mide dos huecos ya documentados en TODO.md
+    # (guardian.py al 0 % por su fail-open con os._exit; oracle.py al
+    # 81,3 %, por debajo del suelo del núcleo). Son huecos conocidos, no
+    # regresiones: continue-on-error evita que el repo entero quede en rojo
+    # por algo que ya está diagnosticado. Ver «## Verificar en CI».
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Cobertura de scripts/**/*.py, subprocesos incluidos
+        run: python3 tools/coverage.py
+
+  plugin-validate:
+    name: plugin-validate
+    runs-on: ubuntu-latest
+    # Sin un run real en un runner limpio no se puede comprobar si el CLI
+    # exige credenciales para este comando fuera de una sesión ya
+    # autenticada; continue-on-error evita bloquear el resto del workflow
+    # mientras eso no esté confirmado. Ver «## Verificar en CI».
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Instalar el CLI de Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Estructura del plugin (manifiesto, skills, agentes, hook)
+        run: claude plugin validate . --strict
+
+  evals:
+    name: evals
+    runs-on: ubuntu-latest
+    # Cuesta tokens y usa un LLM: nunca se dispara en push ni en
+    # pull_request, sólo a mano. Ver evals/README.md y «## Verificar en CI».
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    needs: [tests, self-spec]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Instalar el CLI de Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: claude plugin eval venoxia
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude plugin eval venoxia --ablation with-without \
+            --allow-tools 'Bash(python3 *)' Write Read Glob Grep

@@ -327,6 +327,22 @@ El ID vive en el encabezado: estable, linkable, parseable. El bloque de metadato
 
 ---
 
+## Fase 10 · CI: la tesis falla en CI cuando miente
+
+> «Lo que distingue a Venoxia: la spec deja de ser prosa y pasa a ser un contrato que falla en CI cuando miente.» Hasta esta fase no había ningún CI: la frase era una promesa que sólo se cumplía si alguien ejecutaba los scripts a mano.
+
+**Qué se ha construido (`DEF-009`).** `.github/workflows/ci.yml`, el CI del propio plugin, con cinco jobs (`tests` en matriz 3.12/3.13/3.14, `self-spec` con `validate.py`/`charter_lint.py --strict`, `coverage` con `tools/coverage.py`, `plugin-validate` con el CLI instalado por `npm`, y `evals` restringido a `workflow_dispatch`); y `templates/ci/venoxia-gate.yml`, la plantilla para que un proyecto consumidor haga checkout de un Venoxia fijado por tag y corra la puerta sin `pip`, incluido el oráculo por cada change `validated`/`verified`.
+
+- [x] `.github/workflows/ci.yml` — disparadores `push`/`pull_request` sobre `main` y `workflow_dispatch`; jobs `tests`, `self-spec`, `coverage`, `plugin-validate`, `evals`
+- [x] `templates/ci/venoxia-gate.yml` — checkout fijado de `oa2p-solutions/venoxia` con `secrets.VENOXIA_TOKEN`, `charter_lint.py --strict`, `validate.py --strict`, y `oracle.py --change <id>` por cada change en `validated`/`verified` cuando existe `.venoxia/venoxia.json`, sin ningún paso de `pip`
+- [x] `tests/test_ci_workflow.py` — comprueba estructuralmente (regex sobre el YAML, sin librería de YAML: cero dependencias) los disparadores, los cinco jobs, la matriz, los comandos exactos de `self-spec`, la plantilla del consumidor y la sección nueva del README
+- [x] `README.md` — sección «## Verificar en CI» que explica los dos workflows y por qué `evals` es manual; «Instalación» pasa a nombrar la matriz 3.12–3.14 en vez de sólo «probado con 3.14»
+- [x] Hueco conocido y documentado, no atribuible a `DEF-009`: **el job `self-spec`, tal como el criterio de aceptación lo pide (`--strict` en los dos comandos), falla hoy sobre este mismo repositorio.** No por nada que esta fase haya introducido: `python3 scripts/validate.py --root . --strict --json` ya devolvía `exit 1` antes de esta fase, con 8 avisos `V18` heredados de `.venoxia/changes/2026-09-04-oracle` (`R-ORC-001`…`R-ORC-008`), cuyo primer run de `oracle.json` quedó en `missing` en vez de `red` — un hueco de `DEF-004`/`DEF-006`, no de este change. `charter_lint.py --strict` sí sale en verde (0/0). Arreglarlo exige reescribir el historial de `oracle.json` de ese change o revisar si `V18` debería tratar `missing` como equivalente a `red` para este caso, y ninguna de las dos está en el alcance de `DEF-009`. Mientras no se resuelva, el job `self-spec` de `ci.yml` fallará en el primer `push`/`pull_request` real — es correcto que falle, porque el aviso es cierto, pero conviene saber que la causa es anterior a esta fase, no una regresión suya
+- [ ] Dos partes del criterio de aceptación de `DEF-009` exigen un run real en GitHub Actions, imposible sin `git push` (ninguna acción remota en esta sesión): (a) que la matriz de `tests` pase de verdad en las tres versiones de Python en los runners de GitHub — no probado localmente para 3.12 (intérprete no instalado en esta máquina; sí se corrió la suite completa en 3.13 y 3.14, verde en ambos, y no se ha encontrado sintaxis posterior a 3.12 en el código); (b) la prueba negativa de un `SHALL` en `.venoxia/capabilities/validator/spec.md` empujado a una rama, con el enlace al run fallido de `self-spec` como evidencia — se hizo su forma local equivalente (`validate.py --strict` con el `SHALL` introducido y revertido) y confirmó que `V14` dispara, pero eso no sustituye al run de GitHub Actions que pide el criterio
+- [x] El change `.venoxia/changes/2026-09-04-ci-gate` de este repo tiene su rojo y su verde grabados en `oracle.json` (`R-CI-001`…`R-CI-005`); queda en `specified` porque esta sesión no dispone de la herramienta para despachar los lectores de `/venoxia:diverge` — el paso a `validated` y a `verified` lo hace la sesión principal, anotado en el `## Pendiente` de su `proposal.md`
+
+---
+
 ## Verificación de extremo a extremo
 
 Sobre un proyecto real, no un fixture:

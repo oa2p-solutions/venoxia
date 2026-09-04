@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "change": "2026-09-04-ci-gate",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-04T20:58:43Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-001",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 42,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 195, in test_runs_charter_lint_and_validate_in_strict_without_pip\n    text = _read(GATE_PATH, \"la plantilla templates/ci/venoxia-gate.yml\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 51, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «templates/ci/venoxia-gate.yml»: falta la plantilla templates/ci/venoxia-gate.yml.\n\n======================================================================\nFAIL: test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists (tests.test_ci_workflow.VenoxiaGateTemplateTest.test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 206, in test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists\n    text = _read(GATE_PATH, \"la plantilla templates/ci/venoxia-gate.yml\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 51, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «templates/ci/venoxia-gate.yml»: falta la plantilla templates/ci/venoxia-gate.yml.\n\n----------------------------------------------------------------------\nRan 13 tests in 0.002s\n\nFAILED (failures=13)"
+        },
+        {
+          "requirement_id": "R-CI-002",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 37,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 195, in test_runs_charter_lint_and_validate_in_strict_without_pip\n    text = _read(GATE_PATH, \"la plantilla templates/ci/venoxia-gate.yml\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 51, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «templates/ci/venoxia-gate.yml»: falta la plantilla templates/ci/venoxia-gate.yml.\n\n======================================================================\nFAIL: test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists (tests.test_ci_workflow.VenoxiaGateTemplateTest.test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 206, in test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists\n    text = _read(GATE_PATH, \"la plantilla templates/ci/venoxia-gate.yml\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 51, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «templates/ci/venoxia-gate.yml»: falta la plantilla templates/ci/venoxia-gate.yml.\n\n----------------------------------------------------------------------\nRan 13 tests in 0.002s\n\nFAILED (failures=13)"
+        },
+        {
+          "requirement_id": "R-CI-003",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 37,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 195, in test_runs_charter_lint_and_validate_in_strict_without_pip\n    text = _read(GATE_PATH, \"la plantilla templates/ci/venoxia-gate.yml\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 51, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «templates/ci/venoxia-gate.yml»: falta la plantilla templates/ci/venoxia-gate.yml.\n\n======================================================================\nFAIL: test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists (tests.test_ci_workflow.VenoxiaGateTemplateTest.test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 206, in test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists\n    text = _read(GATE_PATH, \"la plantilla templates/ci/venoxia-gate.yml\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 51, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «templates/ci/venoxia-gate.yml»: falta la plantilla templates/ci/venoxia-gate.yml.\n\n----------------------------------------------------------------------\nRan 13 tests in 0.002s\n\nFAILED (failures=13)"
+        },
+        {
+          "requirement_id": "R-CI-004",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 37,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 195, in test_runs_charter_lint_and_validate_in_strict_without_pip\n    text = _read(GATE_PATH, \"la plantilla templates/ci/venoxia-gate.yml\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 51, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «templates/ci/venoxia-gate.yml»: falta la plantilla templates/ci/venoxia-gate.yml.\n\n======================================================================\nFAIL: test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists (tests.test_ci_workflow.VenoxiaGateTemplateTest.test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 206, in test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists\n    text = _read(GATE_PATH, \"la plantilla templates/ci/venoxia-gate.yml\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 51, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «templates/ci/venoxia-gate.yml»: falta la plantilla templates/ci/venoxia-gate.yml.\n\n----------------------------------------------------------------------\nRan 13 tests in 0.002s\n\nFAILED (failures=13)"
+        },
+        {
+          "requirement_id": "R-CI-005",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 38,
+          "output_tail": "  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 195, in test_runs_charter_lint_and_validate_in_strict_without_pip\n    text = _read(GATE_PATH, \"la plantilla templates/ci/venoxia-gate.yml\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 51, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «templates/ci/venoxia-gate.yml»: falta la plantilla templates/ci/venoxia-gate.yml.\n\n======================================================================\nFAIL: test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists (tests.test_ci_workflow.VenoxiaGateTemplateTest.test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 206, in test_runs_oracle_per_validated_or_verified_change_when_venoxia_json_exists\n    text = _read(GATE_PATH, \"la plantilla templates/ci/venoxia-gate.yml\")\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 51, in _read\n    raise AssertionError(f\"no existe «{path.relative_to(REPO_ROOT)}»: falta {what}.\")\nAssertionError: no existe «templates/ci/venoxia-gate.yml»: falta la plantilla templates/ci/venoxia-gate.yml.\n\n----------------------------------------------------------------------\nRan 13 tests in 0.002s\n\nFAILED (failures=13)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 5,
+        "missing": 0,
+        "timeout": 0,
+        "total": 5
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-04T21:00:27Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-001",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 40,
+          "output_tail": ".............\n----------------------------------------------------------------------\nRan 13 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-002",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 36,
+          "output_tail": ".............\n----------------------------------------------------------------------\nRan 13 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-003",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 36,
+          "output_tail": ".............\n----------------------------------------------------------------------\nRan 13 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-004",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 35,
+          "output_tail": ".............\n----------------------------------------------------------------------\nRan 13 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-005",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 37,
+          "output_tail": ".............\n----------------------------------------------------------------------\nRan 13 tests in 0.001s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 5,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 5
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

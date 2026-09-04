@@ -19,7 +19,7 @@ claude plugin marketplace add oa2p-solutions/venoxia
 claude plugin install venoxia@venoxia
 ```
 
-Requiere Python 3 en el `PATH` (probado con 3.14). Los scripts usan **sólo la biblioteca estándar**: no hay `pip install`, ni entorno virtual, ni dependencias que mantener. La suite de tests del propio plugin tampoco pide nada: es `unittest`, de la biblioteca estándar.
+Requiere Python 3 en el `PATH` (la matriz de CI cubre 3.12, 3.13 y 3.14; en desarrollo se prueba con 3.14). Los scripts usan **sólo la biblioteca estándar**: no hay `pip install`, ni entorno virtual, ni dependencias que mantener. La suite de tests del propio plugin tampoco pide nada: es `unittest`, de la biblioteca estándar.
 
 ## Empezar un proyecto desde cero
 
@@ -389,6 +389,22 @@ claude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *
 Y los ejemplos de este README no son decorado: el acta y el requisito que enseña se extraen a ficheros reales y se pasan por `charter_lint.py` y `validate.py` antes de publicarlos. Un README que muestra un ejemplo que su propio linter rechazaría es exactamente el fallo que este plugin existe para impedir, y ya pasó una vez, con un `SHALL` que la regla `V14` marcaba.
 
 El propio repositorio adoptó Venoxia: `.venoxia/charter.md` y las capabilities retroactivas de `.venoxia/capabilities/` pasan `python3 scripts/charter_lint.py --root . --strict` y `python3 scripts/validate.py --root . --strict` con cero errores y cero avisos, igual que se le exige a cualquier proyecto que lo adopte.
+
+## Verificar en CI
+
+La tesis del plugin es que la spec «falla en CI cuando miente». Esto es lo que la hace cumplible, en dos workflows con responsabilidades distintas.
+
+**[`.github/workflows/ci.yml`](.github/workflows/ci.yml) es el CI de este repositorio.** Se dispara en `push` y `pull_request` sobre `main`, y también a mano con `workflow_dispatch`. Cinco jobs:
+
+- `tests`: `python3 -m unittest discover -s tests -q` en una matriz de Python 3.12, 3.13 y 3.14.
+- `self-spec`: `python3 scripts/validate.py --root . --strict --json` y `python3 scripts/charter_lint.py --root . --strict --json` — el propio repo obedece su propio contrato, o el job falla.
+- `coverage`: `python3 tools/coverage.py` (véase «Verificar regresiones»). Se marca `continue-on-error` porque hoy mide dos huecos ya documentados en `TODO.md` (`guardian.py` al 0 % por el `os._exit` de su fail-open; `oracle.py` al 81,3 %, por debajo del suelo del núcleo): son huecos conocidos, no algo que este workflow deba convertir en un rojo permanente del repo entero.
+- `plugin-validate`: instala el CLI de Claude Code con `npm install -g @anthropic-ai/claude-code` y corre `claude plugin validate . --strict`. Se marca `continue-on-error` porque no se ha podido confirmar, sin un run real en un runner limpio de GitHub Actions, si ese comando exige credenciales fuera de una sesión ya autenticada.
+- `evals`: **sólo** con `workflow_dispatch`, nunca en `push` ni en `pull_request`. Corre `claude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *)' Write Read Glob Grep` con `secrets.ANTHROPIC_API_KEY`. Es manual a propósito: usa un LLM de verdad y cuesta tokens en cada corrida, así que dispararlo en cada commit sería pagar por una comprobación que nadie pidió ver ahora mismo.
+
+**[`templates/ci/venoxia-gate.yml`](templates/ci/venoxia-gate.yml) es la plantilla para un proyecto que adopta Venoxia.** No se ejecuta en este repo: se copia al proyecto consumidor. Hace checkout del proyecto y, en un directorio auxiliar, checkout de `oa2p-solutions/venoxia` fijado a un tag (`VENOXIA_REF`, nunca una rama en movimiento) con `secrets.VENOXIA_TOKEN` porque el repositorio es privado. Corre `charter_lint.py --strict` y `validate.py --strict` sobre el proyecto, sin `pip` en ningún paso — el mismo criterio de cero dependencias que el resto de Venoxia. Si el proyecto declara `.venoxia/venoxia.json`, además ejecuta `oracle.py --change <id>` por cada change en `validated` o `verified`, y cualquier código de salida distinto de `0` hace fallar el job: un change que dice `verified` con su oráculo caído en CI es exactamente la mentira que el guardián no puede ver desde el editor de nadie.
+
+Dos partes de este contrato sólo las puede confirmar un run real en GitHub Actions, no la suite local: que la matriz de `tests` pasa de verdad en las tres versiones de Python, y que un `SHALL` introducido a propósito en un requisito hace fallar `self-spec` por `V14`. La segunda se probó una vez en su forma local equivalente (`validate.py --strict` sobre una copia con el `SHALL`, revertida después) y confirmó que `V14` dispara.
 
 ## Qué queda fuera de esta entrega
 

@@ -1,0 +1,102 @@
+# Plantilla de Venoxia para el CI de un proyecto que lo ha adoptado.
+#
+# Copia este fichero a `.github/workflows/venoxia-gate.yml` en el proyecto
+# consumidor y ajusta lo que hay entre `<...>`. Hace checkout del propio
+# proyecto y de `oa2p-solutions/venoxia` fijado a una referencia (un tag,
+# nunca una rama en movimiento) en un directorio auxiliar —el repo es
+# privado, de ahí el token—, y corre el validador y el acta en `--strict`
+# sobre el proyecto. Si el proyecto declara `.venoxia/venoxia.json`, además
+# ejecuta el oráculo por cada change en `validated` o `verified` y falla el
+# job si alguno no sale en verde. Sin `pip`: sólo el `python3` del runner y
+# la biblioteca estándar, exactamente como el resto de Venoxia.
+#
+# Secrets que hay que declarar en el proyecto consumidor:
+#   VENOXIA_TOKEN: un token con permiso de lectura sobre oa2p-solutions/venoxia.
+#
+# Variables que hay que ajustar:
+#   VENOXIA_REF: el tag de Venoxia contra el que se valida (nunca "main").
+
+name: venoxia-gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  VENOXIA_REF: "<venoxia--vX.Y.Z>"
+  VENOXIA_DIR: .venoxia-tooling
+
+jobs:
+  gate:
+    name: venoxia-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del proyecto
+        uses: actions/checkout@v4
+
+      - name: Checkout de oa2p-solutions/venoxia (fijado, repo privado)
+        uses: actions/checkout@v4
+        with:
+          repository: oa2p-solutions/venoxia
+          ref: ${{ env.VENOXIA_REF }}
+          token: ${{ secrets.VENOXIA_TOKEN }}
+          path: ${{ env.VENOXIA_DIR }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: charter_lint.py --strict sobre el acta del proyecto
+        run: python3 "${VENOXIA_DIR}/scripts/charter_lint.py" --root . --strict --json
+
+      - name: validate.py --strict sobre las specs del proyecto
+        run: python3 "${VENOXIA_DIR}/scripts/validate.py" --root . --strict --json
+
+      - name: oracle.py sobre cada change validated o verified
+        if: hashFiles('.venoxia/venoxia.json') != ''
+        run: |
+          python3 - "$VENOXIA_DIR" <<'PYEOF'
+          import json
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          venoxia_dir = Path(sys.argv[1])
+          oracle = venoxia_dir / "scripts" / "oracle.py"
+          changes_dir = Path(".venoxia") / "changes"
+
+          gated_states = {"validated", "verified"}
+          failing = []
+
+          if not changes_dir.is_dir():
+              print("Sin .venoxia/changes/: nada que ejecutar con el oráculo.")
+              sys.exit(0)
+
+          for entry in sorted(changes_dir.iterdir()):
+              change_file = entry / "change.json"
+              if not change_file.is_file():
+                  continue
+              try:
+                  data = json.loads(change_file.read_text(encoding="utf-8"))
+              except (OSError, ValueError) as error:
+                  print(f"{entry.name}: change.json ilegible ({error}); se omite.")
+                  continue
+              if not isinstance(data, dict):
+                  continue
+              state = str(data.get("state", "")).strip().lower()
+              if state not in gated_states:
+                  continue
+              change_id = str(data.get("id") or entry.name)
+              print(f"== oracle.py --change {change_id} (state: {state}) ==")
+              result = subprocess.run(
+                  [sys.executable, str(oracle), "--root", ".", "--change", change_id],
+              )
+              if result.returncode != 0:
+                  failing.append(change_id)
+
+          if failing:
+              print(f"Changes con el oráculo en rojo: {', '.join(failing)}")
+              sys.exit(1)
+          PYEOF

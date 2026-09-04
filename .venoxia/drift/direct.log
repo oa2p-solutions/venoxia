@@ -67,3 +67,11 @@
 {"ts": "2026-09-04T20:33:38Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".gitignore"}
 {"ts": "2026-09-04T20:33:50Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
 {"ts": "2026-09-04T20:34:26Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}
+{"ts": "2026-09-04T20:56:11Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "tests/test_ci_workflow.py"}
+{"ts": "2026-09-04T20:58:58Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": ".github/workflows/ci.yml"}
+{"ts": "2026-09-04T20:59:20Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "templates/ci/venoxia-gate.yml"}
+{"ts": "2026-09-04T20:59:35Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
+{"ts": "2026-09-04T20:59:52Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
+{"ts": "2026-09-04T21:00:12Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_ci_workflow.py"}
+{"ts": "2026-09-04T21:00:18Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_ci_workflow.py"}
+{"ts": "2026-09-04T21:01:55Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}
