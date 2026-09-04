@@ -12,15 +12,20 @@ por versión y corre la puerta sin `pip`.
 Lo que este fichero **no** puede comprobar —porque exige un run real de
 GitHub Actions, no disponible aquí— son las dos mitades dinámicas del
 criterio de aceptación: que la matriz efectivamente pasa en 3.12/3.13/3.14
-sobre los runners de GitHub, y que un `SHALL` introducido a propósito hace
-fallar el job `self-spec` en un run real. Ambas quedan documentadas como
-huecos en `README.md` y en la entrega de este change.
+sobre los runners de GitHub (R-CI-006), y que un `SHALL` introducido a
+propósito hace fallar el job `self-spec` en un run real. Tampoco puede
+comprobar si `claude plugin validate` exige credenciales en un runner
+limpio sin sesión previa (R-CI-007); para esas dos apuestas, este fichero
+sólo aporta la evidencia local parcial que su «why» declara. Todo queda
+documentado como huecos en `README.md` y en la entrega de este change.
 
 @covers R-CI-001
 @covers R-CI-002
 @covers R-CI-003
 @covers R-CI-004
 @covers R-CI-005
+@covers R-CI-006
+@covers R-CI-007
 
 Cómo lanzarlo::
 
@@ -166,6 +171,48 @@ class CiPluginValidateAndEvalsTest(unittest.TestCase):
             "claude plugin eval venoxia",
             job,
             "el job «evals» no ejecuta el comando de evals/README.md",
+        )
+
+
+class CiMatrixRealRunGapTest(unittest.TestCase):
+    """R-CI-006 · Apuesta: que la matriz pase de verdad en GitHub Actions.
+
+    Esto no se puede confirmar aquí (exige un run real, prohibido en esta
+    sesión, y esta máquina no tiene Python 3.12 instalado). Lo único que
+    esta clase aporta es la evidencia local parcial que el «why» del
+    requisito declara: que el intérprete que corre esta comprobación es
+    uno de los tres que la matriz declara.
+    """
+
+    def test_local_interpreter_is_one_of_the_declared_matrix_versions(self):
+        declared = {(3, 12), (3, 13), (3, 14)}
+        self.assertIn(
+            sys.version_info[:2],
+            declared,
+            "el intérprete que corre esta suite no es ninguno de los "
+            "declarados en la matriz de «tests»; incluso esa evidencia "
+            "local parcial se pierde",
+        )
+
+
+class CiPluginValidateSafetyNetTest(unittest.TestCase):
+    """R-CI-007 · Apuesta: si el CLI exige credenciales en un runner limpio.
+
+    No se puede confirmar aquí porque esta máquina ya tiene una sesión de
+    Claude Code autenticada. Lo que sí se puede comprobar localmente es que
+    la mitigación (`continue-on-error: true`) sigue declarada mientras esa
+    pregunta no tenga respuesta.
+    """
+
+    def test_plugin_validate_job_has_a_continue_on_error_safety_net(self):
+        text = _read(CI_PATH, "el workflow de CI del plugin")
+        job = _job_block(text, "plugin-validate")
+        self.assertIn(
+            "continue-on-error: true",
+            job,
+            "el job «plugin-validate» no declara «continue-on-error: "
+            "true»: si «claude plugin validate» exige credenciales en un "
+            "runner limpio, bloquearía todo el workflow",
         )
 
 

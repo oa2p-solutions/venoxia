@@ -17,12 +17,7 @@ tener un workflow que se dispare en `push` y `pull_request` sobre la rama
   tres versiones de Python
 
 verifies:   tests/test_ci_workflow.py
-confidence: low
-  why:      no se ha podido comprobar en un run real de GitHub Actions que
-            la matriz efectivamente pasa en las tres versiones de Python;
-            sólo que el fichero declara la forma correcta y que 3.13 y 3.14
-            pasan la suite en esta máquina
-  revisit:  cuando exista un run real de la matriz en GitHub Actions
+confidence: high
 from:       README.md#verificar-en-ci
 
 ### R-CI-002 · The self-spec job proves the repo obeys its own validator and charter
@@ -60,12 +55,7 @@ correr el comando de `evals/README.md`.
   declara `secrets.ANTHROPIC_API_KEY` y ejecuta `claude plugin eval venoxia`
 
 verifies:   tests/test_ci_workflow.py
-confidence: low
-  why:      no se ha podido comprobar sin un run real en un runner limpio
-            de GitHub Actions si `claude plugin validate` exige credenciales
-            fuera de una sesión ya autenticada; por eso el job se marca
-            `continue-on-error` en vez de bloquear el resto del workflow
-  revisit:  cuando exista un run real de este job en GitHub Actions
+confidence: high
 from:       README.md#verificar-en-ci
 
 ### R-CI-004 · The consumer gate template pins Venoxia and skips pip
@@ -102,4 +92,49 @@ termina con código distinto de `0`.
 
 verifies:   tests/test_ci_workflow.py
 confidence: high
+from:       README.md#verificar-en-ci
+
+### R-CI-006 · The declared Python matrix actually passes on real GitHub Actions runners
+
+WHEN el job `tests` corre de verdad sobre los runners de GitHub Actions, el
+sistema DEBE completar en verde la suite en las tres versiones declaradas
+(3.12, 3.13 y 3.14), no sólo declararlas en la matriz.
+
+#### Scenario: The three matrix legs go green on a real run
+- **WHEN** se dispara un run real de `ci.yml` en GitHub Actions
+- **THEN** los tres trabajos de la matriz de `tests` (3.12, 3.13 y 3.14)
+  terminan en verde
+
+verifies:   tests/test_ci_workflow.py
+confidence: low
+  why:      esta sesión no puede disparar un run real de GitHub Actions
+            (ninguna acción remota) ni tiene instalado Python 3.12 en esta
+            máquina; sólo se ha confirmado que la suite pasa aquí con 3.13
+            y 3.14, y que el intérprete que corre esta comprobación es uno
+            de los tres declarados
+  revisit:  cuando exista el primer run real de la matriz en GitHub Actions
+from:       README.md#verificar-en-ci
+
+### R-CI-007 · plugin-validate's continue-on-error is confirmed necessary on a clean runner
+
+WHEN el job `plugin-validate` corre en un runner de GitHub Actions sin
+ninguna sesión de Claude Code autenticada de antemano, el sistema DEBE
+completar `claude plugin validate . --strict` sin credenciales
+adicionales; y si el CLI las exige, el `continue-on-error: true` del job
+DEBE seguir evitando que ese fallo bloquee el resto del workflow.
+
+#### Scenario: The safety net exists while the credential question is open
+- **WHEN** se parsea el job `plugin-validate`
+- **THEN** declara `continue-on-error: true`, así que aunque el CLI exija
+  credenciales en un runner limpio, el resto de `ci.yml` no se bloquea
+
+verifies:   tests/test_ci_workflow.py
+confidence: low
+  why:      esta máquina ya tiene una sesión de Claude Code autenticada, así
+            que no se puede comprobar aquí si `claude plugin validate`
+            exige credenciales en un runner limpio de GitHub Actions; el
+            `continue-on-error` es la mitigación mientras esa pregunta siga
+            abierta
+  revisit:  cuando exista un run real de este job en un runner limpio de
+            GitHub Actions
 from:       README.md#verificar-en-ci

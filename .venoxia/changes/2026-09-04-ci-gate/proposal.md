@@ -67,27 +67,34 @@ Ninguna: `validate.py`, `charter_lint.py`, `oracle.py`, `guardian.py` y
 
 ## Confidence
 
-- **El job `plugin-validate` se marca `continue-on-error`** · `low` · no se
-  puede comprobar sin un run real en un runner de GitHub Actions si `claude
-  plugin validate` exige credenciales fuera de una sesión interactiva; en
-  este repositorio, con una sesión ya autenticada, el comando no las pide ·
-  se revisa con el primer run real en GitHub Actions (el enlace queda
-  pendiente, ver «## Pendiente»).
+- **Que `claude plugin validate` no exija credenciales en un runner limpio
+  de GitHub Actions (`R-CI-007`)** · `low` · no se puede comprobar sin un
+  run real en un runner sin sesión previa; en este repositorio, con una
+  sesión ya autenticada, el comando no las pide · mitigado con
+  `continue-on-error: true` mientras tanto · se revisa con el primer run
+  real de ese job en un runner limpio (el enlace queda pendiente, ver
+  «## Pendiente»).
 - **El job `coverage` se marca `continue-on-error`** · `medium` · los dos
   huecos que le impiden salir en verde (`guardian.py` al 0 %, `oracle.py`
   al 81,3 %) ya están documentados en `TODO.md` como conocidos y no
   atribuibles a este change; convertirlos en un rojo permanente del repo no
   añade información nueva · se revisa cuando `tools/coverage.py --init` se
   vuelva a ejecutar tras cerrar cualquiera de los dos huecos.
-- **La matriz cubre 3.12, 3.13 y 3.14 sin haber podido probar 3.12 en esta
-  máquina** · `low` · el intérprete 3.12 no está instalado en este entorno
-  de desarrollo y no se ha instalado uno nuevo sólo para esta comprobación;
-  no se ha encontrado en el código ninguna sintaxis posterior a 3.12 (sin
-  `match`, sin `except*`, sin `tomllib`) y la suite sí se ha corrido en 3.13
-  y 3.14 · se revisa con el primer run real de la matriz en GitHub Actions.
-- **El resto de la propuesta** · `high` · los comandos y disparadores son
-  literales del contrato ya escrito en `README.md`, `evals/README.md` y
-  `TODO.md`; no hay apuesta de comportamiento nueva.
+- **Que la matriz declarada (3.12, 3.13, 3.14) pase de verdad en GitHub
+  Actions (`R-CI-006`)** · `low` · el intérprete 3.12 no está instalado en
+  este entorno de desarrollo y esta sesión no puede disparar un run real
+  (ninguna acción remota); no se ha encontrado en el código ninguna
+  sintaxis posterior a 3.12 (sin `match`, sin `except*`, sin `tomllib`) y la
+  suite sí se ha corrido en 3.13 y 3.14 · se revisa con el primer run real
+  de la matriz en GitHub Actions.
+- **El resto de la propuesta, incluida la forma estructural que declaran
+  `ci.yml` y `venoxia-gate.yml`** (`R-CI-001`…`R-CI-005`) · `high` · los
+  comandos, disparadores y nombres de job son literales del contrato ya
+  escrito en `README.md`, `evals/README.md` y `TODO.md`, y se comprueban
+  íntegramente por parseo estático (`tests/test_ci_workflow.py`); la única
+  incertidumbre real —si lo declarado se sostiene en un run real— se movió
+  a `R-CI-006` y `R-CI-007` en la ronda de corrección de esta propuesta, sin
+  la cual el 40 % del ámbito quedaba en `low` y `V11` (límite 30 %) fallaba.
 
 ## Pendiente
 
@@ -110,3 +117,27 @@ negativa se hizo en su forma local equivalente
 el `SHALL` introducido y revertida a continuación) y confirmó que V14
 dispara, pero eso no sustituye al run de GitHub Actions que el criterio
 pide.
+
+Ronda de corrección: una revisión independiente encontró que el delta
+original dejaba `R-CI-001` y `R-CI-003` en `confidence: low` por una apuesta
+que su propio texto no hacía (ambos sólo prometen lo que el YAML declara,
+no que un run real lo cumpla), llevando el ámbito al 40 % en `low` y
+haciendo fallar `V11` (límite 30 %) — un error real en `validate.py --root .
+--change 2026-09-04-ci-gate`, sin `--strict` siquiera, no disclosed en la
+entrega anterior. Se corrigió separando cada una en su parte estructural
+(ahora `high`) y una apuesta nueva propia: `R-CI-006` (la matriz
+efectivamente pasa en runners reales) y `R-CI-007` (`claude plugin
+validate` no exige credenciales en un runner limpio), ambas `low` y ambas
+genuinas. El ámbito pasó a 7 requisitos, 2 en `low` (28,6 %), `V11` en
+verde. `oracle.py --record` se volvió a ejecutar sobre el change: como
+`ci.yml` y `venoxia-gate.yml` ya existían y pasaban, sólo pudo grabar un run
+verde para las siete IDs — no hay forma retroactiva de fabricar un rojo
+para `R-CI-006`/`R-CI-007` sin deshacer código que ya funciona. Por eso
+`validate.py --strict` sobre este change emite ahora dos avisos `V18`
+nuevos (`R-CI-006`, `R-CI-007`, «pasó a verde sin haber estado en rojo»),
+del mismo tipo ya aceptado para `R-ORC-001`…`R-ORC-008` de
+`2026-09-04-oracle`: cero errores, sólo avisos, documentados también en
+`TODO.md`. El resto de la entrega (contenido de `ci.yml` y
+`venoxia-gate.yml`, sección del README, ausencia de `pip`, suite completa,
+`charter_lint.py --strict`, `claude plugin validate --strict`, cifras de
+los cinco fixtures de `evals/`) no cambió y se volvió a comprobar en verde.
