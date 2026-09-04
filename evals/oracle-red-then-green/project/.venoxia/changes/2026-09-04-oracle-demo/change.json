@@ -1,0 +1,7 @@
+{
+  "id": "2026-09-04-oracle-demo",
+  "state": "validated",
+  "via": "spec",
+  "capabilities": ["checkout"],
+  "created": "2026-09-04T21:00:00Z"
+}

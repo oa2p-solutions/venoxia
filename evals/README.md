@@ -1,6 +1,6 @@
 # Evals de Venoxia
 
-Cinco casos que responden a una sola pregunta: **¿el sistema falla cuando debe y calla
+Seis casos que responden a una sola pregunta: **¿el sistema falla cuando debe y calla
 cuando debe?** No miden si el modelo escribe bonito. Cada caso monta un proyecto de
 juguete completo bajo `<caso>/project/`, pide capturar la salida JSON de la herramienta
 determinista que corresponda, y puntúa **el contenido de ese JSON**, no la prosa de la
@@ -16,7 +16,7 @@ claude plugin eval venoxia --ablation with-without \
 
 El `--allow-tools` no es opcional: `Bash` y `Write` son herramientas con verja y sin ese
 permiso de operador ningún caso puede ejecutar `validate.py` ni escribir el JSON que se
-puntúa. Sin él los cinco casos fallan por falta de permisos, no por regresión.
+puntúa. Sin él los seis casos fallan por falta de permisos, no por regresión.
 
 Variantes útiles:
 
@@ -44,6 +44,7 @@ cambiado de verdad.
 | `budget-exceeded` | 2 de 5 requisitos en `confidence: low` (40 %) | Rechazo con **V11** y solo con V11, con `budget.low = 2` y `budget.total = 5` |
 | `ambiguous-status-code` | El escenario dice que la petición «se rechaza» sin fijar el código | Divergencia **dura** en `status_code`: 409 contra 422, con pregunta cerrada |
 | `ambiguous-partial-effect` | El requisito dice que el sistema «reserva lo que puede» | Divergencia **dura** en `side_effects` (pedido completo contra unidades con stock) y **blanda** en `effect` |
+| `oracle-red-then-green` | Change `validated` con dos requisitos: uno con marcador de fallo para el runner falso, otro que pasa tal cual | El oráculo distingue: `R-CHK-001` en `green`, `R-CHK-002` en `red`, `all_green: false` |
 
 ### `clean-spec` es el caso que más importa
 
@@ -125,16 +126,32 @@ real. `clean-spec` pasa además en modo `--strict`.
 | `budget-exceeded` | `ok: false` · 1 error (V11) · 0 avisos · 5 requisitos · `low: 2` · ratio 0.4 | — |
 | `ambiguous-status-code` | `ok: true` (la ambigüedad es invisible al validador, y eso es la tesis) | `converged: false` · hard 1 · soft 0 · gaps 0 |
 | `ambiguous-partial-effect` | `ok: true` | `converged: false` · hard 1 · soft 1 · gaps 0 |
+| `oracle-red-then-green` | no aplica (no se ejecuta `validate.py`) | no aplica (no se ejecuta `diff_readings.py`) |
 
 Que los dos casos de ambigüedad pasen el validador no es un descuido: es el argumento
 entero del motor de divergencia. Una especificación puede cumplir las dieciocho reglas y
 seguir admitiendo dos lecturas incompatibles. El validador comprueba la forma; la
 divergencia comprueba el significado.
 
-Ningún fixture trae `oracle.json`: los cinco changes se quedan en `draft`, sin
-oráculo grabado, así que `V17` (que sólo mira changes en `verified`) y `V18`
-(que sólo mira changes con `oracle.json`) no se evalúan sobre ninguno de los
-cinco y las cifras de la tabla no cambian por su llegada.
+Ninguno de los cinco primeros fixtures trae `oracle.json`: esos changes se quedan en
+`draft`, sin oráculo grabado, así que `V17` (que sólo mira changes en `verified`) y `V18`
+(que sólo mira changes con `oracle.json`) no se evalúan sobre ninguno de los cinco y las
+cifras de la tabla de arriba no cambian por su llegada.
+
+`oracle-red-then-green` es distinto: no pasa por `validate.py` ni por
+`diff_readings.py`, pasa por `oracle.py`. Su change `2026-09-04-oracle-demo` está
+`validated` con dos requisitos; `R-CHK-001` (`test/checkout/receipt.spec.ts`) no lleva
+marcador y el runner falso lo da por bueno, `R-CHK-002`
+(`test/checkout/refund.spec.ts`) lleva `// RESULT: red` y el runner falso sale con `1`.
+Comprobado a mano:
+
+```bash
+python3 scripts/oracle.py --root evals/oracle-red-then-green/project \
+  --change 2026-09-04-oracle-demo --json --no-color
+```
+
+produce `all_green: false`, `all_red: false` y `counts` de `green: 1`, `red: 1`,
+`missing: 0`, `timeout: 0`, `total: 2` — las cifras que sus graders dan por buenas.
 
 ## Cuando un caso falla
 

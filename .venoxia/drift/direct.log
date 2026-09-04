@@ -78,3 +78,16 @@
 {"ts": "2026-09-04T21:16:38Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_ci_workflow.py"}
 {"ts": "2026-09-04T21:16:48Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_ci_workflow.py"}
 {"ts": "2026-09-04T21:18:57Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}
+{"ts": "2026-09-04T21:33:25Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "evals/oracle-red-then-green/project/tools/fake_runner.py"}
+{"ts": "2026-09-04T21:33:28Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "evals/oracle-red-then-green/project/.venoxia/venoxia.json"}
+{"ts": "2026-09-04T21:33:33Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "evals/oracle-red-then-green/project/.venoxia/principles.md"}
+{"ts": "2026-09-04T21:33:38Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "evals/oracle-red-then-green/project/prfaq/checkout-sin-sorpresas.md"}
+{"ts": "2026-09-04T21:33:47Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "evals/oracle-red-then-green/project/.venoxia/changes/2026-09-04-oracle-demo/change.json"}
+{"ts": "2026-09-04T21:34:01Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "evals/oracle-red-then-green/project/.venoxia/changes/2026-09-04-oracle-demo/delta/checkout.md"}
+{"ts": "2026-09-04T21:34:04Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "evals/oracle-red-then-green/project/test/checkout/receipt.spec.ts"}
+{"ts": "2026-09-04T21:34:10Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "evals/oracle-red-then-green/project/test/checkout/refund.spec.ts"}
+{"ts": "2026-09-04T21:34:35Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "evals/oracle-red-then-green/case.yaml"}
+{"ts": "2026-09-04T21:34:40Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "evals/README.md"}
+{"ts": "2026-09-04T21:34:43Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "evals/README.md"}
+{"ts": "2026-09-04T21:34:49Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "evals/README.md"}
+{"ts": "2026-09-04T21:35:03Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "evals/README.md"}

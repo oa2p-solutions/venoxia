@@ -1,0 +1,84 @@
+schema_version: "1.0"
+name: oracle-red-then-green
+description: >-
+  Un change `validated` con dos requisitos: uno cuyo test lleva el marcador de fallo
+  del runner falso y otro que pasa tal cual. Mide que el plugin ejecute el oráculo
+  de verdad —no que cuente lo que cree— y que el JSON grabado distinga rojo de verde.
+tags: [oracle, tdd, must-detect]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Trabajas sobre un proyecto que usa Venoxia. Su raíz es el directorio `project/`, que
+    se te ha añadido a esta sesión como directorio de trabajo adicional; dentro tiene su
+    especificación en `.venoxia/`. Localízalo antes de nada si no lo tienes a la vista.
+
+    Pasa el oráculo del change `2026-09-04-oracle-demo` y guarda la salida JSON íntegra
+    en `oracle-result.json`, dentro de tu directorio de trabajo actual. Cópiala tal cual:
+    sin editarla, sin resumirla y sin reformatearla.
+
+    No arregles nada bajo `project/`: ni el test que falla ni el código que le falta. Que
+    el oráculo termine con un requisito en rojo no es un fallo de la herramienta: es justo
+    el resultado que se te pide capturar.
+
+    Termina con dos frases como mucho: cuántos requisitos quedaron en verde y cuántos en
+    rojo, y si el conjunto está en verde completo o no.
+  max_turns: 14
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Skill]
+runs: 2
+expected_outcome: >-
+  El oráculo distingue los dos requisitos del change: `R-CHK-001` en `green` y
+  `R-CHK-002` en `red`, con `all_green: false` y `counts` de `green: 1`, `red: 1`,
+  `missing: 0`, `timeout: 0`, `total: 2` en el JSON grabado.
+graders:
+  - type: tool_used
+    name: oracle-script-ran
+    tool: Bash
+    input_match: 'oracle\.py'
+    min: 1
+  - type: file_exists
+    name: oracle-result-written
+    path: oracle-result.json
+  - type: regex
+    name: oracle-schema-version
+    target:
+      source: file
+      path: oracle-result.json
+    pattern: '"version":\s*1,\s*"change":\s*"2026-09-04-oracle-demo"'
+    flags: "s"
+  - type: regex
+    name: not-all-green
+    target:
+      source: file
+      path: oracle-result.json
+    pattern: '"all_green":\s*false'
+  - type: regex
+    name: a-requirement-is-red
+    target:
+      source: file
+      path: oracle-result.json
+    pattern: '"status":\s*"red"'
+  - type: regex
+    name: a-requirement-is-green
+    target:
+      source: file
+      path: oracle-result.json
+    pattern: '"status":\s*"green"'
+  - type: regex
+    name: counts-are-exactly-one-and-one
+    target:
+      source: file
+      path: oracle-result.json
+    pattern: '"counts":\s*\{\s*"green":\s*1,\s*"red":\s*1,\s*"missing":\s*0,\s*"timeout":\s*0,\s*"total":\s*2'
+    flags: "s"
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only

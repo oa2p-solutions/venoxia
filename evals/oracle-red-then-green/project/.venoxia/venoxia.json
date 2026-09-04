@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "test_command": "python3 tools/fake_runner.py {files}",
+  "cwd": "."
+}
