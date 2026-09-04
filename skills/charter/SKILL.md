@@ -86,7 +86,7 @@ Con código delante hay que decidir además una cosa que la tabla no tiene colum
 
 Si existe `.venoxia/charter.md`, léelo entero y pásale el linter antes de preguntar nada. Después enseña lo que hay en cuatro líneas —el propósito, cuántos usuarios, la capability 1 con su `Done when`, cuántas apuestas— y **lo que falta**, que es lo que de verdad interesa.
 
-Trae también, delante de todo, las apuestas cuyo `revisit` ya ha pasado. Una apuesta vencida es el motivo por el que existe la sección: alguien se comprometió a volver a mirarla en esta fecha y la fecha es hoy.
+Trae también, delante de todo, **todas las apuestas vivas con su `revisit`**, y pregunta una por una si ese hecho ya ha ocurrido. Ése es el momento en que una apuesta se resuelve, y por eso `revisit` declara un hecho y no una fecha: nadie abre un fichero porque hoy sea 12 de noviembre, pero cualquiera sabe contestar a «¿ya habéis cerrado las diez primeras compras?». Las que hayan ocurrido se resuelven ahora —sube la confianza y quita el `revisit`, o corrige lo que la apuesta daba por hecho—; las que no, se quedan como están y se dice.
 
 Luego pregunta, con opciones y sin dar por hecho ninguna: **continuar por donde se quedó**, **revisar una sección concreta** (y cuál) o **empezar de cero**. Si es lo último, avisa antes de escribir: el acta nueva pisa la anterior y esta skill no guarda copias —escribe tres cosas y no una cuarta—, así que si quiere conservarla, que la aparte antes.
 
@@ -135,7 +135,9 @@ Distingue las dos cosas que se confunden en esta tanda, porque el acta las guard
 
 ### Tanda E · ¿Lo has visto o lo supones?
 
-Obligatoria, y como mínimo sobre el propósito y sobre la capability de prioridad 1. Es la tanda que convierte el acta en un documento honesto.
+Obligatoria, y como mínimo sobre el propósito y sobre la capability de prioridad 1. Es la tanda que convierte el acta en un documento honesto. Tiene dos mitades y las dos son obligatorias: la primera mira al pasado y la segunda al futuro, y **una apuesta que no aparece en la primera casi siempre aparece en la segunda**.
+
+#### E.1 · Lo que ya pasó
 
 Primera pregunta, con estas cuatro opciones tal cual:
 
@@ -146,7 +148,38 @@ Primera pregunta, con estas cuatro opciones tal cual:
 | «Lo supongo, pero me parece razonable» | Apuesta con `confidence: medium` |
 | «Es una corazonada» | Apuesta con `confidence: low` |
 
-Y para cada apuesta, dos preguntas más: **«¿qué verías que te haría cambiar de opinión, y para cuándo lo sabrás?»** —de ahí salen `why` y `revisit`— y **«si esto sale mal, ¿el proyecto sigue teniendo sentido?»**, que es `fatal`.
+Y para cada apuesta, dos preguntas más, y la primera va **partida en dos** porque juntas se contesta sólo la mitad:
+
+- **«¿Qué verías que te haría cambiar de opinión?»** → `why`.
+- **«¿Y qué tendría que pasar para que pudieras verlo?»** → `revisit`.
+
+La segunda pide un **hecho**, no una fecha: «cuando hayamos cerrado las diez primeras compras», «cuando el primer proveedor conteste por el hilo». **Tú no lo inventas nunca**, y no es una regla de estilo: no sabes a qué ritmo pasan las cosas en este negocio, así que cualquier plazo que escribas es un número al aire con aspecto de compromiso. Si la respuesta no llega, no la rellenes: pregunta por el ritmo real —«¿cuántos presupuestos os llegan a la semana?»— y deja que el hecho salga de ahí. `C12` rechaza tanto las fechas como los «ya veremos», y con razón: las dos cosas son la misma, una casilla ocupada sin nada dentro.
+
+Y la tercera: **«si esto sale mal, ¿el proyecto sigue teniendo sentido?»**, que es `fatal`.
+
+#### E.2 · Lo que hará falta que alguien haga
+
+Sobre **cada fila de la tabla**, no sólo sobre la primera, una pregunta que la mitad de arriba no puede hacer:
+
+> **«Para que esta fila valga, ¿alguien tiene que hacer algo que hoy no hace?»**
+
+«¿Lo has visto o lo supones?» pregunta por hechos del presente, y la respuesta honesta sobre un comportamiento que todavía no existe es «no lo he visto porque no existe». Por ahí se cuela intacta la suposición más cara que un acta puede tener: **que alguien va a rellenar un dato manualmente, más tarde, sin recompensa inmediata.** Marcar si el proveedor cumplió, valorar al candidato, cerrar la incidencia, confirmar la recepción. En la entrevista todo el mundo dice de buena fe que sí lo hará, y en el mes tres nadie lo hace.
+
+Cuando la respuesta sea que sí, tres preguntas más, y son las que deciden lo que se escribe:
+
+| Pregunta | Qué destapa |
+|---|---|
+| **¿Cuánto tarda en pasar desde que la persona hace lo suyo?** | Dentro de la misma sesión no es una apuesta. Días o semanas después, sí |
+| **¿Qué gana quien lo hace, en ese momento?** | Si el beneficio se lo lleva otro, u otro día, la apuesta es de las malas |
+| **¿Qué fila se queda vacía si nadie lo hace?** | Si alguna otra capability lee ese dato, el daño no sale donde lo esperas |
+
+Con eso ya tienes la apuesta entera. Y si la tercera pregunta señala a otra fila —una que ordena, puntúa o resume a partir de lo que aquí se marca—, es **`fatal: yes`** aunque la fila que lo recoge parezca inofensiva: cuando nadie marque, no fallará esta capability, saldrá en blanco la otra, y quien la mire creerá que el fallo está donde no está.
+
+La apuesta se escribe **nombrando el slug de la fila en su prosa**. No es cosmético: es lo único que enlaza una apuesta con la capability que sostiene, y es lo que miran `C18` y `C19` para saber si el riesgo ya está declarado. Sin el slug, la apuesta existe y el linter sigue avisando, con razón: dentro de tres meses nadie sabrá de qué fila hablaba.
+
+Y una salida que conviene ofrecer antes de dar la apuesta por buena: **si al escribirla ves que no te fías del todo, la respuesta no es la apuesta, es rediseñar la fila** para que el dato lo recoja el sistema en vez de esperar a que alguien entre a ponerlo. Una apuesta declarada avisa; un dato que se recoge solo no hace falta que avise.
+
+#### Lo que sale de las dos mitades
 
 Una apuesta con `fatal: yes` y `confidence: low` es la línea más importante del acta. No la entierres entre las demás: se dice en voz alta en la entrega y es lo que habría que ir a comprobar esta semana, antes de escribir ninguna spec.
 
@@ -182,7 +215,21 @@ Cuatro casos, y los cuatro se arreglan con la pregunta siguiente, no señalando 
 
 > **Ante `<la tensión>`, se prefiere `<A>` a costa de `<B>`.** `<Por qué, con las palabras del usuario.>`
 
-Si no apareció ninguno, `principles.md` sale sin principios de dominio y lo dices. **No los inventes**: un principio de dominio fabricado por ti se convierte en una restricción que nadie recuerda haber aceptado y que a partir de mañana decide specs.
+**No los inventes**: un principio de dominio fabricado por ti se convierte en una restricción que nadie recuerda haber aceptado y que a partir de mañana decide specs.
+
+**Pero cazar no basta, porque hay tensiones que la tabla trae escritas aunque el usuario no las haya dicho en voz alta.** Cuando una capability promete un juicio y no un dato —comparar, puntuar, ordenar por varios criterios, recomendar, señalar cuál gana—, el desempate existe: alguien va a tener que decidir qué pasa cuando el más barato es el más lento. Que no aparezca en la entrevista no significa que no haga falta; significa que se va a tomar sin que nadie mire. Ahí sí se pregunta, y se pregunta **con la tensión concreta de su tabla delante**, no en abstracto:
+
+> «La fila 2 compara por precio, plazo y forma de pago. Si un proveedor es 600 € más barato y tarda un mes más, ¿cuál quieres que salga marcado como el que gana?»
+
+Ésa es una pregunta que se puede contestar, a diferencia de «¿cuáles son tus principios?». Y **preguntar no es inventar**: lo que no puedes escribir es la respuesta; la pregunta es tuya y es tu trabajo hacerla. Tres respuestas posibles y las tres son buenas:
+
+- **Elige uno.** Ya tienes el principio, con sus palabras.
+- **«Depende».** Pregunta de qué depende: eso también es el principio, y suele ser mejor que el anterior.
+- **«Que no elija el sistema, que lo vea el comprador y decida él.»** Entonces no hay principio que escribir, pero **hay una celda que arreglar**: si la capability no arbitra, «Qué podrá hacer» no puede decir que arbitra. Corrige la fila.
+
+Si aun así el usuario no quiere decidirlo hoy, se respeta, y entonces el desempate es una apuesta: va a `## Bets` con su `revisit`, no a los principios. Lo que no puede es desaparecer.
+
+Y si de verdad no apareció ninguno y la tabla tampoco arbitra, `principles.md` sale sin principios de dominio y lo dices. Es un final legítimo: hay proyectos que sólo mueven datos de un sitio a otro y no tienen ningún juicio que declarar.
 
 ## Paso 5 · Cuándo se para
 
@@ -192,11 +239,12 @@ Si no apareció ninguno, `principles.md` sale sin principios de dominio y lo dic
 2. **un** usuario con su `**hoy:**` y su `**con esto:**`,
 3. la capability de prioridad 1 con su `Done when` observable,
 4. **un** no-alcance con su porqué,
-5. y la tanda E pasada sobre el 1 y el 3, con lo que resulte supuesto ya escrito en `## Bets`,
+5. la tanda E pasada —**las dos mitades**— sobre el propósito y sobre la capability de prioridad 1, con lo que resulte supuesto ya escrito en `## Bets`,
+6. y, **sólo si alguna fila de la tabla arbitra**, el desempate resuelto: o un principio de dominio, o una apuesta que diga que aún no se ha decidido.
 
-el acta ya vale para escribir la primera spec. Todo lo demás —el segundo usuario, la fila 4, la apuesta que se le acaba de ocurrir— se completa después, y se completa mejor cuando haya algo funcionando. Cuando tengas esas cinco cosas, **ofrece cerrar**; no sigas preguntando porque queden casillas.
+el acta ya vale para escribir la primera spec. Todo lo demás —el segundo usuario, la fila 4, la apuesta que se le acaba de ocurrir— se completa después, y se completa mejor cuando haya algo funcionando. Cuando tengas esas cosas, **ofrece cerrar**; no sigas preguntando porque queden casillas.
 
-La quinta entra en el mínimo y no en «todo lo demás», y no es un capricho: es la única de la lista que no se puede añadir más tarde. Las otras cuatro siguen ahí mañana esperando a que alguien las escriba; la diferencia entre lo que el usuario vio y lo que supuso se borra sola en cuanto pasan unas semanas, y entonces el acta entera se lee como si todo estuviera comprobado. Dos preguntas cuestan dos minutos hoy y no se pueden recuperar después.
+Las dos últimas entran en el mínimo y no en «todo lo demás», y no es un capricho: son las únicas de la lista que no se pueden añadir más tarde en las mismas condiciones. Las otras cuatro siguen ahí mañana esperando a que alguien las escriba. La diferencia entre lo que el usuario vio y lo que supuso, en cambio, se borra sola en cuanto pasan unas semanas, y entonces el acta entera se lee como si todo estuviera comprobado. Y un desempate que no está escrito cuando se redacta la primera spec no se queda pendiente: **se toma solo**, en una línea de un requisito, y a partir de ahí es «como funciona el sistema» sin que nadie recuerde haberlo acordado. Dos preguntas cuestan dos minutos hoy y no se recuperan después.
 
 Y hay un tope por el otro lado: si después de seis tandas no hay una capability de prioridad 1 con un `Done when` observable, para igualmente y dilo. No es un fracaso de la entrevista, es su hallazgo más útil: el proyecto todavía no está en condiciones de que le escriban una spec, y saberlo hoy es mucho más barato que descubrirlo con tres meses de código encima.
 
@@ -230,6 +278,12 @@ La forma es vinculante porque la comprueba un script:
 | `## Out of scope` | Una o más viñetas `- **<Qué>.** <por qué no>` | Un «no» sin razón se vuelve a abrir en la primera reunión en la que alguien insista |
 | `## Bets` | Cero o más `### B-NNN · <título>`, con prosa y el bloque de metadatos | Separa lo observado de lo supuesto antes de que pase el tiempo y ya no se distingan |
 
+**Antes de dar el acta por escrita, un repaso que ningún script puede hacer por ti: cada dolor que nombraste en un `**hoy:**` tiene que acabar en algún sitio.** O en una fila de la tabla, o en `## Out of scope`. Las viñetas de `**hoy:**` son la parte del acta que se escribe con las palabras del usuario y sin filtrar, así que casi siempre nombran más problemas de los que el proyecto va a resolver —«y además somos tres comprando, cada uno con su hoja, sin ver lo que ha pedido el otro»—. Ese «además» es un dolor real que alguien ha dicho en voz alta, y si no aparece en ninguna de las dos secciones, el acta lo deja colgado: no está prometido, pero tampoco está descartado. Alguien lo leerá dentro de dos meses y dará por hecho que entra.
+
+Recórrelas una por una y decide con el usuario, en una sola pregunta por cabo suelto: **entra** —y se le busca fila y prioridad—, o **no entra** —y se escribe como no-alcance, con su porqué—. La respuesta suele ser la segunda, y tarda diez segundos. Un no escrito vale más que un silencio.
+
+Ese mismo repaso destapa la otra cosa que se escapa: **un dolor que no es del usuario que tienes en la lista**. Si la tabla promete algo que mira alguien por encima —un responsable que ve el histórico, un jefe de equipo que compara— y en `## Users` sólo está quien hace el trabajo del día, falta un papel. O se añade con sus dos viñetas, o la fila es del usuario que ya está; lo que no puede es que la capability sirva a alguien que el acta no nombra.
+
 Las cinco secciones van siempre, en este orden y con estos encabezados exactos: es lo primero que comprueba el linter. `## Bets` puede quedarse sin ninguna apuesta debajo —es legal—, pero si en la tabla hay un `high`, el aviso llegará y con razón.
 
 Las columnas de la tabla, en este orden y con estos títulos:
@@ -249,11 +303,11 @@ El bloque de metadatos de una apuesta tiene la misma forma que el de un requisit
 ```
 confidence: low
   why:      no lo hemos comprobado con ningún restaurante real
-  revisit:  2026-12-15
+  revisit:  cuando hayamos hablado con tres restaurantes que ya reserven por enlace
   fatal:    no
 ```
 
-`confidence` es `high`, `medium` o `low`; `revisit` es una fecha ISO estrictamente futura; `fatal` es `yes` o `no` y contesta a si el proyecto sigue teniendo sentido cuando la apuesta sale mal.
+`confidence` es `high`, `medium` o `low`; `revisit` es **el hecho que resuelve la apuesta**, nunca una fecha y nunca un «más adelante»; `fatal` es `yes` o `no` y contesta a si el proyecto sigue teniendo sentido cuando la apuesta sale mal.
 
 ## Paso 8 · Escribir los principios
 
@@ -285,7 +339,11 @@ requisitos pueden nacer con `confidence: low`.
 - **Ante <la tensión>, se prefiere <A> a costa de <B>.** <Por qué, con las palabras del usuario.>
 ```
 
-Este fichero no lo parsea ningún script: lo leen las personas y `/venoxia:specify` antes de redactar nada. Por eso sus encabezados van en español, a diferencia de los del acta. Si una de las dos secciones quedó vacía, bórrala en vez de dejar el hueco con un ejemplo dentro.
+De este fichero el linter lee una sola cosa —si hay principios de dominio, para `C17`—; todo lo demás lo leen las personas y `/venoxia:specify` antes de redactar nada. Por eso sus encabezados van en español, a diferencia de los del acta, y por eso el de dominio se escribe **exactamente** así: `## Principios de dominio`.
+
+Si una de las dos secciones quedó vacía, bórrala en vez de dejar el hueco con un ejemplo dentro. El hueco de la plantilla —el que trae `<la tensión>` entre ángulos— no cuenta como principio ni para el linter ni para nadie: dejarlo puesto es peor que borrar la sección, porque aparenta un acuerdo que no existe.
+
+Con una excepción, y es la que `C17` va a señalar: **si alguna fila de la tabla arbitra, la sección de dominio no se borra por vacía.** O lleva el desempate, o la entrevista todavía no ha terminado. Vuelve al Paso 4 y haz la pregunta con la tensión concreta delante.
 
 ## Paso 9 · Pasar el linter y corregir hasta verde
 
@@ -297,13 +355,21 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/charter_lint.py" --root "<raíz>" --stric
 
 **Con `--strict` desde la primera ejecución**, y aquí no hay excusa posible para el rojo. La spec tiene una: `V07` y `V08` se quedan rojas esperando un test que todavía no está escrito, y ese rojo es correcto. El acta no depende de nada externo —todo lo que necesita está en el mismo fichero—, así que **todo hallazgo, error o aviso, se resuelve aquí**, a veces con una pregunta más de por medio. Devolver el control con uno pendiente es dejar el acta a medio acordar.
 
-Itera: lee cada hallazgo, corrige el acta, vuelve a ejecutar. Las reglas se llaman `C01`–`C16`, como las `V01`–`V16` del validador, y cada hallazgo trae su remedio: preséntalo como lo hace `/venoxia:validate`, con el error delante y el remedio pegado. No reclasifiques la severidad, no descartes un hallazgo por parecerte menor y no matices el veredicto: si el script sale con `1`, el acta no cumple.
+Itera: lee cada hallazgo, corrige el acta, vuelve a ejecutar. Las reglas se llaman `C01`–`C19`, como las `V01`–`V16` del validador, y cada hallazgo trae su remedio: preséntalo como lo hace `/venoxia:validate`, con el error delante y el remedio pegado. No reclasifiques la severidad, no descartes un hallazgo por parecerte menor y no matices el veredicto: si el script sale con `1`, el acta no cumple.
 
 Tres casos que se paran a preguntar en vez de corregirse solos, y los tres por el mismo motivo: el remedio pasaría por **inventar contenido**.
 
 - Una columna `Done when` vacía —o llena con una fórmula que no dice quién ve qué— y un no-alcance que no existe —o que dice «nada por ahora», que para el linter es lo mismo— no se arreglan escribiendo algo plausible: se arreglan con una pregunta más al usuario.
 - Una viñeta `**hoy:**` o `**con esto:**` que falta tampoco se completa con lo que ese papel suele hacer. O se pregunta, o se borra el usuario entero: un acta con un solo usuario de verdad es mejor que una con dos, uno de ellos con dos frases que nadie ha dicho, porque la segunda aparenta que se ha hablado con dos personas.
 - Un riesgo alto sin apuestas **no se arregla bajando el riesgo a `medium`**. Eso apaga el aviso sin tocar el problema, que es el peor arreglo posible en una herramienta que existe para señalar lo que no se sabe. Se arregla preguntando qué se está dando por hecho en esa capability.
+
+Y tres más, que son los avisos de fondo: `C17`, `C18` y `C19` no señalan la forma del acta, señalan algo que no se ha decidido todavía. Ninguno se calla escribiendo lo que suene bien.
+
+- **`C17` · una capability arbitra y no hay principio de dominio.** El remedio es la pregunta del Paso 4, con la tensión concreta de su tabla delante. Escribir un principio que el usuario no ha dicho es exactamente lo que el Paso 4 prohíbe, y de propina apaga el aviso: quedaría un criterio inventado gobernando todas las specs del proyecto.
+- **`C18` · un «Done when» absoluto sin apuesta que lo respalde.** Dos salidas y las dos son del usuario: bajar el listón a algo alcanzable, o dejarlo y declarar la apuesta. No elijas tú. «Sin corregir ninguno» puede ser una exigencia deliberada del negocio o una frase que sonaba bien, y sólo quien la escribió sabe cuál de las dos.
+- **`C19` · un «Done when» que espera a que alguien vuelva.** Es la tanda E.2 sin hacer. Vuelve a ella con esa fila: cuánto tarda, qué gana quien lo hace, y qué otra fila se queda en blanco si no lo hace. Y **no lo arregles quitando el paso diferido de la celda**: la frase se queda limpia y la dependencia sigue ahí, sólo que ya no la ve nadie.
+
+Los tres se callan también con el arreglo bueno cuando el arreglo bueno es rediseñar la fila —que el sistema recoja el dato en vez de esperar a alguien, que la celda no prometa un juicio que la capability no hace—. Eso no es apagar un aviso: es lo que el aviso pedía.
 
 Corregir la forma es tuyo; rellenar el fondo, no.
 
@@ -320,6 +386,7 @@ Termina con un informe corto, sin adornos:
 - Los ficheros escritos, con ruta.
 - El acta en cuatro líneas: el propósito, cuántos usuarios, la capability 1 con su `Done when`, y cuántas apuestas hay.
 - **Las apuestas con `fatal: yes`, delante y por su nombre**, con la fecha en la que se resuelven. Si alguna es además `confidence: low`, ésa es la primera frase de la entrega.
+- **El desempate, si alguna fila arbitra**: el principio de dominio tal como quedó escrito, o —si el usuario prefirió no decidirlo hoy— la apuesta en la que se aparcó y su fecha. Es la línea del acta que más lejos llega: la va a leer cada `/venoxia:specify` de aquí en adelante, y es la única que decide comportamiento sin estar en ningún requisito.
 - El veredicto literal del linter.
 - Lo que quedó sin cerrar y qué haría falta para cerrarlo. Una casilla vacía se dice; no se disimula.
 - Toda decisión que tomaste tú porque la entrevista no la cubría, marcada como tal. Una asunción tuya que el usuario no ve es una asunción que nadie revisa.

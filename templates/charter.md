@@ -80,6 +80,10 @@ cuaderno que sólo entiende quien lo escribió.
        «la funcionalidad está completa»—. Mencionar uno de esos verbos de pasada, en
        cambio, no cuenta: «el dueño ve las mesas libres sin configurar nada» describe un
        hecho y pasa.
+       Y ojo con el criterio que no admite un fallo —«sin corregir ninguno», «siempre
+       acierta»—: no está prohibido, pero casi nunca se elige a sabiendas, y el linter
+       pide que se declare como apuesta o se baje a algo alcanzable. Lo mismo con el que
+       sólo se cumple si alguien vuelve semanas después a rellenar un dato.
      · `Risk` — `high`, `medium` o `low`. Mide lo que no se sabe de esta capability, no lo
        que cuesta programarla: `high` es que puede resultar que no era la que hacía falta,
        o que su comportamiento correcto todavía está por decidir. Un `high` en la fila 1 no
@@ -144,6 +148,24 @@ cuaderno que sólo entiende quien lo escribió.
        sentido? Un `fatal: yes` con `confidence: low` es la línea más importante del
        documento y lo que habría que ir a comprobar esta semana, antes de escribir
        ninguna spec.
+
+     **Nombra el slug de la capability en la prosa de la apuesta.** El acta no tiene un
+     campo que las enlace, así que el nombre es lo único que dice de qué fila hablaba
+     ésta el día que alguien llegue a su `revisit:`. También es lo que miran `C18` y
+     `C19` para saber si el riesgo de una fila ya está declarado.
+
+     Dos apuestas que casi nunca se escriben solas y que el linter va a ir a buscar:
+
+     · **El «Done when» absoluto** (`C18`). «Sin corregir ninguno», «nunca falla», «el
+       100 %»: un criterio que no admite un fallo es una suposición sobre lo bien que va
+       a salir algo que todavía no existe. O se baja el listón a algo alcanzable, o se
+       escribe aquí abajo como lo que es.
+     · **El paso que espera a alguien** (`C19`). «Pasada la entrega, marca si cumplió el
+       plazo.» Manual, semanas después, y quien lo hace no cobra el beneficio: se lo
+       lleva quien use el dato el mes que viene. Es la dependencia que más veces se
+       incumple y la que menos veces está escrita. Mira bien el `fatal:` de ésta: si otra
+       fila ordena o resume a partir de ese dato, cuando nadie lo rellene no fallará la
+       fila que lo pide, saldrá en blanco la otra.
 
      El encabezado se queda aunque no tengas ninguna apuesta: las cinco secciones son
      obligatorias. Ahora bien, un acta con un `high` en la tabla y esta sección vacía es

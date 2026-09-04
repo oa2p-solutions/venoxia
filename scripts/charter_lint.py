@@ -4,7 +4,7 @@
 El acta (`.venoxia/charter.md`) es lo que existe **antes** de que exista un
 cambio que especificar: dice qué cambia en el mundo, para quién, qué se va a
 construir y en qué orden, qué queda fuera y qué se está suponiendo. Aquí viven
-las dieciséis reglas que la juzgan. Todas son deterministas: ninguna consulta a
+las diecinueve reglas que la juzgan. Todas son deterministas: ninguna consulta a
 un modelo, ninguna toca la red y sólo `C12` mira el calendario, para saber si
 una apuesta con fecha de revisión ya venció. Dos ejecuciones sobre la misma acta
 producen el mismo veredicto y el mismo JSON, byte a byte.
@@ -266,6 +266,88 @@ _FILLER_EXCLUSION_ALTERNATIVES = (
 FILLER_EXCLUSION_RE = re.compile(
     "^(?:" + "|".join(_FILLER_EXCLUSION_ALTERNATIVES) + ")$"
 )
+
+#: Marcas con las que una capability declara que **arbitra**: que el sistema no
+#: se limita a enseñar datos, sino que emite un juicio sobre cuál de varias
+#: opciones vale más. Un arbitraje siempre esconde un criterio de desempate —qué
+#: gana cuando el más barato es el más lento— y ese criterio es una decisión de
+#: negocio, no de programación. Si no está escrito en «## Principios de dominio»,
+#: lo acaba tomando quien implementa, en una línea que nadie volverá a encontrar.
+#:
+#: La lista es corta a propósito y sólo recoge formas de alta señal. Fuera queda
+#: «elegir»: en «el comprador elige el proveedor» quien arbitra es la persona, y
+#: denunciarlo sería el falso positivo que acaba con la regla apagada. «Ordenar»
+#: entra sólo cuando nombra los criterios —«ordenados **por** cumplimiento y
+#: precio»—, porque «ordenados alfabéticamente» no tiene desempate que declarar.
+_ARBITRATION_ALTERNATIVES = (
+    r"comparar|compara|comparacion|comparativa|comparad[oa]s?",
+    r"priorizar|prioriza|priorizacion|priorizad[oa]s?",
+    r"puntuar|puntua|puntuacion|puntuad[oa]s?",
+    r"clasificar|clasifica|clasificacion|ranking|rankear|rankead[oa]s?",
+    r"recomendar|recomienda|recomendacion|recomendad[oa]s?",
+    r"cual(?:\s+de\s+ell[oa]s)?\s+(?:gana|conviene|sale\s+mejor|es\s+(?:el\s+|la\s+)?mejor)",
+    r"(?:el|la)\s+mejor\s+(?:opcion|candidat[oa]|oferta|alternativa)",
+    r"orden(?:ar|ad[oa]s?)\b[^.;]{0,40}\bpor\b",
+)
+ARBITRATION_RE = re.compile("|".join(f"(?:{alt})" for alt in _ARBITRATION_ALTERNATIVES))
+
+#: Absolutos de acierto en un «Done when»: el criterio no admite ni un fallo, ni
+#: una corrección, ni una excepción. No son ilegales —hay comportamientos que de
+#: verdad son binarios— pero casi nunca se declaran a sabiendas: se escriben
+#: porque suenan bien, y convierten el criterio de entrega en un listón que
+#: probablemente no se alcance nunca.
+#:
+#: Sólo entran las formas que **niegan el fallo**. Un «todos los presupuestos de
+#: la compra» declara alcance, no perfección, y quedarse con él llenaría el acta
+#: de avisos que nadie querría leer.
+_ABSOLUTE_ALTERNATIVES = (
+    r"sin\s+(?:tener\s+que\s+|que\s+\w+\s+)?"
+    r"(?:corregir|retocar|ajustar|repasar|tocar|intervenir|arreglar)"
+    r"\b(?:[^.;]{0,20}\b(?:ningun[oa]?|nada|nunca))?",
+    r"sin\s+ningun[a]?\s+(?:error|fallo|correccion|ajuste|retoque|intervencion|excepcion)",
+    r"sin\s+(?:intervencion\s+manual|excepcion(?:es)?)",
+    r"nunca\s+(?:falla|fallan|se\s+equivoca|hay\s+que|se\s+pierde)",
+    r"siempre\s+(?:acierta|aciertan|correct[oa]s?|exact[oa]s?|bien)",
+    r"(?:el\s+)?100\s*%|(?:el\s+)?cien\s+por\s+cien",
+    r"cero\s+(?:errores|fallos|correcciones|incidencias)",
+    r"en\s+tod[oa]s\s+l[oa]s\s+casos",
+)
+ABSOLUTE_RE = re.compile("|".join(f"(?:{alt})" for alt in _ABSOLUTE_ALTERNATIVES))
+
+#: Marcas de que el «Done when» sólo se cumple si **alguien vuelve más tarde**.
+#: Es la dependencia más frágil que un acta puede tener y la que peor se ve: el
+#: acto es manual, ocurre semanas después, y quien lo hace no cobra el beneficio
+#: —se lo lleva quien use el dato el mes que viene—. Los sistemas de opinión, de
+#: valoración y de seguimiento se vacían siempre por aquí, y casi nunca está
+#: escrito como suposición porque en el momento de la entrevista todo el mundo
+#: dice que sí lo hará.
+#:
+#: Fuera queda el «después de» genérico: «después de subir el PDF» pasa dentro de
+#: la misma sesión y no es una espera de nadie.
+_DEFERRED_ALTERNATIVES = (
+    r"pasad[oa]s?\s+(?:la|el|los|las|unos|unas|\d)\s*[\w\s]{0,20}?\b\w+",
+    r"transcurrid[oa]s?\s+[\w\s]{0,20}?\b\w+",
+    r"una\s+vez\s+(?:entregad|recibid|cerrad|completad|pasad|transcurrid|finalizad|"
+    r"cumplid|servid|facturad)",
+    r"(?:dias|semanas|meses|jornadas)\s+(?:despues|mas\s+tarde)",
+    r"al\s+cabo\s+de\b",
+    r"mas\s+(?:tarde|adelante)\b",
+    r"(?:tras|despues\s+de)\s+(?:la|el)\s+"
+    r"(?:entrega|recepcion|compra|cierre|ejecucion|prestacion|instalacion|obra)",
+    r"al\s+(?:finalizar|terminar|cerrarse|completarse|recibirse)\b",
+    r"posteriormente\b",
+    r"periodicamente\b|cada\s+(?:dia|semana|mes|trimestre|ano)",
+    r"vuelv[ae]\s+a\s+(?:entrar|marcar|revisar|abrir|puntuar|valorar)",
+)
+DEFERRED_RE = re.compile("|".join(f"(?:{alt})" for alt in _DEFERRED_ALTERNATIVES))
+
+#: Encabezado de la sección de principios de dominio dentro de «principles.md».
+#: Va en español porque ese fichero no lo parsea ninguna otra cosa: lo leen las
+#: personas y `/venoxia:specify` antes de redactar.
+DOMAIN_PRINCIPLES_HEADING = "principios de dominio"
+
+#: Dónde vive el fichero de principios dentro del proyecto.
+PRINCIPLES_FILENAME = "principles.md"
 
 #: Forma canónica del identificador de una apuesta: «B-001».
 BET_ID_RE = re.compile(r"^B-\d{3}$")
@@ -932,6 +1014,8 @@ class Context:
     charter: Charter
     today: date = field(default_factory=date.today)
     live_capabilities: dict[str, str] = field(default_factory=dict)
+    domain_principles: list[str] = field(default_factory=list)
+    principles_exist: bool = False
 
 
 @dataclass(frozen=True)
@@ -971,7 +1055,7 @@ def _finding(
 
 
 # ---------------------------------------------------------------------------
-# Las dieciséis reglas
+# Las diecinueve reglas
 # ---------------------------------------------------------------------------
 
 
@@ -2004,6 +2088,243 @@ def rule_c16(ctx: Context) -> list[Finding]:
     return findings
 
 
+def _quote_match(text: str, pattern: re.Pattern[str]) -> str | None:
+    """El fragmento **original** que casa con el patrón, con sus tildes puestas.
+
+    Los patrones de `C18` y `C19` se escriben sin acentos porque se comparan
+    contra el texto normalizado, y citar ahí la coincidencia devolvería «dias
+    despues» a un usuario que escribió «días después». En un linter cuyo único
+    producto es el mensaje, una cita mal escrita del texto de quien lo lee es un
+    defecto, no un detalle.
+
+    Así que la normalización se hace carácter a carácter, guardando de qué
+    posición del original salió cada uno. `_strip_accents` sobre un carácter
+    devuelve cero o un carácter, nunca más, así que el mapa nunca se descuadra.
+    Devuelve `None` cuando no hay coincidencia.
+    """
+    collapsed = _collapse(text)
+    flat: list[str] = []
+    origin: list[int] = []
+    for position, char in enumerate(collapsed):
+        for produced in _strip_accents(char).lower():
+            flat.append(produced)
+            origin.append(position)
+
+    match = pattern.search("".join(flat))
+    if match is None:
+        return None
+    start, end = match.start(), match.end()
+    if start >= len(origin) or end == start:
+        # Una coincidencia vacía no se cita: no hay nada que enseñar.
+        return None
+    last = origin[end - 1]
+    return collapsed[origin[start] : last + 1].strip(" ,;:")
+
+
+def _row_text(row: CapabilityRow) -> str:
+    """Lo que la fila promete, normalizado: la columna «Qué podrá hacer» y el «Done when».
+
+    Las tres reglas de fondo miran las dos celdas juntas porque la promesa se
+    reparte entre ellas sin ninguna regla fija: hay actas que ponen el arbitraje
+    en «comparar los presupuestos» y otras que sólo lo dejan ver en «señalado
+    cuál gana». Leer una sola de las dos sería decidir a cara o cruz.
+    """
+    return _normalize(f"{row.what} {row.done_when}")
+
+
+def _bet_naming(ctx: Context, slug: str) -> Bet | None:
+    """La primera apuesta que nombra ese slug en su título o en su prosa.
+
+    Es todo lo que el linter puede saber sobre qué apuesta cubre qué capability:
+    el acta no tiene un campo que las enlace, y añadirlo obligaría a reescribir
+    todas las actas que ya existen. Nombrar el slug en la prosa cuesta una
+    palabra y deja la apuesta trazable hasta su fila, que es exactamente lo que
+    hace falta el día que alguien llegue a la fecha de `revisit:` y tenga que
+    averiguar qué estaba en juego.
+    """
+    if not slug:
+        return None
+    needle = _normalize(slug)
+    for bet in ctx.charter.bets:
+        haystack = _normalize(f"{bet.title} {bet.header} {bet.prose}")
+        if needle in haystack:
+            return bet
+    return None
+
+
+def rule_c17(ctx: Context) -> list[Finding]:
+    """C17 · El acta arbitra y no declara ningún principio de dominio.
+
+    Comparar, puntuar, ordenar por varios criterios o recomendar no es enseñar
+    datos: es emitir un juicio. Y todo juicio tiene un desempate —qué gana
+    cuando el más barato es el más lento, cuándo pesa más la antigüedad que la
+    nota— que no es una decisión técnica y que la especificación no puede
+    deducir. Si no está escrito, no desaparece: lo toma quien implemente la
+    capability, en una línea enterrada en un requisito, y a partir de ahí es
+    «como funciona el sistema» sin que nadie recuerde haberlo acordado.
+
+    La regla mira `.venoxia/principles.md` porque es donde ese criterio vive. Un
+    aviso, no un error, por dos motivos: la detección es textual y el remedio
+    pasa por una decisión del usuario que el linter no puede tomar por él.
+
+    Un solo hallazgo por acta, con todas las filas que arbitran listadas. Un
+    principio de dominio suele gobernar varias a la vez, y repetir el aviso fila
+    a fila empujaría a escribir uno por fila para callarlo, que es justo la
+    inflación de principios de relleno que la skill prohíbe.
+    """
+    if ctx.domain_principles:
+        return []
+
+    arbitrating = [
+        row for row in ctx.charter.capabilities if ARBITRATION_RE.search(_row_text(row))
+    ]
+    if not arbitrating:
+        return []
+
+    listed = ", ".join(f"«{row.slug or row.priority_text}»" for row in arbitrating)
+    plural = len(arbitrating) > 1
+    donde = (
+        "El fichero «.venoxia/principles.md» no existe todavía"
+        if not ctx.principles_exist
+        else "«.venoxia/principles.md» no declara ninguno"
+    )
+    return [
+        _finding(
+            ctx,
+            "C17",
+            SEVERITY_WARNING,
+            (
+                f"{listed} {'prometen' if plural else 'promete'} un juicio sobre cuál "
+                f"opción vale más, y no hay ningún principio de dominio que diga cómo "
+                f"se desempata: {donde}."
+            ),
+            (
+                "Escribe en «.venoxia/principles.md», bajo «## Principios de dominio», "
+                "la forma canónica: «**Ante <la tensión>, se prefiere <A> a costa de "
+                "<B>.** <Por qué.>». La tensión ya está en tu tabla —el más barato "
+                "contra el más rápido, el más nuevo contra el más usado—; lo que falta "
+                "es decir cuál gana. No lo inventes tú si no lo has decidido: es una "
+                "pregunta más para quien pidió la capability, y contestarla ahora es "
+                "más barato que descubrir en la primera divergencia que se decidió sola. "
+                "Y si de verdad el sistema no arbitra —sólo enseña las columnas y elige "
+                "la persona—, dilo así en «Qué podrá hacer», porque entonces la celda "
+                "está prometiendo algo que la capability no hace."
+            ),
+            line=ctx.charter.line_of(SECTION_CAPABILITIES),
+        )
+    ]
+
+
+def rule_c18(ctx: Context) -> list[Finding]:
+    """C18 · Un «Done when» absoluto que ninguna apuesta respalda.
+
+    «Sin corregir ninguno», «nunca falla», «el 100 %»: criterios que no admiten
+    ni un fallo. No están prohibidos —hay comportamientos que de verdad son
+    binarios— pero casi nunca se eligen a sabiendas. Se escriben porque suenan a
+    calidad, y el resultado es un criterio de entrega que probablemente no se
+    alcance nunca y una capability que nadie puede declarar terminada.
+
+    El aviso se calla de dos maneras, y las dos son buenas: bajando el listón a
+    algo alcanzable —«corrige como mucho un campo de cada tres»— o declarando la
+    apuesta, que es reconocer que el absoluto es una suposición y ponerle fecha.
+    Lo que no vale es dejarlo sin decir.
+
+    La cobertura se comprueba por el nombre: una apuesta cubre la fila cuando la
+    nombra por su slug. Es la única forma que el acta tiene de enlazarlas.
+    """
+    findings: list[Finding] = []
+    for row in ctx.charter.capabilities:
+        if not row.done_when:
+            # La ausencia la denuncia C07; aquí no hay nada que juzgar.
+            continue
+        quoted = _quote_match(row.done_when, ABSOLUTE_RE)
+        if quoted is None:
+            continue
+        if _bet_naming(ctx, row.slug) is not None:
+            continue
+        findings.append(
+            _finding(
+                ctx,
+                "C18",
+                SEVERITY_WARNING,
+                (
+                    f"El «Done when» de {row.label} no admite ni un fallo —«{quoted}»— "
+                    "y ninguna apuesta del acta lo respalda: un criterio de entrega "
+                    "absoluto es una suposición sobre lo bien que va a salir algo que "
+                    "todavía no existe."
+                ),
+                (
+                    "Dos salidas, y las dos valen. O bajas el listón a algo que se pueda "
+                    "alcanzar y medir —«corrige como mucho un campo de cada tres»—, o "
+                    f"dejas el absoluto y escribes la apuesta que lo sostiene, nombrando "
+                    f"«{row.slug or 'la capability'}» en su prosa para que se sepa de qué "
+                    "fila habla. Lo que no conviene es firmarlo sin decir que es una "
+                    "apuesta: el día que no se cumpla, nadie recordará que se dudaba."
+                ),
+                line=row.line,
+                subject=row.slug or None,
+            )
+        )
+    return findings
+
+
+def rule_c19(ctx: Context) -> list[Finding]:
+    """C19 · Un «Done when» que depende de que alguien vuelva más tarde, sin apuesta.
+
+    «Pasada la entrega, marca si cumplió el plazo.» Es la dependencia más frágil
+    que un acta puede declarar y la que peor se ve: el acto es manual, ocurre
+    semanas después y quien lo hace no cobra el beneficio —se lo lleva quien use
+    el dato el mes que viene—. Los sistemas de valoración, de seguimiento y de
+    histórico se vacían siempre por aquí.
+
+    Y casi nunca está escrito como suposición, porque en el momento de la
+    entrevista todo el mundo dice de buena fe que sí lo hará. La tanda E tampoco
+    lo caza sola: su pregunta —«¿lo has visto o lo supones?»— es sobre hechos del
+    presente, y aquí la respuesta honesta es «no lo he visto porque todavía no
+    existe». Por eso hace falta una regla y no sólo una pregunta.
+
+    Duele el doble cuando la fila alimenta a otra: una capability que ordena por
+    un dato que nadie rellena enseña una lista en blanco, y quien la mire creerá
+    que el fallo es del ranking.
+    """
+    findings: list[Finding] = []
+    for row in ctx.charter.capabilities:
+        if not row.done_when:
+            continue
+        quoted = _quote_match(row.done_when, DEFERRED_RE)
+        if quoted is None:
+            continue
+        if _bet_naming(ctx, row.slug) is not None:
+            continue
+        findings.append(
+            _finding(
+                ctx,
+                "C19",
+                SEVERITY_WARNING,
+                (
+                    f"El «Done when» de {row.label} sólo se cumple si alguien vuelve "
+                    f"después —«{quoted}»— y ninguna apuesta del acta dice "
+                    "que vaya a volver: un paso manual y diferido es la suposición que "
+                    "más veces se incumple y la que menos veces está escrita."
+                ),
+                (
+                    "Escribe la apuesta en «## Bets», nombrando "
+                    f"«{row.slug or 'la capability'}» en su prosa: qué das por hecho, por "
+                    "qué no lo has comprobado, cuándo lo sabrás y si el proyecto sigue "
+                    "teniendo sentido sin ese dato. Mira bien el «fatal:»: si otra "
+                    "capability ordena, puntúa o resume a partir de lo que aquí se marca, "
+                    "cuando nadie marque no fallará esta fila, sino la otra, y saldrá en "
+                    "blanco sin que nada lo explique. Y si al escribirla ves que no te "
+                    "fías, la salida no es la apuesta: es que el dato lo recoja el "
+                    "sistema en vez de esperar a que alguien entre a ponerlo."
+                ),
+                line=row.line,
+                subject=row.slug or None,
+            )
+        )
+    return findings
+
+
 RULES: list[Rule] = [
     Rule("C01", SEVERITY_ERROR, "Están las cinco secciones obligatorias", rule_c01),
     Rule("C02", SEVERITY_ERROR, "El propósito tiene entre una y tres frases", rule_c02),
@@ -2021,11 +2342,14 @@ RULES: list[Rule] = [
     Rule("C14", SEVERITY_WARNING, "«fatal:» vale yes o no cuando está", rule_c14),
     Rule("C15", SEVERITY_WARNING, "Un riesgo alto sin apuestas declaradas", rule_c15),
     Rule("C16", SEVERITY_WARNING, "El orden construido es el que el acta declara", rule_c16),
+    Rule("C17", SEVERITY_WARNING, "Lo que el acta arbitra tiene principio que lo desempate", rule_c17),
+    Rule("C18", SEVERITY_WARNING, "Un «Done when» absoluto declara que es una apuesta", rule_c18),
+    Rule("C19", SEVERITY_WARNING, "Lo que depende de un paso diferido lo dice", rule_c19),
 ]
 
 
 def run_rules(ctx: Context) -> list[Finding]:
-    """Aplica las dieciséis reglas en orden y devuelve todos sus hallazgos.
+    """Aplica las diecinueve reglas en orden y devuelve todos sus hallazgos.
 
     Una regla que se cayera no puede tumbar el linter entero: el fallo se
     convierte en un hallazgo con su código y el resto sigue. Es la misma defensa
@@ -2109,6 +2433,66 @@ def locate_charter(root: Path, given: str | None) -> Target:
     return Target(path=charter_path)
 
 
+def domain_principles(root: Path) -> tuple[bool, list[str]]:
+    """Los principios de dominio de «principles.md»: si el fichero está y cuáles son.
+
+    Es la única lectura que el linter hace fuera del acta, y la hace porque el
+    acta sola no puede contestar la pregunta de `C17`: una capability que arbitra
+    necesita un criterio de desempate, y ese criterio no vive en el acta, vive en
+    los principios. Preguntar por él sin mirar dónde se escribe sería avisar a
+    ciegas.
+
+    Tolerante en las dos direcciones: un proyecto sin `principles.md` devuelve
+    `(False, [])` y un fichero ilegible también. Nunca lanza. Un linter que se
+    cae porque el fichero vecino tiene los permisos cambiados deja al usuario sin
+    veredicto sobre lo que sí se pudo leer, y eso es peor que callarse.
+
+    Cuenta como principio cada viñeta de primer nivel bajo el encabezado
+    «## Principios de dominio», ya sin la marca de lista. Un encabezado con la
+    sección vacía —o con sólo el ejemplo de la plantilla, que la skill manda
+    borrar— devuelve la lista vacía, y para `C17` eso es lo mismo que no tenerla.
+    """
+    path = root / VENOXIA_DIR / PRINCIPLES_FILENAME
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False, []
+
+    principles: list[str] = []
+    inside = False
+    for raw in text.splitlines():
+        line = raw.rstrip()
+        header = SECTION_HEADER_RE.match(line)
+        if header is not None:
+            inside = _normalize(header.group("title")) == DOMAIN_PRINCIPLES_HEADING
+            continue
+        if not inside:
+            continue
+        if SECTION_BREAK_RE.match(line):
+            # Un «# …» cierra la sección igual que un «## …».
+            inside = False
+            continue
+        bullet = ANY_BULLET_RE.match(line)
+        if bullet is None:
+            continue
+        body = _collapse(bullet.group("text"))
+        if body and not _is_template_placeholder(body):
+            principles.append(body)
+    return True, principles
+
+
+def _is_template_placeholder(text: str) -> bool:
+    """¿La viñeta es el hueco de la plantilla en vez de un principio de verdad?
+
+    La plantilla del Paso 8 trae la forma canónica con los huecos entre ángulos
+    —«Ante <la tensión>, se prefiere <A> a costa de <B>»— y la skill manda
+    borrarla si nadie dijo ninguno. Contarla como principio dejaría el acta
+    conforme por no haber limpiado un ejemplo, que es exactamente la clase de
+    verde mentiroso contra el que existe este linter.
+    """
+    return "<" in text and ">" in text
+
+
 def live_capabilities(root: Path) -> dict[str, str]:
     """Las capabilities que ya tienen `spec.md` en disco: slug → ruta relativa."""
     found: dict[str, str] = {}
@@ -2132,7 +2516,7 @@ def lint_charter(root: Path, path: Path, strict: bool = False) -> tuple[Validati
     """Lee el acta, aplica las reglas y devuelve el resultado y el modelo.
 
     Un acta que no se deja leer produce el `P01` del parser **y nada más**: las
-    dieciséis reglas hablan de lo que el acta dice, y de un fichero que no se ha
+    diecinueve reglas hablan de lo que el acta dice, y de un fichero que no se ha
     podido abrir no se puede decir que le falte la sección «## Purpose». Sería
     culpar al contenido de un problema del continente.
     """
@@ -2143,12 +2527,15 @@ def lint_charter(root: Path, path: Path, strict: bool = False) -> tuple[Validati
         result.add(charter.failure)
         return result, charter
 
+    principles_found, principles_list = domain_principles(root)
     ctx = Context(
         root=root,
         path=path,
         display=charter.path,
         charter=charter,
         live_capabilities=live_capabilities(root),
+        principles_exist=principles_found,
+        domain_principles=principles_list,
     )
     for finding in run_rules(ctx):
         result.add(finding)
@@ -2289,7 +2676,7 @@ def build_parser() -> argparse.ArgumentParser:
     cli = argparse.ArgumentParser(
         prog="charter_lint.py",
         description=(
-            "Comprueba el acta del proyecto contra las dieciséis reglas del contrato "
+            "Comprueba el acta del proyecto contra las diecinueve reglas del contrato "
             "del acta. Determinista: ninguna regla consulta a un modelo."
         ),
         epilog=(

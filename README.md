@@ -147,6 +147,9 @@ Todas deterministas, igual que las del validador: ninguna consulta a un modelo. 
 | `C14` | `fatal:`, cuando está, vale `yes` o `no`. | warning |
 | `C15` | El acta declara alguna capability de riesgo `high` y no declara ninguna apuesta: una suposición que nadie ha escrito es una suposición que nadie va a revisar. | warning |
 | `C16` | El orden en que se está construyendo no es el que el acta declara: alguna capability con `spec.md` vivo va detrás de otra que todavía no tiene ninguno. Aviso y no error, porque adelantarse puede estar justificado; lo que no puede es quedarse sin decir. | warning |
+| `C17` | Alguna capability promete un **juicio** —comparar, puntuar, recomendar, ordenar por varios criterios— y `.venoxia/principles.md` no declara ningún principio de dominio que diga cómo se desempata. El criterio existe igual: si no está escrito, lo toma quien implemente. Un aviso por acta, no uno por fila. | warning |
+| `C18` | Un `Done when` **absoluto** —«sin corregir ninguno», «nunca falla», «el 100 %»— que ninguna apuesta respalda. O se baja el listón a algo alcanzable, o se declara la apuesta. | warning |
+| `C19` | Un `Done when` que sólo se cumple si **alguien vuelve más tarde** —«pasada la entrega, marca si cumplió»— y ninguna apuesta lo reconoce. Es la dependencia que más veces se incumple y la que menos veces está escrita. | warning |
 
 Y como en el validador, el parseo tiene su propio código: `P01` (error) es un acta que no se ha podido leer, y es un fallo de Venoxia, no del acta.
 
@@ -285,7 +288,7 @@ claude plugin validate . --strict
 claude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *)' Write
 ```
 
-- La suite cubre el núcleo determinista: un caso en positivo y otro en negativo por cada regla `V01`–`V16` del validador y por cada regla `C01`–`C16` del linter del acta, más la gramática del parser, el esquema JSON del informe, los cinco caminos del guardián y la aritmética de divergencia. Es la parte con cobertura obligatoria: de ella depende la credibilidad del resto. Y es `unittest` de la biblioteca estándar a propósito: si para ejecutarla hiciera falta instalar algo, habría un día en que nadie la ejecutaría.
+- La suite cubre el núcleo determinista: un caso en positivo y otro en negativo por cada regla `V01`–`V16` del validador y por cada regla `C01`–`C19` del linter del acta, más la gramática del parser, el esquema JSON del informe, los cinco caminos del guardián y la aritmética de divergencia. Es la parte con cobertura obligatoria: de ella depende la credibilidad del resto. Y es `unittest` de la biblioteca estándar a propósito: si para ejecutarla hiciera falta instalar algo, habría un día en que nadie la ejecutaría.
 - `claude plugin validate . --strict` comprueba la estructura del plugin: manifiesto, frontmatter de skills y agentes, y el hook declarado.
 - `claude plugin eval venoxia --ablation with-without …` mide lo único que no se puede probar con asserts: que el plugin cambia el resultado. El `--allow-tools` no es decorativo: `Bash` y `Write` están con verja, y sin ese permiso de operador los cinco casos fallan por falta de permisos en vez de por regresión (el detalle, en [`evals/README.md`](evals/README.md)). Compara la ejecución con y sin él sobre casos que deben detectarse (código de estado ambiguo, efecto parcial ambiguo, oráculo ausente, presupuesto de incertidumbre excedido) y uno que no debe dar falso positivo (spec limpia).
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reglas C01–C16 del linter del acta: qué proyecto se va a construir y para quién.
+"""Reglas C01–C19 del linter del acta: qué proyecto se va a construir y para quién.
 
 Cada regla trae un caso en positivo —el acta canónica no la dispara— y al menos
 uno en negativo. La disciplina de todos los negativos es la misma que en el
@@ -295,6 +295,28 @@ class CharterCase(unittest.TestCase):
         """Escribe el acta del proyecto."""
         return self.project.write(CHARTER_RELPATH, text)
 
+    def write_principles(self, *domain: str, heading: bool = True) -> Path:
+        """Escribe `.venoxia/principles.md`, que es lo único que C17 mira fuera del acta.
+
+        Sin argumentos escribe el fichero **con** la sección de dominio vacía, que
+        es el caso que más se parece a la realidad: la skill deja el encabezado y
+        nadie llega a rellenarlo. `heading=False` lo escribe sin la sección.
+        """
+        blocks = ["# Principios de la especificación", "## Convenciones técnicas", "- **Dinero.** Enteros en la unidad mínima."]
+        if heading:
+            blocks.append("## Principios de dominio")
+            blocks.extend(f"- {item}" for item in domain)
+        return self.project.write(".venoxia/principles.md", "\n\n".join(blocks) + "\n")
+
+    def remove_principles(self) -> None:
+        """Borra el «principles.md» que el andamio monta por omisión.
+
+        Es el proyecto que adoptó el acta sin haber escrito nunca los principios,
+        y para C17 no es el mismo caso que tenerlos y dejarlos vacíos: el remedio
+        empieza por crear el fichero.
+        """
+        (self.project.root / ".venoxia" / "principles.md").unlink()
+
     def write_spec(self, slug: str) -> Path:
         """Crea una capability viva en disco, que es lo único que C16 mira."""
         return self.project.write(
@@ -366,7 +388,7 @@ class CharterCase(unittest.TestCase):
 
 
 class TestCanonicalCharterIsTheBaseline(CharterCase):
-    """El punto de partida: el acta del contrato pasa las dieciséis reglas."""
+    """El punto de partida: el acta del contrato pasa las diecinueve reglas."""
 
     def test_the_canonical_charter_conforms_in_strict_mode(self) -> None:
         """Sin tocar nada, el acta canónica pasa con «--strict» y cero avisos."""
@@ -1414,6 +1436,187 @@ class TestRuleC16LivePriority(CharterCase):
 
 
 # ---------------------------------------------------------------------------
+# C17 · lo que el acta arbitra y el principio que lo desempata (aviso)
+# ---------------------------------------------------------------------------
+
+#: Una capability que promete un juicio, no un dato.
+JUDGING = Cap(
+    priority=2,
+    slug="availability",
+    what="comparar las mesas libres por tamaño y por hora",
+    done_when="el dueño ve las mesas de la noche con la mejor marcada",
+    risk="medium",
+)
+
+#: El desempate escrito, en la forma canónica del Paso 8.
+DOMAIN_RULE = (
+    "**Ante dos mesas igual de libres, se prefiere la más pequeña a costa de la "
+    "vista.** Una mesa grande ocupada por dos personas cuesta un turno entero."
+)
+
+
+class TestRuleC17ArbitrationWithoutPrinciple(CharterCase):
+    """C17 · una capability que emite un juicio y ningún criterio que lo gobierne."""
+
+    def test_c17_stays_quiet_when_nothing_in_the_charter_arbitrates(self) -> None:
+        """El acta canónica enseña datos y no juzga: no hay desempate que declarar."""
+        self.assert_conforms(charter())
+
+    def test_c17_stays_quiet_when_the_principle_is_written(self) -> None:
+        """Con el principio de dominio escrito, la capability puede arbitrar tranquila."""
+        self.write_principles(DOMAIN_RULE)
+        self.assert_conforms(charter(capabilities=[Cap(), JUDGING]))
+
+    def test_c17_warns_when_a_capability_judges_and_no_principle_exists(self) -> None:
+        """Comparar y marcar la mejor sin decir qué gana deja la decisión al que implemente."""
+        self.write_principles()
+        findings = self.assert_only_warning("C17", charter(capabilities=[Cap(), JUDGING]))
+        self.assertEqual(len(findings), 1)
+        self.assertIn("«availability»", findings[0]["message"])
+        self.assertIn("no declara ninguno", findings[0]["message"])
+
+    def test_c17_says_so_when_the_principles_file_does_not_exist_at_all(self) -> None:
+        """Sin «principles.md» el remedio es otro, y el mensaje lo distingue."""
+        self.remove_principles()
+        findings = self.assert_only_warning("C17", charter(capabilities=[Cap(), JUDGING]))
+        self.assertIn("no existe todavía", findings[0]["message"])
+
+    def test_c17_does_not_count_the_template_placeholder_as_a_principle(self) -> None:
+        """El hueco entre ángulos que trae la plantilla no es un principio acordado."""
+        self.write_principles("**Ante <la tensión>, se prefiere <A> a costa de <B>.** <Por qué.>")
+        self.assert_only_warning("C17", charter(capabilities=[Cap(), JUDGING]))
+
+    def test_c17_reports_every_judging_capability_in_a_single_finding(self) -> None:
+        """Un principio suele gobernar varias filas: un aviso por acta, no uno por fila."""
+        second = Cap(
+            priority=3,
+            slug="waitlist",
+            what="recomendar a quién se avisa primero de una cancelación",
+            done_when="el dueño ve el primer nombre de la lista de espera",
+            risk="low",
+        )
+        findings = self.assert_only_warning("C17", charter(capabilities=[Cap(), JUDGING, second]))
+        self.assertEqual(len(findings), 1)
+        self.assertIn("«availability»", findings[0]["message"])
+        self.assertIn("«waitlist»", findings[0]["message"])
+
+    def test_c17_ignores_an_ordering_that_names_no_criteria(self) -> None:
+        """«Ordenadas alfabéticamente» no tiene desempate: el criterio ya está entero."""
+        alphabetical = Cap(
+            priority=2,
+            slug="availability",
+            what="ver las mesas ordenadas alfabéticamente",
+            done_when="el dueño abre el móvil y ve las mesas de hoy",
+            risk="medium",
+        )
+        self.assert_conforms(charter(capabilities=[Cap(), alphabetical]))
+
+    def test_c17_does_not_denounce_a_person_choosing(self) -> None:
+        """Cuando quien elige es el usuario, el sistema no arbitra y no hay nada que declarar."""
+        chooser = Cap(
+            priority=2,
+            slug="availability",
+            what="dejar que el dueño elija la mesa que prefiera",
+            done_when="el dueño toca una mesa y queda asignada",
+            risk="medium",
+        )
+        self.assert_conforms(charter(capabilities=[Cap(), chooser]))
+
+
+# ---------------------------------------------------------------------------
+# C18 · el «Done when» que no admite un fallo (aviso)
+# ---------------------------------------------------------------------------
+
+
+class TestRuleC18AbsoluteDoneWhen(CharterCase):
+    """C18 · un criterio de entrega absoluto que ninguna apuesta reconoce como apuesta."""
+
+    def test_c18_stays_quiet_on_a_criterion_with_room_to_fail(self) -> None:
+        """El acta canónica no promete perfección: no hay absoluto que declarar."""
+        self.assert_conforms(charter())
+
+    def test_c18_warns_on_an_absolute_that_no_bet_backs(self) -> None:
+        """«Sin corregir ninguno» es una apuesta sobre algo que todavía no existe."""
+        absolute = Cap(done_when="el cliente ve los datos de su reserva sin corregir ninguno")
+        findings = self.assert_only_warning("C18", charter(capabilities=[absolute, DEFAULT_CAPABILITIES[1]]))
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0]["requirement_id"], "booking")
+        self.assertIn("sin corregir ninguno", findings[0]["message"])
+
+    def test_c18_falls_quiet_when_a_bet_names_the_capability(self) -> None:
+        """Declarada la apuesta y nombrada la fila, el absoluto ya está sobre la mesa."""
+        absolute = Cap(done_when="el cliente ve los datos de su reserva sin corregir ninguno")
+        backing = Bet(
+            title="La extracción acierta a la primera",
+            prose="Damos por hecho que «booking» leerá bien los datos sin que nadie los repase.",
+        )
+        self.assert_conforms(
+            charter(capabilities=[absolute, DEFAULT_CAPABILITIES[1]], bets=[backing])
+        )
+
+    def test_c18_is_not_satisfied_by_a_bet_about_another_capability(self) -> None:
+        """Una apuesta que no nombra la fila no la cubre: el enlace es el slug."""
+        absolute = Cap(done_when="el cliente ve los datos de su reserva sin corregir ninguno")
+        self.assert_only_warning("C18", charter(capabilities=[absolute, DEFAULT_CAPABILITIES[1]]))
+
+    def test_c18_quotes_the_absolute_with_its_accents(self) -> None:
+        """La cita sale del texto del usuario, no del normalizado que la regla compara."""
+        absolute = Cap(done_when="el cliente reserva y la búsqueda nunca falla en el primer intento")
+        findings = self.assert_only_warning("C18", charter(capabilities=[absolute, DEFAULT_CAPABILITIES[1]]))
+        self.assertIn("nunca falla", findings[0]["message"])
+
+    def test_c18_leaves_a_plain_scope_quantifier_alone(self) -> None:
+        """«Todas las mesas» declara alcance, no perfección, y no dispara nada."""
+        scoped = Cap(done_when="el cliente ve todas las mesas libres de la noche")
+        self.assert_conforms(charter(capabilities=[scoped, DEFAULT_CAPABILITIES[1]]))
+
+
+# ---------------------------------------------------------------------------
+# C19 · el «Done when» que espera a que alguien vuelva (aviso)
+# ---------------------------------------------------------------------------
+
+#: El paso manual y diferido en su forma más común: alguien vuelve semanas después.
+DEFERRED_DONE_WHEN = "el dueño abre la reserva y, pasada la cena, marca si el cliente vino"
+
+
+class TestRuleC19DeferredDoneWhen(CharterCase):
+    """C19 · el criterio que sólo se cumple si alguien vuelve más tarde a rellenarlo."""
+
+    def test_c19_stays_quiet_when_nothing_waits_for_anyone(self) -> None:
+        """El acta canónica se cumple dentro de la sesión: no espera a nadie."""
+        self.assert_conforms(charter())
+
+    def test_c19_warns_when_the_criterion_needs_someone_to_come_back(self) -> None:
+        """«Pasada la cena, marca…» es la suposición que más veces se incumple."""
+        deferred = Cap(priority=2, slug="availability", done_when=DEFERRED_DONE_WHEN, risk="medium")
+        findings = self.assert_only_warning("C19", charter(capabilities=[Cap(), deferred]))
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0]["requirement_id"], "availability")
+        self.assertIn("pasada la cena", findings[0]["message"])
+
+    def test_c19_falls_quiet_when_a_bet_names_the_capability(self) -> None:
+        """Reconocido por escrito que alguien tiene que volver, la regla se calla."""
+        deferred = Cap(priority=2, slug="availability", done_when=DEFERRED_DONE_WHEN, risk="medium")
+        backing = Bet(
+            title="Alguien vuelve a marcar quién vino",
+            prose="Damos por hecho que el dueño entrará a «availability» al cerrar la noche.",
+        )
+        self.assert_conforms(charter(capabilities=[Cap(), deferred], bets=[backing]))
+
+    def test_c19_points_at_what_breaks_when_nobody_comes_back(self) -> None:
+        """La pista nombra el daño real: la fila que consume el dato sale en blanco."""
+        deferred = Cap(priority=2, slug="availability", done_when=DEFERRED_DONE_WHEN, risk="medium")
+        findings = self.assert_only_warning("C19", charter(capabilities=[Cap(), deferred]))
+        self.assertIn("fatal", findings[0]["hint"])
+        self.assertIn("en blanco", findings[0]["hint"])
+
+    def test_c19_ignores_a_step_that_happens_in_the_same_sitting(self) -> None:
+        """«Después de reservar, ve la confirmación» no espera a nadie: es la misma sesión."""
+        immediate = Cap(done_when="el cliente reserva y después de eso ve la confirmación")
+        self.assert_conforms(charter(capabilities=[immediate, DEFAULT_CAPABILITIES[1]]))
+
+
+# ---------------------------------------------------------------------------
 # El parseo no lanza
 # ---------------------------------------------------------------------------
 
@@ -1684,7 +1887,7 @@ class TestCommandLine(CharterCase):
 
 
 class TestRuleRegistry(unittest.TestCase):
-    """`RULES` es el contrato del fichero: dieciséis códigos, en orden y con severidad."""
+    """`RULES` es el contrato del fichero: diecinueve códigos, en orden y con severidad."""
 
     #: La severidad que el contrato del acta le asigna a cada regla.
     SEVERITIES = {
@@ -1704,12 +1907,15 @@ class TestRuleRegistry(unittest.TestCase):
         "C14": "warning",
         "C15": "warning",
         "C16": "warning",
+        "C17": "warning",
+        "C18": "warning",
+        "C19": "warning",
     }
 
-    def test_the_sixteen_rules_are_registered_in_order(self) -> None:
-        """Los códigos son C01…C16, sin saltos ni repetidos."""
+    def test_the_nineteen_rules_are_registered_in_order(self) -> None:
+        """Los códigos son C01…C19, sin saltos ni repetidos."""
         codes = [rule.code for rule in charter_lint.RULES]
-        self.assertEqual(codes, [f"C{number:02d}" for number in range(1, 17)])
+        self.assertEqual(codes, [f"C{number:02d}" for number in range(1, 20)])
 
     def test_every_rule_declares_its_severity_and_its_function(self) -> None:
         """Cada regla trae la severidad del contrato, un resumen y una función."""
