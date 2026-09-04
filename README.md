@@ -307,6 +307,8 @@ claude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *
 
 Y los ejemplos de este README no son decorado: el acta y el requisito que enseña se extraen a ficheros reales y se pasan por `charter_lint.py` y `validate.py` antes de publicarlos. Un README que muestra un ejemplo que su propio linter rechazaría es exactamente el fallo que este plugin existe para impedir, y ya pasó una vez, con un `SHALL` que la regla `V14` marcaba.
 
+El propio repositorio adoptó Venoxia: `.venoxia/charter.md` y las capabilities retroactivas de `.venoxia/capabilities/` pasan `python3 scripts/charter_lint.py --root . --strict` y `python3 scripts/validate.py --root . --strict` con cero errores y cero avisos, igual que se le exige a cualquier proyecto que lo adopte.
+
 ## Qué queda fuera de esta entrega
 
 Diseñado, documentado y pospuesto hasta que el núcleo se use en una feature real:

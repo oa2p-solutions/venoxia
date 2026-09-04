@@ -812,7 +812,7 @@ class TestRuleV16OrphanCovers(unittest.TestCase):
             self.assertEqual(run.rule_set(), set(), run.describe())
 
     def test_v16_warns_when_a_test_covers_an_unknown_id(self):
-        """Un «@covers R-XXX-999» sin requisito detrás es aviso: exit 0 sin «--strict»."""
+        """Un «@covers» sin requisito detrás es aviso: exit 0 sin «--strict»."""
         with Project() as project:
             # El mismo oráculo sigue cubriendo R-CHK-014, así que V08 calla y el
             # único hallazgo posible es el «@covers» huérfano.
@@ -843,6 +843,7 @@ class TestRuleV16OrphanCovers(unittest.TestCase):
 class TestCommandLineInterface(unittest.TestCase):
     """El CLI de §5: códigos de salida, ámbito, formato y verbosidad."""
 
+    # @covers R-VAL-001
     def test_cli_exits_zero_when_the_specification_conforms(self):
         """El proyecto limpio sale con 0 y lo dice en español."""
         with Project() as project:
@@ -850,6 +851,7 @@ class TestCommandLineInterface(unittest.TestCase):
             self.assertEqual(run.returncode, 0, run.describe())
             self.assertIn("La especificación cumple el contrato.", run.stdout)
 
+    # @covers R-VAL-001
     def test_cli_exits_one_when_the_specification_does_not_conform(self):
         """Un requisito sin oráculo hace salir con 1."""
         with Project() as project:
@@ -860,6 +862,7 @@ class TestCommandLineInterface(unittest.TestCase):
             self.assertEqual(run.returncode, 1, run.describe())
             self.assertIn("incumple el contrato", run.stdout)
 
+    # @covers R-VAL-001
     def test_cli_exits_two_when_the_path_does_not_exist(self):
         """Una ruta que no existe es error de uso: código 2 y aviso por stderr."""
         with Project() as project:
@@ -889,6 +892,7 @@ class TestCommandLineInterface(unittest.TestCase):
             self.assertEqual(run.returncode, 2, run.describe())
             self.assertIn("no existe el change", run.stderr)
 
+    # @covers R-VAL-003
     def test_cli_says_in_spanish_that_the_project_has_not_adopted_venoxia(self):
         """Sin `.venoxia/` el plugin no estorba: mensaje en español y exit 0."""
         with Project(scaffold=False) as project:

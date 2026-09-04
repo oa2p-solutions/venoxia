@@ -7,8 +7,3 @@ evals/results/
 # Artefactos de sesión/orquestador, ajenos al contenido versionado del repo.
 /CLAUDE.md
 /notas.md
-
-# El .venoxia/ de pruebas no se versiona…
-.venoxia/
-# …pero los fixtures de los evals sí: son el contenido de los casos.
-!evals/*/project/.venoxia/

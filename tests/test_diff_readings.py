@@ -453,6 +453,7 @@ class TestNormalize(unittest.TestCase):
                     diff_readings.similarity(left, right), diff_readings.DEFAULT_THRESHOLD
                 )
 
+    # @covers R-DIV-004
     def test_similarity_never_dilutes_a_different_number(self):
         """Dos cifras distintas no describen el mismo efecto, compartan las palabras que compartan."""
         for left, right in (
@@ -503,6 +504,7 @@ class TestNormalize(unittest.TestCase):
 class TestComparisonTable(DiffCase):
     """Cada fila de la tabla campo a campo del contrato §7."""
 
+    # @covers R-DIV-001
     def test_different_status_codes_are_a_hard_divergence(self):
         """409 contra 422 en el mismo escenario es divergencia dura y exit 1."""
         run = self.diff(
@@ -1510,6 +1512,7 @@ class TestFilesNobodyReads(DiffCase):
 class TestIncompleteRuns(DiffCase):
     """Lo que no se comparó no converge: ni con un lector, ni sin escenarios."""
 
+    # @covers R-DIV-002
     def test_a_single_reader_cannot_claim_convergence(self):
         """Con un solo lector el JSON no dice `converged: true` y la ejecución no sale con 0."""
         run = self.diff(
@@ -1566,6 +1569,7 @@ class TestStrictInEveryChannel(DiffCase):
             "b": [reading("Reservation created", SOFT_B, "201")],
         }
 
+    # @covers R-DIV-003
     def test_strict_with_only_soft_divergences_reports_a_failure_not_a_warning(self):
         """Con `--strict` y sólo blandas: exit 1, ✗ en el resumen y un veredicto en pasado."""
         target = self.project.path("informe.md")
@@ -1590,6 +1594,7 @@ class TestStrictInEveryChannel(DiffCase):
         self.assertIn("`--strict`", line)
         self.assertIn("salida 1", line)
 
+    # @covers R-DIV-003
     def test_without_strict_the_same_pair_is_a_warning_and_says_so(self):
         """Sin `--strict` el mismo par sale con 0, ⚠ en el resumen y `strict: false` en el JSON."""
         target = self.project.path("informe.md")

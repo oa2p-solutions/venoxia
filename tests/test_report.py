@@ -70,7 +70,7 @@ ANSI_MARKER = "\x1b["
 
 #: Mensaje y remedio con acentos y comillas angulares, para probar `ensure_ascii=False`.
 ACCENTED_MESSAGE = "El «revisit:» no señala ningún hecho: la apuesta quedó sin comprobación."
-ACCENTED_HINT = "Añade «verifies: ruta/al/test» y señala el test con «@covers R-CHK-014»."
+ACCENTED_HINT = "Añade «verifies: ruta/al/test» y señala el test con su «@covers»."
 
 
 # ---------------------------------------------------------------------------
@@ -185,6 +185,7 @@ class TestJsonSchemaKeys(unittest.TestCase):
         )
         self.payload = report.build_payload(self.result)
 
+    # @covers R-VAL-002
     def test_payload_top_level_keys_are_exactly_the_schema(self):
         """El primer nivel trae las siete claves del esquema, ni una más ni una menos."""
         self.assertEqual(set(self.payload), set(SCHEMA_TOP_LEVEL_KEYS))

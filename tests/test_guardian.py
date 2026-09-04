@@ -100,6 +100,7 @@ class GuardianTestCase(unittest.TestCase):
 class GuardianDecisionPathsTest(GuardianTestCase):
     """Los cinco pasos del orden de decisión, uno por test."""
 
+    # @covers R-GRD-002
     def test_step1_allows_when_the_project_has_no_venoxia_directory(self):
         """Paso 1: sin «.venoxia/» el proyecto no ha adoptado Venoxia y todo pasa."""
         project = self.make_project(scaffold=False)
@@ -125,6 +126,7 @@ class GuardianDecisionPathsTest(GuardianTestCase):
                 run = project.guardian(file_path=relative)
                 self.assert_allow(run, f"«{relative}» es especificación y debía permitirse")
 
+    # @covers R-GRD-003
     def test_step3_allows_when_the_active_change_is_validated(self):
         """Paso 3: un cambio activo en «state»: «validated» respalda la edición de código."""
         project = self.make_project()
@@ -139,6 +141,7 @@ class GuardianDecisionPathsTest(GuardianTestCase):
         self.assert_allow(run)
         self.assertIn("validated", run.reason)
 
+    # @covers R-GRD-004
     def test_step4_allows_when_the_active_change_declares_via_direct(self):
         """Paso 4: «via»: «direct» es la salida de emergencia y permite la edición."""
         project = self.make_project()
@@ -279,6 +282,7 @@ class GuardianDriftLogTest(GuardianTestCase):
         )
         self.assertEqual(1, len(self.drift_lines(self.project)))
 
+    # @covers R-GRD-004
     def test_drift_log_line_is_valid_json_with_the_four_contract_fields(self):
         """La línea del diario es JSON válido y trae «ts», «change», «tool» y «path»."""
         self.assert_allow(self.project.guardian(tool_name="Write", file_path=CODE_PATH))
@@ -358,6 +362,7 @@ class GuardianDenyMessageTest(GuardianTestCase):
 class GuardianOutputShapeTest(GuardianTestCase):
     """El sobre JSON que Claude Code espera de un hook «PreToolUse»."""
 
+    # @covers R-GRD-001
     def test_output_is_a_pretooluse_hook_specific_output(self):
         """La salida es «hookSpecificOutput» con el evento y una decisión válida."""
         project = self.make_project()
@@ -1532,6 +1537,7 @@ class GuardianForgedChangeTest(GuardianTestCase):
     def setUp(self) -> None:
         self.project = self.make_project()
 
+    # @covers R-GRD-003
     def test_the_two_step_bypass_no_longer_disarms_the_guardian(self):
         """La secuencia exacta del rodeo, paso a paso, terminando en «deny»."""
         self.assert_deny(
@@ -1669,6 +1675,7 @@ class GuardianCorruptChangeTest(GuardianTestCase):
             b"\x00\x01\xff\xfe\x80 basura binaria"
         )
 
+    # @covers R-GRD-005
     def test_a_binary_change_json_does_not_grant_the_edit(self):
         """El «change.json» binario del único cambio: se deniega, no se permite."""
         project = self.make_project()
@@ -1719,6 +1726,7 @@ class GuardianCorruptChangeTest(GuardianTestCase):
         self.assert_allow(run, "el cambio válido de debajo sigue valiendo")
         self.assertIn("older", run.reason)
 
+    # @covers R-GRD-001
     def test_a_corrupt_change_still_exits_zero_with_one_decision_and_a_trace(self):
         """Denegar no es romperse: exit 0, una sola decisión y la traza en stderr."""
         project = self.make_project()
@@ -1803,6 +1811,7 @@ class GuardianIoFailOpenTest(GuardianTestCase):
         "case_changes_directory_without_permissions",
     )
 
+    # @covers R-GRD-005
     def test_every_io_failure_allows_and_exits_zero(self):
         """Ningún fallo de entrada/salida puede convertirse en un `deny`."""
         for name in self.IO_CASES:

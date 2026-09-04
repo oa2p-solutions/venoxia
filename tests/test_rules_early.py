@@ -593,6 +593,7 @@ class TestRuleV06Oracle(EarlyRuleCase):
         self.delta_with(requirement(verifies=self.project.oracle(DEFAULT_REQUIREMENT_ID)))
         self.assert_conforms()
 
+    # @covers R-VAL-004
     def test_v06_fails_when_verifies_is_absent(self) -> None:
         """Sin la línea «verifies:», salta V06 con un hint accionable."""
         self.delta_with(requirement(omit=("verifies",)))
@@ -600,6 +601,7 @@ class TestRuleV06Oracle(EarlyRuleCase):
         self.assertEqual(findings[0]["requirement_id"], DEFAULT_REQUIREMENT_ID)
         self.assert_actionable_hint(findings[0])
 
+    # @covers R-VAL-004
     def test_v06_fails_when_verifies_is_empty(self) -> None:
         """Una línea «verifies:» sin valor promete un oráculo y no dice cuál."""
         self.delta_with(requirement(verifies=""))
@@ -912,6 +914,7 @@ class TestEarlyRulesAreErrors(unittest.TestCase):
 class TestCleanProjectIsTheBaseline(unittest.TestCase):
     """El punto de partida: el proyecto canónico no dispara ninguna de las ocho."""
 
+    # @covers R-VAL-005
     def test_the_clean_project_triggers_no_early_rule(self) -> None:
         """Sin tocar nada, el proyecto canónico pasa V01–V08 incluso en modo estricto."""
         with Project() as project:

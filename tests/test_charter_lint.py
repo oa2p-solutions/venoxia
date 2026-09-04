@@ -791,6 +791,7 @@ class TestRuleC07DoneWhen(CharterCase):
         """Con criterio de terminación escrito, la regla se calla."""
         self.assert_conforms(charter())
 
+    # @covers R-CHL-003
     def test_c07_fails_when_a_capability_has_no_done_when(self) -> None:
         """Sin «Done when» nadie puede afirmar que la capability está hecha."""
         findings = self.assert_only_error(
@@ -1239,6 +1240,7 @@ class TestRuleC12Revisit(CharterCase):
         findings = self.assert_only_error("C12", charter(bets=[Bet(revisit="")]))
         self.assertIn("está vacío", findings[0]["message"])
 
+    # @covers R-CHL-004
     def test_c12_rejects_a_future_date(self) -> None:
         """Una fecha es lo que este campo dejó de admitir, apunte hacia donde apunte."""
         future = future_date(30)
@@ -1252,6 +1254,7 @@ class TestRuleC12Revisit(CharterCase):
         findings = self.assert_only_error("C12", charter(bets=[Bet(revisit=past_date(30))]))
         self.assertIn("es una fecha", findings[0]["message"])
 
+    # @covers R-CHL-004
     def test_c12_rejects_filler_that_means_later(self) -> None:
         """«Ya veremos» ocupa la línea sin nombrar nada, que es no tener apuesta."""
         for filler in ("ya veremos", "más adelante", "TBD", "el próximo trimestre", "3 meses"):
@@ -1781,6 +1784,7 @@ class TestMalformedCharterNeverRaises(CharterCase):
 class TestCommandLine(CharterCase):
     """El CLI: las dos ausencias que no son error, los dos que sí, y las banderas."""
 
+    # @covers R-CHL-002
     def test_a_project_without_venoxia_is_not_an_error(self) -> None:
         """Un proyecto que no ha adoptado Venoxia no falla por no haberlo adoptado."""
         project = Project(scaffold=False)
@@ -1789,6 +1793,7 @@ class TestCommandLine(CharterCase):
         self.assertEqual(run.returncode, 0, run.describe())
         self.assertIn("todavía no ha adoptado Venoxia", run.stdout)
 
+    # @covers R-CHL-002
     def test_a_project_without_a_charter_is_invited_to_write_one(self) -> None:
         """Con `.venoxia/` y sin acta se invita a escribirla, y se sale con cero."""
         run = self.lint()
@@ -1824,6 +1829,7 @@ class TestCommandLine(CharterCase):
         self.assertEqual(run.returncode, 0, run.describe())
         self.assertEqual(run.json["charter"]["path"], "borradores/acta.md", run.describe())
 
+    # @covers R-CHL-001
     def test_a_missing_explicit_path_is_a_usage_error(self) -> None:
         """Nombrar un acta que no existe es un error de uso, no un acta que incumple."""
         run = self.lint("no-existe.md")
@@ -1842,6 +1848,7 @@ class TestCommandLine(CharterCase):
         self.assertEqual(run.returncode, 2, run.describe())
         self.assertIn("no existe o no es un directorio", run.stderr)
 
+    # @covers R-CHL-001
     def test_strict_turns_warnings_into_a_failure(self) -> None:
         """El mismo acta: con avisos sale 0, y con «--strict» sale 1."""
         self.write(charter(bets=""))
@@ -1853,6 +1860,7 @@ class TestCommandLine(CharterCase):
         self.assertEqual(strict.json["ok"], False, strict.describe())
         self.assertEqual(strict.json["strict"], True, strict.describe())
 
+    # @covers R-CHL-005
     def test_the_json_carries_the_stable_schema(self) -> None:
         """El documento es el esquema versión 1, con lo del acta colgando de «charter»."""
         self.write(charter())
