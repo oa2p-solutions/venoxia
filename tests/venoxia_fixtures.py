@@ -696,7 +696,8 @@ class Project:
     ) -> Path:
         """Escribe `.venoxia/changes/<id>/change.json` y devuelve su ruta.
 
-        `state ∈ {draft, specified, validated, archived}` y `via ∈ {spec, direct}`.
+        `state ∈ {draft, specified, validated, verified, archived}` (el orden
+        de `venoxia.model.CHANGE_STATES`) y `via ∈ {spec, direct}`.
         `extra` añade o pisa claves del JSON; `raw` escribe el fichero literal
         (para probar un `change.json` corrupto).
 
@@ -910,6 +911,70 @@ class Project:
                 indent=2,
             )
             + "\n",
+        )
+
+    def oracle_record(
+        self,
+        change_id: str,
+        runs: Sequence[Mapping[str, str]],
+        *,
+        command: str = "python3 -m unittest {files}",
+        cwd: str = ".",
+    ) -> Path:
+        """Escribe `.venoxia/changes/<change_id>/oracle.json` con runs fabricados.
+
+        Para `tests/test_rules_oracle.py`, que necesita historiales concretos
+        —«rojo y luego verde», «verde sin rojo antes»— sin invocar ningún test
+        de verdad. `runs` es una lista de `{requirement_id: status}`, del run
+        más antiguo al más reciente; `status` es uno de `green`, `red`,
+        `missing` o `timeout`. Cada entrada se completa con `results`,
+        `counts`, `all_green` y `all_red` con la misma aritmética que usaría
+        `oracle.py`, y con un `ran_at` propio, estrictamente creciente, para
+        que el orden de los runs no dependa de la resolución del reloj.
+
+        Para fabricar un `oracle.json` corrupto (V17 negativo «d»), no se usa
+        esto: se escribe directamente con `project.write(...)`.
+        """
+        statuses = ("green", "red", "missing", "timeout")
+        built_runs: list[dict] = []
+        for offset, run in enumerate(runs):
+            counts = {status: 0 for status in statuses}
+            results: list[dict] = []
+            for requirement_id, status in run.items():
+                if status not in statuses:
+                    raise ValueError(
+                        f"oracle_record: status desconocido «{status}» para "
+                        f"«{requirement_id}»; los válidos son {statuses}."
+                    )
+                counts[status] += 1
+                results.append(
+                    {
+                        "requirement_id": requirement_id,
+                        "verifies": [],
+                        "status": status,
+                        "exit_code": 0 if status == "green" else (1 if status == "red" else None),
+                        "duration_ms": 0,
+                        "output_tail": "",
+                    }
+                )
+            total = len(results)
+            counts["total"] = total
+            built_runs.append(
+                {
+                    "version": 1,
+                    "ran_at": f"2026-01-{(offset % 28) + 1:02d}T00:00:{offset % 60:02d}Z",
+                    "runner": {"command": command, "cwd": cwd},
+                    "results": results,
+                    "counts": counts,
+                    "all_green": total > 0 and counts["green"] == total,
+                    "all_red": total > 0 and counts["red"] == total,
+                }
+            )
+
+        document = {"version": 1, "change": change_id, "runs": built_runs}
+        return self.write(
+            f".venoxia/changes/{change_id}/oracle.json",
+            _json.dumps(document, ensure_ascii=False, indent=2) + "\n",
         )
 
     # -- Ejecución de los scripts -------------------------------------------

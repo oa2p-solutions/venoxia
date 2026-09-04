@@ -114,6 +114,8 @@ Mantén el orden de findings que trae el JSON dentro de cada grupo: ya viene ord
 | `V14` (aviso) | `SHALL` o `MUST` en la narrativa | Escribe el modal en español (`DEBE`); las palabras clave estructurales siguen en inglés |
 | `V15` (aviso) | Falta `from:` en un requisito de una capability nueva | Enlaza el documento de origen que justifica el requisito |
 | `V16` (aviso) | Un test declara `@covers` de un ID que no existe | Corrige el ID del test, o especifica el comportamiento que ese test ya está comprobando |
+| `V17` | Un change `verified` sin `oracle.json` en verde que cubra todos sus IDs | Ejecuta `/venoxia:verify` sobre el change: graba el oráculo antes de dejarlo en `verified` |
+| `V18` (aviso) | Un requisito llegó a verde sin haber pasado antes por rojo en ningún run | Comprueba que el test de verdad falla sin la implementación; si ya se comprobó, no hay nada que hacer |
 | `P01` | Fichero ilegible o inexistente | Comprueba la ruta y los permisos |
 | `P02` (aviso) | Clave de metadatos desconocida | Usa sólo `verifies`, `confidence`, `why`, `revisit`, `from` |
 | `P03` (aviso) | Clave de metadatos repetida | Deja una sola; el parser se queda con la última |

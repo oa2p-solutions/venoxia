@@ -168,4 +168,4 @@ Termina con un informe corto, sin adornos:
 - Los requisitos creados o modificados, ID y título, una línea cada uno.
 - El veredicto literal del validador y, si quedan `V07`/`V08`, la lista exacta de tests que hay que escribir con la línea `@covers` que debe llevar cada uno.
 - Toda decisión que tomaste tú porque la petición no la cubría, marcada como tal. Una asunción tuya que el usuario no ve es una asunción que nadie revisa.
-- El siguiente paso: escribir los tests, y luego `/venoxia:diverge` para someter el delta a los lectores aislados.
+- El siguiente paso, la cadena completa hasta el código: escribir los tests → `/venoxia:diverge` para someter el delta a los lectores aislados → `/venoxia:verify` graba el oráculo en rojo → se escribe el código → `/venoxia:verify` otra vez graba el verde y deja el change en `verified`.

@@ -61,6 +61,14 @@ FILLER_REVISIT_RE = re.compile(
 # Forma canónica del identificador de un requisito: «R-CHK-014».
 REQUIREMENT_ID_RE = re.compile(r"^R-[A-Z]{2,4}-\d{3}$")
 
+# Estados del ciclo de vida de un change, en el orden en que se alcanzan:
+# draft (specify aún no ha corrido) → specified (specify) → validated
+# (diverge, con validador y divergencia en 0) → verified (verify, con el
+# oráculo en verde) → archived. Vive aquí, y sólo aquí, para que `validate.py`
+# (V17 compara contra «verified») y las skills que escriben cada estado no
+# repitan la lista cada una a su manera.
+CHANGE_STATES = ("draft", "specified", "validated", "verified", "archived")
+
 
 @dataclass
 class Finding:

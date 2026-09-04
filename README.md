@@ -10,7 +10,7 @@ La tesis es corta y cabe en tres frases. **Una especificación es una apuesta so
 
 En la práctica eso significa que cada requisito nace con dos campos que ninguna otra herramienta exige: `verifies:`, la ruta del test que resuelve la apuesta, y `confidence:`, el nivel de confianza declarado. Sin oráculo, no compila. Y como el validador es un script de Python sin modelo detrás, el veredicto es el mismo en tu portátil, en el CI y dentro de la conversación.
 
-Esta entrega cubre el **núcleo verificable**: el acta del proyecto y su linter de 19 reglas, el formato del requisito, el validador de 16 reglas, el guardián y el motor de divergencia.
+Esta entrega cubre el **núcleo verificable**: el acta del proyecto y su linter de 19 reglas, el formato del requisito, el validador de 18 reglas, el guardián y el motor de divergencia.
 
 ## Instalación
 
@@ -230,7 +230,21 @@ Se usan en este orden:
 
 El `change.json` pasa a `"state": "validated"` sólo cuando validador **y** divergencia pasan.
 
-## Las 16 reglas del validador
+## El ciclo de vida de un change, y quién escribe cada estado
+
+Cinco estados, siempre en este orden; ninguna skill escribe uno que no le toca y ningún estado se salta:
+
+| Estado | Lo escribe | Cuándo |
+|---|---|---|
+| `draft` | quien crea el directorio del change | Antes de que exista `proposal.md` o `delta/`. |
+| `specified` | `/venoxia:specify` | El delta está en EARS, con `verifies:` y `confidence:` desde el primer borrador; `validate.py` puede estar en rojo por `V07`/`V08` —el test aún no existe— y es lo esperado. |
+| `validated` | `/venoxia:diverge` | Sólo cuando `validate.py` **y** `diff_readings.py` salen los dos con `0` en la misma pasada. |
+| `verified` | `/venoxia:verify` | Sólo cuando el oráculo (`scripts/oracle.py --record`) deja el último run en verde, cubriendo todos los requisitos del change: `V17` audita que el disco lo respalde. |
+| `archived` | quien cierra el change | El comportamiento ya vive en la capability y el change deja de ser el ámbito activo. |
+
+`guardian.py` no cambia con esto: sigue abriendo la puerta al código en `validated`, porque escribir el código es justo lo que convierte el rojo del oráculo en verde. Exigir `verified` antes de escribir sería pedirle al código que exista antes de poder existir.
+
+## Las 18 reglas del validador
 
 Todas deterministas: ninguna consulta a un modelo. `scripts/validate.py` sale con `0` si el ámbito es conforme, `1` si no lo es y `2` ante un error de uso. Con `--strict`, los avisos también hacen fallar.
 
@@ -252,6 +266,8 @@ Todas deterministas: ninguna consulta a un modelo. `scripts/validate.py` sale co
 | `V14` | La narrativa no usa `SHALL` ni `MUST`. | warning |
 | `V15` | `from:` ausente en un requisito de una capability nueva. | warning |
 | `V16` | Un test declara `@covers <ID>` de un ID que no existe en ninguna spec: comportamiento no especificado. | warning |
+| `V17` | Un change en `state: verified` tiene un `oracle.json` legible cuyo último run está en verde y cubre todos los IDs del delta. Se evalúa sólo sobre los changes en `verified`. | error |
+| `V18` | Un requisito en verde en el último run de `oracle.json` tuvo un run anterior con ese mismo requisito en rojo. Se evalúa sobre cualquier change con `oracle.json`, sin mirar su estado. | warning |
 
 Además de las reglas, el parser emite sus propios findings de forma: `P01` (error, fichero ilegible o inexistente), `P02` (aviso, clave de metadatos desconocida), `P03` (aviso, clave repetida; gana la última), `P04` (aviso, bullet de escenario que no encaja en `- **KW** texto`) y `P05` (aviso, un `### ` con forma de requisito que cae dentro de un bloque de código y por tanto no se ha leído como requisito). El parser nunca lanza una excepción: todo problema sale como finding.
 

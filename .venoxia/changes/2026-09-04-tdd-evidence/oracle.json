@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "change": "2026-09-04-tdd-evidence",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-04T19:26:37Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-VAL-006",
+          "verifies": [
+            "tests/test_rules_oracle.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 621,
+          "output_tail": "    \"deltas\": 1\n  },\n  \"findings\": [],\n  \"budget\": {\n    \"low\": 0,\n    \"total\": 3,\n    \"ratio\": 0.0,\n    \"limit\": 0.3,\n    \"ok\": true\n  },\n  \"adopted\": true\n}\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 12 tests in 0.578s\n\nFAILED (failures=8)"
+        },
+        {
+          "requirement_id": "R-VAL-007",
+          "verifies": [
+            "tests/test_rules_oracle.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 627,
+          "output_tail": "    \"deltas\": 1\n  },\n  \"findings\": [],\n  \"budget\": {\n    \"low\": 0,\n    \"total\": 3,\n    \"ratio\": 0.0,\n    \"limit\": 0.3,\n    \"ok\": true\n  },\n  \"adopted\": true\n}\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 12 tests in 0.584s\n\nFAILED (failures=8)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 2,
+        "missing": 0,
+        "timeout": 0,
+        "total": 2
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-04T19:26:57Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-VAL-006",
+          "verifies": [
+            "tests/test_rules_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 634,
+          "output_tail": "............\n----------------------------------------------------------------------\nRan 12 tests in 0.589s\n\nOK"
+        },
+        {
+          "requirement_id": "R-VAL-007",
+          "verifies": [
+            "tests/test_rules_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 611,
+          "output_tail": "............\n----------------------------------------------------------------------\nRan 12 tests in 0.566s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 2,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 2
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

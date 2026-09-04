@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validador determinista de Venoxia: el contrato que la especificación cumple o no.
 
-Aquí viven las dieciséis reglas del formato. Todas son deterministas: ninguna
+Aquí viven las dieciocho reglas del formato. Todas son deterministas: ninguna
 consulta a un modelo ni toca la red, y `V10` rechaza tanto una fecha como una
 fórmula vacía en `revisit:`: la apuesta debe declarar el hecho que la
 resuelve, no un plazo. Dos ejecuciones sobre el mismo árbol producen el mismo
@@ -25,6 +25,7 @@ error: se dice y se sale con `0`.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import sys
@@ -58,6 +59,17 @@ CAPABILITIES_DIR = "capabilities"
 CHANGES_DIR = "changes"
 DELTA_DIR = "delta"
 SPEC_FILENAME = "spec.md"
+CHANGE_FILENAME = "change.json"
+ORACLE_FILENAME = "oracle.json"
+
+# El estado que V17 exige ver acreditado en oracle.json. Literal y no
+# «model.CHANGE_STATES[3]»: indexar por posición ataría esta regla al orden
+# de esa tupla, y lo único que V17 necesita saber de ella es este nombre.
+STATE_VERIFIED = "verified"
+
+# Los cuatro estados que puede llevar un requisito en un run de oracle.py.
+ORACLE_STATUS_GREEN = "green"
+ORACLE_STATUS_RED = "red"
 
 # Bloques cuyos requisitos *declaran* comportamiento: son los únicos que pueden
 # duplicar un ID. Los demás bloques citan un ID que ya vive en una capability,
@@ -452,7 +464,7 @@ def _novelty(ctx: Context, requirement: Requirement) -> str | None:
 
 
 # ---------------------------------------------------------------------------
-# Las dieciséis reglas
+# Las dieciocho reglas
 # ---------------------------------------------------------------------------
 
 
@@ -1298,6 +1310,259 @@ def rule_v16(ctx: Context) -> list[Finding]:
     return findings
 
 
+# ---------------------------------------------------------------------------
+# V17 y V18: lo que `change.json` y `oracle.json` dicen del estado del change
+# ---------------------------------------------------------------------------
+
+
+def _change_id_from_delta_path(path: str) -> str | None:
+    """El ID del change al que pertenece un delta, deducido de su ruta.
+
+    Un delta vive en `.venoxia/changes/<ID>/delta/<capability>.md`. Un delta
+    fuera de esa estructura —pasado como ruta suelta, por ejemplo— no
+    pertenece a ningún change: no hay `change.json` ni `oracle.json` a los que
+    asociarlo, y V17/V18 lo ignoran en vez de adivinar.
+    """
+    parts = Path(path).parts
+    for index, part in enumerate(parts):
+        if (
+            part == CHANGES_DIR
+            and index + 2 < len(parts)
+            and parts[index + 2] == DELTA_DIR
+        ):
+            return parts[index + 1]
+    return None
+
+
+def _requirements_by_change(ctx: Context) -> dict[str, list[Requirement]]:
+    """Agrupa los requisitos del ámbito validado por el change de su delta."""
+    grouped: dict[str, list[Requirement]] = {}
+    for delta in ctx.deltas:
+        change_id = _change_id_from_delta_path(delta.path)
+        if change_id is None:
+            continue
+        grouped.setdefault(change_id, []).extend(delta.requirements)
+    return grouped
+
+
+def _change_state(ctx: Context, change_id: str) -> str | None:
+    """El «state» declarado en `change.json`, o `None` si no se puede saber.
+
+    Un `change.json` ausente, ilegible o que no es JSON válido no acredita
+    «verified»: se trata igual que si no lo declarase, y V17 no se evalúa. No
+    es el mismo criterio que usa `guardian.py` con el `change.json` corrupto
+    —ahí un fallo de E/S abre una vía de escape—, porque aquí lo que está en
+    juego no es permitir una edición, es dar por bueno un estado que nadie
+    puede confirmar.
+    """
+    path = f"{VENOXIA_DIR}/{CHANGES_DIR}/{change_id}/{CHANGE_FILENAME}"
+    if not ctx.is_file(path):
+        return None
+    text, failure = ctx.read_with_failure(path)
+    if failure is not None or text is None:
+        return None
+    try:
+        data = json.loads(text)
+    except ValueError:
+        return None
+    if not isinstance(data, dict):
+        return None
+    state = data.get("state")
+    return state if isinstance(state, str) else None
+
+
+def _read_oracle_runs(ctx: Context, change_id: str) -> tuple[list[dict] | None, str]:
+    """Los runs de `oracle.json` de un change, del más antiguo al más reciente.
+
+    Devuelve `(None, motivo)` cuando el fichero no existe, no se puede leer,
+    no es JSON válido, no tiene la forma esperada o no trae ningún run: los
+    cuatro son «no hay oráculo que acredite nada», y el motivo —en español,
+    sin traza— es lo que V17 necesita para decir cuál de los cuatro fue, sin
+    imprimir una excepción cruda.
+    """
+    path = f"{VENOXIA_DIR}/{CHANGES_DIR}/{change_id}/{ORACLE_FILENAME}"
+    if not ctx.is_file(path):
+        return None, "no existe"
+    text, failure = ctx.read_with_failure(path)
+    if failure is not None:
+        return None, f"no se pudo leer ({failure.message})"
+    try:
+        data = json.loads(text or "")
+    except ValueError as error:
+        return None, f"no es JSON válido ({error})"
+    if not isinstance(data, dict) or not isinstance(data.get("runs"), list):
+        return None, "no tiene la forma esperada (falta la lista «runs»)"
+    runs = [run for run in data["runs"] if isinstance(run, dict)]
+    if not runs:
+        return None, "no tiene ningún run registrado"
+    return runs, ""
+
+
+def _run_status_by_id(run: dict) -> dict[str, str]:
+    """El `status` de cada requisito de un run, indexado por su `requirement_id`."""
+    results = run.get("results")
+    if not isinstance(results, list):
+        return {}
+    status_by_id: dict[str, str] = {}
+    for result in results:
+        if not isinstance(result, dict):
+            continue
+        requirement_id = result.get("requirement_id")
+        if requirement_id:
+            status_by_id[requirement_id] = result.get("status")
+    return status_by_id
+
+
+def _v17_finding(change_id: str, oracle_path: str, requirement_id: str | None, message: str) -> Finding:
+    """Un hallazgo de V17: mismo remedio en las tres formas de fallar."""
+    return Finding(
+        rule="V17",
+        severity=SEVERITY_ERROR,
+        message=message,
+        file=oracle_path,
+        requirement_id=requirement_id,
+        hint=(
+            f"Ejecuta «/venoxia:verify» sobre el change «{change_id}»: es la skill "
+            "que graba el oráculo en «oracle.json» y sólo entonces —con todos los "
+            "requisitos del change en verde— tiene sentido dejarlo en «verified»."
+        ),
+    )
+
+
+def rule_v17(ctx: Context) -> list[Finding]:
+    """V17 · Un change «verified» tiene su oráculo en verde de verdad, en disco.
+
+    Se evalúa sólo sobre los changes cuyo `change.json` declara
+    `state: verified`. Falla en tres casos, comprobados en este orden: no hay
+    un `oracle.json` legible; su último run no está en verde; o ese último
+    run no cubre todos los requisitos que el delta del change declara —una
+    forma de decir «verified» sin que el oráculo se haya enterado de lo
+    último que se escribió—.
+    """
+    findings: list[Finding] = []
+    for change_id, requirements in _requirements_by_change(ctx).items():
+        if _change_state(ctx, change_id) != STATE_VERIFIED:
+            continue
+
+        declared_ids = [requirement.id for requirement in requirements if requirement.id]
+        oracle_path = f"{VENOXIA_DIR}/{CHANGES_DIR}/{change_id}/{ORACLE_FILENAME}"
+        first_id = declared_ids[0] if declared_ids else None
+
+        runs, reason = _read_oracle_runs(ctx, change_id)
+        if runs is None:
+            findings.append(
+                _v17_finding(
+                    change_id,
+                    oracle_path,
+                    first_id,
+                    (
+                        f"El change «{change_id}» está en «verified» y «{oracle_path}» "
+                        f"{reason}: un «verified» sin oráculo legible en el disco no "
+                        "acredita nada."
+                    ),
+                )
+            )
+            continue
+
+        last_run = runs[-1]
+        status_by_id = _run_status_by_id(last_run)
+
+        if last_run.get("all_green") is not True:
+            target = next(
+                (rid for rid in declared_ids if status_by_id.get(rid) != ORACLE_STATUS_GREEN),
+                first_id,
+            )
+            findings.append(
+                _v17_finding(
+                    change_id,
+                    oracle_path,
+                    target,
+                    (
+                        f"El change «{change_id}» está en «verified» y el último run de "
+                        f"«{oracle_path}» no está en verde (all_green: "
+                        f"{last_run.get('all_green')!r}): el oráculo dice que el "
+                        "comportamiento todavía no está resuelto."
+                    ),
+                )
+            )
+            continue
+
+        missing_ids = [rid for rid in declared_ids if rid not in status_by_id]
+        if missing_ids:
+            listed = ", ".join(f"«{rid}»" for rid in missing_ids)
+            findings.append(
+                _v17_finding(
+                    change_id,
+                    oracle_path,
+                    missing_ids[0],
+                    (
+                        f"El change «{change_id}» está en «verified» pero el último run "
+                        f"de «{oracle_path}» no cubre {listed}: el delta trae requisitos "
+                        "que el oráculo grabado nunca vio."
+                    ),
+                )
+            )
+    return findings
+
+
+def rule_v18(ctx: Context) -> list[Finding]:
+    """V18 · Aviso: un requisito llegó a verde sin haber pasado por rojo antes.
+
+    Se evalúa sobre cualquier change de los deltas en ámbito que tenga
+    `oracle.json`, sin mirar su `state`: la disciplina TDD que comprueba —el
+    test falla antes de que exista la implementación— no depende de en qué
+    fase del ciclo de vida esté el change. Para cada requisito en verde en el
+    último run, hace falta un run **anterior** donde ese mismo requisito
+    estuviera en rojo; si no lo hay, un aviso por requisito, nunca uno solo
+    por change.
+    """
+    findings: list[Finding] = []
+    for change_id in _requirements_by_change(ctx):
+        oracle_path = f"{VENOXIA_DIR}/{CHANGES_DIR}/{change_id}/{ORACLE_FILENAME}"
+        if not ctx.is_file(oracle_path):
+            continue
+
+        runs, _reason = _read_oracle_runs(ctx, change_id)
+        if not runs:
+            # Sin runs legibles no hay historial que juzgar; V17 ya se ocupa
+            # de denunciarlo cuando además el change está en «verified».
+            continue
+
+        last_status = _run_status_by_id(runs[-1])
+        green_ids = sorted(
+            rid for rid, status in last_status.items() if status == ORACLE_STATUS_GREEN
+        )
+
+        ever_red: set[str] = set()
+        for run in runs[:-1]:
+            for rid, status in _run_status_by_id(run).items():
+                if status == ORACLE_STATUS_RED:
+                    ever_red.add(rid)
+
+        for requirement_id in green_ids:
+            if requirement_id in ever_red:
+                continue
+            findings.append(
+                Finding(
+                    rule="V18",
+                    severity=SEVERITY_WARNING,
+                    message=(
+                        f"«{requirement_id}» pasó a verde sin haber estado en rojo: "
+                        "comprueba que el test falla sin la implementación."
+                    ),
+                    file=oracle_path,
+                    requirement_id=requirement_id,
+                    hint=(
+                        f"Antes de escribir el código, deja el test de «{requirement_id}» "
+                        "en rojo y grábalo con «python3 scripts/oracle.py --change "
+                        f"{change_id} --record»; si ya se comprobó y esto es una "
+                        "reconstrucción del historial, no hay nada que arreglar."
+                    ),
+                )
+            )
+    return findings
+
+
 RULES: list[Rule] = [
     Rule("V01", SEVERITY_ERROR, "El ID está, tiene la forma «R-XXX-000» y es único", rule_v01),
     Rule("V02", SEVERITY_ERROR, "La narrativa encaja en exactamente un patrón EARS", rule_v02),
@@ -1315,11 +1580,13 @@ RULES: list[Rule] = [
     Rule("V14", SEVERITY_WARNING, "La narrativa no usa «SHALL» ni «MUST»", rule_v14),
     Rule("V15", SEVERITY_WARNING, "El comportamiento nuevo declara «from:»", rule_v15),
     Rule("V16", SEVERITY_WARNING, "Ningún test cubre un ID inexistente", rule_v16),
+    Rule("V17", SEVERITY_ERROR, "Un change «verified» tiene su oráculo en verde", rule_v17),
+    Rule("V18", SEVERITY_WARNING, "Ningún verde llegó sin pasar antes por rojo", rule_v18),
 ]
 
 
 def run_rules(ctx: Context) -> list[Finding]:
-    """Aplica las dieciséis reglas en orden y devuelve todos sus hallazgos.
+    """Aplica las dieciocho reglas en orden y devuelve todos sus hallazgos.
 
     Una regla que se cayera no puede tumbar la validación entera: el fallo se
     convierte en un hallazgo con su código y el resto sigue.
@@ -1604,7 +1871,7 @@ def build_parser() -> argparse.ArgumentParser:
     cli = argparse.ArgumentParser(
         prog="validate.py",
         description=(
-            "Valida la especificación de Venoxia contra las dieciséis reglas del "
+            "Valida la especificación de Venoxia contra las dieciocho reglas del "
             "contrato. Determinista: ninguna regla consulta a un modelo."
         ),
         epilog=(

@@ -142,6 +142,8 @@ Los ataques del abogado del diablo aparecen en el informe pero **no** cuentan pa
 
 Nunca escribas `validated` porque el resultado «parece razonable», porque las divergencias sean pocas o porque el usuario tenga prisa. Ese estado es lo único que el guardián mira para dejar tocar el código; concederlo sin las dos condiciones vacía de sentido todo lo demás.
 
+Con `validated` ya escrito, el siguiente paso tecleado es `/venoxia:verify`: antes de escribir el código de verdad, esa skill graba el oráculo en rojo —el test existe y falla, que es lo que demuestra que comprueba algo— y sólo cuando el código lo pone en verde vuelve a grabar y deja el change en `verified`. Esta skill no lo hace por su cuenta: `diverge` decide `validated`, nunca `verified`.
+
 ## Cuando el usuario responde las preguntas
 
 Las respuestas se llevan al delta —`/venoxia:specify` o edición manual—, no aquí: esta skill no edita deltas. Después se vuelve a pasar `/venoxia:validate` y `/venoxia:diverge`, con lecturas nuevas. Reutilizar las lecturas viejas contra un delta corregido no comprueba nada.

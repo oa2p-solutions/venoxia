@@ -50,7 +50,7 @@ cambiado de verdad.
 Los otros cuatro comprueban que el sistema grita. Este comprueba que **no grita cuando no
 debe**, que es el fallo que mata la adopción de una herramienta de este tipo: un
 validador que da falsos positivos se desinstala el primer viernes. Su fixture pasa las
-dieciséis reglas sin un solo aviso y sus dos lecturas convergen. Cualquier regresión que
+dieciocho reglas sin un solo aviso y sus dos lecturas convergen. Cualquier regresión que
 introduzca ruido — una regla nueva demasiado celosa, un umbral de similitud mal puesto en
 `diff_readings.py` — lo tumba antes que ningún otro caso.
 
@@ -127,9 +127,14 @@ real. `clean-spec` pasa además en modo `--strict`.
 | `ambiguous-partial-effect` | `ok: true` | `converged: false` · hard 1 · soft 1 · gaps 0 |
 
 Que los dos casos de ambigüedad pasen el validador no es un descuido: es el argumento
-entero del motor de divergencia. Una especificación puede cumplir las dieciséis reglas y
+entero del motor de divergencia. Una especificación puede cumplir las dieciocho reglas y
 seguir admitiendo dos lecturas incompatibles. El validador comprueba la forma; la
 divergencia comprueba el significado.
+
+Ningún fixture trae `oracle.json`: los cinco changes se quedan en `draft`, sin
+oráculo grabado, así que `V17` (que sólo mira changes en `verified`) y `V18`
+(que sólo mira changes con `oracle.json`) no se evalúan sobre ninguno de los
+cinco y las cifras de la tabla no cambian por su llegada.
 
 ## Cuando un caso falla
 
