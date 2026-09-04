@@ -134,9 +134,12 @@ cuaderno que sólo entiende quien lo escribió.
        requisito: cuánto te fías de que esto sea verdad, no de saber implementarlo.
      · `why` — por qué es una apuesta y no un hecho. Sin el porqué, quien la revise no
        sabrá qué tiene que mirar para resolverla.
-     · `revisit` — fecha ISO `YYYY-MM-DD` estrictamente futura, y la del ejemplo es un
-       ejemplo: pon la tuya. Una suposición sin fecha no la revisa nadie por iniciativa
-       propia; a los seis meses ya no es una apuesta, es «cómo funciona el sistema».
+     · `revisit` — **el hecho que resuelve la apuesta**, no una fecha. Lo que cierra
+       una suposición no es que pase el tiempo, es que llegue un dato: «cuando hayamos
+       servido las cincuenta primeras reservas», «cuando el primer cliente reserve por
+       el enlace». El hecho dice qué habrá que mirar y se reconoce cuando ocurre; una
+       fecha llega esté la respuesta disponible o no, y entonces sólo se puede
+       posponer. `C12` rechaza las fechas por eso, y también los «ya veremos».
      · `fatal` — `yes` o `no`. Si esta apuesta sale mal, ¿el proyecto sigue teniendo
        sentido? Un `fatal: yes` con `confidence: low` es la línea más importante del
        documento y lo que habría que ir a comprobar esta semana, antes de escribir
@@ -153,7 +156,7 @@ teléfono del restaurante.
 
 confidence: low
   why:      no lo hemos comprobado con ningún restaurante real
-  revisit:  2026-12-15
+  revisit:  cuando hayamos hablado con tres restaurantes que ya reserven por enlace
   fatal:    no
 
 ### B-002 · El cliente se fía de una confirmación automática
@@ -164,5 +167,5 @@ propósito no se cumple: el cuaderno desaparece y el teléfono se queda.
 
 confidence: low
   why:      corazonada; ningún cliente ha reservado todavía por el enlace
-  revisit:  2026-12-15
+  revisit:  cuando las cincuenta primeras reservas hayan pasado por el enlace
   fatal:    yes

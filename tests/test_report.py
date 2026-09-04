@@ -69,7 +69,7 @@ SCHEMA_FINDING_KEYS = frozenset(
 ANSI_MARKER = "\x1b["
 
 #: Mensaje y remedio con acentos y comillas angulares, para probar `ensure_ascii=False`.
-ACCENTED_MESSAGE = "El año de «expires:» ya pasó: la apuesta caducó sin comprobación."
+ACCENTED_MESSAGE = "El «revisit:» no señala ningún hecho: la apuesta quedó sin comprobación."
 ACCENTED_HINT = "Añade «verifies: ruta/al/test» y señala el test con «@covers R-CHK-014»."
 
 

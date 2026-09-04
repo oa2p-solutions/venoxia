@@ -25,7 +25,38 @@ BLOCK_NAMES = ("ADDED", "MODIFIED", "REMOVED", "RENAMED")
 CONFIDENCE_LEVELS = ("high", "medium", "low")
 
 # Claves reconocidas del bloque de metadatos de un requisito.
-META_KEYS = ("verifies", "confidence", "why", "expires", "from")
+META_KEYS = ("verifies", "confidence", "why", "revisit", "from")
+
+# «expires:» era el nombre de «revisit:» cuando la revisión de una apuesta se
+# declaraba con una fecha. Se conserva aquí, y sólo aquí, para poder dar un
+# aviso que diga cómo se llama ahora: un «clave desconocida» genérico dejaría a
+# quien tenga specs escritas adivinando.
+RETIRED_META_KEYS = {"expires": "revisit"}
+
+#: Fórmulas que ocupan el «revisit:» sin decir qué lo resuelve. Se comparan
+#: contra el valor **entero**, ya normalizado: en cuanto la frase nombra un
+#: suceso concreto deja de casar, y ahí está su seguridad.
+#:
+#: Una fecha ISO suelta entra en la lista a propósito. Es lo que se escribía
+#: antes y lo que un modelo escribe por inercia, y no es lo que ahora se pide:
+#: un día del calendario no dice qué habrá que mirar cuando llegue, y quien
+#: llegue a él no sabrá si la apuesta se puede resolver ya o no.
+_FILLER_REVISIT_ALTERNATIVES = (
+    r"\d{4}-\d{1,2}-\d{1,2}",
+    r"(?:mas\s+adelante|mas\s+tarde|ya\s+veremos|se\s+vera|esta\s+por\s+ver|"
+    r"proximamente|en\s+su\s+momento|cuando\s+(?:toque|proceda|sea|haya\s+tiempo)|"
+    r"algun\s+dia|en\s+el\s+futuro|a\s+futuro)",
+    r"(?:pendiente|por\s+definir|por\s+determinar|por\s+decidir|por\s+ver|"
+    r"sin\s+definir|sin\s+determinar|tbd|tba|n\s*/\s*a|na)",
+    r"(?:en\s+)?(?:unos?\s+)?(?:\d+\s+)?"
+    r"(?:dias|semanas|meses|trimestres|anos|sprints)(?:\s+(?:vista|despues))?",
+    r"(?:el\s+)?(?:proximo|siguiente)\s+(?:mes|trimestre|ano|sprint|release|version)",
+    r"(?:periodicamente|regularmente|de\s+vez\s+en\s+cuando)",
+    r"[-–—?¿.…]+",
+)
+FILLER_REVISIT_RE = re.compile(
+    "^(?:" + "|".join(_FILLER_REVISIT_ALTERNATIVES) + ")$"
+)
 
 # Forma canónica del identificador de un requisito: «R-CHK-014».
 REQUIREMENT_ID_RE = re.compile(r"^R-[A-Z]{2,4}-\d{3}$")

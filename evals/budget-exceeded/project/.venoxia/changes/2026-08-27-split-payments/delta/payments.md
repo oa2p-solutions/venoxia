@@ -12,7 +12,7 @@ tienda y deja la tarjeta para el importe restante.
 verifies:   test/payments/consumption-order.spec.ts
 confidence: low
   why:      nadie ha medido si el cliente prefiere gastar antes el saldo o la tarjeta
-  expires:  2030-06-30
+  revisit:  cuando tengamos mil pedidos pagados con saldo y tarjeta que contar
 from:       prfaq/pago-repartido.md#el-cliente-elige-como-paga
 
 ### R-PAY-011 · Maximum number of payment methods per order
@@ -27,7 +27,7 @@ y deja el reparto anterior intacto.
 verifies:   test/payments/method-limit.spec.ts
 confidence: low
   why:      el tope de tres medios es una conjetura de producto, no un dato de uso
-  expires:  2030-06-30
+  revisit:  cuando veamos el primer cliente que intente usar un cuarto medio
 from:       prfaq/pago-repartido.md#el-cliente-elige-como-paga
 
 ### R-PAY-012 · Split amounts add up to the order total

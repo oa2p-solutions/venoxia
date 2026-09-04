@@ -142,7 +142,7 @@ Todas deterministas, igual que las del validador: ninguna consulta a un modelo. 
 | `C09` | `Risk` vale exactamente `high`, `medium` o `low`. | error |
 | `C10` | `## Out of scope` trae al menos una entrada. Un proyecto que todavía no le ha dicho que no a nada no ha decidido nada. | error |
 | `C11` | Cada apuesta declara `confidence:` con uno de los tres niveles. | error |
-| `C12` | Una apuesta en `low` obliga a `revisit:` con fecha ISO `YYYY-MM-DD` estrictamente futura. Misma exigencia que `V10` le hace a un requisito. | error |
+| `C12` | Una apuesta en `low` obliga a `revisit:` con **el hecho que la resuelve**: «cuando hayamos cerrado las diez primeras compras». Ni una fecha ni un «ya veremos»: las dos se rechazan. Misma exigencia que `V10` le hace a un requisito. | error |
 | `C13` | El identificador de la apuesta casa `B-NNN` y es único en el acta. | error |
 | `C14` | `fatal:`, cuando está, vale `yes` o `no`. | warning |
 | `C15` | El acta declara alguna capability de riesgo `high` y no declara ninguna apuesta: una suposición que nadie ha escrito es una suposición que nadie va a revisar. | warning |
@@ -179,7 +179,7 @@ todas las líneas del pedido durante 15 minutos.
 verifies:   test/checkout/reservation.spec.ts
 confidence: medium
   why:      los 15 minutos son una apuesta, no un dato
-  expires:  2026-10-30
+  revisit:  cuando hayamos medido un mes de reservas caducadas
 from:       prfaq/checkout-express.md#sin-sorpresas-al-pagar
 ```
 
@@ -192,7 +192,7 @@ El ID vive en el encabezado (`### R-CHK-014 · Título`): estable, linkable y pa
 | `verifies` | Sí | Ruta (o rutas separadas por coma o espacio) del fichero de test que decide si el requisito se cumple. | Es el corazón del sistema: la apuesta declara cómo se resuelve. Un requisito sin oráculo es una opinión, y el validador lo rechaza (`V06`, `V07`). |
 | `confidence` | Sí | `high`, `medium` o `low`. | Obliga a separar lo que se sabe de lo que se supone, en el momento de escribirlo y no después del incidente (`V09`). |
 | `why` | Recomendada | Una frase en español que explica por qué la confianza es esa y no otra. | Convierte «medium» en información accionable: dice **qué** parte concreta es la apuesta. |
-| `expires` | Sí cuando `confidence: low` | Fecha ISO `YYYY-MM-DD` estrictamente futura. | Una suposición sin fecha de caducidad se vuelve permanente. Con fecha, el validador la mata solo (`V10`). |
+| `revisit` | Sí cuando `confidence: low` | El hecho que resuelve la apuesta. No una fecha: `V10` las rechaza. | Lo que cierra una suposición no es que pase el tiempo, es que llegue un dato. El hecho dice qué habrá que mirar y se reconoce cuando ocurre; una fecha llega esté la respuesta o no, y entonces sólo se puede posponer. |
 | `from` | Recomendada | Referencia al documento de origen (PR/FAQ, ticket, decisión), con ancla si aplica. | Preserva la trazabilidad hacia la intención de negocio. Su ausencia en un requisito nuevo es un aviso (`V15`). |
 
 El vínculo con el test es **doble**: la spec apunta al fichero con `verifies:`, y el fichero apunta de vuelta al requisito con un comentario `@covers R-CHK-014`. El validador comprueba las dos direcciones (`V07`, `V08`, `V16`), de modo que borrar el test rompe la spec y renombrar el requisito rompe el test.
@@ -223,7 +223,7 @@ Todas deterministas: ninguna consulta a un modelo. `scripts/validate.py` sale co
 | `V07` | El fichero de `verifies:` existe en disco, resuelto desde `--root`. | error |
 | `V08` | Ese fichero contiene `@covers <ID>`. Con varias rutas, basta que una lo contenga. | error |
 | `V09` | `confidence:` está presente y vale `high`, `medium` o `low`. | error |
-| `V10` | `confidence: low` obliga a `expires:` con fecha ISO estrictamente futura. | error |
+| `V10` | `confidence: low` obliga a `revisit:` con el hecho que resuelve la apuesta. Una fecha se rechaza —no dice qué mirar cuando llegue— y un «ya veremos» también. | error |
 | `V11` | Presupuesto de incertidumbre: como mucho el 30 % de los requisitos del ámbito en `low`. Exactamente 0,30 pasa. | error |
 | `V12` | Cada delta declara al menos un bloque `## ADDED\|MODIFIED\|REMOVED\|RENAMED Requirements`. | error |
 | `V13` | Los IDs de `MODIFIED`/`REMOVED`/`RENAMED` existen en alguna capability viva. Sin capabilities en disco, la regla no se evalúa. | error |

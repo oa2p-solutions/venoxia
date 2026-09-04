@@ -4,7 +4,7 @@
 Cada regla trae su caso en positivo y su caso en negativo, y todos se ejecutan
 igual: se monta el proyecto limpio de `Project()`, se rompe **una** cosa y se
 comprueba que el conjunto de reglas disparadas es **exactamente** el esperado.
-Si al romper `expires:` saltara además `V11`, el test lo diría: por eso se
+Si al romper `revisit:` saltara además `V11`, el test lo diría: por eso se
 compara el conjunto entero y no sólo la pertenencia.
 
 `validate.py` se invoca siempre por subproceso y con `--json`, que es el
@@ -30,6 +30,7 @@ import json
 import unittest
 
 from tests.venoxia_fixtures import (
+    REVISIT_FACT,
     BLOCK_NAMES,
     CAPABILITY_NAME,
     CHANGE_ID,
@@ -91,7 +92,7 @@ class TestRuleV09Confidence(unittest.TestCase):
                         added=[
                             requirement(
                                 confidence=level,
-                                expires=future_date() if level == "low" else None,
+                                revisit=REVISIT_FACT if level == "low" else None,
                             )
                         ],
                     )
@@ -160,7 +161,7 @@ class TestRuleV09Confidence(unittest.TestCase):
         """«LOW» dispara V09 y nada más: sin nivel válido no hay apuesta que contar.
 
         Es el efecto colateral que el endurecimiento tenía que dejar fijado. Si
-        V10 le reclamara «expires:» o V11 lo metiera en el presupuesto, dos
+        V10 le reclamara «revisit:» o V11 lo metiera en el presupuesto, dos
         reglas estarían apoyándose en un valor que una tercera acaba de
         rechazar, y el informe cobraría tres veces el mismo error.
         """
@@ -220,8 +221,8 @@ class TestRuleV09Confidence(unittest.TestCase):
         raise AssertionError(f"no se encontró «{needle}» en «{relpath}».")
 
 
-class TestRuleV10Expires(unittest.TestCase):
-    """V10 · una apuesta en «low» caduca: «expires:» con fecha ISO futura."""
+class TestRuleV10Revisit(unittest.TestCase):
+    """V10 · una apuesta en «low» dice qué hecho la resuelve, y no cuándo caduca."""
 
     def _low_bet(self, **meta) -> Project:
         """Proyecto con una única apuesta «low» y presupuesto de V11 holgado.
@@ -239,48 +240,52 @@ class TestRuleV10Expires(unittest.TestCase):
         )
         return project
 
-    def test_v10_accepts_a_low_confidence_bet_with_a_future_expiry(self):
-        """Una apuesta «low» con fecha de revisión futura cumple el contrato."""
-        project = self._low_bet(expires=future_date())
+    def test_v10_accepts_a_low_confidence_bet_that_names_the_fact(self):
+        """Una apuesta «low» que dice qué la resuelve cumple el contrato."""
+        project = self._low_bet(revisit=REVISIT_FACT)
         run = project.validate_json("--strict")
         self.assertEqual(run.returncode, 0, run.describe())
         self.assertEqual(run.rule_set(), set(), run.describe())
 
-    def test_v10_ignores_the_expiry_when_the_confidence_is_not_low(self):
-        """Un «expires:» caducado no molesta si la confianza no es «low»."""
+    def test_v10_does_not_demand_a_revisit_when_the_confidence_is_not_low(self):
+        """Un requisito que no es «low» puede no declarar cómo se resuelve su duda.
+
+        Lo que sí se le exige, si lo declara, es que lo declare bien: eso lo
+        comprueba `test_v10_judges_the_shape_at_every_confidence_level`.
+        """
         with Project() as project:
             project.delta(
                 CHANGE_ID,
                 CAPABILITY_NAME,
-                added=[requirement(confidence="medium", expires=past_date())],
+                added=[requirement(confidence="medium", revisit=None)],
             )
             run = project.validate_json("--strict")
             self.assertEqual(run.returncode, 0, run.describe())
             self.assertEqual(run.rule_set(), set(), run.describe())
 
-    def test_v10_fails_when_a_low_confidence_bet_has_no_expiry(self):
-        """Una apuesta «low» sin «expires:» dispara V10 y sólo V10."""
+    def test_v10_fails_when_a_low_confidence_bet_has_no_revisit(self):
+        """Una apuesta «low» sin «revisit:» dispara V10 y sólo V10."""
         project = self._low_bet()
         run = project.validate_json("--strict")
         self.assertEqual(run.returncode, 1, run.describe())
         self.assertEqual(run.rule_set(), {"V10"}, run.describe())
         finding = run.findings_for("V10")[0]
         self.assertEqual(finding["severity"], "error")
-        self.assertIn("expires", finding["message"])
+        self.assertIn("revisit", finding["message"])
 
-    def test_v10_separates_the_empty_expiry_from_the_absent_one(self):
-        """«expires:» escrita y vacía no es «expires:» ausente.
+    def test_v10_separates_the_empty_revisit_from_the_absent_one(self):
+        """«revisit:» escrita y vacía no es «revisit:» ausente.
 
-        Decirle «no trae expires:» a quien tiene la línea escrita —y señalarle
+        Decirle «no trae revisit:» a quien tiene la línea escrita —y señalarle
         esa misma línea— es contradecirle con su propio fichero delante.
         """
-        project = self._low_bet(expires="")
+        project = self._low_bet(revisit="")
         run = project.validate_json("--strict")
         self.assertEqual(run.returncode, 1, run.describe())
         self.assertEqual(run.rule_set(), {"V10"}, run.describe())
         message = run.findings_for("V10")[0]["message"]
         self.assertIn("está vacío", message)
-        self.assertNotIn("no trae «expires:»", message)
+        self.assertNotIn("no trae «revisit:»", message)
 
     def test_v10_still_says_no_trae_when_the_line_is_absent(self):
         """Y sin la línea, el mensaje sigue siendo el de la ausencia."""
@@ -288,41 +293,61 @@ class TestRuleV10Expires(unittest.TestCase):
         run = project.validate_json("--strict")
         self.assertEqual(run.rule_set(), {"V10"}, run.describe())
         message = run.findings_for("V10")[0]["message"]
-        self.assertIn("no trae «expires:»", message)
+        self.assertIn("no trae «revisit:»", message)
         self.assertNotIn("está vacío", message)
 
-    def test_v10_fails_when_the_expiry_date_is_already_past(self):
-        """Una apuesta «low» con fecha vencida dispara V10 y el mensaje da la fecha."""
-        expired = past_date()
-        project = self._low_bet(expires=expired)
-        run = project.validate_json("--strict")
-        self.assertEqual(run.returncode, 1, run.describe())
-        self.assertEqual(run.rule_set(), {"V10"}, run.describe())
-        message = run.findings_for("V10")[0]["message"]
-        self.assertIn(expired, message)
-        self.assertIn(today().isoformat(), message)
-
-    def test_v10_fails_when_the_expiry_date_is_not_iso_formatted(self):
-        """Una fecha «DD/MM/AAAA» no es ISO, por muy futura que sea."""
-        written = non_iso_date()
-        project = self._low_bet(expires=written)
+    def test_v10_rejects_a_future_date(self):
+        """Una fecha es la respuesta que este campo dejó de admitir."""
+        written = future_date()
+        project = self._low_bet(revisit=written)
         run = project.validate_json("--strict")
         self.assertEqual(run.returncode, 1, run.describe())
         self.assertEqual(run.rule_set(), {"V10"}, run.describe())
         message = run.findings_for("V10")[0]["message"]
         self.assertIn(written, message)
-        self.assertIn("YYYY-MM-DD", message)
+        self.assertIn("es una fecha", message)
 
-    def test_v10_fails_when_the_expiry_date_does_not_exist_in_the_calendar(self):
-        """Un 31 de febrero tiene la forma ISO pero no es un día: también falla."""
-        written = impossible_date()
-        project = self._low_bet(expires=written)
+    def test_v10_rejects_a_past_date_for_the_same_reason(self):
+        """Hacia atrás tampoco: el problema no es que venza, es que no dice qué mirar."""
+        project = self._low_bet(revisit=past_date())
         run = project.validate_json("--strict")
-        self.assertEqual(run.returncode, 1, run.describe())
         self.assertEqual(run.rule_set(), {"V10"}, run.describe())
-        message = run.findings_for("V10")[0]["message"]
-        self.assertIn(written, message)
-        self.assertIn("calendario", message)
+        self.assertIn("es una fecha", run.findings_for("V10")[0]["message"])
+
+    def test_v10_rejects_filler_that_means_later(self):
+        """«Ya veremos» ocupa la línea sin nombrar nada, que es no tener apuesta."""
+        for filler in ("ya veremos", "más adelante", "TBD", "3 meses"):
+            with self.subTest(revisit=filler):
+                project = self._low_bet(revisit=filler)
+                run = project.validate_json("--strict")
+                self.assertEqual(run.rule_set(), {"V10"}, run.describe())
+                self.assertIn(
+                    "no nombra ningún hecho", run.findings_for("V10")[0]["message"]
+                )
+
+    def test_v10_judges_the_shape_at_every_confidence_level(self):
+        """Sólo «low» está obligada a traer «revisit:»; escribirlo mal lo puede cualquiera."""
+        for level in ("high", "medium"):
+            with self.subTest(confidence=level):
+                with Project() as project:
+                    project.delta(
+                        CHANGE_ID,
+                        CAPABILITY_NAME,
+                        added=[requirement(confidence=level, revisit=future_date())],
+                    )
+                    run = project.validate_json("--strict")
+                    self.assertEqual(run.rule_set(), {"V10"}, run.describe())
+                    self.assertIn(
+                        "es una fecha", run.findings_for("V10")[0]["message"]
+                    )
+
+    def test_v10_hint_shows_the_shape_it_wants(self):
+        """El remedio enseña la forma que se pide, no la que se acaba de rechazar."""
+        project = self._low_bet(revisit=future_date())
+        run = project.validate_json("--strict")
+        hint = run.findings_for("V10")[0]["hint"]
+        self.assertIn("hecho", hint)
+        self.assertNotIn("YYYY-MM-DD", hint)
 
 
 class TestRuleV11UncertaintyBudget(unittest.TestCase):
@@ -331,8 +356,8 @@ class TestRuleV11UncertaintyBudget(unittest.TestCase):
     def _budget(self, fillers: int, low_bets: int) -> Project:
         """Proyecto con `1 + fillers` requisitos intachables y `low_bets` apuestas vivas.
 
-        Las apuestas llevan siempre `expires:` futuro, así que lo único que
-        puede saltar es el presupuesto.
+        Las apuestas llevan siempre su `revisit:` con un hecho, así que lo
+        único que puede saltar es el presupuesto.
         """
         project = Project()
         self.addCleanup(project.cleanup)
@@ -346,7 +371,7 @@ class TestRuleV11UncertaintyBudget(unittest.TestCase):
                     title=f"Uncertain bet {offset}",
                     verifies=project.oracle(identifier),
                     confidence="low",
-                    expires=future_date(),
+                    revisit=REVISIT_FACT,
                 )
             )
         project.delta(CHANGE_ID, CAPABILITY_NAME, added=bets)
@@ -427,7 +452,7 @@ class TestBudgetHasASingleSourceOfTruth(unittest.TestCase):
                     title=f"Uncertain bet {offset}",
                     verifies=project.oracle(identifier),
                     confidence=confidence,
-                    expires=future_date(),
+                    revisit=REVISIT_FACT,
                 )
             )
         project.delta(CHANGE_ID, CAPABILITY_NAME, added=blocks)

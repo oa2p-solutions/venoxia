@@ -33,7 +33,9 @@ Produces tres cosas y sólo tres, todas bajo `.venoxia/`: un `change.json`, un `
 >
 > No dice «sé programar esto». Dice «estoy convencido de que este es el comportamiento correcto». `high` es un hecho conocido: un requisito legal, una integración con contrato firmado, una regla que el negocio ya opera. `medium` es una decisión razonada que podría revisarse. `low` es una apuesta: alguien eligió los 15 minutos, el 409 o el reintento porque había que elegir algo.
 >
-> Por eso `low` sin `expires:` es una apuesta sin fecha de resolución, y por eso el validador la rechaza (`V10`). Una apuesta que nadie se compromete a resolver deja de ser una apuesta y se convierte en deuda silenciosa: nadie la mira, nadie la corrige y a los seis meses es «como funciona el sistema». La fecha obliga a volver.
+> Por eso `low` sin `revisit:` es una apuesta que nadie sabe cómo cerrar, y por eso el validador la rechaza (`V10`). Una apuesta que nadie se compromete a resolver deja de ser una apuesta y se convierte en deuda silenciosa: nadie la mira, nadie la corrige y a los seis meses es «como funciona el sistema».
+>
+> **`revisit:` es el hecho que la resuelve, no una fecha, y tú no lo inventas.** Lo que cierra una apuesta es que llegue un dato —«cuando hayamos procesado los primeros veinte documentos reales», «cuando el primer cliente lo use en producción»—, y ese hecho sale del proyecto, no de tu criterio: no sabes a qué ritmo llegan los documentos ni cuándo entra el primer cliente. Si el cambio que estás especificando no te da el hecho, pregúntalo; es una pregunta corta y tiene respuesta. Escribir una fecha estimada es peor que dejarlo en blanco: parece un compromiso, no lo firmó nadie, y `V10` la rechaza.
 
 ---
 
@@ -43,6 +45,8 @@ No se propone nada hasta que este inventario existe. Especificar sin leer lo que
 
 1. **`.venoxia/charter.md`**, si existe. El acta dice para qué existe el proyecto, quién lo usa, qué capabilities están previstas y en qué orden, qué se declaró fuera de alcance y qué se está dando por supuesto. Es el marco dentro del cual el cambio que te piden cae o no cae, y saberlo antes de escribir sale mucho más barato que descubrirlo después. Si no existe, sigue: los proyectos que adoptaron Venoxia antes que el acta no la tienen, y su ausencia no bloquea nada.
 2. **`.venoxia/principles.md`**, entero. Son las restricciones que toda spec de este proyecto respeta. Si el fichero no existe pero `.venoxia/` sí, sigue adelante y dilo en la entrega: estás redactando sin principios declarados.
+
+   Mira con especial cuidado **`## Principios de dominio`**, porque es la sección que decide comportamiento sin estar en ningún requisito. Si el cambio que te piden implica un juicio —qué opción gana cuando dos son buenas, qué se prefiere a costa de qué— y ahí abajo no hay ningún principio que lo gobierne, **no lo decidas tú en silencio**. Es la forma más silenciosa que tiene una spec de mentir: el criterio queda escrito, parece acordado, y nadie recuerda haberlo elegido. Dos salidas, y las dos son legítimas: preguntar al usuario y proponerle que el principio se añada al acta, o escribir el requisito con `confidence: low` y su `revisit:`, diciendo con todas las letras en la propuesta que el desempate lo elegiste tú porque había que elegir algo. Lo que no vale es la tercera, que es escribirlo como si fuera un hecho.
 3. **Todas las capabilities vivas**: `Glob` sobre `.venoxia/capabilities/*/spec.md` y `Read` de **cada** fichero completo. No basta con `grep`, ni con leer la que crees que toca. Un requisito de `billing` puede contradecir el que vas a escribir en `checkout`, y sólo lo ves si lo has leído.
 4. **Los changes en vuelo**: `Glob` sobre `.venoxia/changes/*/change.json`. Un change con `state` distinto de `archived` que toque la misma capability es un conflicto que hay que resolver **antes** de escribir: o se continúa aquel change, o se dice explícitamente en la propuesta por qué este va aparte.
 
@@ -103,7 +107,7 @@ líneas del pedido durante 15 minutos.
 verifies:   test/checkout/reservation.spec.ts
 confidence: medium
   why:      los 15 minutos son una apuesta, no un dato
-  expires:  2026-10-30
+  revisit:  cuando hayamos medido un mes de reservas caducadas
 from:       prfaq/checkout-express.md#sin-sorpresas-al-pagar
 ```
 
@@ -131,7 +135,7 @@ Así que el orden es: **título → oráculo → narrativa → escenarios → co
 - `verifies:` es una ruta de fichero de test relativa a la raíz del proyecto. Se admiten varias separadas por coma o espacio; basta con que **una** contenga el `@covers`.
 - El fichero **puede no existir todavía**. Mientras no exista sale `V07` en rojo (y `V08` en su lugar en cuanto el fichero exista sin el `@covers`; las dos no saltan a la vez sobre el mismo fichero), y ese rojo es correcto: la spec afirma que hay un oráculo y el disco dice que no. No crees un test vacío ni un fichero de relleno para apagarlos; eso es precisamente escribir el oráculo para que el validador calle.
 - El test lleva `@covers <ID>` en un comentario. El vínculo es doble a propósito: desde la spec al test y desde el test a la spec, para que borrar uno de los dos lados se note.
-- `confidence:` es `high`, `medium` o `low` (`V09`). `low` obliga a `expires:` con fecha ISO estrictamente futura: eso lo comprueba `V10` y sin ello el validador rechaza. El `why:` no lo exige ninguna regla, pero escríbelo igual en todo lo que no sea `high`: una apuesta sin porqué no se puede revisar, y quien la mire en tres meses no sabrá qué reconsiderar. Y el conjunto tiene presupuesto: como mucho el 30 % de los requisitos del ámbito en `low` (`V11`). Si te pasas, no bajes etiquetas para cuadrar: significa que hay demasiadas preguntas abiertas y toca resolver algunas con el usuario antes de seguir.
+- `confidence:` es `high`, `medium` o `low` (`V09`). `low` obliga a `revisit:` con el hecho que resuelve la apuesta —nunca una fecha, y nunca un «ya veremos»—: eso lo comprueba `V10` y sin ello el validador rechaza. El `why:` no lo exige ninguna regla, pero escríbelo igual en todo lo que no sea `high`: una apuesta sin porqué no se puede revisar, y quien la mire en tres meses no sabrá qué reconsiderar. Y el conjunto tiene presupuesto: como mucho el 30 % de los requisitos del ámbito en `low` (`V11`). Si te pasas, no bajes etiquetas para cuadrar: significa que hay demasiadas preguntas abiertas y toca resolver algunas con el usuario antes de seguir.
 - `from:` enlaza el documento de origen que justifica el requisito. Su ausencia en una capability nueva es aviso (`V15`).
 
 ### Asignación de IDs

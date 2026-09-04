@@ -49,9 +49,13 @@ confirmación del pedido frente al cliente.
        `medium` es que hay una elección discutible detrás.
      · `why` — qué parte concreta es la apuesta. Imprescindible en `medium` y `low`:
        sin el porqué, quien revise dentro de tres meses no sabrá qué reconsiderar.
-     · `expires` — fecha ISO `YYYY-MM-DD` estrictamente futura. Con `confidence: low`
-       la exige V10, porque una apuesta sin fecha de revisión es una mentira
-       aplazada: nadie vuelve jamás a mirarla por iniciativa propia.
+     · `revisit` — **el hecho que resuelve la apuesta**, no una fecha. Con
+       `confidence: low` lo exige V10. Lo que cierra una suposición no es que pase el
+       tiempo, es que llegue un dato: «cuando hayamos medido un mes de reservas
+       caducadas» dice qué habrá que mirar y permite reconocer el momento cuando
+       llega. Un día del calendario no dice ninguna de las dos cosas y llega igual
+       esté la respuesta disponible o no, así que sólo se puede posponer; V10 rechaza
+       las fechas por eso.
      · `from` — origen de la decisión, como `documento#sección`. V15 avisa si falta
        en un requisito nuevo, para que se sepa de dónde salió el comportamiento.
 
@@ -75,5 +79,5 @@ todas las líneas del pedido durante 15 minutos.
 verifies:   test/checkout/reservation.spec.ts
 confidence: medium
   why:      los 15 minutos son una apuesta, no un dato
-  expires:  2026-10-30
+  revisit:  cuando hayamos medido un mes de reservas caducadas
 from:       prfaq/checkout-express.md#sin-sorpresas-al-pagar

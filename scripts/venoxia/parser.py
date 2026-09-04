@@ -31,6 +31,7 @@ from pathlib import Path
 
 from .model import (
     META_KEYS,
+    RETIRED_META_KEYS,
     SEVERITY_ERROR,
     SEVERITY_WARNING,
     Capability,
@@ -240,7 +241,7 @@ def parse_requirements(
     * `### R-CHK-014 · Título` abre un requisito, que se cierra en el siguiente
       encabezado de nivel 1, 2 o 3.
     * `#### Scenario: Título` abre un escenario, y `- **WHEN** …` lo puebla.
-    * `verifies:`, `confidence:`, `why:`, `expires:` y `from:` son metadatos
+    * `verifies:`, `confidence:`, `why:`, `revisit:` y `from:` son metadatos
       cuando forman parte de un **bloque de metadatos**, venga antes o después
       de los escenarios. La regla exacta de qué es un bloque —y por qué no vale
       con mirar cada línea por su cuenta— está escrita entera junto a
@@ -706,7 +707,7 @@ def _meta_candidates(
 #
 # La respuesta que se sostiene es la tercera: lo que distingue a un metadato es
 # **su clave**. El contrato §3 escribe el bloque con las cinco claves y sólo con
-# ellas (`verifies|confidence|why|expires|from`); nada más es un metadato. La
+# ellas (`verifies|confidence|why|revisit|from`); nada más es un metadato. La
 # vecindad no promueve prosa a metadato, sólo sirve para lo contrario: para
 # entender que lo que cae **entre** dos claves reconocidas forma parte del mismo
 # bloque aunque su clave no esté en la lista.
@@ -792,7 +793,31 @@ def _metadata_span(
 def _unknown_key_finding(
     requirement: Requirement, key: str, line_number: int, source_file: str
 ) -> Finding:
-    """Construye el aviso `P02` de una clave de metadatos desconocida."""
+    """Construye el aviso `P02` de una clave de metadatos desconocida.
+
+    Una clave **retirada** se trata aparte. «Clave desconocida» es cierto y no
+    sirve de nada cuando la clave existía la semana pasada: quien tenga specs
+    escritas necesita saber cómo se llama ahora, no que ya no vale.
+    """
+    renamed = RETIRED_META_KEYS.get(key)
+    if renamed is not None:
+        return Finding(
+            rule="P02",
+            severity=SEVERITY_WARNING,
+            message=(
+                f"La clave «{key}» ya no existe: ahora se llama «{renamed}». "
+                "Venoxia la ignora, así que el requisito se está leyendo sin ella."
+            ),
+            file=source_file,
+            line=line_number,
+            requirement_id=requirement.id,
+            hint=(
+                f"Renómbrala a «{renamed}:» y cambia el valor por el hecho que "
+                "resuelve la apuesta —«cuando hayamos visto los diez primeros casos "
+                "reales»—, no por una fecha. Lo que cierra una apuesta es que llegue "
+                "un dato, no que pase el tiempo."
+            ),
+        )
     return Finding(
         rule="P02",
         severity=SEVERITY_WARNING,

@@ -142,7 +142,7 @@ BLOCK_NAMES = ("ADDED", "MODIFIED", "REMOVED", "RENAMED")
 
 #: Claves que admite el parámetro `omit` de `requirement()`.
 OMITTABLE = frozenset(
-    {"id", "title", "narrative", "scenarios", "verifies", "confidence", "why", "expires", "from"}
+    {"id", "title", "narrative", "scenarios", "verifies", "confidence", "why", "revisit", "from"}
 )
 
 
@@ -159,15 +159,28 @@ def today() -> date:
 def future_date(days: int = 90) -> str:
     """Fecha ISO «YYYY-MM-DD» de dentro de `days` días.
 
-    Úsala en todo `expires:` que deba estar vivo: una constante escrita a mano
-    caduca y convierte la suite en verde-hasta-que-un-día-no.
+    Ya no hay ningún campo de Venoxia que pida una fecha: `revisit:` declara el
+    hecho que resuelve la apuesta, no el día en que caduca. Esto se conserva
+    para los casos que prueban que **una fecha se rechaza**, y se calcula desde
+    hoy por el mismo motivo de siempre: una constante escrita a mano deja de ser
+    futura algún día y convierte la suite en verde-hasta-que-un-día-no.
     """
     return (date.today() + timedelta(days=days)).isoformat()
 
 
 def past_date(days: int = 30) -> str:
-    """Fecha ISO «YYYY-MM-DD» de hace `days` días. Para los casos caducados de V10."""
+    """Fecha ISO «YYYY-MM-DD» de hace `days` días.
+
+    Igual que `future_date()`: sirve para comprobar que a `revisit:` le da lo
+    mismo hacia qué lado apunte una fecha, porque ninguna fecha vale.
+    """
     return (date.today() - timedelta(days=days)).isoformat()
+
+
+#: El hecho que resuelve una apuesta, en la forma que `revisit:` pide ahora.
+#: Nombra un suceso reconocible del proyecto de ejemplo: cuando ocurra, quien
+#: mire sabrá que ya puede cerrar la apuesta.
+REVISIT_FACT = "cuando hayamos servido las cincuenta primeras reservas"
 
 
 # ---------------------------------------------------------------------------
@@ -183,7 +196,7 @@ def requirement(
     verifies: str | None = DEFAULT_VERIFIES,
     confidence: str | None = DEFAULT_CONFIDENCE,
     why: str | None = None,
-    expires: str | None = None,
+    revisit: str | None = None,
     source: str | None = None,
     omit: Sequence[str] | str = (),
     *,
@@ -217,18 +230,18 @@ def requirement(
           emite esa viñeta (negativo de V05);
         * una cadena, que se escribe literal como bloque de escenario (para
           viñetas raras, `AND`, o viñetas mal formadas que disparan `P04`).
-    verifies, confidence, why, expires, source
+    verifies, confidence, why, revisit, source
         Los metadatos. `source` es el valor de `from:` (`from` es palabra
         reservada de Python). Reglas comunes:
 
-        * `None` en `verifies`/`confidence`/`why`/`expires` → la línea no se
+        * `None` en `verifies`/`confidence`/`why`/`revisit` → la línea no se
           escribe. `source=None` es la excepción: significa «el valor por
           defecto», porque su valor por defecto no es `None`.
         * `""` → la línea se escribe **vacía** (`verifies:`), que es un caso
           negativo distinto de no escribirla.
     omit
         Tupla de claves que no se emiten. Admite `'verifies'`, `'confidence'`,
-        `'why'`, `'expires'`, `'from'` y además `'id'`, `'title'`,
+        `'why'`, `'revisit'`, `'from'` y además `'id'`, `'title'`,
         `'narrative'` y `'scenarios'`. Una clave desconocida es un `ValueError`:
         vale más un error ruidoso que un `omit` que no omite nada.
     separator
@@ -244,7 +257,7 @@ def requirement(
 
         requirement()                               # impecable
         requirement(omit=("verifies",))             # negativo de V06
-        requirement(confidence="low", expires=past_date())   # negativo de V10
+        requirement(confidence="low", revisit=past_date())   # negativo de V10
         requirement(scenarios=[("Sólo condición", "falta stock", None)])  # V05
     """
     if isinstance(omit, str):
@@ -268,7 +281,7 @@ def requirement(
         for block in blocks:
             parts.append(_scenario_block(block))
 
-    meta = _meta_block(verifies, confidence, why, expires, source, omitted, extra_meta)
+    meta = _meta_block(verifies, confidence, why, revisit, source, omitted, extra_meta)
     if meta:
         parts.append(meta)
 
@@ -279,7 +292,7 @@ def live_requirement(**overrides) -> str:
     """El requisito de la capability viva (`R-CHK-001`), con sus propios valores.
 
     Acepta los mismos parámetros que `requirement()` para sobrescribir lo que
-    haga falta: `live_requirement(confidence="low", expires=past_date())`.
+    haga falta: `live_requirement(confidence="low", revisit=past_date())`.
     """
     defaults = {
         "id": LIVE_REQUIREMENT_ID,
@@ -329,7 +342,7 @@ def _meta_block(
     verifies: str | None,
     confidence: str | None,
     why: str | None,
-    expires: str | None,
+    revisit: str | None,
     source: str | None,
     omitted: frozenset[str],
     extra_meta: Sequence[tuple[str, str]],
@@ -342,8 +355,8 @@ def _meta_block(
         lines.append(f"confidence: {confidence}".rstrip())
     if "why" not in omitted and why is not None:
         lines.append(f"  why:      {why}".rstrip())
-    if "expires" not in omitted and expires is not None:
-        lines.append(f"  expires:  {expires}".rstrip())
+    if "revisit" not in omitted and revisit is not None:
+        lines.append(f"  revisit:  {revisit}".rstrip())
     from_value = DEFAULT_FROM if source is None else source
     if "from" not in omitted:
         lines.append(f"from:       {from_value}".rstrip())
@@ -541,7 +554,7 @@ class Project:
       con `--strict` tumba la validación).
     * `SHALL` y `MUST` en la narrativa disparan V14. La narrativa canónica usa
       «DEBE».
-    * Cualquier `expires:` que deba estar vivo se calcula con `future_date()`.
+    * Todo `revisit:` que deba ser válido usa `REVISIT_FACT`: un hecho, no una fecha.
 
     Acoplamientos reales entre reglas, que no son un fallo del andamio
     ---------------------------------------------------------------------
@@ -964,7 +977,7 @@ class Project:
         return env
 
     def _build_scaffold(self) -> None:
-        """Monta el proyecto limpio: el que pasa las dieciséis reglas con `--strict`."""
+        """Monta el proyecto limpio: el que pasa todas las reglas con `--strict`."""
         self.write(
             ".venoxia/principles.md",
             "# Principios\n\n"
@@ -1030,6 +1043,7 @@ __all__ = [
     "default_readings",
     "ensure_import_paths",
     "future_date",
+    "REVISIT_FACT",
     "live_requirement",
     "past_date",
     "reading",

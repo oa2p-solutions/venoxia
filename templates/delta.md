@@ -39,7 +39,7 @@ todas las líneas del pedido durante 15 minutos.
 verifies:   test/checkout/stock-reservation.spec.ts
 confidence: medium
   why:      los 15 minutos son una apuesta, no un dato
-  expires:  2026-10-30
+  revisit:  cuando hayamos medido un mes de reservas caducadas
 from:       prfaq/checkout-express.md#sin-sorpresas-al-pagar
 
 ## MODIFIED Requirements

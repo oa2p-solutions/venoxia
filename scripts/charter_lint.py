@@ -49,13 +49,14 @@ import sys
 import unicodedata
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from venoxia import parser, report  # noqa: E402
 from venoxia.model import (  # noqa: E402
+    FILLER_REVISIT_RE,
     SEVERITY_ERROR,
     SEVERITY_WARNING,
     Finding,
@@ -324,8 +325,11 @@ TABLE_CELL_SPLIT_RE = re.compile(r"(?<!\\)\|")
 #: que la sección no traía ninguna tabla.
 TABLE_HASH_HEADER_RE = re.compile(r"^#\s*\|")
 
-#: Fecha ISO de «revisit:». La validez del día la juzga `date.fromisoformat`.
-ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+#: Fecha ISO. Ya no se pide en ninguna clave: se usa para **rechazarla** en
+#: «revisit:», donde lo que hace falta es el hecho que resuelve la apuesta y no
+#: el día en que caduca. Reconocerla es lo que permite dar el remedio bueno en
+#: vez de un «valor no válido» que no enseña nada.
+ISO_DATE_RE = re.compile(r"^\d{4}-\d{1,2}-\d{1,2}$")
 
 #: Frontera de frase del propósito. Un punto entre dígitos no la marca: «15.000»
 #: es un número, no dos frases. Y tampoco la marca un punto al que no le sigue
@@ -340,7 +344,10 @@ SENTENCE_BOUNDARY_RE = re.compile(
 )
 
 #: Cuántos días se sugieren por delante cuando hay que proponer un «revisit:».
-REVISIT_SUGGESTION_DAYS = 90
+#: El ejemplo que las pistas de C12 usan para enseñar la forma de un «revisit:».
+#: Es un suceso del proyecto y no un plazo a propósito: lo que se pide es el
+#: hecho que resuelve la apuesta, y un ejemplo con días enseñaría lo contrario.
+REVISIT_EXAMPLE = "cuando hayamos cerrado las diez primeras compras"
 
 
 class UsageError(Exception):
@@ -1713,64 +1720,87 @@ def rule_c11(ctx: Context) -> list[Finding]:
 
 
 def rule_c12(ctx: Context) -> list[Finding]:
-    """C12 · Una apuesta en «low» caduca: «revisit:» con fecha ISO futura."""
+    """C12 · Una apuesta en «low» declara «revisit:»: el hecho que la resuelve.
+
+    No una fecha. Lo que cierra una suposición no es que pase el tiempo, es que
+    llegue un dato: «cuando cerremos la primera compra», «cuando hayamos visto
+    veinte presupuestos de proveedores nuevos». El hecho dice qué habrá que
+    mirar y permite reconocer el momento cuando llega; un día del calendario no
+    dice ninguna de las dos cosas, y llega igual esté la respuesta disponible o
+    no. Una fecha que se cumple sin que haya nada que mirar sólo se puede
+    posponer, y una apuesta pospuesta dos veces ya no la lee nadie.
+
+    Por eso una fecha ISO aquí es un error y no un descuido de forma: es la
+    respuesta que este campo dejó de admitir, y dejarla pasar la reintroduciría
+    por inercia. El acta la revisa entera cada vez que se retoma —ése es el
+    momento en que se pregunta cuáles se han resuelto—, y para eso el hecho
+    sirve y la fecha no.
+    """
     findings: list[Finding] = []
-    suggestion = (ctx.today + timedelta(days=REVISIT_SUGGESTION_DAYS)).isoformat()
 
     for bet in ctx.charter.bets:
-        if bet.value("confidence") != "low":
-            # Un «LOW» con la caja cambiada no es un nivel válido —lo dice C11— y
-            # no se le puede reclamar la fecha de una apuesta mal declarada.
-            continue
-
         value = bet.value("revisit")
         line = bet.line_of("revisit")
+        # La **obligación** de traer «revisit:» es sólo de «low»: una apuesta en
+        # «medium» puede no declarar cómo se resuelve y sigue siendo legal. Pero
+        # la **forma** del valor vale para todas: un «revisit:» escrito dice qué
+        # resuelve la apuesta o no dice nada, y eso no depende de la confianza.
+        # Separarlo importa, porque las fechas inventadas se acumulan justo en
+        # «medium», que es donde acaba casi todo lo que no es un hecho ni una
+        # corazonada.
+        if bet.value("confidence") != "low" and value is None:
+            # Un «LOW» con la caja cambiada no es un nivel válido —lo dice C11— y
+            # no se le puede reclamar el oráculo de una apuesta mal declarada.
+            continue
 
         if value is None:
             message = (
                 f"{bet.label} declara «confidence: low» y no trae «revisit:»: una "
-                "suposición sin fecha de revisión deja de ser una apuesta y se "
+                "suposición que no dice qué la resuelve deja de ser una apuesta y se "
                 "convierte en «cómo funciona el sistema»."
             )
             hint = (
-                f"Añade «revisit: {suggestion}» (YYYY-MM-DD, futura), o sube la "
-                "confianza si ya lo has comprobado con alguien."
+                f"Añade el hecho que la cierra: «revisit: {REVISIT_EXAMPLE}». No una "
+                "fecha: hace falta saber qué habrá que mirar y poder reconocer cuándo "
+                "ya se puede mirar. Si no lo sabes tú, es una pregunta más para quien "
+                "conoce el negocio; y si ya lo has comprobado con alguien, sube la "
+                "confianza."
             )
         elif not value:
             message = (
-                f"El «revisit:» de {bet.label} está vacío: promete una fecha de "
-                "revisión para una apuesta en «low» y no dice cuál."
+                f"El «revisit:» de {bet.label} está vacío: promete decir qué resuelve "
+                "la apuesta y no lo dice."
             )
             hint = (
-                f"Escribe la fecha: «revisit: {suggestion}» (YYYY-MM-DD, futura), o "
-                "sube la confianza si ya no es una apuesta."
+                f"Escribe el hecho: «revisit: {REVISIT_EXAMPLE}», o sube la confianza "
+                "si ya no es una apuesta."
             )
-        elif not ISO_DATE_RE.match(value):
+        elif ISO_DATE_RE.match(value):
             message = (
-                f"«revisit: {value}» de {bet.label} no es una fecha ISO «YYYY-MM-DD»."
+                f"«revisit: {value}» de {bet.label} es una fecha, y «revisit:» pide el "
+                "hecho que resuelve la apuesta, no el día en que caduca."
             )
-            hint = f"Escríbela como «revisit: {suggestion}»: año, mes y día con guiones."
+            hint = (
+                "El día llega esté la respuesta o no, y quien llegue a él no sabrá qué "
+                "tenía que mirar. Escribe el dato que la cierra: "
+                f"«revisit: {REVISIT_EXAMPLE}». Si la fecha salía de algo —el fin de "
+                "una campaña, la primera entrega—, nombra ese algo, que es lo que de "
+                "verdad la resuelve."
+            )
+        elif _is_filler_revisit(value):
+            message = (
+                f"«revisit: {value}» de {bet.label} no nombra ningún hecho: es una "
+                "forma de decir «más adelante», y más adelante no llega nunca."
+            )
+            hint = (
+                "Contesta a qué tendría que pasar para poder cerrar esta apuesta: un "
+                "número de casos vistos, un cliente usándolo, una conversación que "
+                f"todavía no has tenido. Por ejemplo «revisit: {REVISIT_EXAMPLE}». Si "
+                "no hay nada que pueda resolverla, no es una apuesta: es una decisión "
+                "tomada, y va en «medium» con su «why:»."
+            )
         else:
-            revisit = _parse_iso_date(value)
-            if revisit is None:
-                message = (
-                    f"«revisit: {value}» de {bet.label} tiene la forma correcta pero no "
-                    "existe en el calendario."
-                )
-                hint = f"Corrige el mes o el día; por ejemplo «revisit: {suggestion}»."
-            elif revisit <= ctx.today:
-                when = "vence hoy" if revisit == ctx.today else "venció"
-                message = (
-                    f"La fecha de revisión de {bet.label} («{value}») {when} y la "
-                    f"apuesta sigue en «confidence: low» a {ctx.today.isoformat()}."
-                )
-                hint = (
-                    "Revisa la apuesta: si ya sabes la respuesta, sube la confianza y "
-                    f"quita «revisit:»; si sigue abierta, mueve la fecha a "
-                    f"«{suggestion}» y anota en «why:» qué falta por comprobar."
-                )
-            else:
-                continue
+            continue
 
         findings.append(
             _finding(
@@ -1786,15 +1816,10 @@ def rule_c12(ctx: Context) -> list[Finding]:
     return findings
 
 
-def _parse_iso_date(value: str) -> date | None:
-    """Convierte «YYYY-MM-DD» en fecha, o `None` si no existe en el calendario."""
-    if not ISO_DATE_RE.match(value or ""):
-        return None
-    try:
-        return date.fromisoformat(value)
-    except ValueError:
-        return None
-
+def _is_filler_revisit(value: str) -> bool:
+    """¿El «revisit:» entero es un «ya veremos» en vez de un hecho?"""
+    bare = _bare_text(value)
+    return bool(bare) and FILLER_REVISIT_RE.match(bare) is not None
 
 def rule_c13(ctx: Context) -> list[Finding]:
     """C13 · El identificador de la apuesta casa «B-NNN» y es único."""

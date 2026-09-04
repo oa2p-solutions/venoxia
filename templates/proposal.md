@@ -59,9 +59,10 @@ pagar la última unidad y uno de los dos recibe una cancelación posterior.
 <!-- Sección propia de Venoxia. Aquí se declara, a la vista de todo el mundo, qué
      partes de esta propuesta son apuestas y cuándo se revisan. Es el mismo contrato
      que imponen los metadatos de cada requisito, pero al nivel de la decisión
-     completa: `validate.py` exige `expires` a cada requisito en `confidence: low`
-     (V10) porque una apuesta sin fecha de revisión es una mentira aplazada, y limita
-     al 30 % la proporción de requisitos en `low` (V11).
+     completa: `validate.py` exige `revisit` a cada requisito en `confidence: low`
+     (V10) —el hecho que resuelve la apuesta, no una fecha— porque una apuesta que no
+     dice qué la cierra no la cierra nadie, y limita al 30 % la proporción de
+     requisitos en `low` (V11).
 
      Una línea por apuesta, con el mismo vocabulario que los requisitos:
      qué se apuesta · nivel · por qué es una apuesta · cuándo se revisa · qué dato la
@@ -69,10 +70,10 @@ pagar la última unidad y uno de los dos recibe una cancelación posterior.
      preferencia disfrazada. -->
 
 - **Los 15 minutos de la reserva** · `low` · el número sale de una estimación, no de
-  datos de conversión · se revisa el `2026-10-30` con la tasa de reservas caducadas
-  del primer mes.
+  datos de conversión · se revisa cuando tengamos un mes de reservas caducadas que
+  contar.
 - **Rechazar el pedido completo cuando falta una sola línea** · `medium` · asumimos
-  que el cliente prefiere el rechazo al envío parcial · se revisa el `2026-12-15` con
-  las reclamaciones de pedidos rechazados.
+  que el cliente prefiere el rechazo al envío parcial · se revisa cuando haya
+  reclamaciones de pedidos rechazados que leer.
 - **El resto de la propuesta** · `high` · comportamiento decidido y contrastado con
   operaciones; no requiere revisión programada.

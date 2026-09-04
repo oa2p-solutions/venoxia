@@ -65,10 +65,9 @@ def future_date(days: int = 60) -> str:
     return (date.today() + timedelta(days=days)).isoformat()
 
 
-#: El requisito canónico del contrato §3, letra por letra, con la única
-#: variación de que «expires» se calcula desde hoy en vez de ser una constante.
-#: Las líneas están numeradas en el comentario porque los tests las afirman.
-CANONICAL_EXPIRES = future_date()
+#: El requisito canónico del contrato §3, letra por letra. Las líneas están
+#: numeradas en el comentario porque los tests las afirman.
+CANONICAL_REVISIT = "cuando hayamos medido un mes de reservas caducadas"
 CANONICAL = (
     "### R-CHK-014 · Stock reservation on payment confirmation\n"          # 1
     "\n"                                                                    # 2
@@ -86,7 +85,7 @@ CANONICAL = (
     "verifies:   test/checkout/reservation.spec.ts\n"                      # 14
     "confidence: medium\n"                                                 # 15
     "  why:      los 15 minutos son una apuesta, no un dato\n"             # 16
-    "  expires:  " + CANONICAL_EXPIRES + "\n"                              # 17
+    "  revisit:  " + CANONICAL_REVISIT + "\n"                              # 17
     "from:       prfaq/checkout-express.md#sin-sorpresas-al-pagar\n"       # 18
 )
 
@@ -239,7 +238,7 @@ class TestCanonicalRequirement(unittest.TestCase):
                 "verifies": "test/checkout/reservation.spec.ts",
                 "confidence": "medium",
                 "why": "los 15 minutos son una apuesta, no un dato",
-                "expires": CANONICAL_EXPIRES,
+                "revisit": CANONICAL_REVISIT,
                 "from": "prfaq/checkout-express.md#sin-sorpresas-al-pagar",
             },
         )
@@ -248,7 +247,7 @@ class TestCanonicalRequirement(unittest.TestCase):
         """`meta_lines` da la línea 1-indexada de cada metadato, para señalar el error."""
         self.assertEqual(
             self.requirements[0].meta_lines,
-            {"verifies": 14, "confidence": 15, "why": 16, "expires": 17, "from": 18},
+            {"verifies": 14, "confidence": 15, "why": 16, "revisit": 17, "from": 18},
         )
 
 
@@ -474,9 +473,9 @@ class TestMetadata(unittest.TestCase):
         )
         self.assertEqual(findings, [])
 
-    def test_cosmetic_indentation_of_why_and_expires_is_ignored(self):
-        """La sangría de «why» y «expires» es cosmética: se ignora al leerlas."""
-        expires = future_date(90)
+    def test_cosmetic_indentation_of_why_and_revisit_is_ignored(self):
+        """La sangría de «why» y «revisit» es cosmética: se ignora al leerlas."""
+        revisit = "cuando cerremos el primer trimestre con datos"
         requirements, findings = parse_one(
             "### R-CHK-001 · T\n"
             "\n"
@@ -484,11 +483,11 @@ class TestMetadata(unittest.TestCase):
             "\n"
             "confidence: low\n"
             "  why:      la cifra es una apuesta\n"
-            "  expires:  " + expires + "\n"
+            "  revisit:  " + revisit + "\n"
         )
         self.assertEqual(
             requirements[0].meta,
-            {"confidence": "low", "why": "la cifra es una apuesta", "expires": expires},
+            {"confidence": "low", "why": "la cifra es una apuesta", "revisit": revisit},
         )
         self.assertEqual(findings, [])
 
@@ -1479,7 +1478,7 @@ class TestModelConstants(unittest.TestCase):
     def test_meta_keys(self):
         """Las cinco claves de metadatos reconocidas."""
         self.assertEqual(
-            model.META_KEYS, ("verifies", "confidence", "why", "expires", "from")
+            model.META_KEYS, ("verifies", "confidence", "why", "revisit", "from")
         )
 
     def test_requirement_id_regex_accepts_the_canonical_form(self):
@@ -1558,7 +1557,7 @@ class TestContractDivergences(unittest.TestCase):
 class TestMetadataIndentationGuards(unittest.TestCase):
     """Casos límite de la sangría dentro y fuera del bloque de metadatos.
 
-    El contrato §3 dice que la sangría de «why»/«expires» es cosmética, y eso
+    El contrato §3 dice que la sangría de «why»/«revisit» es cosmética, y eso
     vale **dentro del bloque**. Estos tests fijan la frontera: la valla ```
     protege, la clave desconocida suelta se queda como prosa, ni las viñetas ni
     las URL entran por sangrada que esté la línea, y un metadato legítimo se lee
@@ -1654,7 +1653,7 @@ class TestMetadataIndentationGuards(unittest.TestCase):
 
     def test_a_legitimate_metadata_survives_twenty_spaces_of_indentation(self):
         """Con veinte espacios de sangría el metadato se lee igual y sale de la prosa."""
-        expires = future_date(45)
+        revisit = "cuando el primer cliente lo use en producción"
         requirements, findings = parse_one(
             "### R-CHK-001 · T\n"
             "\n"
@@ -1662,14 +1661,14 @@ class TestMetadataIndentationGuards(unittest.TestCase):
             "\n"
             "confidence:         low\n"
             "                    why:     los 15 minutos son una apuesta\n"
-            "                    expires: " + expires + "\n"
+            "                    revisit: " + revisit + "\n"
         )
         self.assertEqual(
             requirements[0].meta,
             {
                 "confidence": "low",
                 "why": "los 15 minutos son una apuesta",
-                "expires": expires,
+                "revisit": revisit,
             },
         )
         self.assertEqual(requirements[0].meta_lines["why"], 6)
@@ -1726,8 +1725,8 @@ class TestMetadataBlockRegion(unittest.TestCase):
     como mucho) y con al menos una de las cinco claves reconocidas.
     """
 
-    def test_an_indented_example_does_not_override_expires(self):
-        """Una tabla de ejemplo alineada a mano no toca el `expires:` que gobierna V10."""
+    def test_an_indented_example_does_not_override_revisit(self):
+        """Una tabla de ejemplo alineada a mano no toca el `revisit:` que gobierna V10."""
         requirements, findings = parse_one(
             "### R-CHK-001 · T\n"
             "\n"
@@ -1735,23 +1734,23 @@ class TestMetadataBlockRegion(unittest.TestCase):
             "\n"
             "verifies:   test/real.spec.ts\n"
             "confidence: high\n"
-            "expires:    2030-01-01\n"
+            "revisit:    cuando lo vea el primer cliente\n"
             "\n"
             "Tabla de ejemplo, alineada a mano:\n"
             "\n"
             "            confidence: xxxxx\n"
-            "            expires:    ayer\n"
+            "            revisit:    ayer\n"
         )
         self.assertEqual(
             requirements[0].meta,
             {
                 "verifies": "test/real.spec.ts",
                 "confidence": "high",
-                "expires": "2030-01-01",
+                "revisit": "cuando lo vea el primer cliente",
             },
         )
         self.assertEqual(findings, [])
-        self.assertIn("            expires:    ayer", requirements[0].narrative)
+        self.assertIn("            revisit:    ayer", requirements[0].narrative)
 
     def test_an_unknown_key_inside_the_final_block_leaves_the_narrative_clean(self):
         """Un «owner:» del bloque final avisa, se pierde y no vuelve a la prosa."""

@@ -77,8 +77,9 @@ DEFAULT_PURPOSE = (
     "cuaderno que sólo entiende quien lo escribió."
 )
 
-#: Cuántos días por delante lleva el «revisit:» del acta canónica.
-REVISIT_DAYS = 105
+#: El hecho con el que el acta canónica declara qué resuelve su apuesta.
+#: `revisit:` ya no admite fechas: pide el suceso que cierra la suposición.
+REVISIT_FACT = "cuando hayamos servido las cincuenta primeras reservas"
 
 
 @dataclass
@@ -150,7 +151,8 @@ DEFAULT_OUT_OF_SCOPE: tuple[str, ...] = (
     "**App nativa.** La web basta para lo que promete el propósito.",
 )
 
-#: Marca de «calcula tú la fecha»: futura si la apuesta va en «low», ninguna si no.
+#: Marca de «pon tú el valor bueno»: el hecho canónico si la apuesta va en
+#: «low», y ninguna línea si no, porque sólo «low» lo exige.
 AUTO = "auto"
 
 
@@ -178,7 +180,7 @@ class Bet:
         header = f"### {self.id} · {self.title}" if self.title else f"### {self.id}"
         revisit = self.revisit
         if revisit == AUTO:
-            revisit = future_date(REVISIT_DAYS) if self.confidence == "low" else None
+            revisit = REVISIT_FACT if self.confidence == "low" else None
 
         meta: list[str] = []
         if self.confidence is not None:
@@ -1197,37 +1199,73 @@ class TestRuleC11BetConfidence(CharterCase):
 
 
 class TestRuleC12Revisit(CharterCase):
-    """C12 · una apuesta en «low» trae «revisit:» con fecha ISO futura."""
+    """C12 · una apuesta en «low» dice qué hecho la resuelve, y no cuándo caduca."""
 
-    def test_c12_accepts_a_future_revisit_and_ignores_the_other_levels(self) -> None:
-        """En «low» con fecha futura pasa; en «medium» no se le reclama ninguna."""
-        self.assert_conforms(charter(bets=[Bet(revisit=future_date(30))]))
+    def test_c12_accepts_a_fact_and_ignores_the_other_levels(self) -> None:
+        """En «low» con el hecho escrito pasa; en «medium» no se le reclama ninguno."""
+        self.assert_conforms(charter(bets=[Bet(revisit="cuando entre el primer cliente")]))
         self.assert_conforms(charter(bets=[Bet(confidence="medium", revisit=None)]))
 
     def test_c12_fails_when_a_low_bet_has_no_revisit(self) -> None:
-        """Sin fecha, la suposición deja de ser apuesta y pasa a ser el sistema."""
+        """Sin nada que la resuelva, la suposición deja de ser apuesta y pasa a ser el sistema."""
         findings = self.assert_only_error("C12", charter(bets=[Bet(revisit=None)]))
         self.assertIn("no trae «revisit:»", findings[0]["message"])
         self.assertIn("cómo funciona el sistema", findings[0]["message"])
 
-    def test_c12_fails_when_the_revisit_has_already_passed(self) -> None:
-        """Una fecha vencida con la apuesta todavía en «low» es deuda silenciosa."""
-        expired = past_date(30)
-        findings = self.assert_only_error("C12", charter(bets=[Bet(revisit=expired)]))
-        self.assertIn(expired, findings[0]["message"])
-        self.assertIn("venció", findings[0]["message"])
+    def test_c12_fails_when_the_revisit_is_empty(self) -> None:
+        """La línea escrita y vacía promete decir qué resuelve la apuesta y no lo dice."""
+        findings = self.assert_only_error("C12", charter(bets=[Bet(revisit="")]))
+        self.assertIn("está vacío", findings[0]["message"])
 
-    def test_c12_fails_when_the_revisit_is_not_an_iso_date(self) -> None:
-        """«el mes que viene» no es una fecha con la que se pueda contar."""
-        findings = self.assert_only_error(
-            "C12", charter(bets=[Bet(revisit="el mes que viene")])
+    def test_c12_rejects_a_future_date(self) -> None:
+        """Una fecha es lo que este campo dejó de admitir, apunte hacia donde apunte."""
+        future = future_date(30)
+        findings = self.assert_only_error("C12", charter(bets=[Bet(revisit=future)]))
+        self.assertIn(future, findings[0]["message"])
+        self.assertIn("es una fecha", findings[0]["message"])
+        self.assertIn("hecho que resuelve la apuesta", findings[0]["message"])
+
+    def test_c12_rejects_a_past_date_for_the_same_reason(self) -> None:
+        """Hacia atrás tampoco: el problema no es que venza, es que no dice qué mirar."""
+        findings = self.assert_only_error("C12", charter(bets=[Bet(revisit=past_date(30))]))
+        self.assertIn("es una fecha", findings[0]["message"])
+
+    def test_c12_rejects_filler_that_means_later(self) -> None:
+        """«Ya veremos» ocupa la línea sin nombrar nada, que es no tener apuesta."""
+        for filler in ("ya veremos", "más adelante", "TBD", "el próximo trimestre", "3 meses"):
+            with self.subTest(revisit=filler):
+                findings = self.assert_only_error("C12", charter(bets=[Bet(revisit=filler)]))
+                self.assertIn("no nombra ningún hecho", findings[0]["message"])
+
+    def test_c12_accepts_a_fact_that_merely_mentions_a_period(self) -> None:
+        """«Tras las tres primeras semanas de uso real» nombra un hecho, no un plazo vacío."""
+        self.assert_conforms(
+            charter(bets=[Bet(revisit="tras las tres primeras semanas de uso real")])
         )
-        self.assertIn("no es una fecha ISO", findings[0]["message"])
 
-    def test_c12_fails_when_the_revisit_does_not_exist_in_the_calendar(self) -> None:
-        """«2027-02-31» tiene la forma correcta y no existe."""
-        findings = self.assert_only_error("C12", charter(bets=[Bet(revisit="2027-02-31")]))
-        self.assertIn("no existe en el calendario", findings[0]["message"])
+    def test_c12_judges_the_shape_at_every_confidence_level(self) -> None:
+        """Sólo «low» está obligada a traer «revisit:»; escribirlo mal lo puede cualquiera.
+
+        Las fechas inventadas se acumulan justo en «medium», que es donde acaba
+        casi todo lo que no es un hecho comprobado ni una corazonada. Una regla
+        que sólo mirase «low» las dejaría pasar todas.
+        """
+        for level in ("high", "medium"):
+            with self.subTest(confidence=level):
+                findings = self.assert_only_error(
+                    "C12", charter(bets=[Bet(confidence=level, revisit=future_date(30))])
+                )
+                self.assertIn("es una fecha", findings[0]["message"])
+
+    def test_c12_lets_a_non_low_bet_omit_the_revisit(self) -> None:
+        """Lo que sigue siendo exclusivo de «low» es la obligación de traerlo."""
+        self.assert_conforms(charter(bets=[Bet(confidence="medium", revisit=None)]))
+        self.assert_conforms(charter(bets=[Bet(confidence="high", revisit=None)]))
+
+    def test_c12_points_at_the_fact_in_its_hint(self) -> None:
+        """El remedio enseña la forma que se pide, no la que se acaba de rechazar."""
+        findings = self.assert_only_error("C12", charter(bets=[Bet(revisit=future_date(30))]))
+        self.assertIn(charter_lint.REVISIT_EXAMPLE, findings[0]["hint"])
 
 
 # ---------------------------------------------------------------------------

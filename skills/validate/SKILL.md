@@ -107,7 +107,7 @@ Mantén el orden de findings que trae el JSON dentro de cada grupo: ya viene ord
 | `V07` | El fichero de `verifies:` no existe en disco | Crea el test en esa ruta, o corrige la ruta si está mal escrita |
 | `V08` | El fichero de `verifies:` no contiene `@covers <ID>` | Añade el comentario `@covers <ID>` dentro del test; el vínculo es doble a propósito |
 | `V09` | `confidence:` ausente o fuera de `{high, medium, low}` | Declara uno de los tres valores; no hay valor por defecto |
-| `V10` | `confidence: low` sin `expires:` futuro | Añade `expires: YYYY-MM-DD` con fecha estrictamente futura, o sube la confianza si ya no es una apuesta |
+| `V10` | `confidence: low` sin `revisit:` útil | Escribe en `revisit:` el hecho que resuelve la apuesta —«cuando hayamos visto los diez primeros casos reales»—, nunca una fecha; o sube la confianza si ya no es una apuesta |
 | `V11` | Más del 30 % de los requisitos en `low` | Resuelve las apuestas más caras antes de seguir: baja el número de `low`, no el listón |
 | `V12` | El delta no declara ningún bloque | Abre al menos un `## ADDED\|MODIFIED\|REMOVED\|RENAMED Requirements` |
 | `V13` | Un ID de `MODIFIED`/`REMOVED`/`RENAMED` no existe en ninguna capability viva | Corrige el ID, o mueve el requisito al bloque `ADDED` si de verdad es nuevo |
@@ -115,7 +115,7 @@ Mantén el orden de findings que trae el JSON dentro de cada grupo: ya viene ord
 | `V15` (aviso) | Falta `from:` en un requisito de una capability nueva | Enlaza el documento de origen que justifica el requisito |
 | `V16` (aviso) | Un test declara `@covers` de un ID que no existe | Corrige el ID del test, o especifica el comportamiento que ese test ya está comprobando |
 | `P01` | Fichero ilegible o inexistente | Comprueba la ruta y los permisos |
-| `P02` (aviso) | Clave de metadatos desconocida | Usa sólo `verifies`, `confidence`, `why`, `expires`, `from` |
+| `P02` (aviso) | Clave de metadatos desconocida | Usa sólo `verifies`, `confidence`, `why`, `revisit`, `from` |
 | `P03` (aviso) | Clave de metadatos repetida | Deja una sola; el parser se queda con la última |
 | `P04` (aviso) | Bullet de escenario con forma inesperada | Escríbelo como `- **WHEN** texto` |
 | `P05` (aviso) | Un `### ` con forma de requisito cae dentro de un bloque de código y no se ha leído como requisito | Si es un ejemplo, no hay nada que hacer; si es un requisito de verdad, sácalo del bloque o cierra la valla ` ``` ` que lo envuelve |

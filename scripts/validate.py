@@ -27,9 +27,10 @@ import argparse
 import os
 import re
 import sys
+import unicodedata
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -37,6 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from venoxia import model, parser, report  # noqa: E402
 from venoxia.model import (  # noqa: E402
     CONFIDENCE_LEVELS,
+    FILLER_REVISIT_RE,
     REQUIREMENT_ID_RE,
     SEVERITY_ERROR,
     SEVERITY_WARNING,
@@ -109,8 +111,11 @@ ID_SHAPE_RE = re.compile(r"^[A-Za-z][\w.]*[-_][\w.-]*\d$")
 # Modales que delatan una traducción a medias: la prosa va en español.
 ENGLISH_MODAL_RE = re.compile(r"\b(SHALL|MUST)\b")
 
-# Fecha ISO de «expires:». La validez del día la juzga `date.fromisoformat`.
-ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+#: Fecha ISO. Ya no se pide en ninguna clave: se usa para **rechazarla** en
+#: «revisit:», donde lo que hace falta es el hecho que resuelve la apuesta y no
+#: el día en que caduca. Reconocerla es lo que permite dar el remedio bueno en
+#: vez de un «valor no válido» que no enseña nada.
+ISO_DATE_RE = re.compile(r"^\d{4}-\d{1,2}-\d{1,2}$")
 
 # Separadores admitidos entre varias rutas de un mismo «verifies:».
 VERIFIES_SPLIT_RE = re.compile(r"[,\s]+")
@@ -118,8 +123,12 @@ VERIFIES_SPLIT_RE = re.compile(r"[,\s]+")
 # Colapsa cualquier racha de espacios en blanco en uno solo.
 WHITESPACE_RE = re.compile(r"\s+")
 
-# Cuántos días se sugieren por delante cuando hay que proponer un «expires:».
-EXPIRES_SUGGESTION_DAYS = 90
+# El ejemplo de «revisit:» que usan las pistas de V10.
+#: El ejemplo que las pistas de V10 usan para enseñar la forma de un «revisit:».
+#: Es deliberadamente un suceso del proyecto y no un plazo: lo que se pide es el
+#: hecho que resuelve la apuesta, y un ejemplo con un número de días enseñaría
+#: justo lo contrario.
+REVISIT_EXAMPLE = "cuando hayamos procesado los primeros veinte pedidos reales"
 
 
 class UsageError(Exception):
@@ -945,7 +954,7 @@ def rule_v09(ctx: Context) -> list[Finding]:
             hint = (
                 f"Cámbialo por «confidence: {expected}»: los tres niveles se comparan "
                 "tal cual. Mientras la caja no coincida el nivel no cuenta como "
-                "declarado, así que ni V10 le reclama «expires:» ni V11 lo cuenta "
+                "declarado, así que ni V10 le reclama «revisit:» ni V11 lo cuenta "
                 "como apuesta."
             )
         else:
@@ -970,68 +979,87 @@ def rule_v09(ctx: Context) -> list[Finding]:
 
 
 def rule_v10(ctx: Context) -> list[Finding]:
-    """V10 · Una apuesta en «low» caduca: «expires:» con fecha ISO futura."""
+    """V10 · Una apuesta en «low» declara «revisit:»: el hecho que la resuelve.
+
+    No una fecha. Un requisito en `low` es una decisión que se tomó porque
+    había que tomar alguna, y lo que la cierra no es que pase el tiempo: es que
+    llegue un dato. «Cuando hayamos procesado los primeros veinte pedidos» dice
+    qué habrá que mirar y permite reconocer el momento cuando llega; un día del
+    calendario no dice ninguna de las dos cosas, y quien llegue a él tendrá que
+    reconstruir de memoria qué se estaba esperando.
+
+    Por eso una fecha ISO en «revisit:» es un error y no un descuido de forma:
+    es la respuesta que este campo dejó de admitir, y dejarla pasar la
+    reintroduciría por inercia.
+
+    Lo que la regla puede comprobar es que el hecho **esté y diga algo**. Que
+    vaya a ocurrir, y cuándo, no lo sabe nadie todavía; que «ya veremos» no es
+    un hecho, sí.
+    """
     findings: list[Finding] = []
-    suggestion = (ctx.today + timedelta(days=EXPIRES_SUGGESTION_DAYS)).isoformat()
 
     for requirement in ctx.all_requirements:
-        if _declared_confidence(requirement) != "low":
+        value = _meta(requirement, "revisit")
+        line = _meta_line(requirement, "revisit")
+        # La **obligación** de traer «revisit:» es sólo de «low»; la **forma**
+        # del valor vale para todos. Un requisito en «medium» puede no declarar
+        # cómo se resuelve su duda, pero si la declara, la declara bien: una
+        # fecha ahí es igual de inútil el día que llegue.
+        if _declared_confidence(requirement) != "low" and value is None:
             # Un «LOW» con la caja cambiada no es un nivel válido —lo denuncia
-            # V09— y no se le puede reclamar la fecha de una apuesta que aún
+            # V09— y no se le puede reclamar el oráculo de una apuesta que aún
             # no está bien declarada.
             continue
 
-        value = _meta(requirement, "expires")
-        line = _meta_line(requirement, "expires")
-
         if value is None:
             message = (
-                f"{requirement.label} declara «confidence: low» y no trae «expires:»: "
-                "una apuesta sin fecha de revisión no se revisa nunca."
+                f"{requirement.label} declara «confidence: low» y no trae «revisit:»: "
+                "una apuesta que no dice qué la resuelve no la resuelve nadie."
             )
             hint = (
-                f"Añade «expires: {suggestion}» (formato YYYY-MM-DD, fecha futura), o "
-                "sube la confianza si ya no es una apuesta."
+                f"Añade el hecho que la cierra: «revisit: {REVISIT_EXAMPLE}». No una "
+                "fecha: lo que hace falta es saber qué habrá que mirar y poder "
+                "reconocer el momento en que ya se puede mirar. Si no lo sabes, es "
+                "una pregunta para quien pidió el cambio. Y si ya no hay nada que "
+                "resolver, sube la confianza."
             )
         elif not value:
             # La línea está escrita y vacía: no es lo mismo que no traerla, y
-            # señalar «no trae» justo en la línea donde pone «expires:» es
+            # señalar «no trae» justo en la línea donde pone «revisit:» es
             # contradecir al usuario con su propio fichero delante.
             message = (
-                f"El «expires:» de {requirement.label} está vacío: promete una fecha "
-                "de revisión para una apuesta en «low» y no dice cuál."
+                f"El «revisit:» de {requirement.label} está vacío: promete decir qué "
+                "resuelve la apuesta y no lo dice."
             )
             hint = (
-                f"Escribe la fecha: «expires: {suggestion}» (YYYY-MM-DD, futura), o "
-                "sube la confianza si ya no es una apuesta."
+                f"Escribe el hecho: «revisit: {REVISIT_EXAMPLE}», o sube la confianza "
+                "si ya no es una apuesta."
             )
-        elif not ISO_DATE_RE.match(value):
+        elif ISO_DATE_RE.match(value):
             message = (
-                f"«expires: {value}» de {requirement.label} no es una fecha ISO "
-                "«YYYY-MM-DD»."
+                f"«revisit: {value}» de {requirement.label} es una fecha, y «revisit:» "
+                "pide el hecho que resuelve la apuesta, no el día en que caduca."
             )
-            hint = f"Escríbela como «expires: {suggestion}»: año, mes y día con guiones."
+            hint = (
+                "Una fecha no dice qué habrá que mirar cuando llegue, y el día que "
+                "llegue nadie sabrá si la apuesta ya se puede cerrar. Escribe el dato "
+                f"que la cierra: «revisit: {REVISIT_EXAMPLE}». Si la fecha salía de un "
+                "hecho —el fin de una campaña, una migración—, nombra el hecho."
+            )
+        elif _is_filler_revisit(value):
+            message = (
+                f"«revisit: {value}» de {requirement.label} no nombra ningún hecho: es "
+                "una forma de decir «más adelante», y más adelante no llega nunca."
+            )
+            hint = (
+                "Contesta a qué tendría que pasar para poder cerrar esta apuesta: un "
+                "volumen alcanzado, un cliente en producción, una medición hecha. "
+                f"Por ejemplo «revisit: {REVISIT_EXAMPLE}». Si de verdad no hay nada "
+                "que pueda resolverla, entonces no es una apuesta: es una decisión "
+                "tomada, y va en «medium» con su «why:»."
+            )
         else:
-            expires = _parse_iso_date(value)
-            if expires is None:
-                message = (
-                    f"«expires: {value}» de {requirement.label} tiene la forma correcta "
-                    "pero no existe en el calendario."
-                )
-                hint = f"Corrige el mes o el día; por ejemplo «expires: {suggestion}»."
-            elif expires <= ctx.today:
-                when = "vence hoy" if expires == ctx.today else "venció"
-                message = (
-                    f"La fecha de revisión de {requirement.label} («{value}») {when} y "
-                    f"el requisito sigue en «confidence: low» a {ctx.today.isoformat()}."
-                )
-                hint = (
-                    "Revisa la apuesta: si ya sabes la respuesta sube la confianza y "
-                    f"quita «expires:»; si sigue abierta, mueve la fecha a «{suggestion}» "
-                    "y anota en «why:» qué falta por comprobar."
-                )
-            else:
-                continue
+            continue
 
         findings.append(
             Finding(
@@ -1047,20 +1075,23 @@ def rule_v10(ctx: Context) -> list[Finding]:
     return findings
 
 
-def _parse_iso_date(value: str) -> date | None:
-    """Convierte «YYYY-MM-DD» en fecha.
+def _is_filler_revisit(value: str) -> bool:
+    """¿El «revisit:» entero es un «ya veremos» en vez de un hecho?"""
+    bare = re.sub(
+        r"^[*_`\s]+|[*_`\s.,;:…!?]+$",
+        "",
+        _strip_accents(WHITESPACE_RE.sub(" ", value or "").strip().lower()),
+    )
+    return bool(bare) and FILLER_REVISIT_RE.match(bare) is not None
 
-    Devuelve `None` tanto si la forma no es la esperada como si la fecha no
-    existe en el calendario —un 31 de febrero—; V10 distingue los dos casos
-    antes de llamar, porque el remedio no es el mismo.
-    """
-    if not ISO_DATE_RE.match(value or ""):
-        return None
+
+def _strip_accents(text: str) -> str:
+    """Quita los acentos sin tocar nada más, para comparar «vera» con «verá»."""
     try:
-        return date.fromisoformat(value)
-    except ValueError:
-        return None
-
+        decomposed = unicodedata.normalize("NFD", text)
+    except Exception:  # defensa: normalizar no puede tumbar el validador
+        return text
+    return "".join(char for char in decomposed if not unicodedata.combining(char))
 
 def rule_v11(ctx: Context) -> list[Finding]:
     """V11 · Presupuesto de incertidumbre: como mucho el 30 % en «low».
@@ -1278,7 +1309,7 @@ RULES: list[Rule] = [
     Rule("V07", SEVERITY_ERROR, "El fichero del oráculo existe en disco", rule_v07),
     Rule("V08", SEVERITY_ERROR, "El fichero del oráculo contiene «@covers <ID>»", rule_v08),
     Rule("V09", SEVERITY_ERROR, "«confidence:» vale high, medium o low", rule_v09),
-    Rule("V10", SEVERITY_ERROR, "Una apuesta en «low» trae «expires:» con fecha futura", rule_v10),
+    Rule("V10", SEVERITY_ERROR, "Una apuesta en «low» dice qué hecho la resuelve", rule_v10),
     Rule("V11", SEVERITY_ERROR, "Como mucho el 30 % de los requisitos está en «low»", rule_v11),
     Rule("V12", SEVERITY_ERROR, "Cada delta declara al menos un bloque", rule_v12),
     Rule("V13", SEVERITY_ERROR, "Lo que el delta cambia o retira existe vivo", rule_v13),

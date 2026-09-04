@@ -120,7 +120,7 @@ todas las líneas del pedido durante 15 minutos.
 verifies:   test/checkout/reservation.spec.ts
 confidence: medium
   why:      los 15 minutos son una apuesta, no un dato
-  expires:  2026-10-30
+  revisit:  cuando hayamos medido un mes de reservas caducadas
 from:       prfaq/checkout-express.md#sin-sorpresas-al-pagar
 ```
 
@@ -158,7 +158,7 @@ El ID vive en el encabezado: estable, linkable, parseable. El bloque de metadato
 | `V07` | El fichero de `verifies:` existe en disco | error |
 | `V08` | El fichero de `verifies:` contiene `@covers <ID>` (doble vínculo) | error |
 | `V09` | `confidence:` ∈ `{high, medium, low}` | error |
-| `V10` | `confidence: low` obliga a `expires:` con fecha futura | error |
+| `V10` | `confidence: low` obliga a `revisit:` con el hecho que la resuelve | error |  **Corrección sobre el diseño:** el campo se llamaba `expires:` y pedía una fecha ISO futura. Lo escribía el modelo, que no tiene forma de saber cuándo llega la evidencia, así que producía plazos redondos con aspecto de compromiso —seis apuestas de un proyecto real, todas el mismo día—. Una fecha inventada es peor que ninguna. Ahora pide el hecho que cierra la apuesta, que sí sale del proyecto, y `V10`/`C12` rechazan tanto la fecha como el «ya veremos» |
 | `V11` | Presupuesto de incertidumbre: ≤30% de requisitos con `low` | error |
 | `V12` | El delta declara al menos un bloque `## ADDED\|MODIFIED\|REMOVED\|RENAMED Requirements` | error |
 | `V13` | Los IDs de `MODIFIED`/`REMOVED` existen en la capability viva | error |
