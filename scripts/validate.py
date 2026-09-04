@@ -2,9 +2,10 @@
 """Validador determinista de Venoxia: el contrato que la especificación cumple o no.
 
 Aquí viven las dieciséis reglas del formato. Todas son deterministas: ninguna
-consulta a un modelo, ninguna toca la red y sólo `V10` mira el calendario, para
-saber si una apuesta con fecha de revisión ya venció. Dos ejecuciones sobre el
-mismo árbol producen el mismo veredicto y el mismo JSON, byte a byte.
+consulta a un modelo ni toca la red, y `V10` rechaza tanto una fecha como una
+fórmula vacía en `revisit:`: la apuesta debe declarar el hecho que la
+resuelve, no un plazo. Dos ejecuciones sobre el mismo árbol producen el mismo
+veredicto y el mismo JSON, byte a byte.
 
 Uso:
 
@@ -30,7 +31,6 @@ import sys
 import unicodedata
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -157,7 +157,6 @@ class Context:
     live_requirements: dict[str, Requirement] = field(default_factory=dict)
     live_by_capability: dict[str, set[str]] = field(default_factory=dict)
     owners: dict[str, str] = field(default_factory=dict)
-    today: date = field(default_factory=date.today)
     disk_reads: int = 0
     _texts: dict[str, str | None] = field(default_factory=dict, repr=False)
     _failures: dict[str, Finding | None] = field(default_factory=dict, repr=False)
@@ -1528,7 +1527,6 @@ def build_context(
     root: Path,
     result: ValidationResult,
     live_capabilities: list[Capability],
-    today: date | None = None,
 ) -> Context:
     """Reúne en un solo objeto todo lo que las reglas van a mirar."""
     all_requirements: list[Requirement] = []
@@ -1561,7 +1559,6 @@ def build_context(
         live_requirements=live_requirements,
         live_by_capability=live_by_capability,
         owners=owners,
-        today=today or date.today(),
     )
 
 
@@ -1570,7 +1567,6 @@ def validate_targets(
     capability_paths: list[Path] | None = None,
     delta_paths: list[Path] | None = None,
     strict: bool = False,
-    today: date | None = None,
 ) -> ValidationResult:
     """Valida un ámbito ya resuelto y devuelve el resultado completo."""
     root_path = Path(root).expanduser().resolve()
@@ -1591,7 +1587,7 @@ def validate_targets(
         for finding in findings:
             result.add(finding)
 
-    ctx = build_context(root_path, result, live_capabilities, today)
+    ctx = build_context(root_path, result, live_capabilities)
     for finding in run_rules(ctx):
         result.add(finding)
 

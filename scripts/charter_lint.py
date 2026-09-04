@@ -49,7 +49,6 @@ import sys
 import unicodedata
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -1012,7 +1011,6 @@ class Context:
     path: Path
     display: str
     charter: Charter
-    today: date = field(default_factory=date.today)
     live_capabilities: dict[str, str] = field(default_factory=dict)
     domain_principles: list[str] = field(default_factory=list)
     principles_exist: bool = False

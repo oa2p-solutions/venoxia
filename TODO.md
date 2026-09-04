@@ -64,7 +64,7 @@ venoxia/
 │   ├── validate.py               EL CONTRATO · determinista, sin LLM
 │   ├── guardian.py               PreToolUse · fail-open
 │   ├── diff_readings.py          compara lecturas · aritmética en código
-│   ├── charter_lint.py           EL ACTA · 16 reglas C01–C16, sin LLM
+│   ├── charter_lint.py           EL ACTA · 19 reglas C01–C19, sin LLM
 │   └── venoxia/
 │       ├── parser.py
 │       ├── model.py
@@ -272,11 +272,11 @@ El ID vive en el encabezado: estable, linkable, parseable. El bloque de metadato
 **Por qué el acta se valida y no se limita a existir.** Un documento de visión que nadie comprueba se convierte en decoración en tres semanas. Las dos casillas que no se pueden dejar en blanco son `Done when` y `Out of scope`: sin criterio de terminación, una capability se termina cuando alguien se cansa; sin fuera de alcance escrito, todo está dentro y la primera entrega no llega nunca. Las dos son la versión, a escala de proyecto, de lo que `verifies:` es a escala de requisito.
 
 - [x] `templates/charter.md` — encabezados estructurales y claves en inglés, prosa y comentarios guía en español, como el resto de plantillas
-- [x] `scripts/charter_lint.py` — 16 reglas `C01`–`C16` sobre `.venoxia/charter.md`, deterministas y sin modelo detrás. Mismos códigos de salida y mismas convenciones (`--json`, `--no-color`, `--strict`) que `validate.py`
+- [x] `scripts/charter_lint.py` — 19 reglas `C01`–`C19` sobre `.venoxia/charter.md`, deterministas y sin modelo detrás. Mismos códigos de salida y mismas convenciones (`--json`, `--no-color`, `--strict`) que `validate.py`
 - [x] `skills/charter/SKILL.md` — la entrevista: pregunta, no rellena; escribe `.venoxia/charter.md` y `.venoxia/principles.md`; pasa el linter hasta verde antes de devolver el control, y entrega el `/venoxia:specify` de la primera capability
-- [x] `tests/test_charter_lint.py` — un caso en positivo y otro en negativo por cada regla `C01`–`C16`, con `unittest.TestCase` como el resto de la suite
+- [x] `tests/test_charter_lint.py` — un caso en positivo y otro en negativo por cada regla `C01`–`C19`, con `unittest.TestCase` como el resto de la suite
 - [x] `skills/specify/SKILL.md` — lee el acta en el paso 1 junto con los principios; si no hay ni acta ni capabilities, remite a `/venoxia:charter` en vez de pedir «el cambio, en una frase»; si hay acta, comprueba que la capability figura en su tabla y pregunta antes de inventarse una fila
-- [x] `README.md` — «Empezar un proyecto desde cero» con el recorrido de siete pasos (esqueleto → acta → spec → el rojo correcto de `V07` → test → divergencia → código) y «El acta del proyecto» con las secciones y la tabla de las 16 reglas
+- [x] `README.md` — «Empezar un proyecto desde cero» con el recorrido de siete pasos (esqueleto → acta → spec → el rojo correcto de `V07` → test → divergencia → código) y «El acta del proyecto» con las secciones y la tabla de las 19 reglas
 - [x] Verificar: los ejemplos de markdown del README pasados por `validate.py` y `charter_lint.py` **como ficheros reales**, no como bloques que nadie ejecuta. El README ya coló una vez un `SHALL` que su propia regla `V14` marcaba
 
 ---

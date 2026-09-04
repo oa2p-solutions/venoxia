@@ -385,8 +385,8 @@ Termina con un informe corto, sin adornos:
 
 - Los ficheros escritos, con ruta.
 - El acta en cuatro líneas: el propósito, cuántos usuarios, la capability 1 con su `Done when`, y cuántas apuestas hay.
-- **Las apuestas con `fatal: yes`, delante y por su nombre**, con la fecha en la que se resuelven. Si alguna es además `confidence: low`, ésa es la primera frase de la entrega.
-- **El desempate, si alguna fila arbitra**: el principio de dominio tal como quedó escrito, o —si el usuario prefirió no decidirlo hoy— la apuesta en la que se aparcó y su fecha. Es la línea del acta que más lejos llega: la va a leer cada `/venoxia:specify` de aquí en adelante, y es la única que decide comportamiento sin estar en ningún requisito.
+- **Las apuestas con `fatal: yes`, delante y por su nombre**, con el hecho que las resuelve. Si alguna es además `confidence: low`, ésa es la primera frase de la entrega.
+- **El desempate, si alguna fila arbitra**: el principio de dominio tal como quedó escrito, o —si el usuario prefirió no decidirlo hoy— la apuesta en la que se aparcó y el hecho que la resuelve. Es la línea del acta que más lejos llega: la va a leer cada `/venoxia:specify` de aquí en adelante, y es la única que decide comportamiento sin estar en ningún requisito.
 - El veredicto literal del linter.
 - Lo que quedó sin cerrar y qué haría falta para cerrarlo. Una casilla vacía se dice; no se disimula.
 - Toda decisión que tomaste tú porque la entrevista no la cubría, marcada como tal. Una asunción tuya que el usuario no ve es una asunción que nadie revisa.

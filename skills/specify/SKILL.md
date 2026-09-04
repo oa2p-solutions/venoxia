@@ -10,7 +10,6 @@ allowed-tools:
   - Glob
   - Grep
   - Bash(python3 "${CLAUDE_PLUGIN_ROOT}/scripts/validate.py" *)
-  - Bash(python3 *)
 ---
 
 # Venoxia · especificar

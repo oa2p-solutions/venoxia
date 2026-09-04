@@ -10,7 +10,7 @@ La tesis es corta y cabe en tres frases. **Una especificación es una apuesta so
 
 En la práctica eso significa que cada requisito nace con dos campos que ninguna otra herramienta exige: `verifies:`, la ruta del test que resuelve la apuesta, y `confidence:`, el nivel de confianza declarado. Sin oráculo, no compila. Y como el validador es un script de Python sin modelo detrás, el veredicto es el mismo en tu portátil, en el CI y dentro de la conversación.
 
-Esta entrega cubre el **núcleo verificable**: el acta del proyecto y su linter, el formato del requisito, el validador de 16 reglas, el guardián y el motor de divergencia.
+Esta entrega cubre el **núcleo verificable**: el acta del proyecto y su linter de 19 reglas, el formato del requisito, el validador de 16 reglas, el guardián y el motor de divergencia.
 
 ## Instalación
 
@@ -125,7 +125,7 @@ Son las dos casillas que la entrevista no deja en blanco, y las dos por el mismo
 
 **`Out of scope` es la frontera.** Un proyecto sin fronteras escritas las tiene igualmente: las descubre tarde, de una en una y en mitad de una entrega. Y cada viñeta lleva el porqué, no sólo el qué, porque un «pagos, no» a secas se vuelve a discutir la semana que viene, mientras que un «pagos no, porque el riesgo regulatorio no compensa hasta que haya reservas de verdad» se puede revisar el día en que esa condición cambie. Una frontera sin razón no es una decisión, es un capricho, y los caprichos no sobreviven a la primera reunión.
 
-### Las 16 reglas del linter del acta
+### Las 19 reglas del linter del acta
 
 Todas deterministas, igual que las del validador: ninguna consulta a un modelo. `scripts/charter_lint.py` sale con `0` si el acta cumple, `1` si no y `2` ante un error de uso. Con `--strict`, los avisos también hacen fallar.
 
