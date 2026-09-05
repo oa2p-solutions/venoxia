@@ -122,6 +122,43 @@ def _run_plain(module: str | None, script: str | None, args: list[str]) -> int:
     return 0
 
 
+class _IgnoreByPath:
+    """Sustituto de `trace._Ignore` que decide por la ruta del fichero.
+
+    `trace._Ignore.names(filename, modulename)` cachea su veredicto por
+    `modulename`, y `trace` le pasa el nombre **base** del fichero: todos los
+    `__init__.py` del proceso comparten la clave `__init__`. El primero que se
+    ejecuta decide por los demás: si es uno de la stdlib (bajo `sys.prefix`,
+    ignorado), `scripts/venoxia/__init__.py` queda ignorado también y su
+    `.cover` no se escribe nunca. Es lo que pasó en el primer run real de
+    `coverage` en Forgejo («SIN DATOS (FALLA)» para ese fichero).
+
+    Además compara contra la ruta real de cada prefijo: con un `sys.prefix`
+    que es un symlink (Python de Homebrew en macOS), `co_filename` trae la
+    ruta resuelta y `trace._Ignore` no reconocía la stdlib, así que la
+    medía entera —lento, y con un `.cover` por módulo de la stdlib.
+    """
+
+    def __init__(self, dirs: list[str]) -> None:
+        prefixes: list[str] = []
+        for directory in dirs:
+            for candidate in (directory, os.path.realpath(directory)):
+                prefix = os.path.normpath(candidate) + os.sep
+                if prefix not in prefixes:
+                    prefixes.append(prefix)
+        self._prefixes = tuple(prefixes)
+        self._cache: dict[str, int] = {}
+
+    def names(self, filename: str | None, modulename: str) -> int:  # noqa: ARG002
+        if filename is None:  # un built-in: `trace` los ignora siempre
+            return 1
+        verdict = self._cache.get(filename)
+        if verdict is None:
+            verdict = 1 if filename.startswith(self._prefixes) else 0
+            self._cache[filename] = verdict
+        return verdict
+
+
 def _run_traced(
     module: str | None, script: str | None, args: list[str], trace_dir: Path
 ) -> int:
@@ -135,6 +172,9 @@ def _run_traced(
         infile=counts_file,
         outfile=counts_file,
     )
+    # `Trace.__init__` construye `self.ignore = _Ignore(ignoremods, ignoredirs)`
+    # y `globaltrace_lt` sólo lo consulta vía `.names(...)`: se sustituye entero.
+    tracer.ignore = _IgnoreByPath([sys.prefix, sys.exec_prefix])  # type: ignore[assignment]
 
     dumped = False
 

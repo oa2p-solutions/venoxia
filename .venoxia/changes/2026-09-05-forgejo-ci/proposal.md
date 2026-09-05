@@ -91,3 +91,19 @@ executable file not found in $PATH` en los tres jobs con imagen
 `python:*-slim`. Corregido instalando `nodejs` junto a `git` en el mismo
 paso `apt-get`; la spec no cambia (los comandos de GitHub siguen
 apareciendo íntegros en cada job) y el oráculo sigue en verde.
+
+Segundo run real (2026-09-05): `coverage` en rojo por dos causas distintas,
+reproducidas las dos en Docker local con `python:3.14-slim`. (1) El job
+corre como root, para quien no existen los ficheros sin permiso de lectura:
+15 tests se saltaban y `guardian.py` bajaba al 82,0 % (umbral 85); como
+usuario normal se saltan 6 y mide 87,3 %, igual que en local. Los jobs
+`tests` y `coverage` crean ahora un usuario `ci` y corren la suite con él.
+(2) `scripts/venoxia/__init__.py` salía «SIN DATOS»: la caché de
+`trace._Ignore` va por nombre base de módulo, todos los `__init__.py` se
+llaman `__init__`, y el primero que se ejecuta en el contenedor es uno de la
+stdlib (ignorada por `sys.prefix`), así que arrastraba al de `venoxia`. En
+macOS no se veía porque el `sys.prefix` de Homebrew es un symlink y `trace`
+ni siquiera reconocía la stdlib. `tools/trace_run.py` sustituye esa caché
+por una indexada por ruta real (`_IgnoreByPath`), con test en
+`tests/test_trace_wrapping.py`. El job reproducido paso a paso en Docker
+termina con código 0.

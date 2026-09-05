@@ -145,3 +145,9 @@
 {"ts": "2026-09-05T17:03:56Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".forgejo/workflows/ci.yml"}
 {"ts": "2026-09-05T17:03:58Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".forgejo/workflows/ci.yml"}
 {"ts": "2026-09-05T17:04:00Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
+{"ts": "2026-09-05T17:37:56Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_trace_wrapping.py"}
+{"ts": "2026-09-05T17:38:43Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tools/trace_run.py"}
+{"ts": "2026-09-05T17:39:42Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".forgejo/workflows/ci.yml"}
+{"ts": "2026-09-05T17:39:46Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".forgejo/workflows/ci.yml"}
+{"ts": "2026-09-05T17:39:50Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_forgejo_workflow.py"}
+{"ts": "2026-09-05T17:39:52Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}

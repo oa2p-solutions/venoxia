@@ -36,8 +36,13 @@ jobs:
       - name: git y node para el checkout
         run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs
       - uses: actions/checkout@v4
+      # Los jobs en contenedor corren como root, y para root no existen los
+      # ficheros sin permiso de lectura: 15 tests de esos caminos se saltarían
+      # en silencio. Un usuario normal los ejecuta todos (primer run real).
+      - name: Usuario sin privilegios (root se salta los tests de permisos)
+        run: useradd -m ci && chown -R ci .
       - name: Suite completa (stdlib unittest, sin pytest)
-        run: python3 -m unittest discover -s tests -q
+        run: su ci -c "python3 -m unittest discover -s tests -q"
 
   self-spec:
     name: self-spec
@@ -65,8 +70,13 @@ jobs:
       - name: git y node para el checkout
         run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs
       - uses: actions/checkout@v4
+      # Como root, los tests de ficheros ilegibles se saltan y guardian.py
+      # baja del 85 % (82,0 % en el primer run real); como usuario normal mide
+      # lo mismo que en local.
+      - name: Usuario sin privilegios (root se salta los tests de permisos)
+        run: useradd -m ci && chown -R ci .
       - name: Cobertura de scripts/**/*.py, subprocesos incluidos
-        run: python3 tools/coverage.py
+        run: su ci -c "python3 tools/coverage.py"
 
   plugin-validate:
     name: plugin-validate

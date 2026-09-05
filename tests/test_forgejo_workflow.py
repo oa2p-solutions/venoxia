@@ -188,11 +188,13 @@ class ForgejoMirrorsGithubCommandsTest(unittest.TestCase):
             actual = _run_commands(_job_block(forgejo, job_name, FORGEJO_CI))
             self.assertTrue(expected, f"el job «{job_name}» de GitHub no tiene ningún «run:»")
             for command in expected:
-                self.assertIn(
-                    command,
-                    actual,
+                # «Aparece» en el job: el comando literal, tal cual o envuelto
+                # (`su ci -c "python3 tools/coverage.py"`: en el contenedor el
+                # job corre como root y root se salta los tests de permisos).
+                self.assertTrue(
+                    any(command in step for step in actual),
                     f"el job «{job_name}» de Forgejo no ejecuta «{command}», "
-                    f"que sí ejecuta el de GitHub",
+                    f"que sí ejecuta el de GitHub; sus pasos: {actual}",
                 )
 
     def test_coverage_and_plugin_validate_keep_continue_on_error(self):

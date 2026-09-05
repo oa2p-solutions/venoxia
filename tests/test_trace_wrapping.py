@@ -188,6 +188,45 @@ class TraceRunScriptTest(unittest.TestCase):
                 )
                 self.assertEqual(result.returncode, 3, result.stderr)
 
+    def test_a_package_init_is_still_measured_after_a_stdlib_init_ran_first(self) -> None:
+        """La caché de ignorados de `trace` va por nombre base de módulo, y todos
+        los `__init__.py` se llaman `__init__`: si el primero que se ejecuta es
+        uno de la stdlib (ignorada por `sys.prefix`), `trace` daba por ignorados
+        todos los demás, incluido `scripts/venoxia/__init__.py`. Es lo que pasó
+        en el primer run real de `coverage` en Forgejo: «SIN DATOS (FALLA)»
+        para ese fichero, con los otros ocho medidos."""
+        with tempfile.TemporaryDirectory() as workdir:
+            root = Path(workdir)
+            (root / "pkg").mkdir()
+            (root / "pkg" / "__init__.py").write_text(
+                '"""Paquete de prueba."""\n\nMARK = 1\n', encoding="utf-8"
+            )
+            script = root / "main.py"
+            # `http` es un paquete de la stdlib que el envoltorio no importa:
+            # su `__init__.py` es el primero que ve `trace`, y queda ignorado.
+            script.write_text("import http\nimport pkg\nprint(pkg.MARK)\n", encoding="utf-8")
+            with tempfile.TemporaryDirectory() as trace_dir:
+                env = dict(os.environ, VENOXIA_TRACE_DIR=trace_dir)
+                result = subprocess.run(
+                    [sys.executable, str(TRACE_RUN_PY), str(script)],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    env=env,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                covers = sorted(p.name for p in Path(trace_dir).glob("*.cover"))
+                self.assertIn(
+                    "pkg.__init__.cover",
+                    covers,
+                    f"el `__init__.py` del paquete local no se midió; .cover escritos: {covers}",
+                )
+                self.assertNotIn(
+                    "http.__init__.cover",
+                    covers,
+                    "la stdlib bajo sys.prefix tiene que seguir ignorada",
+                )
+
     def test_with_no_arguments_fails_with_usage_error(self) -> None:
         result = subprocess.run(
             [sys.executable, str(TRACE_RUN_PY)],

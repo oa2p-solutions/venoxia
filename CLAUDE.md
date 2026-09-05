@@ -17,7 +17,7 @@ Convenciones fijas de todo el repo:
 ## Comandos
 
 ```bash
-# Suite completa (734 tests, ~30 s). unittest de la stdlib, sin -t .
+# Suite completa (735 tests, ~30 s). unittest de la stdlib, sin -t .
 python3 -m unittest discover -s tests -q
 
 # Un fichero, una clase, un test. El import cualificado tests.venoxia_fixtures exige lanzarlo desde la raíz.
