@@ -247,7 +247,7 @@ El ID vive en el encabezado: estable, linkable, parseable. El bloque de metadato
 
 ## Fase 6 · Repo y distribución
 
-- [ ] **Confirmar antes de crear nada remoto.** Crear `oa2p-solutions/venoxia` privado y empujar
+- [x] **Confirmar antes de crear nada remoto.** Crear `oa2p-solutions/venoxia` privado y empujar (hecho el 2026-09-05 con la cuenta `arochaoscar` de `gh`; `oscar-ppay` no tiene permiso de crear repos en la organización)
 - [x] `.claude-plugin/marketplace.json` — un solo plugin. **Corrección sobre el diseño:** `claude plugin validate` rechaza `source: "git"` («plugins.0.source: Invalid input»); la forma válida que conserva la misma URL es `{source: "url", url: "https://github.com/oa2p-solutions/venoxia.git"}`
 - [x] `README.md` en español: qué es, la tesis en tres frases, instalación, el formato del requisito, y **el modelo de confianza del guardián** (qué bloquea y cómo desactivarlo)
 - [x] Instalación para el equipo:
@@ -255,7 +255,7 @@ El ID vive en el encabezado: estable, linkable, parseable. El bloque de metadato
   claude plugin marketplace add oa2p-solutions/venoxia
   claude plugin install venoxia@venoxia
   ```
-- [ ] `claude plugin tag` para la release `venoxia--v0.1.0`
+- [x] `claude plugin tag` para la release: la primera publicada es `venoxia--v0.2.0` (2026-09-05), empujada a `origin`. La 0.1.0 no llegó a etiquetarse
 
 ---
 
