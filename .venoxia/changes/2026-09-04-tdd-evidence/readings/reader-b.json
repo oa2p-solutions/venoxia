@@ -1,0 +1,74 @@
+[
+  {
+    "scenario": "Verified with a green run that covers every requirement",
+    "effect": "el validador no reporta ningún hallazgo V17",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Verified with no oracle.json at all",
+    "effect": "V17 se dispara nombrando el change y el primer requisito",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Verified with a red run",
+    "effect": "V17 se dispara nombrando el primer requisito no verde",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Verified with a green run that forgot a requirement",
+    "effect": "V17 se dispara nombrando el requisito que el run nunca vio",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A corrupt oracle.json does not crash the validator",
+    "effect": "V17 se dispara con mensaje de fichero ilegible, sin traceback",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Red preceded the green",
+    "effect": "V18 no se dispara para ese requisito",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The only run is already green",
+    "effect": "V18 se dispara para el requisito con severidad warning",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Every run has always been green",
+    "effect": "V18 se dispara para ese requisito",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "One warning per requirement, never one per change",
+    "effect": "V18 se dispara una sola vez, nombrando ese requisito",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

@@ -1,7 +1,9 @@
 {
   "id": "2026-09-04-tdd-evidence",
-  "state": "specified",
+  "state": "verified",
   "via": "spec",
-  "capabilities": ["validator"],
+  "capabilities": [
+    "validator"
+  ],
   "created": "2026-09-04T19:10:00Z"
 }

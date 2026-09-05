@@ -1,0 +1,13 @@
+[{"scenario": "Three requirements, three green tests", "effect": "termina en verde con el total correcto de requisitos", "status_code": "0", "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "One red among three", "effect": "identifica el requisito rojo con su exit_code, deja los demás en verde", "status_code": "1", "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "verifies points to a file that was never written", "effect": "marca el requisito como missing sin invocar el runner", "status_code": "1", "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "A runner that sleeps past the limit", "effect": "el requisito queda marcado como timeout", "status_code": "1", "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "No traceback after a timeout", "effect": "stderr no contiene ningún rastro de traceback", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The project never wrote venoxia.json", "effect": "termina con error nombrando venoxia.json y un ejemplo", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "test_command forgot the placeholder", "effect": "termina con error nombrando el marcador {files} ausente", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "Dry run over a change with two requirements", "effect": "imprime un comando por requisito sin invocar ningún runner", "status_code": "0", "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "Two runs in a row", "effect": "oracle.json acumula las dos ejecuciones registradas", "status_code": null, "side_effects": ["se escribe/actualiza oracle.json con el historial de runs"], "unclear": false, "unclear_why": null},
+{"scenario": "The history file is corrupt", "effect": "el historial corrupto se reemplaza por uno con solo la ejecución actual", "status_code": null, "side_effects": ["oracle.json se sobrescribe con un historial nuevo"], "unclear": false, "unclear_why": null},
+{"scenario": "A corrupt history warns without a traceback", "effect": "advierte por stderr sin mostrar ningún traceback", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The top-level keys never change", "effect": "el JSON expone exactamente las claves de primer nivel del esquema", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "Two paths, one invocation", "effect": "el runner se invoca una sola vez recibiendo ambas rutas", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null}]

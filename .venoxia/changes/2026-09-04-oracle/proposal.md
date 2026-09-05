@@ -63,3 +63,24 @@ no cambian de comportamiento.
 - **El resto de la propuesta** · `high` · comportamiento decidido y
   contrastado con el mismo criterio que ya usa `validate.py`: determinista,
   sin modelo, códigos 0/1/2.
+
+## Pendiente
+
+Divergencia pasada el 2026-09-05 desde la sesión principal, en cuatro rondas
+con lectores nuevos cada vez, y **no converge**: la última ronda dio 6 duras,
+11 blandas y 0 lagunas sobre 13 escenarios. Ninguna de las duras es un
+desacuerdo sobre comportamiento: los dos lectores coinciden en los códigos de
+salida y en el efecto de cada escenario, y difieren en cuántos efectos
+colaterales deducen del contexto (uno anota «no invoca el runner» o «termina
+la ejecución del test_command» como colateral y el otro no lo anota porque ya
+está en el efecto principal). `diff_readings.py` mide la cobertura de cada
+colateral contra el repertorio del otro lector y lo cuenta como duro cuando
+nadie más lo recoge. Es la debilidad conocida del motor sobre deltas largos de
+línea de comandos, recogida en la Fase 11 del `TODO.md`.
+
+El change se queda en `specified`, con `readings/` y `divergence.md` de la
+última ronda en disco. Su `oracle.json` acredita el ciclo rojo→verde (rojo
+real del 2026-09-04 apartando `scripts/oracle.py`, verde después), así que lo
+único que le falta para `validated` es que el motor deje de contar como dura
+una diferencia de granularidad. Hasta entonces, el estado dice la verdad: la
+spec no ha pasado la divergencia.

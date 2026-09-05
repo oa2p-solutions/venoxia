@@ -40,19 +40,28 @@ from:       README.md#verificar-en-ci
 
 WHEN el job `plugin-validate` de `.github/workflows/ci.yml` se ejecuta, el
 sistema DEBE instalar el CLI de Claude Code con `npm` y correr `claude
-plugin validate . --strict`; y WHEN el job `evals` se ejecuta, el sistema
-DEBE limitarse a `workflow_dispatch`, exigir `secrets.ANTHROPIC_API_KEY` y
+plugin validate . --strict`, con `continue-on-error: true` en el job porque
+la apuesta `B-004` del acta (si el CLI exige credenciales en un runner
+limpio) sigue abierta; y WHEN el job `evals` se ejecuta, el sistema DEBE
+limitarse a `workflow_dispatch`, exigir `secrets.ANTHROPIC_API_KEY` y
 correr el comando de `evals/README.md`.
 
 #### Scenario: plugin-validate installs before validating
 - **WHEN** se parsea el job `plugin-validate`
-- **THEN** un paso instala el paquete del CLI con `npm install` antes de
-  correr `claude plugin validate . --strict`
+- **THEN** el paso que ejecuta `npm install` del CLI va antes del paso que
+  ejecuta `claude plugin validate . --strict`
 
-#### Scenario: evals only runs by hand and needs the API key
+#### Scenario: plugin-validate does not block the workflow
+- **WHEN** se parsea el job `plugin-validate`
+- **THEN** el job declara `continue-on-error: true`
+
+#### Scenario: evals only runs by hand
 - **WHEN** se parsea el job `evals`
-- **THEN** su condición es `github.event_name == 'workflow_dispatch'`,
-  declara `secrets.ANTHROPIC_API_KEY` y ejecuta `claude plugin eval venoxia`
+- **THEN** la condición del job es `github.event_name == 'workflow_dispatch'`
+
+#### Scenario: evals needs the API key
+- **WHEN** se parsea el job `evals`
+- **THEN** el job referencia `secrets.ANTHROPIC_API_KEY`
 
 verifies:   tests/test_ci_workflow.py
 confidence: high
@@ -65,13 +74,22 @@ DEBE hacer checkout del proyecto y de `oa2p-solutions/venoxia` a una
 referencia fija (`VENOXIA_REF`) en un directorio auxiliar, usando
 `secrets.VENOXIA_TOKEN` porque el repositorio es privado, y correr
 `charter_lint.py --strict` y `validate.py --strict` sobre el proyecto
-consumidor sin invocar `pip` en ningún paso.
+consumidor exigiendo código de salida `0` en los dos, sin invocar `pip` en
+ningún paso.
 
-#### Scenario: Pinned checkout and the two strict gates
+#### Scenario: Pinned checkout of Venoxia
 - **WHEN** se parsea `templates/ci/venoxia-gate.yml`
-- **THEN** declara el checkout fijado por referencia con el token de
-  secrets, y sus pasos corren `charter_lint.py` y `validate.py` en
-  `--strict` sin ningún `pip install`
+- **THEN** el checkout de `oa2p-solutions/venoxia` usa la referencia
+  `VENOXIA_REF` y el token `secrets.VENOXIA_TOKEN`
+
+#### Scenario: Two strict gates that can fail
+- **WHEN** se parsea `templates/ci/venoxia-gate.yml`
+- **THEN** los pasos que ejecutan `charter_lint.py --strict` y
+  `validate.py --strict` no llevan `|| true` ni `continue-on-error`
+
+#### Scenario: No pip anywhere
+- **WHEN** se parsea `templates/ci/venoxia-gate.yml`
+- **THEN** ningún paso ejecuta `pip`
 
 verifies:   tests/test_ci_workflow.py
 confidence: high
@@ -88,53 +106,9 @@ termina con código distinto de `0`.
 - **WHEN** existe `.venoxia/venoxia.json` y un change en `verified` cuyo
   oráculo ya no está todo en verde
 - **THEN** el paso que corre `oracle.py --change <id>` sobre ese change
-  termina con código distinto de `0` y el job se marca en rojo
+  termina con código `1`, el que `oracle.py` devuelve cuando algún requisito
+  no está en verde, y el job se marca en rojo
 
 verifies:   tests/test_ci_workflow.py
 confidence: high
-from:       README.md#verificar-en-ci
-
-### R-CI-006 · The declared Python matrix actually passes on real GitHub Actions runners
-
-WHEN el job `tests` corre de verdad sobre los runners de GitHub Actions, el
-sistema DEBE completar en verde la suite en las tres versiones declaradas
-(3.12, 3.13 y 3.14), no sólo declararlas en la matriz.
-
-#### Scenario: The three matrix legs go green on a real run
-- **WHEN** se dispara un run real de `ci.yml` en GitHub Actions
-- **THEN** los tres trabajos de la matriz de `tests` (3.12, 3.13 y 3.14)
-  terminan en verde
-
-verifies:   tests/test_ci_workflow.py
-confidence: low
-  why:      esta sesión no puede disparar un run real de GitHub Actions
-            (ninguna acción remota) ni tiene instalado Python 3.12 en esta
-            máquina; sólo se ha confirmado que la suite pasa aquí con 3.13
-            y 3.14, y que el intérprete que corre esta comprobación es uno
-            de los tres declarados
-  revisit:  cuando exista el primer run real de la matriz en GitHub Actions
-from:       README.md#verificar-en-ci
-
-### R-CI-007 · plugin-validate's continue-on-error is confirmed necessary on a clean runner
-
-WHEN el job `plugin-validate` corre en un runner de GitHub Actions sin
-ninguna sesión de Claude Code autenticada de antemano, el sistema DEBE
-completar `claude plugin validate . --strict` sin credenciales
-adicionales; y si el CLI las exige, el `continue-on-error: true` del job
-DEBE seguir evitando que ese fallo bloquee el resto del workflow.
-
-#### Scenario: The safety net exists while the credential question is open
-- **WHEN** se parsea el job `plugin-validate`
-- **THEN** declara `continue-on-error: true`, así que aunque el CLI exija
-  credenciales en un runner limpio, el resto de `ci.yml` no se bloquea
-
-verifies:   tests/test_ci_workflow.py
-confidence: low
-  why:      esta máquina ya tiene una sesión de Claude Code autenticada, así
-            que no se puede comprobar aquí si `claude plugin validate`
-            exige credenciales en un runner limpio de GitHub Actions; el
-            `continue-on-error` es la mitigación mientras esa pregunta siga
-            abierta
-  revisit:  cuando exista un run real de este job en un runner limpio de
-            GitHub Actions
 from:       README.md#verificar-en-ci

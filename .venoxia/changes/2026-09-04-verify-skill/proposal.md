@@ -62,12 +62,19 @@ existiera `/venoxia:diverge`.
   `/venoxia:validate` y `/venoxia:diverge`: la aritmética de rojo/verde vive
   en `oracle.py`, la skill sólo lee el código de salida y presenta.
 
-## Pendiente
+## Cierre
 
-Esta sesión no dispone de la herramienta para despachar los lectores de
-`/venoxia:diverge`, así que este change se deja en `specified`, con
-`oracle.json` grabando el rojo (`skills/verify/SKILL.md` todavía no
-existía) y después el verde (una vez escrita), en ese orden. El paso a
-`validated` con `/venoxia:diverge` y a `verified` con `/venoxia:verify`
-—sobre este mismo change, una vez exista la skill que este change
-especifica— los hace la sesión principal.
+Divergencia pasada el 2026-09-05 desde la sesión principal, en tres rondas.
+Las dos primeras no convergieron por dos motivos que eran del delta: un
+lector tomaba el «código 0» del WHEN como código del escenario, y el
+escenario del verde sin rojo no decía qué pasa cuando el usuario contesta que
+no. Se reescribieron los escenarios con un hecho por escenario, sin códigos
+en las condiciones, y se añadieron «The user does not confirm» y «A red run
+never writes verified». La tercera ronda dio 0 duras, 3 blandas de
+vocabulario y 0 lagunas: `validated`, y con el rojo del 2026-09-04 en
+`oracle.json` y el verde de hoy, `verified`.
+
+El abogado del diablo insiste en dos ataques que la skill ya cubre en su
+texto pero el delta no fija: aceptar `missing` como rojo previo (un test
+vacío nacido después pasa de `missing` a verde) y que `Write` no tenga ámbito.
+Quedan como candidatos a un change siguiente, no como huecos de éste.

@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "El requisito condiciona la aceptación a que «el último run tenga `all_green: true`» y a que cubra los IDs; una implementación que lee sólo ese booleano y nunca contrasta los estados individuales acepta un `oracle.json` con `all_green: true` y todos sus requisitos en `red`/`timeout`, y pasa igual el escenario del run rojo porque allí el fichero trae `all_green: false`. Resultado: un change queda `verified` con la suite entera en rojo, que es exactamente lo que V17 existe para impedir.",
+    "requirement_id": "R-VAL-006",
+    "severity": "high"
+  },
+  {
+    "attack": "Nada exige que el run verde sea posterior al contenido actual del delta ni de los tests: basta con que los `requirement_id` coincidan. Reescribir por completo el cuerpo de un requisito y su test conservando el ID deja V17 en silencio y el change en `verified` sobre una ejecución vieja que nunca vio ese código, convirtiendo el sello de evidencia TDD en una firma caducada e invisible.",
+    "requirement_id": "R-VAL-006",
+    "severity": "medium"
+  },
+  {
+    "attack": "El requisito no fija severidad para V17 y ningún escenario observa el código de salida: sólo comprueban que «`V17` se dispara». Emitir V17 como `warning` (como V18, que sí lo dice) cumple los cuatro escenarios y deja `validate.py` saliendo con 0, de modo que un change en `verified` sin `oracle.json` o con oracle corrupto no rechaza nada pese al «DEBE rechazar la especificación».",
+    "requirement_id": "R-VAL-006",
+    "severity": "medium"
+  }
+]

@@ -12,10 +12,10 @@ por versión y corre la puerta sin `pip`.
 Lo que este fichero **no** puede comprobar —porque exige un run real de
 GitHub Actions, no disponible aquí— son las dos mitades dinámicas del
 criterio de aceptación: que la matriz efectivamente pasa en 3.12/3.13/3.14
-sobre los runners de GitHub (R-CI-006), y que un `SHALL` introducido a
-propósito hace fallar el job `self-spec` en un run real. Tampoco puede
-comprobar si `claude plugin validate` exige credenciales en un runner
-limpio sin sesión previa (R-CI-007); para esas dos apuestas, este fichero
+sobre los runners de GitHub (apuesta B-003 del acta), y que un `SHALL`
+introducido a propósito hace fallar el job `self-spec` en un run real.
+Tampoco puede comprobar si `claude plugin validate` exige credenciales en un
+runner limpio sin sesión previa (apuesta B-004); para esas dos apuestas, este fichero
 sólo aporta la evidencia local parcial que su «why» declara. Todo queda
 documentado como huecos en `README.md` y en la entrega de este change.
 
@@ -24,8 +24,6 @@ documentado como huecos en `README.md` y en la entrega de este change.
 @covers R-CI-003
 @covers R-CI-004
 @covers R-CI-005
-@covers R-CI-006
-@covers R-CI-007
 
 Cómo lanzarlo::
 
@@ -175,7 +173,7 @@ class CiPluginValidateAndEvalsTest(unittest.TestCase):
 
 
 class CiMatrixRealRunGapTest(unittest.TestCase):
-    """R-CI-006 · Apuesta: que la matriz pase de verdad en GitHub Actions.
+    """B-003 · Apuesta del acta: que la matriz pase de verdad en GitHub Actions.
 
     Esto no se puede confirmar aquí (exige un run real, prohibido en esta
     sesión, y esta máquina no tiene Python 3.12 instalado). Lo único que
@@ -196,7 +194,7 @@ class CiMatrixRealRunGapTest(unittest.TestCase):
 
 
 class CiPluginValidateSafetyNetTest(unittest.TestCase):
-    """R-CI-007 · Apuesta: si el CLI exige credenciales en un runner limpio.
+    """B-004 · Apuesta del acta: si el CLI exige credenciales en un runner limpio.
 
     No se puede confirmar aquí porque esta máquina ya tiene una sesión de
     Claude Code autenticada. Lo que sí se puede comprobar localmente es que

@@ -406,6 +406,75 @@
       },
       "all_green": true,
       "all_red": false
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-05T15:50:34Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-001",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 36,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-002",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 37,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-003",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 44,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-004",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 41,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-005",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 37,
+          "output_tail": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.001s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 5,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 5
+      },
+      "all_green": true,
+      "all_red": false
     }
   ]
 }

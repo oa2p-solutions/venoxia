@@ -63,23 +63,10 @@ hábito de memoria en vez de una comprobación.
   usan `V01`–`V16`: sin modelo, dos ejecuciones sobre el mismo árbol producen
   el mismo veredicto.
 
-## Pendiente
+## Cierre
 
-Esta sesión no tiene despachados los agentes lectores de `/venoxia:diverge`
-—no hay herramienta disponible para invocarlos—, así que este change se deja
-en `specified` en vez de `validated` o `verified`. Lo que sí se ha grabado a
-mano, sin la skill, con `scripts/oracle.py --change 2026-09-04-tdd-evidence
---record`:
-
-1. Un run **rojo**: `tests/test_rules_oracle.py` fallaba porque `V17`/`V18`
-   todavía no existían en `validate.py` (el `assert` de cada test contra un
-   `rule_set()` que no incluía la regla nueva).
-2. Un run **verde**, después de implementar `rule_v17`/`rule_v18`: los doce
-   tests de `tests/test_rules_oracle.py` pasan.
-
-La sesión principal es quien debe ejecutar `/venoxia:diverge` sobre este
-change —lectores y abogado del diablo de verdad, no prefabricados— y, si
-converge, `/venoxia:verify` para dejarlo en `validated` y después en
-`verified`. Hasta que eso ocurra, este `proposal.md` y el `oracle.json` que
-lo acompaña son la evidencia de que el ciclo rojo→verde se recorrió de
-verdad, aunque el `state` del change todavía no lo diga.
+Divergencia pasada el 2026-09-05 desde la sesión principal con dos lectores
+aislados y el abogado del diablo (`readings/`, `divergence.md`): 0 duras, 2
+blandas de vocabulario, 0 lagunas. Validador y divergencia en `0`, así que el
+change pasó a `validated`; `/venoxia:verify` volvió a grabar el oráculo en
+verde y, con el rojo del 2026-09-04 en el historial, lo dejó en `verified`.

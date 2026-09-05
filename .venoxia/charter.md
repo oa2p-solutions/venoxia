@@ -24,6 +24,7 @@ en CI cuando miente.
 | 3 | `guardian` | impedir que se edite código de producción cuando no hay un change validado al lado | quien intenta un `Write` sobre código de producción sin un change `validated` con delta ve la edición denegada, con el comando exacto que la desbloquea | medium |
 | 4 | `divergence` | cotejar dos lecturas aisladas del mismo delta y convertir cada desacuerdo en una pregunta cerrada | quien ejecuta `python3 scripts/diff_readings.py` sobre dos lecturas con `status_code` distintos ve el proceso terminar con código 1 y la divergencia marcada como dura | medium |
 | 5 | `oracle` | traducir el resultado del `test_command` declarado en `venoxia.json` en verificado o no verificado | quien ejecuta `/venoxia:verify` sobre un change con oráculo ve el resultado del `test_command` convertido en verificado o no verificado, sin tener que leer la salida del test a mano | high |
+| 6 | `ci` | hacer que la especificación falle en CI cuando miente, en el plugin y en los proyectos que lo adoptan | quien empuja una spec con un `SHALL` ve el job `self-spec` en rojo con el hallazgo `V14` en el registro del run | medium |
 
 ## Out of scope
 
@@ -66,4 +67,28 @@ subproceso, sin tener que instrumentar código con dependencias externas.
 confidence: low
   why:      no se ha probado todavía con el volumen real de tests que trae DEF-010
   revisit:  cuando DEF-010 produzca su primer informe
+  fatal:    no
+
+### B-003 · La matriz de Python pasa en los runners reales
+
+La capability `ci` declara en `.github/workflows/ci.yml` una matriz con
+Python 3.12, 3.13 y 3.14. Suponemos que la suite pasa en las tres sobre los
+runners de GitHub Actions: aquí sólo se ha comprobado con 3.13 y 3.14, y no
+se ha lanzado ningún run remoto todavía.
+
+confidence: low
+  why:      no hay Python 3.12 en esta máquina y no ha habido ningún run real de la matriz
+  revisit:  cuando exista el primer run real de la matriz en GitHub Actions
+  fatal:    no
+
+### B-004 · El CLI valida el plugin sin credenciales en un runner limpio
+
+El job `plugin-validate` de la capability `ci` da por hecho que
+`claude plugin validate . --strict` funciona en un runner sin sesión de
+Claude Code autenticada. Mientras no se sepa, el job lleva
+`continue-on-error: true` para no bloquear el resto del workflow.
+
+confidence: low
+  why:      esta máquina ya tiene sesión autenticada, así que aquí no se puede comprobar
+  revisit:  cuando exista el primer run real del job plugin-validate en un runner limpio
   fatal:    no

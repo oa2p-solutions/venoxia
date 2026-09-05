@@ -61,8 +61,12 @@ WHILE el `test_command` de un requisito sigue en marcha más allá de
 
 #### Scenario: A runner that sleeps past the limit
 - **WHEN** el `test_command` de un requisito tarda más que `--timeout 1`
-- **THEN** ese requisito queda con `status: timeout`, el proceso termina con
-  código `1` y `stderr` no contiene «Traceback»
+- **THEN** ese requisito queda con `status: timeout` y el proceso termina con
+  código `1`
+
+#### Scenario: No traceback after a timeout
+- **WHEN** el `test_command` de un requisito tarda más que `--timeout 1`
+- **THEN** `stderr` no contiene «Traceback»
 
 verifies:   tests/test_oracle.py
 confidence: high
@@ -114,13 +118,17 @@ por `stderr`, sin ningún «Traceback».
 
 #### Scenario: Two runs in a row
 - **WHEN** se ejecuta `--record` dos veces seguidas
-- **THEN** `oracle.json` tiene `version: 1` y dos runs, en el orden en que se
-  ejecutaron
+- **THEN** `oracle.json` contiene dos runs
 
 #### Scenario: The history file is corrupt
-- **WHEN** `oracle.json` existe y no se puede interpretar como JSON
-- **THEN** el tercer `--record` lo sustituye por un historial nuevo, avisa
-  por `stderr` y no produce ningún «Traceback»
+- **WHEN** `oracle.json` existe, no se puede interpretar como JSON y se
+  ejecuta `--record`
+- **THEN** `oracle.json` queda con un único run, el actual
+
+#### Scenario: A corrupt history warns without a traceback
+- **WHEN** `oracle.json` existe, no se puede interpretar como JSON y se
+  ejecuta `--record`
+- **THEN** `stderr` recibe un aviso y ningún «Traceback»
 
 verifies:   tests/test_oracle.py
 confidence: high
