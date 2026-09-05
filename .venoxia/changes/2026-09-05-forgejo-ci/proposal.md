@@ -83,3 +83,11 @@ verde del mismo día: `verified`.
 Lo que sigue sin comprobarse en local es el run real en Forgejo Actions:
 que el runner inyecte `node` en `python:*-slim`, que `actions/checkout@v4`
 funcione con el `git` instalado por `apt-get`, y `B-003`/`B-004`.
+
+Primer run real en Forgejo (2026-09-05): la apuesta `medium` de arriba salió
+mal en su primera mitad. `forgejo-runner` **no** inyecta `node` en el
+contenedor del job, y `actions/checkout@v4` murió con `exec: "node":
+executable file not found in $PATH` en los tres jobs con imagen
+`python:*-slim`. Corregido instalando `nodejs` junto a `git` en el mismo
+paso `apt-get`; la spec no cambia (los comandos de GitHub siguen
+apareciendo íntegros en cada job) y el oráculo sigue en verde.

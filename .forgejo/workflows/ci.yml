@@ -29,9 +29,12 @@ jobs:
     container:
       image: docker.io/library/python:${{ matrix.python-version }}-slim
     steps:
-      # Las imágenes slim no traen git, y actions/checkout lo necesita.
-      - name: git para el checkout
-        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates
+      # Las imágenes slim no traen git ni node, y actions/checkout necesita
+      # los dos: es una acción JavaScript y forgejo-runner no inyecta node en
+      # el contenedor (primer run real, 2026-09-05: «exec: "node": executable
+      # file not found in $PATH»).
+      - name: git y node para el checkout
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs
       - uses: actions/checkout@v4
       - name: Suite completa (stdlib unittest, sin pytest)
         run: python3 -m unittest discover -s tests -q
@@ -42,8 +45,8 @@ jobs:
     container:
       image: docker.io/library/python:3.14-slim
     steps:
-      - name: git para el checkout
-        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates
+      - name: git y node para el checkout
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs
       - uses: actions/checkout@v4
       - name: El validador sobre el propio repo, en estricto
         run: python3 scripts/validate.py --root . --strict --json
@@ -59,8 +62,8 @@ jobs:
     # documentados en TODO.md; continue-on-error evita un rojo permanente.
     continue-on-error: true
     steps:
-      - name: git para el checkout
-        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates
+      - name: git y node para el checkout
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs
       - uses: actions/checkout@v4
       - name: Cobertura de scripts/**/*.py, subprocesos incluidos
         run: python3 tools/coverage.py

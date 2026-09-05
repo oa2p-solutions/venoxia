@@ -142,3 +142,6 @@
 {"ts": "2026-09-05T16:07:15Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}
 {"ts": "2026-09-05T16:52:38Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "tests/test_forgejo_workflow.py"}
 {"ts": "2026-09-05T16:53:23Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "tests/test_forgejo_workflow.py"}
+{"ts": "2026-09-05T17:03:56Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".forgejo/workflows/ci.yml"}
+{"ts": "2026-09-05T17:03:58Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".forgejo/workflows/ci.yml"}
+{"ts": "2026-09-05T17:04:00Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
