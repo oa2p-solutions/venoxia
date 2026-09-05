@@ -1,0 +1,97 @@
+name: ci
+
+# El CI del propio plugin en Forgejo Actions: espejo de
+# .github/workflows/ci.yml sobre el forgejo-runner interno de la organización.
+# Mismos disparadores, mismos cinco jobs, mismos comandos; lo que cambia es lo
+# que ese runner impone: sólo las etiquetas «oa2p-debian» (Debian 13 slim) y
+# «oa2p-node» (Node 22), y como el host sólo tiene Python 3.14, cada entrada de
+# la matriz corre dentro de una imagen python:<versión>-slim. Ver
+# «## Verificar en CI» en README.md. tests/test_forgejo_workflow.py comprueba
+# que este fichero no se desvía del de GitHub.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: tests (python ${{ matrix.python-version }})
+    runs-on: oa2p-debian
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
+    # El intérprete viene de la imagen, no de setup-python: el host del runner
+    # sólo tiene 3.14.
+    container:
+      image: docker.io/library/python:${{ matrix.python-version }}-slim
+    steps:
+      # Las imágenes slim no traen git, y actions/checkout lo necesita.
+      - name: git para el checkout
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v4
+      - name: Suite completa (stdlib unittest, sin pytest)
+        run: python3 -m unittest discover -s tests -q
+
+  self-spec:
+    name: self-spec
+    runs-on: oa2p-debian
+    container:
+      image: docker.io/library/python:3.14-slim
+    steps:
+      - name: git para el checkout
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v4
+      - name: El validador sobre el propio repo, en estricto
+        run: python3 scripts/validate.py --root . --strict --json
+      - name: El acta del propio repo, en estricto
+        run: python3 scripts/charter_lint.py --root . --strict --json
+
+  coverage:
+    name: coverage
+    runs-on: oa2p-debian
+    container:
+      image: docker.io/library/python:3.14-slim
+    # Mismo motivo que en GitHub: tools/coverage.py mide huecos ya
+    # documentados en TODO.md; continue-on-error evita un rojo permanente.
+    continue-on-error: true
+    steps:
+      - name: git para el checkout
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v4
+      - name: Cobertura de scripts/**/*.py, subprocesos incluidos
+        run: python3 tools/coverage.py
+
+  plugin-validate:
+    name: plugin-validate
+    runs-on: oa2p-node
+    # Apuesta B-004 del acta: si el CLI exige credenciales en un runner
+    # limpio. Este run es el que puede resolverla; mientras, continue-on-error.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar el CLI de Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Estructura del plugin (manifiesto, skills, agentes, hook)
+        run: claude plugin validate . --strict
+
+  evals:
+    name: evals
+    runs-on: oa2p-node
+    # Cuesta tokens y usa un LLM: nunca se dispara en push ni en
+    # pull_request, sólo a mano. Ver evals/README.md y «## Verificar en CI».
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    needs: [tests, self-spec]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar el CLI de Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: claude plugin eval venoxia
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude plugin eval venoxia --ablation with-without \
+            --allow-tools 'Bash(python3 *)' Write Read Glob Grep

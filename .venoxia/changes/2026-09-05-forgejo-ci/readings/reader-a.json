@@ -1,0 +1,74 @@
+[
+  {
+    "scenario": "Triggers read from disk",
+    "effect": "el workflow declara push, pull_request en main y workflow_dispatch",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The five jobs by name",
+    "effect": "el workflow declara los cinco jobs nombrados",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Only the internal runner labels",
+    "effect": "cada job corre sólo en oa2p-debian u oa2p-node",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The matrix names the three versions",
+    "effect": "la matriz del job tests nombra 3.12, 3.13 y 3.14",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The interpreter comes from the image",
+    "effect": "el job declara container con imagen python:matrix.python-version-slim",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Same commands per job",
+    "effect": "cada comando run de GitHub aparece en el job homónimo de Forgejo",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Same safety nets",
+    "effect": "coverage y plugin-validate declaran continue-on-error true",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "evals only runs by hand",
+    "effect": "el job evals sólo corre por workflow_dispatch",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "evals needs the API key",
+    "effect": "el job evals referencia el secreto ANTHROPIC_API_KEY",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]
