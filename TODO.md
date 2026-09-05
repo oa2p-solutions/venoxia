@@ -353,6 +353,14 @@ Sobre un proyecto real, no un fixture:
 
 ---
 
+## Fase 11 · La divergencia se resuelve como entrevista
+
+> Observación recogida al usar `/venoxia:diverge` sobre un delta real («Divergencias duras · 3 · Escenario: Extraction service does not answer»): el informe vuelca todas las preguntas cerradas de golpe y el usuario tiene que contestarlas en bloque.
+
+- [ ] Las preguntas de divergencia se plantean **como entrevista al usuario, una por una**, con `AskUserQuestion`: cada opción es una de las lecturas enfrentadas y lleva sus ventajas y desventajas en la descripción, igual que hace `/venoxia:charter` en su entrevista. La aritmética sigue en `diff_readings.py`; lo que cambia es cómo la skill presenta el resultado y recoge la respuesta, y que la respuesta elegida se lleve al delta sin pasar por una reformulación de la skill.
+
+---
+
 ## Fuera de alcance en esta entrega
 
 Diseñado, documentado y pospuesto hasta que el núcleo se use en una feature real:
