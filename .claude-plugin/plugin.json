@@ -5,7 +5,7 @@
   "description": "Convierte la especificación en un contrato que falla en CI cuando miente. Cada requisito nace con su oráculo de verificación y su nivel de confianza declarado; sin oráculo, no compila. Incluye validador determinista, guardián PreToolUse y motor de divergencia con lectores aislados.",
   "author": {
     "name": "Oscar Arocha",
-    "email": "oscar.arocha@b2bcarts.com"
+    "email": "arocha.oscar@gmail.com"
   },
   "homepage": "https://github.com/oa2p-solutions/venoxia",
   "repository": "https://github.com/oa2p-solutions/venoxia",

@@ -1,6 +1,6 @@
 {
   "id": "2026-09-04-ci-gate",
-  "state": "verified",
+  "state": "archived",
   "via": "spec",
   "capabilities": [
     "ci"

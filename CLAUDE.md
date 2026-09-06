@@ -46,7 +46,7 @@ python3 scripts/oracle.py --root . --change <id> --record      # ejecuta y añad
 python3 tools/coverage.py
 ```
 
-No hay linter ni formateador configurado (el núcleo es pequeño y las convenciones se sostienen por revisión y por los propios validadores). Sí hay CI: `.github/workflows/ci.yml` (jobs `tests` en matriz de Python, `self-spec` con `validate.py`/`charter_lint.py --strict`, `coverage` con `tools/coverage.py`, `plugin-validate`, y `evals` sólo por `workflow_dispatch`) y `templates/ci/venoxia-gate.yml`, la plantilla que un proyecto consumidor copia para correr la misma puerta sin `pip`.
+No hay linter ni formateador configurado (el núcleo es pequeño y las convenciones se sostienen por revisión y por los propios validadores). Sí hay CI: `.forgejo/workflows/ci.yml` (jobs `tests` en matriz de Python, `self-spec` con `validate.py`/`charter_lint.py --strict`, `coverage` con `tools/coverage.py`, `plugin-validate`, y `evals` sólo por `workflow_dispatch`), y es el único: el proyecto dejó de usar GitHub y no queda nada bajo `.github/`. `templates/ci/venoxia-gate.yml` es la plantilla que un proyecto consumidor copia a su `.forgejo/workflows/` para correr la misma puerta.
 
 ## Arquitectura
 

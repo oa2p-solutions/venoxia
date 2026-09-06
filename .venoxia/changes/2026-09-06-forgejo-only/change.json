@@ -1,0 +1,9 @@
+{
+  "id": "2026-09-06-forgejo-only",
+  "state": "verified",
+  "via": "spec",
+  "capabilities": [
+    "ci"
+  ],
+  "created": "2026-09-06T00:00:00Z"
+}

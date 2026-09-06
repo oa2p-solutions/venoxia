@@ -1,0 +1,90 @@
+[
+  {
+    "scenario": "A purely added side effect is soft",
+    "effect": "clasifica la divergencia de efecto colateral como blanda",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An opposite polarity is hard",
+    "effect": "clasifica la divergencia de efecto colateral como dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A different number is hard",
+    "effect": "clasifica la divergencia de efecto colateral como dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unrelated added effect stays soft",
+    "effect": "clasifica la divergencia de efecto colateral como blanda",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A soft divergence is still reported",
+    "effect": "incluye la divergencia blanda en el informe con pregunta y opciones",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Strict mode still fails on an addition",
+    "effect": "la ejecución termina en fallo pese a ser sólo blanda",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A contradiction the rule cannot see stays soft",
+    "effect": "clasifica como blanda una contradicción no detectable y la presenta al revisor",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A contradiction says so",
+    "effect": "el detalle indica que el efecto contradice al otro lector",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An addition says so",
+    "effect": "el detalle indica que ninguna otra lectura lo niega ni le pone otra cifra",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The fixture still diverges hard",
+    "effect": "el resultado trae al menos una divergencia dura en side_effects",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The rule is general, not a special case",
+    "effect": "el resultado trae divergencia dura en otro proyecto con otras palabras",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

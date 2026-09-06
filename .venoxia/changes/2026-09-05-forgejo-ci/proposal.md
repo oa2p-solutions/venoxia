@@ -7,8 +7,8 @@ en GitHub Actions (`oa2p-solutions/venoxia`, 2026-09-05) se quedó en cola
 más de veinte minutos sin que ningún runner lo recogiera y terminó
 cancelado. Las apuestas `B-003` y `B-004` del acta siguen sin resolver
 porque nunca llegó a ejecutarse nada. La organización tiene un Forgejo
-interno (`forgejo.int.oa2p-solutions.com`) con Forgejo Actions activado y un
-`forgejo-runner` registrado en `oa2p-server`, y el repo ya está espejado en
+interno de la organización con Forgejo Actions activado y un
+`forgejo-runner` propio, y el repo ya está espejado en
 `OA2P/venoxia`. Un workflow allí es la forma de que el contrato «falla en CI
 cuando miente» tenga por fin un testigo que corre.
 

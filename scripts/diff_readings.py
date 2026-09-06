@@ -291,6 +291,126 @@ def numeric_tokens(s: object) -> set[str]:
     return found
 
 
+#: Palabras que cambian el **sentido** de una frase en vez de añadirle detalle.
+#:
+#: Son las dos maneras de negar en español sin cambiar de verbo: la negación
+#: propiamente dicha, y el alcance —«el pedido completo» frente a «sólo las
+#: unidades con stock»—. Dos efectos que hablan de lo mismo y difieren en una de
+#: estas marcas no pueden ser los dos ciertos; dos que hablan de lo mismo y no
+#: difieren en ninguna son, casi siempre, el mismo hecho contado con más o menos
+#: detalle.
+#:
+#: La lista es cerrada a propósito. Es lo único que separa «contradecir» de
+#: «añadir» sin consultar a un modelo, y ampliarla con verbos —«borrar» contra
+#: «conservar»— sería empezar un diccionario de antónimos que nunca termina.
+#: Esa frontera está declarada en `R-DIV-005` y medida en su propuesta: los
+#: antónimos verbales caen del lado blando, se siguen presentando con su
+#: pregunta, y `--strict` los devuelve a hacer fallar la ejecución.
+#: Las que niegan. Se miran como **presencia**, no como conjunto: «no se crea
+#: ningún presupuesto» y «no crea presupuesto» niegan lo mismo aunque una
+#: refuerce con una partícula más, y compararlas por conjunto convertía el
+#: refuerzo en un desacuerdo.
+#:
+#: **«sin» no está aquí, y es deliberado.** Niega, pero en prosa técnica
+#: española introduce un complemento muchísimo más veces de las que niega un
+#: predicado: «sin tocar el guardián», «sin llegar al checkout», «sin que
+#: nadie lo pida». La primera versión de esta lista lo incluía, y el primer
+#: delta real que pasó por el motor nuevo declaró incompatibles «el job falla
+#: antes del checkout» y «el job termina en fallo sin llegar al checkout», que
+#: dicen lo mismo. Distinguir los dos usos exige mirar si le sigue un
+#: infinitivo, y eso es gramática, no recuento de tokens.
+NEGATION_MARKERS = frozenset(
+    """
+    no ni nunca jamas tampoco
+    ningun ninguna ninguno ningunos ningunas
+    """.split()
+)
+
+#: Las que acotan el alcance sobre el eje parcial/total. Éstas sí se comparan
+#: como conjunto, porque el desacuerdo está en cuál de ellas se usa: «para el
+#: pedido completo» contra «sólo para las unidades con stock» es el caso del
+#: fixture `ambiguous-partial-effect`, que no lleva ni negación ni cifra y aun
+#: así no puede ser cierto de las dos maneras.
+#:
+#: Deliberadamente **no** entran aquí los indefinidos y distributivos —«cada»,
+#: «alguno», «cualquier»—: aparecen y desaparecen por estilo entre dos
+#: redacciones del mismo hecho, y contarlos reinstauraría el falso positivo que
+#: este cambio existe para quitar.
+SCOPE_MARKERS = frozenset(
+    """
+    solo solamente unicamente unico unica
+    parcial parciales parcialmente
+    completo completa completos completas completamente
+    total totales totalmente
+    todo toda todos todas ambos ambas
+    """.split()
+)
+
+#: Todo lo que cambia el **sentido** de una frase en vez de añadirle detalle.
+#: Se descuenta del sujeto para poder preguntar «¿hablan de lo mismo?» aparte de
+#: «¿dicen lo mismo sobre ello?».
+CONTRADICTION_MARKERS = NEGATION_MARKERS | SCOPE_MARKERS
+
+
+#: Las que abren una subordinada. Una negación detrás de una de ellas califica
+#: la **condición** —«un oráculo que no termina en verde deja el job en fallo»—,
+#: no el efecto que el escenario describe, y contarla como polaridad del efecto
+#: declaraba incompatibles a dos lectores que decían lo mismo: uno escribía el
+#: efecto a secas y el otro se traía el WHEN dentro.
+SUBORDINATE_OPENERS = frozenset("que si cuando mientras aunque donde porque".split())
+
+
+def polarity(s: object) -> tuple[bool, frozenset[str]]:
+    """La polaridad de un texto: si niega, y con qué alcance.
+
+    Dos dimensiones y dos maneras de compararlas, porque no se comportan igual.
+    La negación es un interruptor: da igual con cuántas partículas se exprese.
+    El alcance es una elección entre alternativas excluyentes, y ahí sí importa
+    **cuál**.
+
+    Se lee del texto **normalizado crudo**, no de `content_tokens`: varias de
+    estas marcas —«todo», «todas»— son palabras vacías para comparar
+    comportamiento y `content_tokens` las descarta, que es lo correcto allí y lo
+    contrario de lo que hace falta aquí.
+    """
+    words = normalize(s).split()
+    negated = any(
+        word in NEGATION_MARKERS
+        and not (index and words[index - 1] in SUBORDINATE_OPENERS)
+        for index, word in enumerate(words)
+    )
+    return negated, frozenset(set(words) & SCOPE_MARKERS)
+
+
+def subject_tokens(s: object) -> set[str]:
+    """Los tokens de contenido **sin** las marcas de polaridad ni las cifras.
+
+    Es el «de qué habla» de la frase, despojado del «qué dice sobre ello». Dos
+    efectos con el mismo sujeto y distinta marca se contradicen; con sujetos
+    distintos, ni se comparan.
+    """
+    raw = [
+        word
+        for word in normalize(s).split()
+        if word not in CONTRADICTION_MARKERS and not word.isdigit()
+    ]
+    meaningful = {stem_es(word) for word in raw if word not in STOPWORDS_ES}
+    return meaningful or set(raw)
+
+
+def same_subject(mine: object, theirs: object, threshold: float) -> bool:
+    """¿Las dos frases hablan de lo mismo, ignorando polaridad y cifras?
+
+    Misma asimetría que `coverage` y por la misma razón: la pregunta es si lo
+    que yo nombro está dentro de lo que nombra el otro, no si los dos decimos
+    igual de cosas.
+    """
+    mine_tokens = subject_tokens(mine)
+    if not mine_tokens:
+        return False
+    return len(mine_tokens & subject_tokens(theirs)) / len(mine_tokens) >= threshold
+
+
 def similarity(left: object, right: object) -> float:
     """Similitud entre dos textos de prosa, en el rango [0.0, 1.0].
 
@@ -1215,9 +1335,17 @@ def coverage(mine: object, theirs: object) -> float:
     Las cifras se blindan igual que en `similarity`: si el efecto nombra un
     número que la otra frase no nombra, no está recogido por muy contenidas que
     estén sus palabras.
+
+    Y la **polaridad** se blinda por la misma razón, que es la avería que este
+    blindaje viene a tapar: «no se crea el presupuesto» comparte dos de sus tres
+    tokens de contenido con «se crea el presupuesto», así que salía recogido por
+    su propia negación y el desacuerdo más flagrante posible se informaba como
+    convergencia. Una frase nunca está contenida en la que la niega.
     """
     mine_numbers, their_numbers = numeric_tokens(mine), numeric_tokens(theirs)
     if mine_numbers - their_numbers:
+        return 0.0
+    if polarity(mine) != polarity(theirs):
         return 0.0
     my_tokens = content_tokens(mine)
     if not my_tokens:
@@ -1232,6 +1360,33 @@ def unmatched_effects(mine: list[str], theirs: list[str], threshold: float) -> l
         for item in mine
         if not any(coverage(item, other) >= threshold for other in theirs)
     ]
+
+
+def contradicts(item: str, theirs: list[str], threshold: float) -> bool:
+    """¿Algún efecto del repertorio ajeno habla de lo mismo y dice lo contrario?
+
+    Dos señales, las dos sintácticas y deterministas:
+
+    * **Polaridad.** El mismo sujeto con una marca de negación o de alcance que
+      el otro no lleva: «no se crea el presupuesto» contra «se crea el
+      presupuesto», «para el pedido completo» contra «sólo para las unidades
+      con stock».
+    * **Cifra.** El mismo sujeto con otro número: «dura 15 minutos» contra
+      «dura 30 minutos». `numeric_tokens` ya blindaba las cifras en
+      `similarity` y en `coverage`; aquí decide categoría.
+
+    Sin ninguna de las dos, el efecto **sólo añade**: nadie lo niega, el otro
+    lector simplemente no dedujo esa consecuencia. Eso es una divergencia
+    blanda, no una imposibilidad lógica.
+    """
+    for other in theirs:
+        if not same_subject(item, other, threshold):
+            continue
+        if polarity(item) != polarity(other):
+            return True
+        if numeric_tokens(item) != numeric_tokens(other):
+            return True
+    return False
 
 
 def compare_side_effects(
@@ -1275,6 +1430,12 @@ def compare_side_effects(
     # único que se denuncia. Se recorre por pares para que con tres lectores no
     # baste con que uno cualquiera lo respalde.
     orphans: dict[str, list[str]] = {}
+    # Un huérfano que **contradice** el repertorio ajeno hace dura la
+    # divergencia; uno que sólo **añade**, no. Antes bastaba con estar huérfano,
+    # y eso llamaba «imposibles a la vez» a dos lecturas que no se negaban:
+    # sobre deltas largos, cuatro rondas seguidas de preguntas que no eran
+    # desacuerdos. La regla entera está en `contradicts`.
+    contradicted = False
     for name in present:
         missing: list[str] = []
         for other in present:
@@ -1283,6 +1444,11 @@ def compare_side_effects(
             for item in unmatched_effects(judged[name], repertoires[other], threshold):
                 if item not in missing:
                     missing.append(item)
+                # Un repertorio ajeno vacío no acredita que el efecto «sólo
+                # añada»: no hay nada contra lo que comprobarlo, y el
+                # desacuerdo es máximo, no mínimo.
+                if not repertoires[other] or contradicts(item, repertoires[other], threshold):
+                    contradicted = True
         if missing:
             orphans[name] = missing
 
@@ -1301,11 +1467,22 @@ def compare_side_effects(
         " Se han comparado «effect» y «side_effects» juntos, así que no es una "
         "diferencia de dónde colocó cada lector el mismo efecto."
     )
+    # El informe dice **lo que se ha comprobado**, no más: el cotejo es
+    # sintáctico —negaciones, marcas de alcance y cifras—, así que prometer que
+    # «nadie lo contradice» sería asegurarle al revisor un hecho que nadie ha
+    # mirado. Y es ese revisor el último filtro antes de que el guardián abra la
+    # puerta al código.
+    detail += (
+        " Además, lo que registra el otro lector lo contradice."
+        if contradicted
+        else " Ninguna otra lectura lo niega ni le pone otra cifra: nadie lo contradice"
+        " en lo que se ha podido comprobar, así que sólo añade."
+    )
 
     return Divergence(
         scenario=group.title,
         field=FIELD_SIDE_EFFECTS,
-        hardness=HARDNESS_HARD,
+        hardness=HARDNESS_HARD if contradicted else HARDNESS_SOFT,
         # Sólo lo enfrentado. Los efectos que los dos lectores recogen no están
         # en discusión, y meterlos aquí ponía en la pregunta lecturas que
         # ninguna opción ofrecía: quien la contesta tendría que elegir entre

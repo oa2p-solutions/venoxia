@@ -1,23 +1,46 @@
 # Plantilla de Venoxia para el CI de un proyecto que lo ha adoptado.
 #
-# Copia este fichero a `.github/workflows/venoxia-gate.yml` en el proyecto
+# Copia este fichero a `.forgejo/workflows/venoxia-gate.yml` en el proyecto
 # consumidor y ajusta lo que hay entre `<...>`. Hace checkout del propio
-# proyecto y de `oa2p-solutions/venoxia` fijado a una referencia (un tag,
-# nunca una rama en movimiento) en un directorio auxiliar —el repo es
-# privado, de ahí el token—, y corre el validador y el acta en `--strict`
-# sobre el proyecto. Si el proyecto declara `.venoxia/venoxia.json`, además
-# ejecuta el oráculo por cada change en `validated` o `verified` y falla el
-# job si alguno no sale en verde. Sin `pip`: sólo el `python3` del runner y
-# la biblioteca estándar, exactamente como el resto de Venoxia.
+# proyecto y de `OA2P/venoxia` fijado a una referencia (un tag, nunca una rama
+# en movimiento) en un directorio auxiliar —el repo es privado, de ahí el
+# token—, y corre el validador y el acta en `--strict` sobre el proyecto.
+# Además ejecuta el oráculo por cada change en `validated` o `verified` y falla
+# el job si alguno no sale en verde.
 #
 # Secrets que hay que declarar en el proyecto consumidor:
-#   VENOXIA_TOKEN: un token con permiso de lectura sobre oa2p-solutions/venoxia.
+#   VENOXIA_TOKEN: un token con permiso de lectura sobre OA2P/venoxia.
 #
 # Variables que hay que ajustar:
-#   VENOXIA_REF: el tag de Venoxia contra el que se valida (nunca "main").
+#   VENOXIA_REF: el **tag** de Venoxia contra el que se valida.
+#     Nunca "main" ni ninguna otra rama: una rama en movimiento hace que la
+#     puerta de cada build use una versión distinta de Venoxia, y un cambio
+#     allí puede romper —o relajar— las validaciones de todos los consumidores
+#     a la vez sin que nadie toque nada aquí.
+#
+# ---------------------------------------------------------------------------
+# Dos cosas que hay que saber antes de copiarla, las dos deliberadas:
+#
+# 1. **El paso del oráculo ejecuta el `test_command` que declara este mismo
+#    repositorio.** Es código que puede venir de un pull request, así que se
+#    ejecuta sin ningún secreto en su entorno y con `persist-credentials:
+#    false` en todos los checkouts, para que tampoco pueda leer una credencial
+#    del `.git/config` del workspace. Si añades secretos a este workflow,
+#    decláralos en el paso que los necesite, nunca a nivel de job ni de
+#    workflow.
+#
+# 2. **No hay ningún `pip install`, y eso es una limitación real de esta
+#    plantilla, no sólo una postura.** Venoxia no tiene dependencias, pero la
+#    suite del proyecto consumidor probablemente sí: tal cual, el oráculo
+#    fallaría con `ModuleNotFoundError` en cuanto tu `test_command` importe
+#    algo que no esté en la biblioteca estándar. Si tu suite tiene
+#    dependencias, añade **tú** el paso que las instale justo antes del paso
+#    del oráculo —con el gestor que uses— y no le pases secretos.
+# ---------------------------------------------------------------------------
 
 name: venoxia-gate
 
+# Una puerta que sólo arranca a mano no bloquea ninguna fusión.
 on:
   push:
     branches: [main]
@@ -31,22 +54,54 @@ env:
 jobs:
   gate:
     name: venoxia-gate
-    runs-on: ubuntu-latest
+    runs-on: oa2p-debian
+    # El intérprete viene de la imagen: el host del runner interno no
+    # garantiza ninguna versión concreta de Python.
+    container:
+      image: docker.io/library/python:3.14-slim
     steps:
+      # Las imágenes slim no traen git ni node, y actions/checkout necesita los
+      # dos: es una acción JavaScript y forgejo-runner no inyecta node en el
+      # contenedor.
+      - name: git y node para el checkout
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs
+
+      # Sin VENOXIA_REF no se hace checkout de nada: una «ref» vacía toma la
+      # rama por defecto de OA2P/venoxia, que es justo la rama en movimiento
+      # que esta plantilla existe para evitar. Falla antes, y diciendo qué
+      # falta.
+      - name: VENOXIA_REF tiene que estar definida
+        run: |
+          python3 - <<'PYEOF'
+          import os
+          import sys
+
+          ref = os.environ.get("VENOXIA_REF", "").strip()
+          if not ref or ref.startswith("<"):
+              sys.stderr.write(
+                  "venoxia-gate: falta la variable VENOXIA_REF. Ponle el tag de "
+                  "Venoxia contra el que valida este proyecto (nunca una rama: "
+                  "con una rama, la puerta cambia sola cuando cambia Venoxia).\n"
+              )
+              raise SystemExit(1)
+          PYEOF
+
       - name: Checkout del proyecto
         uses: actions/checkout@v4
+        with:
+          # El paso del oráculo ejecuta el test_command de este repositorio:
+          # si el checkout dejara la credencial en .git/config, ese comando
+          # podría leerla de ahí aunque no esté en su entorno.
+          persist-credentials: false
 
-      - name: Checkout de oa2p-solutions/venoxia (fijado, repo privado)
+      - name: Checkout de OA2P/venoxia (fijado, repo privado)
         uses: actions/checkout@v4
         with:
-          repository: oa2p-solutions/venoxia
+          repository: OA2P/venoxia
           ref: ${{ env.VENOXIA_REF }}
           token: ${{ secrets.VENOXIA_TOKEN }}
           path: ${{ env.VENOXIA_DIR }}
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
+          persist-credentials: false
 
       - name: charter_lint.py --strict sobre el acta del proyecto
         run: python3 "${VENOXIA_DIR}/scripts/charter_lint.py" --root . --strict --json
@@ -54,8 +109,10 @@ jobs:
       - name: validate.py --strict sobre las specs del proyecto
         run: python3 "${VENOXIA_DIR}/scripts/validate.py" --root . --strict --json
 
+      # Aquí, y sólo aquí, va el paso que instale las dependencias de tu suite
+      # si las tiene. Ver la nota 2 de la cabecera.
+
       - name: oracle.py sobre cada change validated o verified
-        if: hashFiles('.venoxia/venoxia.json') != ''
         run: |
           python3 - "$VENOXIA_DIR" <<'PYEOF'
           import json
@@ -66,26 +123,36 @@ jobs:
           venoxia_dir = Path(sys.argv[1])
           oracle = venoxia_dir / "scripts" / "oracle.py"
           changes_dir = Path(".venoxia") / "changes"
+          config = Path(".venoxia") / "venoxia.json"
+
+          # Un paso que se salta en silencio convierte borrar un fichero en la
+          # forma de esquivar la puerta. Sin configuración del oráculo no hay
+          # puerta, y eso se dice en rojo, no se omite.
+          if not config.is_file():
+              print(f"venoxia-gate: falta {config}, sin él no se puede ejecutar el oráculo.")
+              sys.exit(1)
 
           gated_states = {"validated", "verified"}
           failing = []
+          unreadable = []
 
-          if not changes_dir.is_dir():
-              print("Sin .venoxia/changes/: nada que ejecutar con el oráculo.")
-              sys.exit(0)
-
-          for entry in sorted(changes_dir.iterdir()):
+          for entry in sorted(changes_dir.iterdir()) if changes_dir.is_dir() else []:
               change_file = entry / "change.json"
               if not change_file.is_file():
                   continue
               try:
                   data = json.loads(change_file.read_text(encoding="utf-8"))
               except (OSError, ValueError) as error:
-                  print(f"{entry.name}: change.json ilegible ({error}); se omite.")
+                  # Un change.json ilegible no se omite: omitirlo convierte
+                  # corromper un fichero en la forma de saltarse el oráculo.
+                  unreadable.append(f"{entry.name} ({error})")
                   continue
-              if not isinstance(data, dict):
+              if not isinstance(data, dict) or not str(data.get("state", "")).strip():
+                  unreadable.append(f"{entry.name} (sin «state»)")
                   continue
-              state = str(data.get("state", "")).strip().lower()
+              # Normalizado: «Verified» o «validated » con espacios son el
+              # estado que nombran, no un estado desconocido que se salta.
+              state = str(data["state"]).strip().lower()
               if state not in gated_states:
                   continue
               change_id = str(data.get("id") or entry.name)
@@ -96,7 +163,12 @@ jobs:
               if result.returncode != 0:
                   failing.append(change_id)
 
+          if unreadable:
+              print(f"venoxia-gate: changes que no se pueden leer: {', '.join(unreadable)}")
           if failing:
-              print(f"Changes con el oráculo en rojo: {', '.join(failing)}")
+              print(f"venoxia-gate: changes con el oráculo en rojo: {', '.join(failing)}")
+          if unreadable or failing:
               sys.exit(1)
+
+          print("venoxia-gate: el oráculo no deja ningún change en rojo.")
           PYEOF

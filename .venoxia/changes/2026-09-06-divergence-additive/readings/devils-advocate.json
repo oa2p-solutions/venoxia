@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "El escenario «A contradiction the rule cannot see stays soft» obliga a clasificar como blanda una contradicción real («se borra el borrador» vs «se conserva el borrador»), y ningún escenario fija el comportamiento sin `--strict`: una implementación literal termina en código 0 en la invocación por defecto, con lo que un change en el que un lector afirma que se destruye un dato y el otro que se conserva puede pasar a `validated` y abrir el guardián al código.",
+    "requirement_id": "R-DIV-005",
+    "severity": "medium"
+  },
+  {
+    "attack": "«Sólo añade» se evalúa contra el repertorio del otro lector sin exigir que ese repertorio contenga nada: si un lector devuelve `side_effects` vacío (porque no vio ninguno o porque falló), todos los efectos del otro lector «sólo añaden» y todas las divergencias de colaterales salen blandas, justo el caso en que el desacuerdo es máximo.",
+    "requirement_id": "R-DIV-005",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-DIV-007 exige que el fixture siga siendo duro con una regla general que no lo reconozca por sus cadenas, y nada pone techo a la amplitud del detector de contradicción: una implementación que declare contradicción en cuanto dos efectos comparten palabras significativas cumple R-DIV-007 y los escenarios de R-DIV-005 (que sólo fijan dos casos sin solape léxico), y devuelve duras todas las diferencias de detalle («se reserva el stock» vs «se reserva el stock y se anota la reserva»), reinstaurando el falso positivo que este delta existe para eliminar y bloqueando changes correctos.",
+    "requirement_id": "R-DIV-007",
+    "severity": "medium"
+  }
+]

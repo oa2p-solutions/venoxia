@@ -1,0 +1,300 @@
+{
+  "version": 1,
+  "change": "2026-09-06-divergence-additive",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-06T15:26:17Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-DIV-005",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 6472,
+          "output_tail": "## Divergencias duras · 1\n\nEstas lecturas no pueden ser todas correctas a la vez. Responde cada pregunta con su\nletra, corrige el delta con la respuesta y vuelve a ejecutar la divergencia.\n\n### Escenario: Mail\n\nEl lector A registra «se envia un correo al cliente» y ningún otro lector lo recoge. Se han comparado «effect» y «side_effects» juntos, así que no es una diferencia de dónde colocó cada lector el mismo efecto.\n\n**¿Qué efectos observables debe producir «Mail»?**\n- (A) «se envia un correo al cliente»\n- (B) Ninguno de esos efectos pertenece al escenario: sobran de la lectura\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 103 tests in 6.432s\n\nFAILED (failures=7)"
+        },
+        {
+          "requirement_id": "R-DIV-006",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 6415,
+          "output_tail": "## Divergencias duras · 1\n\nEstas lecturas no pueden ser todas correctas a la vez. Responde cada pregunta con su\nletra, corrige el delta con la respuesta y vuelve a ejecutar la divergencia.\n\n### Escenario: Mail\n\nEl lector A registra «se envia un correo al cliente» y ningún otro lector lo recoge. Se han comparado «effect» y «side_effects» juntos, así que no es una diferencia de dónde colocó cada lector el mismo efecto.\n\n**¿Qué efectos observables debe producir «Mail»?**\n- (A) «se envia un correo al cliente»\n- (B) Ninguno de esos efectos pertenece al escenario: sobran de la lectura\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 103 tests in 6.375s\n\nFAILED (failures=7)"
+        },
+        {
+          "requirement_id": "R-DIV-007",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 6484,
+          "output_tail": "## Divergencias duras · 1\n\nEstas lecturas no pueden ser todas correctas a la vez. Responde cada pregunta con su\nletra, corrige el delta con la respuesta y vuelve a ejecutar la divergencia.\n\n### Escenario: Mail\n\nEl lector A registra «se envia un correo al cliente» y ningún otro lector lo recoge. Se han comparado «effect» y «side_effects» juntos, así que no es una diferencia de dónde colocó cada lector el mismo efecto.\n\n**¿Qué efectos observables debe producir «Mail»?**\n- (A) «se envia un correo al cliente»\n- (B) Ninguno de esos efectos pertenece al escenario: sobran de la lectura\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 103 tests in 6.439s\n\nFAILED (failures=7)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 3,
+        "missing": 0,
+        "timeout": 0,
+        "total": 3
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-06T15:30:27Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-DIV-005",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 6968,
+          "output_tail": "  \"counts\": {\n    \"hard\": 0,\n    \"soft\": 0,\n    \"gaps\": 0,\n    \"scenarios\": 1,\n    \"readers\": 2\n  },\n  \"divergences\": [],\n  \"gaps\": [],\n  \"attacks\": [],\n  \"advocate\": \"absent\"\n}\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 105 tests in 6.920s\n\nFAILED (failures=1)"
+        },
+        {
+          "requirement_id": "R-DIV-006",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 7084,
+          "output_tail": "  \"counts\": {\n    \"hard\": 0,\n    \"soft\": 0,\n    \"gaps\": 0,\n    \"scenarios\": 1,\n    \"readers\": 2\n  },\n  \"divergences\": [],\n  \"gaps\": [],\n  \"attacks\": [],\n  \"advocate\": \"absent\"\n}\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 105 tests in 7.033s\n\nFAILED (failures=1)"
+        },
+        {
+          "requirement_id": "R-DIV-007",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 6567,
+          "output_tail": "  \"counts\": {\n    \"hard\": 0,\n    \"soft\": 0,\n    \"gaps\": 0,\n    \"scenarios\": 1,\n    \"readers\": 2\n  },\n  \"divergences\": [],\n  \"gaps\": [],\n  \"attacks\": [],\n  \"advocate\": \"absent\"\n}\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 105 tests in 6.518s\n\nFAILED (failures=1)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 3,
+        "missing": 0,
+        "timeout": 0,
+        "total": 3
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-06T15:31:13Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-DIV-005",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6608,
+          "output_tail": ".........................................................................................................\n----------------------------------------------------------------------\nRan 105 tests in 6.558s\n\nOK"
+        },
+        {
+          "requirement_id": "R-DIV-006",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6616,
+          "output_tail": ".........................................................................................................\n----------------------------------------------------------------------\nRan 105 tests in 6.565s\n\nOK"
+        },
+        {
+          "requirement_id": "R-DIV-007",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6637,
+          "output_tail": ".........................................................................................................\n----------------------------------------------------------------------\nRan 105 tests in 6.592s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 3,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 3
+      },
+      "all_green": true,
+      "all_red": false
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-06T15:31:51Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-DIV-005",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6586,
+          "output_tail": ".........................................................................................................\n----------------------------------------------------------------------\nRan 105 tests in 6.539s\n\nOK"
+        },
+        {
+          "requirement_id": "R-DIV-006",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6612,
+          "output_tail": ".........................................................................................................\n----------------------------------------------------------------------\nRan 105 tests in 6.563s\n\nOK"
+        },
+        {
+          "requirement_id": "R-DIV-007",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6822,
+          "output_tail": ".........................................................................................................\n----------------------------------------------------------------------\nRan 105 tests in 6.777s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 3,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 3
+      },
+      "all_green": true,
+      "all_red": false
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-06T15:42:02Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-DIV-005",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6602,
+          "output_tail": "..........................................................................................................\n----------------------------------------------------------------------\nRan 106 tests in 6.556s\n\nOK"
+        },
+        {
+          "requirement_id": "R-DIV-006",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6623,
+          "output_tail": "..........................................................................................................\n----------------------------------------------------------------------\nRan 106 tests in 6.577s\n\nOK"
+        },
+        {
+          "requirement_id": "R-DIV-007",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6564,
+          "output_tail": "..........................................................................................................\n----------------------------------------------------------------------\nRan 106 tests in 6.519s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 3,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 3
+      },
+      "all_green": true,
+      "all_red": false
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-06T15:46:56Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-DIV-005",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6840,
+          "output_tail": "............................................................................................................\n----------------------------------------------------------------------\nRan 108 tests in 6.794s\n\nOK"
+        },
+        {
+          "requirement_id": "R-DIV-006",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6648,
+          "output_tail": "............................................................................................................\n----------------------------------------------------------------------\nRan 108 tests in 6.601s\n\nOK"
+        },
+        {
+          "requirement_id": "R-DIV-007",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 6789,
+          "output_tail": "............................................................................................................\n----------------------------------------------------------------------\nRan 108 tests in 6.743s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 3,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 3
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

@@ -1,0 +1,382 @@
+[
+  {
+    "scenario": "No workflow directory for GitHub Actions",
+    "effect": "no existe .github/workflows/ en el repositorio",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The Forgejo workflow is the one on disk",
+    "effect": "existe .forgejo/workflows/ci.yml en la raíz",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The tests job runs the canonical suite command",
+    "effect": "el job tests termina en el comando canónico de la suite",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The self-spec job runs the validator in strict mode",
+    "effect": "el job self-spec incluye validate.py --strict --json",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The self-spec job runs the charter linter in strict mode",
+    "effect": "el job self-spec incluye charter_lint.py --strict --json",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The coverage job runs the coverage tool",
+    "effect": "el job coverage incluye tools/coverage.py",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The plugin-validate job validates the plugin structure",
+    "effect": "el job plugin-validate incluye claude plugin validate . --strict",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The workflow starts without anyone asking",
+    "effect": "el bloque on declara push, pull_request sobre main y workflow_dispatch",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Only two jobs carry a safety net",
+    "effect": "sólo coverage y plugin-validate llevan continue-on-error true",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No job is switched off",
+    "effect": "ningún job declara if salvo evals limitado a workflow_dispatch",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No job depends on the manual one",
+    "effect": "ningún job declara needs sobre evals",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No step is switched off by a condition",
+    "effect": "ningún paso de esos cuatro jobs declara if",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No step discards its own failure",
+    "effect": "ningún paso de los cinco jobs declara continue-on-error",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The evals job is manual",
+    "effect": "el job evals declara condición limitada a workflow_dispatch",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The evals job declares the API key",
+    "effect": "el job evals declara secrets.ANTHROPIC_API_KEY",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The API key never reaches the job that runs pull request code",
+    "effect": "la clave sólo aparece dentro del job evals, no a nivel de workflow",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Every job checks out the commit under test",
+    "effect": "cada uno de los cinco jobs declara un paso actions/checkout",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No command hides its own failure",
+    "effect": "ningún comando run de los cinco jobs contiene || ni if !",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No checkout pins a moving reference",
+    "effect": "ningún paso actions/checkout declara ref, toma el commit del run",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Checkout of a pinned Venoxia",
+    "effect": "el checkout de Venoxia usa ref de VENOXIA_REF y token de VENOXIA_TOKEN",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The pinned reference has no fallback",
+    "effect": "el ref del checkout de Venoxia no declara valor de reserva",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The pinned reference is a tag, not a branch",
+    "effect": "el ejemplo y la documentación piden un tag, no una rama",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An undefined reference fails the job",
+    "effect": "si el consumidor no define VENOXIA_REF, el job falla",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The failure names the missing variable",
+    "effect": "el mensaje de fallo nombra VENOXIA_REF",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The gate never falls back to the default branch",
+    "effect": "el paso de checkout de Venoxia no llega a ejecutarse",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The internal runner label",
+    "effect": "cada runs-on de la plantilla vale oa2p-debian",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The interpreter comes from the image",
+    "effect": "declara container con imagen python:3.14-slim, sin setup-python",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The two linters in strict mode",
+    "effect": "ejecuta charter_lint.py y validate.py, ambos con --strict",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No dependency installer",
+    "effect": "no aparece ningún pip install en la plantilla",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "One oracle invocation per gated change",
+    "effect": "invoca oracle.py --change id por cada change validated o verified",
+    "status_code": null,
+    "side_effects": [
+      "se ejecuta el test_command del proyecto consumidor"
+    ],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The oracle actually runs the tests",
+    "effect": "invoca el oráculo sin --dry-run, ejecutando el test_command de verdad",
+    "status_code": null,
+    "side_effects": [
+      "se ejecutan los tests reales del change"
+    ],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Changes in other states are left alone",
+    "effect": "changes en draft o specified no se invocan con el oráculo",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The state is read without regard to case or spacing",
+    "effect": "el paso trata Verified o validated con espacios como el estado nombrado",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A red oracle fails the job",
+    "effect": "si un oráculo no termina en verde, el job falla",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A missing project config fails the job",
+    "effect": "sin .venoxia/venoxia.json, el job falla y nombra el fichero",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unreadable change fails the job",
+    "effect": "change.json ilegible, inválido o sin state hace fallar el job nombrando el change",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A project with no active change passes",
+    "effect": "sin changes validated ni verified y todos legibles, el paso pasa sin fallo",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The oracle step runs without the checkout token",
+    "effect": "el entorno del paso del oráculo no contiene VENOXIA_TOKEN",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The token belongs to the checkout step alone",
+    "effect": "VENOXIA_TOKEN sólo aparece en el paso de checkout de Venoxia",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No checkout leaves a credential on disk",
+    "effect": "todos los pasos de checkout declaran persist-credentials false",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The gate runs on the events that gate a merge",
+    "effect": "el bloque on declara push y pull_request",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No job or step discards its own failure",
+    "effect": "no aparece continue-on-error en ningún job ni paso de la plantilla",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The section names the only workflow",
+    "effect": "la sección nombra .forgejo/workflows/ci.yml",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The section names the runner labels",
+    "effect": "la sección nombra oa2p-debian y oa2p-node",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The section names the consumer template",
+    "effect": "la sección nombra templates/ci/venoxia-gate.yml",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The section explains the manual evals",
+    "effect": "la sección nombra workflow_dispatch para evals",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The section no longer names a GitHub workflow",
+    "effect": "la sección no menciona .github/workflows/ci.yml",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

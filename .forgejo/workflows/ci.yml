@@ -1,13 +1,23 @@
 name: ci
 
-# El CI del propio plugin en Forgejo Actions: espejo de
-# .github/workflows/ci.yml sobre el forgejo-runner interno de la organización.
-# Mismos disparadores, mismos cinco jobs, mismos comandos; lo que cambia es lo
-# que ese runner impone: sólo las etiquetas «oa2p-debian» (Debian 13 slim) y
-# «oa2p-node» (Node 22), y como el host sólo tiene Python 3.14, cada entrada de
-# la matriz corre dentro de una imagen python:<versión>-slim. Ver
-# «## Verificar en CI» en README.md. tests/test_forgejo_workflow.py comprueba
-# que este fichero no se desvía del de GitHub.
+# El CI del propio plugin, y el único que tiene: el proyecto dejó de usar
+# GitHub en el change 2026-09-06-forgejo-only, así que no hay nada bajo
+# .github/. La tesis del README es que la spec «falla en CI cuando miente»;
+# este fichero es lo que la hace cumplible.
+#
+# Lo que el forgejo-runner interno impone: sólo las etiquetas «oa2p-debian»
+# (Debian 13 slim) y «oa2p-node» (Node 22), y como el host sólo tiene Python
+# 3.14, cada entrada de la matriz corre dentro de una imagen
+# python:<versión>-slim. Ver «## Verificar en CI» en README.md.
+#
+# tests/test_forgejo_workflow.py comprueba este fichero contra el contrato
+# entero (R-CI-008, R-CI-009, R-CI-011, R-CI-012), leyéndolo solo: antes se
+# medía contra el workflow de GitHub, y un espejo sin original no comprueba
+# nada.
+#
+# «github.event_name» en el «if» de evals no es una dependencia de GitHub: es
+# el nombre del contexto de expresión que Forgejo Actions implementa por
+# compatibilidad, y el que han usado los runs reales que sí han corrido.
 
 on:
   push:
@@ -63,8 +73,9 @@ jobs:
     runs-on: oa2p-debian
     container:
       image: docker.io/library/python:3.14-slim
-    # Mismo motivo que en GitHub: tools/coverage.py mide huecos ya
-    # documentados en TODO.md; continue-on-error evita un rojo permanente.
+    # tools/coverage.py mide contra umbrales por fichero: continue-on-error
+    # evita que un umbral que baje convierta el repo entero en rojo mientras
+    # se diagnostica. Ver «## Verificar en CI» en README.md.
     continue-on-error: true
     steps:
       - name: git y node para el checkout
@@ -102,6 +113,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Instalar el CLI de Claude Code
         run: npm install -g @anthropic-ai/claude-code
+      # La clave vive aquí y sólo aquí: en un «env» de nivel de workflow la
+      # heredaría «tests», que ejecuta el código de cada pull request.
       - name: claude plugin eval venoxia
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

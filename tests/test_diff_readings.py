@@ -7,6 +7,10 @@ comprueba que cada desacuerdo sale convertido en una **pregunta cerrada**.
 
 Todo se ejecuta por subproceso sobre un proyecto en un directorio temporal, salvo
 `normalize`/`similarity`, que se importan directamente porque son funciones puras.
+
+@covers R-DIV-005
+@covers R-DIV-006
+@covers R-DIV-007
 """
 
 from __future__ import annotations
@@ -539,8 +543,14 @@ class TestComparisonTable(DiffCase):
         self.assertEqual(divergence["hardness"], "hard")
         self.assertEqual(divergence["readings"], {"reader-a": "409", "reader-b": None})
 
-    def test_a_side_effects_set_difference_is_a_hard_divergence(self):
-        """Un efecto colateral que sólo ve un lector es divergencia dura."""
+    def test_a_side_effects_set_difference_is_a_soft_divergence(self):
+        """Un efecto colateral que sólo ve un lector, y nadie niega, es blando.
+
+        Antes esto era duro. Dejó de serlo con `R-DIV-005`: la categoría dura
+        afirma que las dos lecturas no pueden ser correctas a la vez, y eso no
+        es cierto de un lector que dedujo una consecuencia más del contexto sin
+        que el otro la contradiga.
+        """
         run = self.diff(
             {
                 "a": [reading("Stock available", "ok", "201", ["stock reservado", "evento emitido"])],
@@ -548,10 +558,9 @@ class TestComparisonTable(DiffCase):
             },
             "--json",
         )
-        self.assertEqual(run.returncode, 1, run.describe())
         divergence = run.json["divergences"][0]
         self.assertEqual(divergence["field"], "side_effects")
-        self.assertEqual(divergence["hardness"], "hard")
+        self.assertEqual(divergence["hardness"], "soft", run.describe())
 
     def test_the_same_side_effects_in_a_different_order_do_not_diverge(self):
         """`side_effects` es un conjunto, no una lista: el orden no es un desacuerdo."""
@@ -599,11 +608,14 @@ class TestComparisonTable(DiffCase):
         hard = [d for d in run.json["divergences"] if d["hardness"] == "hard"]
         self.assertEqual(hard, [], run.describe())
 
-    def test_an_effect_that_nobody_else_mentions_is_still_hard(self):
-        """Lo que un lector ve y el otro no ve en ningún campo sigue siendo divergencia dura.
+    def test_an_effect_that_nobody_else_mentions_is_reported_as_soft(self):
+        """Lo que un lector ve y el otro no ve en ningún campo se sigue denunciando.
 
         Es el contrapunto del test de arriba: aflojar el emparejamiento no puede
-        tragarse el caso que esta comparación existe para encontrar.
+        tragarse el caso que esta comparación existe para encontrar. Lo que
+        cambia con `R-DIV-005` es la **categoría**, no que se denuncie: nadie
+        niega el evento, así que la divergencia es blanda y sigue apareciendo
+        en el informe con su pregunta y sus opciones.
         """
         run = self.diff(
             {
@@ -619,12 +631,295 @@ class TestComparisonTable(DiffCase):
             },
             "--json",
         )
+        side = [d for d in run.json["divergences"] if d["field"] == "side_effects"]
+        self.assertEqual(len(side), 1, run.describe())
+        self.assertEqual(side[0]["hardness"], "soft", run.describe())
+        joined = " | ".join(side[0]["options"])
+        self.assertIn("evento emitido al bus", joined, run.describe())
+        self.assertNotIn("stock reservado", joined, run.describe())
+
+    def test_an_opposite_polarity_side_effect_is_hard(self):
+        """R-DIV-005 · La misma frase con la polaridad cambiada sí es contradicción.
+
+        «no se crea el presupuesto» y «se crea el presupuesto» hablan de lo
+        mismo y no pueden ser las dos verdad. Es lo que distingue contradecir
+        de añadir, y lo que la categoría dura tiene que seguir cazando.
+        """
+        run = self.diff(
+            {
+                "a": [reading("Budget", "procesa la solicitud", "200", ["no se crea el presupuesto"])],
+                "b": [reading("Budget", "procesa la solicitud", "200", ["se crea el presupuesto"])],
+            },
+            "--json",
+        )
         hard = [d for d in run.json["divergences"] if d["hardness"] == "hard"]
         self.assertEqual(len(hard), 1, run.describe())
         self.assertEqual(hard[0]["field"], "side_effects", run.describe())
-        joined = " | ".join(hard[0]["options"])
-        self.assertIn("evento emitido al bus", joined, run.describe())
-        self.assertNotIn("stock reservado", joined, run.describe())
+        self.assertEqual(run.returncode, 1, run.describe())
+
+    def test_a_different_number_in_a_side_effect_is_hard(self):
+        """R-DIV-005 · La misma frase con otra cifra es contradicción, no añadido."""
+        run = self.diff(
+            {
+                "a": [reading("Hold", "reserva el stock", "201", ["la reserva dura 15 minutos"])],
+                "b": [reading("Hold", "reserva el stock", "201", ["la reserva dura 30 minutos"])],
+            },
+            "--json",
+        )
+        hard = [d for d in run.json["divergences"] if d["hardness"] == "hard"]
+        self.assertEqual(len(hard), 1, run.describe())
+        self.assertEqual(hard[0]["field"], "side_effects", run.describe())
+
+    def test_a_scope_marker_difference_is_hard(self):
+        """R-DIV-005 · «completo» frente a «solo …» es una contradicción de alcance.
+
+        Es el caso del fixture `ambiguous-partial-effect`: ninguna de las dos
+        frases lleva negación ni cifra, y aun así no pueden ser las dos
+        ciertas. Sin esta señal la regla nueva convertiría el falso positivo en
+        un falso negativo.
+        """
+        run = self.diff(
+            {
+                "a": [reading("Partial", "reserva", "201", ["reserva creada para el pedido completo"])],
+                "b": [
+                    reading(
+                        "Partial",
+                        "reserva",
+                        "201",
+                        ["reserva creada solo para las unidades con stock"],
+                    )
+                ],
+            },
+            "--json",
+        )
+        hard = [d for d in run.json["divergences"] if d["hardness"] == "hard"]
+        self.assertEqual(len(hard), 1, run.describe())
+        self.assertEqual(hard[0]["field"], "side_effects", run.describe())
+
+    def test_a_detail_added_to_the_same_effect_is_not_a_contradiction(self):
+        """R-DIV-005 · El techo del detector: compartir palabras no es contradecir.
+
+        Ataque del abogado del diablo: un detector que declare contradicción en
+        cuanto dos efectos comparten palabras significativas cumpliría el
+        fixture y los escenarios de polaridad, y devolvería duras todas las
+        diferencias de detalle — reinstaurando el falso positivo que este
+        cambio existe para quitar.
+        """
+        run = self.diff(
+            {
+                "a": [reading("Hold", "reserva", "201", ["se reserva el stock y se anota la reserva"])],
+                "b": [reading("Hold", "reserva", "201", ["se reserva el stock"])],
+            },
+            "--json",
+        )
+        # El detalle de más queda **recogido** por la frase que lo agrupa, así
+        # que aquí ni siquiera hay divergencia: es el mejor resultado posible, y
+        # lo que el contrato prohíbe es que salga dura.
+        self.assertEqual(
+            [d for d in run.json["divergences"] if d["hardness"] == "hard"],
+            [],
+            run.describe(),
+        )
+        self.assertEqual(run.returncode, 0, run.describe())
+
+    def test_a_reinforced_negation_is_the_same_polarity(self):
+        """R-DIV-005 · Negar con dos partículas es negar lo mismo, no discrepar.
+
+        «no se crea ningún presupuesto» y «no crea presupuesto» dicen lo mismo:
+        la negación se mira como interruptor, no como conjunto de partículas, o
+        el refuerzo se convertiría en un desacuerdo inventado.
+        """
+        run = self.diff(
+            {
+                "a": [reading("Budget", "rechaza", "422", ["no se crea ningun presupuesto"])],
+                "b": [reading("Budget", "rechaza", "422", ["no crea presupuesto"])],
+            },
+            "--json",
+        )
+        self.assertEqual(
+            [d for d in run.json["divergences"] if d["hardness"] == "hard"],
+            [],
+            run.describe(),
+        )
+
+    def test_sin_as_a_preposition_is_not_a_negation(self):
+        """R-DIV-005 · «sin» introduce un complemento mucho más veces que niega.
+
+        Caso real, cazado al pasar el motor nuevo sobre el delta de
+        `2026-09-06-forgejo-only`: «el job termina en fallo sin llegar al
+        checkout» y «el job falla antes del checkout» dicen lo mismo, y la
+        primera versión de las marcas las declaraba incompatibles porque una
+        llevaba «sin». En prosa técnica española «sin tocar», «sin llegar a» y
+        «sin que» son preposición, no negación del predicado, y contarlas
+        reinstauraba el falso positivo justo donde este cambio lo quitaba.
+        """
+        run = self.diff(
+            {
+                "a": [
+                    reading(
+                        "Ref",
+                        "el job falla",
+                        None,
+                        ["el job falla antes del checkout"],
+                    )
+                ],
+                "b": [
+                    reading(
+                        "Ref",
+                        "el job falla",
+                        None,
+                        ["el job termina en fallo sin llegar al checkout"],
+                    )
+                ],
+            },
+            "--json",
+        )
+        self.assertEqual(
+            [d for d in run.json["divergences"] if d["hardness"] == "hard"],
+            [],
+            run.describe(),
+        )
+
+    def test_a_negation_inside_a_subordinate_clause_is_not_a_contradiction(self):
+        """R-DIV-005 · Una negación tras «que» califica la condición, no el efecto.
+
+        Segundo caso real cazado al pasar el motor nuevo sobre el delta de
+        `2026-09-06-forgejo-only`: un lector escribe el efecto a secas («el job
+        queda en fallo») y el otro se trae la condición dentro («un oráculo
+        **que no** termina en verde deja el job en fallo»). Dicen lo mismo, y
+        contar ese «no» como polaridad del efecto los declaraba incompatibles.
+        """
+        run = self.diff(
+            {
+                "a": [reading("Oracle", "el paso falla", None, ["el job del consumidor queda en fallo"])],
+                "b": [
+                    reading(
+                        "Oracle",
+                        "un oraculo que no termina en verde deja el job en fallo",
+                        None,
+                        [],
+                    )
+                ],
+            },
+            "--json",
+        )
+        self.assertEqual(
+            [d for d in run.json["divergences"] if d["hardness"] == "hard"],
+            [],
+            run.describe(),
+        )
+
+    def test_a_negation_that_opens_the_clause_still_contradicts(self):
+        """R-DIV-005 · La excepción es sólo para la subordinada, no para todo.
+
+        Sin este contrapunto, ignorar las negaciones tras «que» podría
+        extenderse hasta desactivar la señal entera.
+        """
+        run = self.diff(
+            {
+                "a": [reading("Budget", "procesa", "200", ["no se crea el presupuesto"])],
+                "b": [reading("Budget", "procesa", "200", ["se crea el presupuesto"])],
+            },
+            "--json",
+        )
+        hard = [d for d in run.json["divergences"] if d["hardness"] == "hard"]
+        self.assertEqual(len(hard), 1, run.describe())
+
+    def test_an_unrelated_added_side_effect_stays_soft(self):
+        """R-DIV-005 · Un efecto que no se parece a nada del otro repertorio sólo añade."""
+        run = self.diff(
+            {
+                "a": [reading("Mail", "responde al cliente", "200", ["se envia un correo al cliente"])],
+                "b": [reading("Mail", "responde al cliente", "200", [])],
+            },
+            "--json",
+        )
+        self.assertEqual(
+            [d["hardness"] for d in run.json["divergences"] if d["field"] == "side_effects"],
+            ["soft"],
+            run.describe(),
+        )
+
+    def test_a_granularity_difference_does_not_block_the_run(self):
+        """R-DIV-005 · El caso que bloqueaba `2026-09-04-oracle`, de punta a punta.
+
+        Los dos lectores dicen lo mismo con otras palabras y reparten distinto
+        entre `effect` y `side_effects`. Antes salía con código 1 y cuatro
+        rondas no lo arreglaban; ahora no hay ninguna dura y la ejecución no
+        falla.
+        """
+        run = self.diff(
+            {
+                "a": [
+                    reading(
+                        "Oracle",
+                        "invoca el oraculo por cada change",
+                        None,
+                        ["se ejecutan los tests reales del change"],
+                    )
+                ],
+                "b": [
+                    reading(
+                        "Oracle",
+                        "invoca el oraculo por cada change",
+                        None,
+                        ["ejecucion real del test command"],
+                    )
+                ],
+            },
+            "--json",
+        )
+        self.assertEqual(
+            [d for d in run.json["divergences"] if d["hardness"] == "hard"],
+            [],
+            run.describe(),
+        )
+        self.assertEqual(run.returncode, 0, run.describe())
+
+    def test_the_report_says_that_a_hard_one_contradicts(self):
+        """R-DIV-006 · Una dura de colaterales dice que el otro lector la contradice."""
+        run = self.diff(
+            {
+                "a": [reading("Budget", "procesa", "200", ["no se crea el presupuesto"])],
+                "b": [reading("Budget", "procesa", "200", ["se crea el presupuesto"])],
+            },
+        )
+        self.assertIn("lo contradice", run.stdout, run.describe())
+
+    def test_the_report_says_that_a_soft_one_only_adds(self):
+        """R-DIV-006 · Una blanda de colaterales dice que nadie la contradice."""
+        run = self.diff(
+            {
+                "a": [reading("Mail", "responde", "200", ["se envia un correo al cliente"])],
+                "b": [reading("Mail", "responde", "200", [])],
+            },
+        )
+        self.assertIn("nadie lo contradice", run.stdout, run.describe())
+
+    def test_the_known_hard_eval_fixture_keeps_its_hard_divergence(self):
+        """R-DIV-007 · `ambiguous-partial-effect` sigue dando su dura en side_effects.
+
+        Es el criterio de aceptación de `R-DIV-005`, no un efecto colateral: si
+        aflojar la regla se lleva por delante esta cifra, se ha cambiado el
+        falso positivo por un falso negativo y la regla está mal.
+        """
+        fixture = (
+            REPO_ROOT
+            / "evals"
+            / "ambiguous-partial-effect"
+            / "project"
+            / ".venoxia"
+            / "changes"
+            / "2026-08-31-partial-reservation"
+            / "readings"
+        )
+        self.assertTrue(fixture.is_dir(), f"falta el fixture «{fixture}»")
+        run = self.project.run(
+            DIFF_READINGS_PY, "--readings", str(fixture), "--json", "--no-color"
+        )
+        hard = [d for d in run.json["divergences"] if d["hardness"] == "hard"]
+        self.assertTrue(hard, run.describe())
+        self.assertIn("side_effects", [d["field"] for d in hard], run.describe())
 
     def test_an_effect_below_the_threshold_is_a_soft_divergence(self):
         """Dos lecturas que discrepan sin que ninguna pieza estructurada las separe: blanda."""

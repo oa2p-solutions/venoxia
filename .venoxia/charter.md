@@ -23,8 +23,8 @@ en CI cuando miente.
 | 2 | `charter-lint` | decidir si el acta del proyecto tiene sus cinco secciones y sus criterios de cierre | quien ejecuta `python3 scripts/charter_lint.py --root . --strict` sobre un acta sin `Done when` en alguna fila ve el proceso terminar con código 1 y el hallazgo `C07` en la salida | low |
 | 3 | `guardian` | impedir que se edite código de producción cuando no hay un change validado al lado | quien intenta un `Write` sobre código de producción sin un change `validated` con delta ve la edición denegada, con el comando exacto que la desbloquea | medium |
 | 4 | `divergence` | cotejar dos lecturas aisladas del mismo delta y convertir cada desacuerdo en una pregunta cerrada | quien ejecuta `python3 scripts/diff_readings.py` sobre dos lecturas con `status_code` distintos ve el proceso terminar con código 1 y la divergencia marcada como dura | medium |
-| 5 | `oracle` | traducir el resultado del `test_command` declarado en `venoxia.json` en verificado o no verificado | quien ejecuta `/venoxia:verify` sobre un change con oráculo ve el resultado del `test_command` convertido en verificado o no verificado, sin tener que leer la salida del test a mano | high |
-| 6 | `ci` | hacer que la especificación falle en CI cuando miente, en el plugin y en los proyectos que lo adoptan | quien empuja una spec con un `SHALL` ve el job `self-spec` en rojo con el hallazgo `V14` en el registro del run | medium |
+| 5 | `ci` | hacer que la especificación falle en CI cuando miente, en el plugin y en los proyectos que lo adoptan | quien empuja una spec con un `SHALL` ve el job `self-spec` en rojo con el hallazgo `V14` en el registro del run | medium |
+| 6 | `oracle` | traducir el resultado del `test_command` declarado en `venoxia.json` en verificado o no verificado | quien ejecuta `/venoxia:verify` sobre un change con oráculo ve el resultado del `test_command` convertido en verificado o no verificado, sin tener que leer la salida del test a mano | high |
 
 ## Out of scope
 
@@ -71,14 +71,14 @@ confidence: low
 
 ### B-003 · La matriz de Python pasa en los runners reales
 
-La capability `ci` declara en `.github/workflows/ci.yml` una matriz con
-Python 3.12, 3.13 y 3.14. Suponemos que la suite pasa en las tres sobre los
-runners de GitHub Actions: aquí sólo se ha comprobado con 3.13 y 3.14, y no
-se ha lanzado ningún run remoto todavía.
+La capability `ci` declara en `.forgejo/workflows/ci.yml` una matriz con
+Python 3.12, 3.13 y 3.14, cada entrada dentro de su imagen
+`python:<versión>-slim`. Suponemos que la suite pasa en las tres sobre el
+`forgejo-runner` interno: aquí sólo se ha comprobado con 3.13 y 3.14.
 
 confidence: low
-  why:      no hay Python 3.12 en esta máquina y no ha habido ningún run real de la matriz
-  revisit:  cuando exista el primer run real de la matriz en GitHub Actions
+  why:      no hay Python 3.12 en esta máquina y no se ha leído ningún run de la matriz entero en verde
+  revisit:  cuando un run de Forgejo deje los tres jobs de la matriz en verde
   fatal:    no
 
 ### B-004 · El CLI valida el plugin sin credenciales en un runner limpio

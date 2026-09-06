@@ -1,0 +1,9 @@
+{
+  "id": "2026-09-06-divergence-additive",
+  "state": "verified",
+  "via": "spec",
+  "capabilities": [
+    "divergence"
+  ],
+  "created": "2026-09-06T00:00:00Z"
+}

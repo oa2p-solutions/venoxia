@@ -1,6 +1,15 @@
-# ci Delta
+# Capability: ci
 
-## ADDED Requirements
+## Purpose
+
+Hacer cumplible la tesis del plugin —«la spec falla en CI cuando miente»—
+ejecutando en cada `push` la misma puerta que un desarrollador corre en
+local: la suite, el validador y el acta en estricto, la cobertura y la
+estructura del plugin. El CI del repositorio vive en Forgejo Actions sobre
+el runner interno de la organización; `templates/ci/venoxia-gate.yml` es la
+misma puerta empaquetada para un proyecto que adopta Venoxia.
+
+## Requirements
 
 ### R-CI-008 · The Forgejo workflow declares the same triggers and jobs on the internal runner
 
@@ -44,37 +53,6 @@ porque el host del runner sólo tiene Python 3.14 instalado.
 - **WHEN** se parsea el job `tests` de `.forgejo/workflows/ci.yml`
 - **THEN** el job declara `container` con la imagen
   `python:${{ matrix.python-version }}-slim`
-
-verifies:   tests/test_forgejo_workflow.py
-confidence: high
-from:       README.md#verificar-en-ci
-
-### R-CI-010 · The Forgejo workflow runs the same commands and safety nets as the GitHub one
-
-WHEN se parsean `.github/workflows/ci.yml` y `.forgejo/workflows/ci.yml`, el
-sistema DEBE tener, en cada job del workflow de Forgejo, todos los comandos
-`run:` del job homónimo del workflow de GitHub, DEBE declarar
-`continue-on-error: true` en `coverage` y en `plugin-validate`, y DEBE
-mantener el job `evals` limitado a `workflow_dispatch` con
-`secrets.ANTHROPIC_API_KEY`.
-
-#### Scenario: Same commands per job
-- **WHEN** se comparan los dos workflows job a job
-- **THEN** cada comando `run:` de un job de GitHub aparece en el job
-  homónimo de Forgejo
-
-#### Scenario: Same safety nets
-- **WHEN** se parsea `.forgejo/workflows/ci.yml`
-- **THEN** los jobs `coverage` y `plugin-validate` declaran
-  `continue-on-error: true`
-
-#### Scenario: evals only runs by hand
-- **WHEN** se parsea el job `evals` de `.forgejo/workflows/ci.yml`
-- **THEN** la condición del job es `github.event_name == 'workflow_dispatch'`
-
-#### Scenario: evals needs the API key
-- **WHEN** se parsea el job `evals` de `.forgejo/workflows/ci.yml`
-- **THEN** el job referencia `secrets.ANTHROPIC_API_KEY`
 
 verifies:   tests/test_forgejo_workflow.py
 confidence: high

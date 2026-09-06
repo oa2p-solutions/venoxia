@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "La prohibición es una lista cerrada (`||` y `if !`) y ningún escenario mira el código de salida real: un paso `run: |` con `set +e` delante, o con una segunda línea `exit 0` detrás de `python3 -m unittest discover -s tests -q` (uno de sus comandos sigue *terminando* en el comando canónico, no hay `if:` ni `continue-on-error`), cumple los quince escenarios y deja el job `tests` en verde con la suite en rojo.",
+    "requirement_id": "R-CI-012",
+    "severity": "high"
+  },
+  {
+    "attack": "El escenario «Changes in other states are left alone» obliga a no invocar el oráculo salvo en `validated`/`verified`, y sólo se exige fallar cuando el `change.json` es ilegible o no trae `state`: cambiar `\"state\": \"verified\"` por `\"specified\"` o `\"archived\"` —o borrar el directorio del change— hace que la puerta no ejecute ningún oráculo y termine en verde, de modo que una palabra en un fichero de metadatos desactiva exactamente la puerta que debía bloquear la fusión.",
+    "requirement_id": "R-CI-014",
+    "severity": "high"
+  },
+  {
+    "attack": "La plantilla fija el intérprete a un contenedor `python:3.14-slim` y prohíbe todo `pip install`, mientras R-CI-014 obliga a ejecutar de verdad (sin `--dry-run`) el `test_command` del consumidor: para cualquier proyecto consumidor cuya suite tenga una sola dependencia, el oráculo falla siempre por `ModuleNotFoundError`, la puerta queda permanentemente roja sin poder fusionar nada y la propia plantilla prohíbe el único remedio.",
+    "requirement_id": "R-CI-013",
+    "severity": "medium"
+  },
+  {
+    "attack": "El único control exigido sobre `VENOXIA_REF` es que no tenga valor de reserva y que el job falle cuando *no está definida*; una implementación que sólo comprueba que la variable no está vacía acepta `VENOXIA_REF=main`, y el consumidor queda anclado a la rama en movimiento de Venoxia —justo el fallo que el requisito dice querer evitar— porque el escenario del tag sólo obliga a que la documentación lo «pida y advierta», no a rechazarlo.",
+    "requirement_id": "R-CI-013",
+    "severity": "medium"
+  }
+]
