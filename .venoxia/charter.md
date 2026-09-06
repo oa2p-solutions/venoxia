@@ -74,11 +74,11 @@ confidence: low
 La capability `ci` declara en `.forgejo/workflows/ci.yml` una matriz con
 Python 3.12, 3.13 y 3.14, cada entrada dentro de su imagen
 `python:<versión>-slim`. Suponemos que la suite pasa en las tres sobre el
-`forgejo-runner` interno: aquí sólo se ha comprobado con 3.13 y 3.14.
+`el runner interno` interno: aquí sólo se ha comprobado con 3.13 y 3.14.
 
 confidence: low
   why:      no hay Python 3.12 en esta máquina y no se ha leído ningún run de la matriz entero en verde
-  revisit:  cuando un run de Forgejo deje los tres jobs de la matriz en verde
+  revisit:  cuando un run de la forja interna deje los tres jobs de la matriz en verde
   fatal:    no
 
 ### B-004 · El CLI valida el plugin sin credenciales en un runner limpio

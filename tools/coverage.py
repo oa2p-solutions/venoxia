@@ -84,6 +84,7 @@ import json
 import math
 import os
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -212,6 +213,13 @@ def run_suite_under_trace(out_dir: Path) -> int:
     de este entorno para todos los subprocesos que la suite lanza, así que
     también ellos pasan por `tools/trace_run.py`.
     """
+    # Desde cero, siempre. El fichero de cuentas es acumulativo: si sobrevive a
+    # una corrida anterior, sigue nombrando ficheros que quizá ya no existen
+    # —un test borrado desde entonces—, y `write_results` los intenta abrir uno
+    # por uno. Reutilizar `coverage/` convertía cada borrado en un fallo
+    # permanente que sólo se arreglaba a mano.
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     argv = [
         sys.executable,

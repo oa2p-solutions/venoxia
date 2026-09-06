@@ -1,0 +1,6 @@
+[{"scenario": "Triggers read from disk", "effect": "el workflow declara push y pull_request en main, y workflow_dispatch", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The five jobs by name", "effect": "el workflow declara los cinco jobs con esos nombres", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "No runner label is written down", "effect": "cada runs-on lee una variable, ninguno trae etiqueta escrita a mano", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The workflow is scanned like everything else", "effect": "el workflow de CI entra en el barrido de documentación publicada", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The workflow does not name the internal forge", "effect": "el nombre de la forja interna no aparece en ninguna capitalización", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The workflow does not name the internal runner labels", "effect": "ninguna de las dos etiquetas del runner interno aparece", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null}]

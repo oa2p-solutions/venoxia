@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "R-CI-008 exige que cada `runs-on` lea una variable del repositorio, pero nada obliga a que esa variable esté declarada ni a que el workflow falle de forma visible si está vacía, y sus tres escenarios sólo parsean el YAML. Un workflow con `runs-on: ${{ vars.RUNNER }}` sobre una variable inexistente deja los cinco jobs sin máquina (encolados para siempre o abortando en el arranque): la puerta de CI deja de ejecutarse en cada push y el test del requisito sigue verde porque nunca observa una ejecución real.",
+    "requirement_id": "R-CI-008",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-CI-018 sólo instrumenta la ausencia de tres literales (nombre de la forja y dos etiquetas de runner) en el texto del workflow; una implementación que borra esas tres cadenas y deja en un comentario `# runner interno del rack de la oficina, arm64, host 10.x.x.x, SSH 2222` pasa los tres escenarios y publica en un repositorio público exactamente el mapa de infraestructura que R-CI-008 dice querer ocultar.",
+    "requirement_id": "R-CI-018",
+    "severity": "medium"
+  },
+  {
+    "attack": "El barrido de R-CI-018 se limita a una lista cerrada de rutas publicadas (README, docs, skills, templates, scripts, hooks, .claude-plugin y el workflow) y deja fuera `tests/**` y `.venoxia/**`, que en un repositorio público se clonan igual; la implementación literal guarda los tres términos prohibidos en `tests/test_gate.py` —como el propio delta describe— y cualquiera que haga `git clone` sigue obteniendo el nombre de la forja interna, las dos etiquetas del runner y el espejo de respaldo. El requisito reubica la filtración en lugar de eliminarla, y una vez publicada es irreversible.",
+    "requirement_id": "R-CI-018",
+    "severity": "medium"
+  }
+]

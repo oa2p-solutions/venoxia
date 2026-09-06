@@ -14,7 +14,7 @@ informe los presenta como incompatibles.
 
 El coste es real y medido, no hipotético. `2026-09-04-oracle` lleva cuatro
 rondas sin converger y sigue en `specified` por esto: 6 duras, y ninguna es
-un desacuerdo de comportamiento. `2026-09-06-forgejo-only` reprodujo el
+un desacuerdo de comportamiento. `2026-09-06-single-ci` reprodujo el
 mismo patrón en sus rondas 3 y 4, con las lecturas en disco como segundo
 caso de prueba. Mientras la regla no distinga añadir de contradecir, el
 motor bloquea deltas correctos y enseña a desconfiar de su propia categoría
@@ -52,7 +52,7 @@ Ninguna.
   de este cambio, no un efecto colateral: `ambiguous-partial-effect` **debe
   seguir dando una dura en `side_effects`**, porque ahí el desacuerdo sí es
   una contradicción. Si esa cifra se mueve, la regla está mal.
-- `2026-09-04-oracle` y `2026-09-06-forgejo-only` quedan desbloqueados si su
+- `2026-09-04-oracle` y `2026-09-06-single-ci` quedan desbloqueados si su
   divergencia era sólo de granularidad; si alguna de sus duras era real,
   seguirá saliendo y eso también es información.
 - El esquema JSON versión 1 gana valores, no claves: `hardness` ya existe.

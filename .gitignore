@@ -7,3 +7,6 @@ evals/results/
 # Salida de tools/coverage.py: counts/ y los .cover de trace, regenerables.
 /coverage/
 
+
+# El cuaderno de taller: vive en la rama «taller» del espejo interno.
+/TODO.md

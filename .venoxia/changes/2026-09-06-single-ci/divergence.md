@@ -1,6 +1,6 @@
 # Informe de divergencia
 
-- **Lecturas:** `.venoxia/changes/2026-09-06-forgejo-only/readings`
+- **Lecturas:** `.venoxia/changes/2026-09-06-single-ci/readings`
 - **Lectores:** 2 (`reader-a`, `reader-b`)
 - **Escenarios comparados:** 47
 - **Umbral de similitud de `effect`:** 0.60
@@ -115,7 +115,7 @@ Implementaciones que cumplirían el delta al pie de la letra y aun así serían 
 ## Escenarios que convergen · 37
 
 - No workflow directory for GitHub Actions
-- The Forgejo workflow is the one on disk
+- The la forja interna workflow is the one on disk
 - The tests job runs the canonical suite command
 - The self-spec job runs the validator in strict mode
 - The self-spec job runs the charter linter in strict mode

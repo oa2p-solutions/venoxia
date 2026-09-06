@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "change": "2026-09-06-single-ci",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-06T15:50:27Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-011",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 41,
+          "output_tail": "        ^^^^^^^\n        [],\n        ^^^\n        f\"quedan ficheros de workflow bajo «.github/»: {', '.join(strays)}\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: Lists differ: ['.github/workflows/ci.yml'] != []\n\nFirst list contains 1 additional elements.\nFirst extra element 0:\n'.github/workflows/ci.yml'\n\n- ['.github/workflows/ci.yml']\n+ [] : quedan ficheros de workflow bajo «.github/»: .github/workflows/ci.yml\n\n----------------------------------------------------------------------\nRan 16 tests in 0.003s\n\nFAILED (failures=2)"
+        },
+        {
+          "requirement_id": "R-CI-012",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 41,
+          "output_tail": "        ^^^^^^^\n        [],\n        ^^^\n        f\"quedan ficheros de workflow bajo «.github/»: {', '.join(strays)}\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: Lists differ: ['.github/workflows/ci.yml'] != []\n\nFirst list contains 1 additional elements.\nFirst extra element 0:\n'.github/workflows/ci.yml'\n\n- ['.github/workflows/ci.yml']\n+ [] : quedan ficheros de workflow bajo «.github/»: .github/workflows/ci.yml\n\n----------------------------------------------------------------------\nRan 16 tests in 0.003s\n\nFAILED (failures=2)"
+        },
+        {
+          "requirement_id": "R-CI-013",
+          "verifies": [
+            "tests/test_ci_template.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 38,
+          "output_tail": "FAIL: test_section_no_longer_names_a_github_workflow (tests.test_ci_template.ReadmeDescribesOneCiTest.test_section_no_longer_names_a_github_workflow)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_template.py\", line 200, in test_section_no_longer_names_a_github_workflow\n    self.assertNotIn(\n    ~~~~~~~~~~~~~~~~^\n        \".github/workflows/ci.yml\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        _readme_ci_section(),\n        ^^^^^^^^^^^^^^^^^^^^^\n        \"la sección sigue nombrando el workflow de GitHub, que ya no existe\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: '.github/workflows/ci.yml' unexpectedly found in \"\\nLa tesis del plugin es que la spec «falla en CI cuando miente». Esto es lo que la hace cumplible, en dos workflows con responsabilidades distintas.\\n\\n**[`.github/workflows/ci.yml`](.github/workflows/ci.yml) es el CI de este repositorio.** Se dispara en `push` y `pull_request` sobre `main`, y también a mano con `workflow_dispatch`. Cinco jobs:\\n\\n- `tests`: `python3 -m unittest discover -s tests -q` en una matriz de Python 3.12, 3.13 y 3.14.\\n- `self-spec`: `python3 scripts/validate.py --root . --strict --json` y `python3 scripts/charter_lint.py --root . --strict --json` — el propio repo obedece su propio contrato, o el job falla.\\n- `coverage`: `python3 tools/coverage.py` (véase «Verificar regresiones»). Se marca `continue-on-error` porque hoy mide dos huecos ya documentados en `TODO.md` (`guardian.py` al 0 % por el `os._exit` de su fail-open; `oracle.py` al 81,3 %, por debajo del suelo del núcleo): son huecos conocidos, no algo que este workflow deba convertir en un rojo permanente del repo entero.\\n- `plugin-validate`: instala el CLI de Claude Code con `npm install -g @anthropic-ai/claude-code` y corre `claude plugin validate . --strict`. Se marca `continue-on-error` porque no se ha podido confirmar, sin un run real en un runner limpio de GitHub Actions, si ese comando exige credenciales fuera de una sesión ya autenticada.\\n- `evals`: **sólo** con `workflow_dispatch`, nunca en `push` ni en `pull_request`. Corre `claude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *)' Write Read Glob Grep` con `secrets.ANTHROPIC_API_KEY`. Es manual a propósito: usa un LLM de verdad y cuesta tokens en cada corrida, así que dispararlo en cada commit sería pagar por una comprobación que nadie pidió ver ahora mismo.\\n\\n**[`.forgejo/workflows/ci.yml`](.forgejo/workflows/ci.yml) es el mismo CI sobre la forja interna de la organización.** Mismos disparadores, mismos cinco jobs y los mismos comandos `run:` job a job; `tests/test_ci_workflow.py` falla si los dos ficheros se desvían. Lo que cambia es lo que el `el runner interno` de `oa2p-server` impone: los jobs corren sólo sobre sus dos etiquetas, `CI_RUNNER` (Debian 13 slim) y `CI_RUNNER_NODE` (Node 22), y como el host sólo tiene Python 3.14, cada entrada de la matriz de `tests` corre dentro de la imagen `python:<versión>-slim` en vez de usar `actions/setup-python`. Las imágenes `slim` no traen `git` ni `node`, y `actions/checkout` necesita los dos (es una acción JavaScript y el runner no inyecta `node` en el contenedor), así que esos jobs los instalan con `apt-get` antes del checkout. Y como el contenedor corre como root, para quien no existen los ficheros sin permiso de lectura, `tests` y `coverage` crean un usuario sin privilegios y corren la suite con él: como root se saltaban 15 tests y `guardian.py` bajaba del umbral.\\n\\n**[`templates/ci/venoxia-gate.yml`](templates/ci/venoxia-gate.yml) es la plantilla para un proyecto que adopta Venoxia.** No se ejecuta en este repo: se copia al proyecto consumidor. Hace checkout del proyecto y, en un directorio auxiliar, checkout de `oa2p-solutions/venoxia` fijado a un tag (`VENOXIA_REF`, nunca una rama en movimiento) con `secrets.VENOXIA_TOKEN` porque el repositorio es privado. Corre `charter_lint.py --strict` y `validate.py --strict` sobre el proyecto, sin `pip` en ningún paso — el mismo criterio de cero dependencias que el resto de Venoxia. Si el proyecto declara `.venoxia/venoxia.json`, además ejecuta `oracle.py --change <id>` por cada change en `validated` o `verified`, y cualquier código de salida distinto de `0` hace fallar el job: un change que dice `verified` con su oráculo caído en CI es exactamente la mentira que el guardián no puede ver desde el editor de nadie.\\n\\nDos partes de este contrato sólo las puede confirmar un run real en GitHub Actions, no la suite local: que la matriz de `tests` pasa de verdad en las tres versiones de Python, y que un `SHALL` introducido a propósito en un requisito hace fallar `self-spec` por `V14`. La segunda se probó una vez en su forma local equivalente (`validate.py --strict` sobre una copia con el `SHALL`, revertida después) y confirmó que `V14` dispara.\\n\\n\" : la sección sigue nombrando el workflow de GitHub, que ya no existe\n\n----------------------------------------------------------------------\nRan 14 tests in 0.002s\n\nFAILED (failures=5)"
+        },
+        {
+          "requirement_id": "R-CI-014",
+          "verifies": [
+            "tests/test_ci_template.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 39,
+          "output_tail": "FAIL: test_section_no_longer_names_a_github_workflow (tests.test_ci_template.ReadmeDescribesOneCiTest.test_section_no_longer_names_a_github_workflow)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_template.py\", line 200, in test_section_no_longer_names_a_github_workflow\n    self.assertNotIn(\n    ~~~~~~~~~~~~~~~~^\n        \".github/workflows/ci.yml\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        _readme_ci_section(),\n        ^^^^^^^^^^^^^^^^^^^^^\n        \"la sección sigue nombrando el workflow de GitHub, que ya no existe\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: '.github/workflows/ci.yml' unexpectedly found in \"\\nLa tesis del plugin es que la spec «falla en CI cuando miente». Esto es lo que la hace cumplible, en dos workflows con responsabilidades distintas.\\n\\n**[`.github/workflows/ci.yml`](.github/workflows/ci.yml) es el CI de este repositorio.** Se dispara en `push` y `pull_request` sobre `main`, y también a mano con `workflow_dispatch`. Cinco jobs:\\n\\n- `tests`: `python3 -m unittest discover -s tests -q` en una matriz de Python 3.12, 3.13 y 3.14.\\n- `self-spec`: `python3 scripts/validate.py --root . --strict --json` y `python3 scripts/charter_lint.py --root . --strict --json` — el propio repo obedece su propio contrato, o el job falla.\\n- `coverage`: `python3 tools/coverage.py` (véase «Verificar regresiones»). Se marca `continue-on-error` porque hoy mide dos huecos ya documentados en `TODO.md` (`guardian.py` al 0 % por el `os._exit` de su fail-open; `oracle.py` al 81,3 %, por debajo del suelo del núcleo): son huecos conocidos, no algo que este workflow deba convertir en un rojo permanente del repo entero.\\n- `plugin-validate`: instala el CLI de Claude Code con `npm install -g @anthropic-ai/claude-code` y corre `claude plugin validate . --strict`. Se marca `continue-on-error` porque no se ha podido confirmar, sin un run real en un runner limpio de GitHub Actions, si ese comando exige credenciales fuera de una sesión ya autenticada.\\n- `evals`: **sólo** con `workflow_dispatch`, nunca en `push` ni en `pull_request`. Corre `claude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *)' Write Read Glob Grep` con `secrets.ANTHROPIC_API_KEY`. Es manual a propósito: usa un LLM de verdad y cuesta tokens en cada corrida, así que dispararlo en cada commit sería pagar por una comprobación que nadie pidió ver ahora mismo.\\n\\n**[`.forgejo/workflows/ci.yml`](.forgejo/workflows/ci.yml) es el mismo CI sobre la forja interna de la organización.** Mismos disparadores, mismos cinco jobs y los mismos comandos `run:` job a job; `tests/test_ci_workflow.py` falla si los dos ficheros se desvían. Lo que cambia es lo que el `el runner interno` de `oa2p-server` impone: los jobs corren sólo sobre sus dos etiquetas, `CI_RUNNER` (Debian 13 slim) y `CI_RUNNER_NODE` (Node 22), y como el host sólo tiene Python 3.14, cada entrada de la matriz de `tests` corre dentro de la imagen `python:<versión>-slim` en vez de usar `actions/setup-python`. Las imágenes `slim` no traen `git` ni `node`, y `actions/checkout` necesita los dos (es una acción JavaScript y el runner no inyecta `node` en el contenedor), así que esos jobs los instalan con `apt-get` antes del checkout. Y como el contenedor corre como root, para quien no existen los ficheros sin permiso de lectura, `tests` y `coverage` crean un usuario sin privilegios y corren la suite con él: como root se saltaban 15 tests y `guardian.py` bajaba del umbral.\\n\\n**[`templates/ci/venoxia-gate.yml`](templates/ci/venoxia-gate.yml) es la plantilla para un proyecto que adopta Venoxia.** No se ejecuta en este repo: se copia al proyecto consumidor. Hace checkout del proyecto y, en un directorio auxiliar, checkout de `oa2p-solutions/venoxia` fijado a un tag (`VENOXIA_REF`, nunca una rama en movimiento) con `secrets.VENOXIA_TOKEN` porque el repositorio es privado. Corre `charter_lint.py --strict` y `validate.py --strict` sobre el proyecto, sin `pip` en ningún paso — el mismo criterio de cero dependencias que el resto de Venoxia. Si el proyecto declara `.venoxia/venoxia.json`, además ejecuta `oracle.py --change <id>` por cada change en `validated` o `verified`, y cualquier código de salida distinto de `0` hace fallar el job: un change que dice `verified` con su oráculo caído en CI es exactamente la mentira que el guardián no puede ver desde el editor de nadie.\\n\\nDos partes de este contrato sólo las puede confirmar un run real en GitHub Actions, no la suite local: que la matriz de `tests` pasa de verdad en las tres versiones de Python, y que un `SHALL` introducido a propósito en un requisito hace fallar `self-spec` por `V14`. La segunda se probó una vez en su forma local equivalente (`validate.py --strict` sobre una copia con el `SHALL`, revertida después) y confirmó que `V14` dispara.\\n\\n\" : la sección sigue nombrando el workflow de GitHub, que ya no existe\n\n----------------------------------------------------------------------\nRan 14 tests in 0.002s\n\nFAILED (failures=5)"
+        },
+        {
+          "requirement_id": "R-CI-015",
+          "verifies": [
+            "tests/test_ci_template.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 38,
+          "output_tail": "FAIL: test_section_no_longer_names_a_github_workflow (tests.test_ci_template.ReadmeDescribesOneCiTest.test_section_no_longer_names_a_github_workflow)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_template.py\", line 200, in test_section_no_longer_names_a_github_workflow\n    self.assertNotIn(\n    ~~~~~~~~~~~~~~~~^\n        \".github/workflows/ci.yml\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        _readme_ci_section(),\n        ^^^^^^^^^^^^^^^^^^^^^\n        \"la sección sigue nombrando el workflow de GitHub, que ya no existe\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: '.github/workflows/ci.yml' unexpectedly found in \"\\nLa tesis del plugin es que la spec «falla en CI cuando miente». Esto es lo que la hace cumplible, en dos workflows con responsabilidades distintas.\\n\\n**[`.github/workflows/ci.yml`](.github/workflows/ci.yml) es el CI de este repositorio.** Se dispara en `push` y `pull_request` sobre `main`, y también a mano con `workflow_dispatch`. Cinco jobs:\\n\\n- `tests`: `python3 -m unittest discover -s tests -q` en una matriz de Python 3.12, 3.13 y 3.14.\\n- `self-spec`: `python3 scripts/validate.py --root . --strict --json` y `python3 scripts/charter_lint.py --root . --strict --json` — el propio repo obedece su propio contrato, o el job falla.\\n- `coverage`: `python3 tools/coverage.py` (véase «Verificar regresiones»). Se marca `continue-on-error` porque hoy mide dos huecos ya documentados en `TODO.md` (`guardian.py` al 0 % por el `os._exit` de su fail-open; `oracle.py` al 81,3 %, por debajo del suelo del núcleo): son huecos conocidos, no algo que este workflow deba convertir en un rojo permanente del repo entero.\\n- `plugin-validate`: instala el CLI de Claude Code con `npm install -g @anthropic-ai/claude-code` y corre `claude plugin validate . --strict`. Se marca `continue-on-error` porque no se ha podido confirmar, sin un run real en un runner limpio de GitHub Actions, si ese comando exige credenciales fuera de una sesión ya autenticada.\\n- `evals`: **sólo** con `workflow_dispatch`, nunca en `push` ni en `pull_request`. Corre `claude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *)' Write Read Glob Grep` con `secrets.ANTHROPIC_API_KEY`. Es manual a propósito: usa un LLM de verdad y cuesta tokens en cada corrida, así que dispararlo en cada commit sería pagar por una comprobación que nadie pidió ver ahora mismo.\\n\\n**[`.forgejo/workflows/ci.yml`](.forgejo/workflows/ci.yml) es el mismo CI sobre la forja interna de la organización.** Mismos disparadores, mismos cinco jobs y los mismos comandos `run:` job a job; `tests/test_ci_workflow.py` falla si los dos ficheros se desvían. Lo que cambia es lo que el `el runner interno` de `oa2p-server` impone: los jobs corren sólo sobre sus dos etiquetas, `CI_RUNNER` (Debian 13 slim) y `CI_RUNNER_NODE` (Node 22), y como el host sólo tiene Python 3.14, cada entrada de la matriz de `tests` corre dentro de la imagen `python:<versión>-slim` en vez de usar `actions/setup-python`. Las imágenes `slim` no traen `git` ni `node`, y `actions/checkout` necesita los dos (es una acción JavaScript y el runner no inyecta `node` en el contenedor), así que esos jobs los instalan con `apt-get` antes del checkout. Y como el contenedor corre como root, para quien no existen los ficheros sin permiso de lectura, `tests` y `coverage` crean un usuario sin privilegios y corren la suite con él: como root se saltaban 15 tests y `guardian.py` bajaba del umbral.\\n\\n**[`templates/ci/venoxia-gate.yml`](templates/ci/venoxia-gate.yml) es la plantilla para un proyecto que adopta Venoxia.** No se ejecuta en este repo: se copia al proyecto consumidor. Hace checkout del proyecto y, en un directorio auxiliar, checkout de `oa2p-solutions/venoxia` fijado a un tag (`VENOXIA_REF`, nunca una rama en movimiento) con `secrets.VENOXIA_TOKEN` porque el repositorio es privado. Corre `charter_lint.py --strict` y `validate.py --strict` sobre el proyecto, sin `pip` en ningún paso — el mismo criterio de cero dependencias que el resto de Venoxia. Si el proyecto declara `.venoxia/venoxia.json`, además ejecuta `oracle.py --change <id>` por cada change en `validated` o `verified`, y cualquier código de salida distinto de `0` hace fallar el job: un change que dice `verified` con su oráculo caído en CI es exactamente la mentira que el guardián no puede ver desde el editor de nadie.\\n\\nDos partes de este contrato sólo las puede confirmar un run real en GitHub Actions, no la suite local: que la matriz de `tests` pasa de verdad en las tres versiones de Python, y que un `SHALL` introducido a propósito en un requisito hace fallar `self-spec` por `V14`. La segunda se probó una vez en su forma local equivalente (`validate.py --strict` sobre una copia con el `SHALL`, revertida después) y confirmó que `V14` dispara.\\n\\n\" : la sección sigue nombrando el workflow de GitHub, que ya no existe\n\n----------------------------------------------------------------------\nRan 14 tests in 0.003s\n\nFAILED (failures=5)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 5,
+        "missing": 0,
+        "timeout": 0,
+        "total": 5
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-06T15:54:14Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-011",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 44,
+          "output_tail": "......................\n----------------------------------------------------------------------\nRan 22 tests in 0.003s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-012",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 38,
+          "output_tail": "......................\n----------------------------------------------------------------------\nRan 22 tests in 0.002s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-013",
+          "verifies": [
+            "tests/test_ci_template.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 38,
+          "output_tail": ".........................\n----------------------------------------------------------------------\nRan 25 tests in 0.002s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-014",
+          "verifies": [
+            "tests/test_ci_template.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 38,
+          "output_tail": ".........................\n----------------------------------------------------------------------\nRan 25 tests in 0.002s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-015",
+          "verifies": [
+            "tests/test_ci_template.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 38,
+          "output_tail": ".........................\n----------------------------------------------------------------------\nRan 25 tests in 0.003s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 5,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 5
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

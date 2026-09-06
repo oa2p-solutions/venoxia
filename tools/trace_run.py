@@ -131,7 +131,7 @@ class _IgnoreByPath:
     ejecuta decide por los demás: si es uno de la stdlib (bajo `sys.prefix`,
     ignorado), `scripts/venoxia/__init__.py` queda ignorado también y su
     `.cover` no se escribe nunca. Es lo que pasó en el primer run real de
-    `coverage` en Forgejo («SIN DATOS (FALLA)» para ese fichero).
+    `coverage` en CI («SIN DATOS (FALLA)» para ese fichero).
 
     Además compara contra la ruta real de cada prefijo: con un `sys.prefix`
     que es un symlink (Python de Homebrew en macOS), `co_filename` trae la
@@ -186,7 +186,18 @@ def _run_traced(
         if dumped:
             return
         dumped = True
-        tracer.results().write_results(show_missing=True, coverdir=str(trace_dir))
+        try:
+            tracer.results().write_results(show_missing=True, coverdir=str(trace_dir))
+        except Exception as error:  # noqa: BLE001 — ver el comentario
+            # La instrumentación no puede cambiar el veredicto del programa
+            # medido. `write_results` recorre las cuentas acumuladas y abre cada
+            # fichero fuente para escribir su `.cover`; si uno de ellos ya no
+            # existe —un test borrado desde la corrida anterior— revienta con
+            # `FileNotFoundError`, y sin este `except` esa excepción se
+            # convertiría en el código de salida del envoltorio. Eso es
+            # exactamente lo que este fichero existe para no hacer: preservar
+            # el código real del objetivo.
+            print(f"trace_run: no se pudieron volcar las cuentas: {error}", file=sys.stderr)
 
     real_exit = os._exit
 

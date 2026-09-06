@@ -140,8 +140,8 @@
 {"ts": "2026-09-05T16:02:57Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}
 {"ts": "2026-09-05T16:02:59Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}
 {"ts": "2026-09-05T16:07:15Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "TODO.md"}
-{"ts": "2026-09-05T16:52:38Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "tests/test_forgejo_workflow.py"}
-{"ts": "2026-09-05T16:53:23Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "tests/test_forgejo_workflow.py"}
+{"ts": "2026-09-05T16:52:38Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "tests/test_ci_workflow.py"}
+{"ts": "2026-09-05T16:53:23Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "tests/test_ci_workflow.py"}
 {"ts": "2026-09-05T17:03:56Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".forgejo/workflows/ci.yml"}
 {"ts": "2026-09-05T17:03:58Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".forgejo/workflows/ci.yml"}
 {"ts": "2026-09-05T17:04:00Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
@@ -149,11 +149,11 @@
 {"ts": "2026-09-05T17:38:43Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tools/trace_run.py"}
 {"ts": "2026-09-05T17:39:42Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".forgejo/workflows/ci.yml"}
 {"ts": "2026-09-05T17:39:46Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".forgejo/workflows/ci.yml"}
-{"ts": "2026-09-05T17:39:50Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_forgejo_workflow.py"}
+{"ts": "2026-09-05T17:39:50Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "tests/test_ci_workflow.py"}
 {"ts": "2026-09-05T17:39:52Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": "README.md"}
 {"ts": "2026-09-06T14:48:01Z", "change": "2026-09-04-adopt-venoxia", "tool": "Write", "path": "tests/test_ci_workflow.py"}
-{"ts": "2026-09-06T14:55:07Z", "change": "2026-09-06-forgejo-only", "tool": "Write", "path": "tests/test_ci_template.py"}
-{"ts": "2026-09-06T14:56:01Z", "change": "2026-09-06-forgejo-only", "tool": "Write", "path": "tests/test_forgejo_workflow.py"}
+{"ts": "2026-09-06T14:55:07Z", "change": "2026-09-06-single-ci", "tool": "Write", "path": "tests/test_ci_template.py"}
+{"ts": "2026-09-06T14:56:01Z", "change": "2026-09-06-single-ci", "tool": "Write", "path": "tests/test_ci_workflow.py"}
 {"ts": "2026-09-06T15:19:19Z", "change": "2026-09-06-divergence-additive", "tool": "Edit", "path": "tests/test_diff_readings.py"}
 {"ts": "2026-09-06T15:19:29Z", "change": "2026-09-06-divergence-additive", "tool": "Edit", "path": "tests/test_diff_readings.py"}
 {"ts": "2026-09-06T15:19:53Z", "change": "2026-09-06-divergence-additive", "tool": "Edit", "path": "tests/test_diff_readings.py"}

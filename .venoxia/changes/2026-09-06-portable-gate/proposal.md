@@ -6,7 +6,7 @@ El repositorio es público desde hoy, y con él salió a la calle
 `templates/ci/venoxia-gate.yml`. Ese fichero tiene dos problemas que resultan
 ser el mismo.
 
-El primero es de exposición: pide `runs-on: oa2p-debian` y hace checkout de
+El primero es de exposición: pide `runs-on: CI_RUNNER` y hace checkout de
 `OA2P/venoxia` con un token privado. Cómo se ejecutan el respaldo y las
 pruebas internas de la organización no es de interés público, y ahí estaba
 escrito.

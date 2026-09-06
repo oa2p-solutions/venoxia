@@ -103,14 +103,23 @@ def repository_files() -> list[Path]:
     return salida
 
 
+#: El workflow de CI. Entra en el barrido publicado desde que sus `runs-on`
+#: leen una variable del repositorio: hasta entonces quedaba fuera con un
+#: argumento que era cierto —un workflow **tiene** que decir en qué runner
+#: corre—, y desde que lo dice sin escribir la etiqueta la excepción ya no se
+#: sostiene.
+CI_WORKFLOW = REPO_ROOT / ".forgejo" / "workflows" / "ci.yml"
+
+
 def published_docs() -> list[Path]:
     """Lo que el plugin publica a quien lo instala.
 
     Acotar la prohibición a `README.md` la esquiva quien mueve el párrafo a una
-    skill. El repositorio entero tampoco vale: el CI de verdad **tiene** que
-    nombrar sus etiquetas de runner, o no arranca.
+    skill. El repositorio entero tampoco vale: lo que queda fuera es
+    `.venoxia/`, que registra cómo se construye Venoxia y no lo que Venoxia
+    hace.
     """
-    paths = [README_PATH, REPO_ROOT / "CONTRIBUTING.md"]
+    paths = [README_PATH, REPO_ROOT / "CONTRIBUTING.md", CI_WORKFLOW]
     paths += sorted((REPO_ROOT / "docs").rglob("*"))
     paths += sorted((REPO_ROOT / "skills").rglob("*"))
     paths += sorted((REPO_ROOT / "agents").rglob("*"))
@@ -812,6 +821,39 @@ class PublishedDocsTest(unittest.TestCase):
                         "ejecutan el respaldo y las pruebas internas de la "
                         "organización no le sirve a quien instala el plugin",
                     )
+
+    def test_the_workflow_is_scanned_like_everything_else(self):
+        """El barrido mide el workflow como a cualquier otro fichero publicado.
+
+        Sin esto, los dos tests de abajo pasarían por vacuidad el día que
+        alguien quite el workflow de la lista: no fallarían, simplemente
+        dejarían de mirar."""
+        self.assertIn(
+            CI_WORKFLOW,
+            published_docs(),
+            "el workflow de CI no entra en el barrido de documentación publicada",
+        )
+
+    def test_the_workflow_does_not_name_the_internal_forge(self):
+        texto = CI_WORKFLOW.read_text(encoding="utf-8").lower()
+        self.assertNotIn(
+            "forgejo",
+            texto,
+            "el workflow nombra la forja interna; los comentarios cuentan, que "
+            "son lo primero que lee quien lo abre",
+        )
+
+    def test_the_workflow_does_not_name_the_internal_runner_labels(self):
+        texto = CI_WORKFLOW.read_text(encoding="utf-8").lower()
+        for etiqueta in ("oa2p-debian", "oa2p-node"):
+            with self.subTest(etiqueta=etiqueta):
+                self.assertNotIn(
+                    etiqueta,
+                    texto,
+                    f"el workflow escribe la etiqueta «{etiqueta}»: el repositorio "
+                    "es público y publicarla es publicar el mapa de una "
+                    "infraestructura que no es de quien lo clona",
+                )
 
     def test_the_published_docs_do_not_describe_a_backup_mirror(self):
         for path in published_docs():

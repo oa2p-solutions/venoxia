@@ -1,6 +1,6 @@
 # Informe de divergencia
 
-- **Lecturas:** `.venoxia/changes/2026-09-05-forgejo-ci/readings`
+- **Lecturas:** `.venoxia/changes/2026-09-05-internal-ci/readings`
 - **Lectores:** 2 (`reader-a`, `reader-b`)
 - **Escenarios comparados:** 9
 - **Umbral de similitud de `effect`:** 0.60
@@ -28,8 +28,8 @@ El lector A describe el efecto como «el job evals sólo corre por workflow_disp
 
 Implementaciones que cumplirían el delta al pie de la letra y aun así serían inaceptables.
 
-- **[high]** R-CI-010 — El requisito sólo obliga a que cada comando `run:` de GitHub «aparezca» en el job homónimo de Forgejo y sólo exige `continue-on-error: true` en `coverage` y `plugin-validate`; nada prohíbe declararlo también en `tests` y `self-spec` (o poner `if: false` en sus steps). Un workflow así pasa los cuatro escenarios —que sólo parsean el YAML— y deja el CI interno en verde permanente aunque la suite y el validador estén en rojo, que es exactamente lo contrario de la puerta que este change pretende montar.
-- **[medium]** R-CI-010 — La paridad se define únicamente sobre los comandos `run:`, así que el workflow de Forgejo puede omitir los pasos `uses:` del de GitHub, empezando por `actions/checkout`, y seguir cumpliendo «cada comando `run:` aparece en el job homónimo». Sobre el runner interno, cuyo workspace persiste entre ejecuciones, la suite se ejecutaría sobre el árbol que dejó el run anterior: el workflow reporta verde para un commit cuyo código nunca se ha traído ni probado.
+- **[high]** R-CI-010 — El requisito sólo obliga a que cada comando `run:` de GitHub «aparezca» en el job homónimo de la forja interna y sólo exige `continue-on-error: true` en `coverage` y `plugin-validate`; nada prohíbe declararlo también en `tests` y `self-spec` (o poner `if: false` en sus steps). Un workflow así pasa los cuatro escenarios —que sólo parsean el YAML— y deja el CI interno en verde permanente aunque la suite y el validador estén en rojo, que es exactamente lo contrario de la puerta que este change pretende montar.
+- **[medium]** R-CI-010 — La paridad se define únicamente sobre los comandos `run:`, así que el workflow de la forja interna puede omitir los pasos `uses:` del de GitHub, empezando por `actions/checkout`, y seguir cumpliendo «cada comando `run:` aparece en el job homónimo». Sobre el runner interno, cuyo workspace persiste entre ejecuciones, la suite se ejecutaría sobre el árbol que dejó el run anterior: el workflow reporta verde para un commit cuyo código nunca se ha traído ni probado.
 
 ## Escenarios que convergen · 8
 

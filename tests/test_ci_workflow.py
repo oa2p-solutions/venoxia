@@ -1,28 +1,16 @@
 #!/usr/bin/env python3
-"""El CI del plugin: `.forgejo/workflows/ci.yml`, y que sea el único que hay.
+"""El CI de este repositorio, y que sea el único que hay.
 
-`.forgejo/workflows/ci.yml` es el CI de este repositorio sobre el
-`forgejo-runner` interno de la organización, y desde el change
-`2026-09-06-forgejo-only` es el único: el proyecto ha dejado de usar GitHub,
-así que no queda ningún workflow bajo `.github/workflows/`.
+Este fichero es el contrato entero del workflow: se lee del disco y se
+comprueba solo, sin compararlo con ningún otro. Antes existían dos —uno por
+forja— y el segundo se medía **contra** el primero, comando a comando; un
+espejo sin original no comprueba nada, así que ahora el contrato se enuncia
+aquí y el fichero se mide contra él.
 
-Ese cambio se lleva por delante la forma en que este fichero comprobaba las
-cosas. Antes medía el workflow de Forgejo **contra** el de GitHub, comando a
-comando; retirado el segundo, la comparación se queda sin referente y un
-espejo sin original no comprueba nada. Ahora el contrato se enuncia en
-absoluto —los comandos exactos de cada job, las redes de seguridad, el
-`evals` manual y el checkout— y se lee de un solo fichero.
-
-Sin PyYAML —la suite es stdlib pura— el workflow se lee con expresiones
-regulares sobre su forma canónica: jobs de primer nivel con dos espacios de
-indentación, `run:` de una línea o de bloque `|`.
-
-Lo que este fichero **no** puede comprobar, porque exige un run real, son
-las dos apuestas del acta: que la matriz pase de verdad en 3.12/3.13/3.14
-sobre el runner interno (`B-003`) y que `claude plugin validate` no exija
-credenciales en un runner limpio (`B-004`). De la segunda sí comprueba la
-mitigación: que el `continue-on-error` siga puesto mientras no haya
-respuesta.
+Lo que no puede nombrar, y por eso también se comprueba: el repositorio es
+público, así que una etiqueta de runner escrita a mano publicaría a cada
+persona que lo clone el mapa de una infraestructura que no es suya. Los
+`runs-on` leen una variable del repositorio.
 
 @covers R-CI-008
 @covers R-CI-009
@@ -31,8 +19,7 @@ respuesta.
 
 Cómo lanzarlo::
 
-    python3 -m unittest tests.test_forgejo_workflow -v
-    python3 -m unittest discover -s tests -v
+    python3 -m unittest tests.test_ci_workflow -v
 """
 
 from __future__ import annotations
@@ -48,11 +35,14 @@ if _REPO_ROOT not in sys.path:
 
 from tests.venoxia_fixtures import REPO_ROOT  # noqa: E402
 
-FORGEJO_CI = REPO_ROOT / ".forgejo" / "workflows" / "ci.yml"
+WORKFLOW = REPO_ROOT / ".forgejo" / "workflows" / "ci.yml"
 GITHUB_WORKFLOWS_DIR = REPO_ROOT / ".github" / "workflows"
 
 JOB_NAMES = ("tests", "self-spec", "coverage", "plugin-validate", "evals")
-RUNNER_LABELS = frozenset({"oa2p-debian", "oa2p-node"})
+#: Un `runs-on` conforme es una expresión que lee una variable del
+#: repositorio: `${{ vars.LO_QUE_SEA }}`. Cualquier otra cosa es una
+#: etiqueta escrita a mano, que es lo que este repositorio no publica.
+RUNS_ON_FROM_VARS = re.compile(r"^\$\{\{\s*vars\.[A-Za-z_][A-Za-z0-9_]*\s*\}\}$")
 
 #: Los jobs que pueden fallar sin tumbar el workflow, y sólo ellos. `coverage`
 #: mide huecos ya documentados en TODO.md; `plugin-validate` depende de la
@@ -83,7 +73,7 @@ def _read(path: Path, what: str) -> str:
 
 
 def _workflow() -> str:
-    return _read(FORGEJO_CI, "el workflow de CI del plugin en Forgejo")
+    return _read(WORKFLOW, "el workflow de CI de este repositorio")
 
 
 def _jobs_section(text: str) -> str:
@@ -103,7 +93,7 @@ def _job_block(text: str, job_name: str) -> str:
     match = pattern.search(_jobs_section(text))
     if not match:
         raise AssertionError(
-            f"«{FORGEJO_CI.relative_to(REPO_ROOT)}» no declara el job «{job_name}»"
+            f"«{WORKFLOW.relative_to(REPO_ROOT)}» no declara el job «{job_name}»"
         )
     return match.group(0)
 
@@ -137,11 +127,11 @@ def _run_commands(job: str) -> list[str]:
     return commands
 
 
-class ForgejoIsTheOnlyCiTest(unittest.TestCase):
+class TheWorkflowIsTheOnlyCiTest(unittest.TestCase):
     """R-CI-011 · No queda ningún workflow de GitHub Actions en el repositorio."""
 
-    def test_the_forgejo_workflow_exists(self):
-        self.assertTrue(FORGEJO_CI.is_file(), f"falta «{FORGEJO_CI}»")
+    def test_the_workflow_exists(self):
+        self.assertTrue(WORKFLOW.is_file(), f"falta «{WORKFLOW}»")
 
     def test_no_github_actions_workflow_directory(self):
         self.assertFalse(
@@ -170,7 +160,7 @@ class ForgejoIsTheOnlyCiTest(unittest.TestCase):
         )
 
 
-class ForgejoWorkflowTriggersAndJobsTest(unittest.TestCase):
+class WorkflowTriggersAndJobsTest(unittest.TestCase):
     """R-CI-008 · Disparadores, los cinco jobs y sólo las etiquetas del runner."""
 
     def test_triggers_push_pull_request_and_dispatch_on_main(self):
@@ -201,21 +191,33 @@ class ForgejoWorkflowTriggersAndJobsTest(unittest.TestCase):
         for job_name in JOB_NAMES:
             _job_block(text, job_name)  # lanza AssertionError si falta
 
-    def test_every_runs_on_is_a_label_the_internal_runner_declares(self):
+    def test_no_runner_label_is_written_down(self):
+        """El repositorio es público: una etiqueta escrita a mano publicaría el
+        mapa de una infraestructura que no es de quien clona el plugin."""
         text = _workflow()
-        labels = re.findall(r"^\s*runs-on:\s*(.+?)\s*$", text, re.MULTILINE)
-        self.assertTrue(labels, "ningún job declara «runs-on»")
-        for label in labels:
-            self.assertIn(
-                label.strip("\"'"),
-                RUNNER_LABELS,
-                f"«runs-on: {label}» no es una etiqueta del runner interno "
-                f"({', '.join(sorted(RUNNER_LABELS))})",
+        valores = re.findall(r"^\s*runs-on:\s*(.+?)\s*$", text, re.MULTILINE)
+        self.assertTrue(valores, "ningún job declara «runs-on»")
+        for valor in valores:
+            self.assertRegex(
+                valor.strip("\"'"),
+                RUNS_ON_FROM_VARS,
+                f"«runs-on: {valor}» escribe el runner en vez de leerlo de una "
+                "variable del repositorio",
             )
-        self.assertNotIn("ubuntu-latest", text, "el runner interno no conoce «ubuntu-latest»")
+
+    def test_the_workflow_names_no_internal_infrastructure(self):
+        """Los comentarios cuentan: son lo primero que lee quien abre el fichero."""
+        text = _workflow().lower()
+        for termino in ("oa2p-debian", "oa2p-node", "forgejo"):
+            self.assertNotIn(
+                termino,
+                text,
+                f"el workflow nombra «{termino}»: el repositorio es público y eso "
+                "no le sirve a quien instala el plugin",
+            )
 
 
-class ForgejoTestsMatrixFromImageTest(unittest.TestCase):
+class TestsMatrixFromImageTest(unittest.TestCase):
     """R-CI-009 · La matriz nombra 3.12/3.13/3.14 y el intérprete viene de la imagen."""
 
     def test_matrix_names_the_three_supported_python_versions(self):
@@ -253,7 +255,7 @@ class ForgejoTestsMatrixFromImageTest(unittest.TestCase):
         )
 
 
-class ForgejoWorkflowCommandsTest(unittest.TestCase):
+class WorkflowCommandsTest(unittest.TestCase):
     """R-CI-012 · Los comandos exactos de cada job, leídos de un solo fichero."""
 
     def test_every_job_runs_the_commands_its_contract_declares(self):
@@ -271,7 +273,7 @@ class ForgejoWorkflowCommandsTest(unittest.TestCase):
                 )
 
 
-class ForgejoWorkflowSafetyNetsTest(unittest.TestCase):
+class WorkflowSafetyNetsTest(unittest.TestCase):
     """R-CI-012 · Las redes de seguridad están donde tienen que estar, y sólo ahí."""
 
     def test_exactly_two_jobs_carry_a_continue_on_error(self):

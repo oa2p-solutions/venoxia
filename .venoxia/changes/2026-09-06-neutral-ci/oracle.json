@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "change": "2026-09-06-neutral-ci",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-06T23:36:25Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-008",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 41,
+          "output_tail": "FAIL: test_the_workflow_names_no_internal_infrastructure (tests.test_ci_workflow.WorkflowTriggersAndJobsTest.test_the_workflow_names_no_internal_infrastructure)\nLos comentarios cuentan: son lo primero que lee quien abre el fichero.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_ci_workflow.py\", line 212, in test_the_workflow_names_no_internal_infrastructure\n    self.assertNotIn(\n    ~~~~~~~~~~~~~~~~^\n        termino,\n        ^^^^^^^^\n    ...<2 lines>...\n        \"no le sirve a quien instala el plugin\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'CI_RUNNER' unexpectedly found in 'name: ci\\n\\n# el ci del propio plugin, y el único que tiene: el proyecto dejó de usar\\n# github en el change 2026-09-06-single-ci, así que no hay nada bajo\\n# .github/. la tesis del readme es que la spec «falla en ci cuando miente»;\\n# este fichero es lo que la hace cumplible.\\n#\\n# lo que el el runner interno impone: sólo las etiquetas «CI_RUNNER»\\n# (debian 13 slim) y «CI_RUNNER_NODE» (node 22), y como el host sólo tiene python\\n# 3.14, cada entrada de la matriz corre dentro de una imagen\\n# python:<versión>-slim. ver «## verificar en ci» en readme.md.\\n#\\n# tests/test_ci_workflow.py comprueba este fichero contra el contrato\\n# entero (r-ci-008, r-ci-009, r-ci-011, r-ci-012), leyéndolo solo: antes se\\n# medía contra el workflow de github, y un espejo sin original no comprueba\\n# nada.\\n#\\n# «github.event_name» en el «if» de evals no es una dependencia de github: es\\n# el nombre del contexto de expresión que la forja implementa por\\n# compatibilidad, y el que han usado los runs reales que sí han corrido.\\n\\non:\\n  push:\\n    branches: [main]\\n  pull_request:\\n    branches: [main]\\n  workflow_dispatch:\\n\\njobs:\\n  tests:\\n    name: tests (python ${{ matrix.python-version }})\\n    runs-on: CI_RUNNER\\n    strategy:\\n      fail-fast: false\\n      matrix:\\n        python-version: [\"3.12\", \"3.13\", \"3.14\"]\\n    # el intérprete viene de la imagen, no de setup-python: el host del runner\\n    # sólo tiene 3.14.\\n    container:\\n      image: docker.io/library/python:${{ matrix.python-version }}-slim\\n    steps:\\n      # las imágenes slim no traen git ni node, y actions/checkout necesita\\n      # los dos: es una acción javascript y el runner no inyecta node en\\n      # el contenedor (primer run real, 2026-09-05: «exec: \"node\": executable\\n      # file not found in $path»).\\n      - name: git y node para el checkout\\n        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs\\n      - uses: actions/checkout@v4\\n      # los jobs en contenedor corren como root, y para root no existen los\\n      # ficheros sin permiso de lectura: 15 tests de esos caminos se saltarían\\n      # en silencio. un usuario normal los ejecuta todos (primer run real).\\n      - name: usuario sin privilegios (root se salta los tests de permisos)\\n        run: useradd -m ci && chown -r ci .\\n      - name: suite completa (stdlib unittest, sin pytest)\\n        run: su ci -c \"python3 -m unittest discover -s tests -q\"\\n\\n  self-spec:\\n    name: self-spec\\n    runs-on: CI_RUNNER\\n    container:\\n      image: docker.io/library/python:3.14-slim\\n    steps:\\n      - name: git y node para el checkout\\n        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs\\n      - uses: actions/checkout@v4\\n      - name: el validador sobre el propio repo, en estricto\\n        run: python3 scripts/validate.py --root . --strict --json\\n      - name: el acta del propio repo, en estricto\\n        run: python3 scripts/charter_lint.py --root . --strict --json\\n\\n  coverage:\\n    name: coverage\\n    runs-on: CI_RUNNER\\n    container:\\n      image: docker.io/library/python:3.14-slim\\n    # tools/coverage.py mide contra umbrales por fichero: continue-on-error\\n    # evita que un umbral que baje convierta el repo entero en rojo mientras\\n    # se diagnostica. ver «## verificar en ci» en readme.md.\\n    continue-on-error: true\\n    steps:\\n      - name: git y node para el checkout\\n        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs\\n      - uses: actions/checkout@v4\\n      # como root, los tests de ficheros ilegibles se saltan y guardian.py\\n      # baja del 85 % (82,0 % en el primer run real); como usuario normal mide\\n      # lo mismo que en local.\\n      - name: usuario sin privilegios (root se salta los tests de permisos)\\n        run: useradd -m ci && chown -r ci .\\n      - name: cobertura de scripts/**/*.py, subprocesos incluidos\\n        run: su ci -c \"python3 tools/coverage.py\"\\n\\n  plugin-validate:\\n    name: plugin-validate\\n    runs-on: CI_RUNNER_NODE\\n    # apuesta b-004 del acta: si el cli exige credenciales en un runner\\n    # limpio. este run es el que puede resolverla; mientras, continue-on-error.\\n    continue-on-error: true\\n    steps:\\n      - uses: actions/checkout@v4\\n      - name: instalar el cli de claude code\\n        run: npm install -g @anthropic-ai/claude-code\\n      - name: estructura del plugin (manifiesto, skills, agentes, hook)\\n        run: claude plugin validate . --strict\\n\\n  evals:\\n    name: evals\\n    runs-on: CI_RUNNER_NODE\\n    # cuesta tokens y usa un llm: nunca se dispara en push ni en\\n    # pull_request, sólo a mano. ver evals/readme.md y «## verificar en ci».\\n    if: ${{ github.event_name == \\'workflow_dispatch\\' }}\\n    needs: [tests, self-spec]\\n    steps:\\n      - uses: actions/checkout@v4\\n      - name: instalar el cli de claude code\\n        run: npm install -g @anthropic-ai/claude-code\\n      # la clave vive aquí y sólo aquí: en un «env» de nivel de workflow la\\n      # heredaría «tests», que ejecuta el código de cada pull request.\\n      - name: claude plugin eval venoxia\\n        env:\\n          anthropic_api_key: ${{ secrets.anthropic_api_key }}\\n        run: |\\n          claude plugin eval venoxia --ablation with-without \\\\\\n            --allow-tools \\'bash(python3 *)\\' write read glob grep\\n' : el workflow nombra «CI_RUNNER»: el repositorio es público y eso no le sirve a quien instala el plugin\n\n----------------------------------------------------------------------\nRan 23 tests in 0.003s\n\nFAILED (failures=2)"
+        },
+        {
+          "requirement_id": "R-CI-018",
+          "verifies": [
+            "tests/test_gate.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 5300,
+          "output_tail": "======================================================================\nFAIL: test_the_workflow_does_not_name_the_internal_runner_labels (tests.test_gate.PublishedDocsTest.test_the_workflow_does_not_name_the_internal_runner_labels) (etiqueta='CI_RUNNER_NODE')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_gate.py\", line 850, in test_the_workflow_does_not_name_the_internal_runner_labels\n    self.assertNotIn(\n    ~~~~~~~~~~~~~~~~^\n        etiqueta,\n        ^^^^^^^^^\n    ...<3 lines>...\n        \"infraestructura que no es de quien lo clona\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'CI_RUNNER_NODE' unexpectedly found in 'name: ci\\n\\n# el ci del propio plugin, y el único que tiene: el proyecto dejó de usar\\n# github en el change 2026-09-06-single-ci, así que no hay nada bajo\\n# .github/. la tesis del readme es que la spec «falla en ci cuando miente»;\\n# este fichero es lo que la hace cumplible.\\n#\\n# lo que el el runner interno impone: sólo las etiquetas «CI_RUNNER»\\n# (debian 13 slim) y «CI_RUNNER_NODE» (node 22), y como el host sólo tiene python\\n# 3.14, cada entrada de la matriz corre dentro de una imagen\\n# python:<versión>-slim. ver «## verificar en ci» en readme.md.\\n#\\n# tests/test_ci_workflow.py comprueba este fichero contra el contrato\\n# entero (r-ci-008, r-ci-009, r-ci-011, r-ci-012), leyéndolo solo: antes se\\n# medía contra el workflow de github, y un espejo sin original no comprueba\\n# nada.\\n#\\n# «github.event_name» en el «if» de evals no es una dependencia de github: es\\n# el nombre del contexto de expresión que la forja implementa por\\n# compatibilidad, y el que han usado los runs reales que sí han corrido.\\n\\non:\\n  push:\\n    branches: [main]\\n  pull_request:\\n    branches: [main]\\n  workflow_dispatch:\\n\\njobs:\\n  tests:\\n    name: tests (python ${{ matrix.python-version }})\\n    runs-on: CI_RUNNER\\n    strategy:\\n      fail-fast: false\\n      matrix:\\n        python-version: [\"3.12\", \"3.13\", \"3.14\"]\\n    # el intérprete viene de la imagen, no de setup-python: el host del runner\\n    # sólo tiene 3.14.\\n    container:\\n      image: docker.io/library/python:${{ matrix.python-version }}-slim\\n    steps:\\n      # las imágenes slim no traen git ni node, y actions/checkout necesita\\n      # los dos: es una acción javascript y el runner no inyecta node en\\n      # el contenedor (primer run real, 2026-09-05: «exec: \"node\": executable\\n      # file not found in $path»).\\n      - name: git y node para el checkout\\n        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs\\n      - uses: actions/checkout@v4\\n      # los jobs en contenedor corren como root, y para root no existen los\\n      # ficheros sin permiso de lectura: 15 tests de esos caminos se saltarían\\n      # en silencio. un usuario normal los ejecuta todos (primer run real).\\n      - name: usuario sin privilegios (root se salta los tests de permisos)\\n        run: useradd -m ci && chown -r ci .\\n      - name: suite completa (stdlib unittest, sin pytest)\\n        run: su ci -c \"python3 -m unittest discover -s tests -q\"\\n\\n  self-spec:\\n    name: self-spec\\n    runs-on: CI_RUNNER\\n    container:\\n      image: docker.io/library/python:3.14-slim\\n    steps:\\n      - name: git y node para el checkout\\n        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs\\n      - uses: actions/checkout@v4\\n      - name: el validador sobre el propio repo, en estricto\\n        run: python3 scripts/validate.py --root . --strict --json\\n      - name: el acta del propio repo, en estricto\\n        run: python3 scripts/charter_lint.py --root . --strict --json\\n\\n  coverage:\\n    name: coverage\\n    runs-on: CI_RUNNER\\n    container:\\n      image: docker.io/library/python:3.14-slim\\n    # tools/coverage.py mide contra umbrales por fichero: continue-on-error\\n    # evita que un umbral que baje convierta el repo entero en rojo mientras\\n    # se diagnostica. ver «## verificar en ci» en readme.md.\\n    continue-on-error: true\\n    steps:\\n      - name: git y node para el checkout\\n        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates nodejs\\n      - uses: actions/checkout@v4\\n      # como root, los tests de ficheros ilegibles se saltan y guardian.py\\n      # baja del 85 % (82,0 % en el primer run real); como usuario normal mide\\n      # lo mismo que en local.\\n      - name: usuario sin privilegios (root se salta los tests de permisos)\\n        run: useradd -m ci && chown -r ci .\\n      - name: cobertura de scripts/**/*.py, subprocesos incluidos\\n        run: su ci -c \"python3 tools/coverage.py\"\\n\\n  plugin-validate:\\n    name: plugin-validate\\n    runs-on: CI_RUNNER_NODE\\n    # apuesta b-004 del acta: si el cli exige credenciales en un runner\\n    # limpio. este run es el que puede resolverla; mientras, continue-on-error.\\n    continue-on-error: true\\n    steps:\\n      - uses: actions/checkout@v4\\n      - name: instalar el cli de claude code\\n        run: npm install -g @anthropic-ai/claude-code\\n      - name: estructura del plugin (manifiesto, skills, agentes, hook)\\n        run: claude plugin validate . --strict\\n\\n  evals:\\n    name: evals\\n    runs-on: CI_RUNNER_NODE\\n    # cuesta tokens y usa un llm: nunca se dispara en push ni en\\n    # pull_request, sólo a mano. ver evals/readme.md y «## verificar en ci».\\n    if: ${{ github.event_name == \\'workflow_dispatch\\' }}\\n    needs: [tests, self-spec]\\n    steps:\\n      - uses: actions/checkout@v4\\n      - name: instalar el cli de claude code\\n        run: npm install -g @anthropic-ai/claude-code\\n      # la clave vive aquí y sólo aquí: en un «env» de nivel de workflow la\\n      # heredaría «tests», que ejecuta el código de cada pull request.\\n      - name: claude plugin eval venoxia\\n        env:\\n          anthropic_api_key: ${{ secrets.anthropic_api_key }}\\n        run: |\\n          claude plugin eval venoxia --ablation with-without \\\\\\n            --allow-tools \\'bash(python3 *)\\' write read glob grep\\n' : el workflow escribe la etiqueta «CI_RUNNER_NODE»: el repositorio es público y publicarla es publicar el mapa de una infraestructura que no es de quien lo clona\n\n----------------------------------------------------------------------\nRan 51 tests in 5.262s\n\nFAILED (failures=6)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 2,
+        "missing": 0,
+        "timeout": 0,
+        "total": 2
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-06T23:36:42Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-008",
+          "verifies": [
+            "tests/test_ci_workflow.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 39,
+          "output_tail": ".......................\n----------------------------------------------------------------------\nRan 23 tests in 0.003s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-018",
+          "verifies": [
+            "tests/test_gate.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 5397,
+          "output_tail": "...................................................\n----------------------------------------------------------------------\nRan 51 tests in 5.362s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 2,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 2
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

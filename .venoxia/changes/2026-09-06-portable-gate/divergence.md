@@ -278,11 +278,11 @@ El lector A describe el efecto como «la sección aclara que sólo cubre changes
 
 ### Escenario: The published documentation does not name the internal forge
 
-El lector A describe el efecto como «ningún fichero publicado menciona "forgejo" en ninguna forma»; el lector B describe el efecto como «la documentación publicada no menciona 'forgejo' en ningún caso». Similitud de contenido 0.44, por debajo del umbral 0.60. Se comparan las palabras que dicen algo, sin artículos ni conjugación.
+El lector A describe el efecto como «ningún fichero publicado menciona "la forja interna" en ninguna forma»; el lector B describe el efecto como «la documentación publicada no menciona 'la forja interna' en ningún caso». Similitud de contenido 0.44, por debajo del umbral 0.60. Se comparan las palabras que dicen algo, sin artículos ni conjugación.
 
 **¿Cuál de estas lecturas del efecto de «The published documentation does not name the internal forge» es la correcta?**
-- (A) «ningún fichero publicado menciona "forgejo" en ninguna forma»
-- (B) «la documentación publicada no menciona 'forgejo' en ningún caso»
+- (A) «ningún fichero publicado menciona "la forja interna" en ninguna forma»
+- (B) «la documentación publicada no menciona 'la forja interna' en ningún caso»
 - (C) Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real
 
 ### Escenario: The published documentation does not name the internal runner labels

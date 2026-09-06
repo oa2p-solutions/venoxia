@@ -193,7 +193,7 @@ class TraceRunScriptTest(unittest.TestCase):
         los `__init__.py` se llaman `__init__`: si el primero que se ejecuta es
         uno de la stdlib (ignorada por `sys.prefix`), `trace` daba por ignorados
         todos los demás, incluido `scripts/venoxia/__init__.py`. Es lo que pasó
-        en el primer run real de `coverage` en Forgejo: «SIN DATOS (FALLA)»
+        en el primer run real de `coverage` en CI: «SIN DATOS (FALLA)»
         para ese fichero, con los otros ocho medidos."""
         with tempfile.TemporaryDirectory() as workdir:
             root = Path(workdir)

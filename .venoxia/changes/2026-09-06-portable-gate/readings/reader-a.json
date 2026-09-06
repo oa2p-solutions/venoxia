@@ -339,7 +339,7 @@
   },
   {
     "scenario": "The published documentation does not name the internal forge",
-    "effect": "ningún fichero publicado menciona \"forgejo\" en ninguna forma",
+    "effect": "ningún fichero publicado menciona \"la forja interna\" en ninguna forma",
     "status_code": null,
     "side_effects": [],
     "unclear": false,

@@ -1,7 +1,7 @@
 [
   {
     "scenario": "Triggers read from disk",
-    "effect": "el workflow declara push y pull_request en main y workflow_dispatch",
+    "effect": "el workflow declara push, pull_request en main y workflow_dispatch",
     "status_code": null,
     "side_effects": [],
     "unclear": false,
@@ -17,7 +17,7 @@
   },
   {
     "scenario": "Only the internal runner labels",
-    "effect": "cada job corre sólo en oa2p-debian u oa2p-node",
+    "effect": "cada job corre sólo en CI_RUNNER u CI_RUNNER_NODE",
     "status_code": null,
     "side_effects": [],
     "unclear": false,
@@ -33,7 +33,7 @@
   },
   {
     "scenario": "The interpreter comes from the image",
-    "effect": "el job declara container con imagen python:${{ matrix.python-version }}-slim",
+    "effect": "el job declara container con imagen python:matrix.python-version-slim",
     "status_code": null,
     "side_effects": [],
     "unclear": false,
@@ -41,7 +41,7 @@
   },
   {
     "scenario": "Same commands per job",
-    "effect": "cada comando run de un job de GitHub aparece en el job homónimo de Forgejo",
+    "effect": "cada comando run de GitHub aparece en el job homónimo de la forja interna",
     "status_code": null,
     "side_effects": [],
     "unclear": false,
@@ -57,7 +57,7 @@
   },
   {
     "scenario": "evals only runs by hand",
-    "effect": "el job evals condiciona su ejecución a workflow_dispatch",
+    "effect": "el job evals sólo corre por workflow_dispatch",
     "status_code": null,
     "side_effects": [],
     "unclear": false,

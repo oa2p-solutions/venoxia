@@ -1,0 +1,9 @@
+{
+  "id": "2026-09-06-neutral-ci",
+  "state": "verified",
+  "via": "spec",
+  "capabilities": [
+    "ci"
+  ],
+  "created": "2026-09-06T22:00:00Z"
+}

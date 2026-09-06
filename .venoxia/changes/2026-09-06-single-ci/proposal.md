@@ -1,15 +1,15 @@
-# 2026-09-06-forgejo-only Proposal
+# 2026-09-06-single-ci Proposal
 
 ## Why
 
-La organización ha decidido llevar todo a Forgejo: GitHub deja de usarse
+La organización ha decidido llevar todo a la forja interna: GitHub deja de usarse
 para este proyecto. Hoy el repo mantiene dos CI que dicen lo mismo
 (`.github/workflows/ci.yml` y `.forgejo/workflows/ci.yml`), y el segundo
-está escrito **como espejo del primero**: `tests/test_forgejo_workflow.py`
+está escrito **como espejo del primero**: `tests/test_ci_workflow.py`
 compara comando a comando los dos ficheros. Esa forma de comprobar deja de
 tener sentido en cuanto uno de los dos desaparece, porque la referencia
 contra la que se mide es justamente lo que se retira. Y el único CI que ha
-llegado a ejecutarse de verdad es el de Forgejo: el de GitHub nunca pasó de
+llegado a ejecutarse de verdad es el de la forja interna: el de GitHub nunca pasó de
 `queued`.
 
 Mantener el de GitHub sin ejecutarlo sería peor que no tenerlo: un fichero
@@ -23,25 +23,25 @@ repositorio que ya no es la fuente.
 - `.github/workflows/ci.yml` deja de existir. `.forgejo/workflows/ci.yml` es
   el único CI del repositorio, y el repo no declara ningún workflow de
   GitHub Actions.
-- El contrato del workflow de Forgejo pasa a enunciarse **en absoluto**, no
+- El contrato del workflow de la forja interna pasa a enunciarse **en absoluto**, no
   por paridad: los comandos exactos de cada job, `continue-on-error` sólo en
   `coverage` y `plugin-validate`, `evals` limitado a `workflow_dispatch` con
   `secrets.ANTHROPIC_API_KEY`, y `actions/checkout` en todos los jobs. Lo que
   antes se comprobaba comparando dos ficheros se comprueba ahora leyendo uno.
-- `templates/ci/venoxia-gate.yml` pasa a Forgejo Actions: se copia a
+- `templates/ci/venoxia-gate.yml` pasa a la forja interna: se copia a
   `.forgejo/workflows/venoxia-gate.yml` en el proyecto consumidor, hace
   checkout de `OA2P/venoxia` fijado a un tag, corre sobre la etiqueta
-  `oa2p-debian` dentro de la imagen `python:3.14-slim`, y sigue sin `pip` en
+  `CI_RUNNER` dentro de la imagen `python:3.14-slim`, y sigue sin `pip` en
   ningún paso. No queda ninguna plantilla para GitHub Actions.
 - `tests/test_ci_workflow.py` se retira y su contenido vivo se reparte:
-  `tests/test_forgejo_workflow.py` pasa a ser el contrato completo del CI
+  `tests/test_ci_workflow.py` pasa a ser el contrato completo del CI
   del repo, y `tests/test_ci_template.py` (nuevo) el de la plantilla del
   consumidor y el de la sección del README.
 - `README.md`, `CLAUDE.md` y los manifiestos del plugin
   (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`) dejan de
   nombrar GitHub como origen o como CI.
 - Las apuestas `B-003` y `B-004` del acta cambian de testigo: el run real
-  que las resuelve es el de Forgejo, no el de GitHub Actions.
+  que las resuelve es el de la forja interna, no el de GitHub Actions.
 
 ## New Capabilities
 
@@ -50,7 +50,7 @@ Ninguna.
 ## Modified Capabilities
 
 - `ci`: pierde el workflow de GitHub Actions y la plantilla de consumidor
-  para GitHub. Queda un único CI, el de Forgejo, con su contrato enunciado
+  para GitHub. Queda un único CI, el de la forja interna, con su contrato enunciado
   sin depender de ningún fichero espejo.
 
 ## Impact
@@ -64,9 +64,9 @@ Ninguna.
   este change no los toca.
 - Un proyecto consumidor que ya hubiera copiado la plantilla de GitHub
   seguirá funcionando mientras el espejo de GitHub exista, pero deja de
-  estar soportada: la plantilla que se mantiene es la de Forgejo.
+  estar soportada: la plantilla que se mantiene es la de la forja interna.
 - El expresión `github.event_name` del job `evals` **se conserva**: es el
-  nombre del contexto de expresión que Forgejo Actions implementa por
+  nombre del contexto de expresión que la forja interna implementa por
   compatibilidad, no una dependencia de GitHub, y es el que han usado los
   runs reales que sí han corrido.
 
@@ -76,11 +76,11 @@ Ninguna.
   cobertura** · `high` · lo que comprobaba `test_ci_workflow.py` sobre los
   jobs (`self-spec` con sus dos comandos exactos, `plugin-validate` con la
   instalación del CLI, `evals` manual con la API key) pasa entero a
-  `test_forgejo_workflow.py` contra el fichero que sí se ejecuta.
+  `test_ci_workflow.py` contra el fichero que sí se ejecuta.
 - **La forma estructural del workflow y de la plantilla**
   (`R-CI-011`…`R-CI-015`) · `high` · se comprueba por parseo estático, sin
   red y sin lanzar ningún workflow.
-- **Que la plantilla de Forgejo funcione tal cual en un proyecto
+- **Que la plantilla de la forja interna funcione tal cual en un proyecto
   consumidor** · no es un requisito de este delta: ningún test puede
   comprobarlo sin un proyecto consumidor real con su secret. Se declara
   aquí y no se convierte en requisito, por la misma razón por la que

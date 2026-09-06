@@ -1,22 +1,25 @@
 name: ci
 
-# El CI del propio plugin, y el único que tiene: el proyecto dejó de usar
-# GitHub en el change 2026-09-06-forgejo-only, así que no hay nada bajo
-# .github/. La tesis del README es que la spec «falla en CI cuando miente»;
-# este fichero es lo que la hace cumplible.
+# El CI de este repositorio, y el único que tiene. La tesis del README es que
+# la spec «falla en CI cuando miente»; este fichero es lo que la hace
+# cumplible.
 #
-# Lo que el forgejo-runner interno impone: sólo las etiquetas «oa2p-debian»
-# (Debian 13 slim) y «oa2p-node» (Node 22), y como el host sólo tiene Python
-# 3.14, cada entrada de la matriz corre dentro de una imagen
-# python:<versión>-slim. Ver «## Verificar en CI» en README.md.
+# Los `runs-on` leen dos variables del repositorio, `CI_RUNNER` y
+# `CI_RUNNER_NODE`, en vez de escribir la etiqueta: el repositorio es público,
+# y una etiqueta literal publicaría a cada persona que lo clona el mapa de una
+# infraestructura que no es suya. Quien administre la forja las declara una
+# vez. Ver «## Verificar un proyecto» en README.md.
 #
-# tests/test_forgejo_workflow.py comprueba este fichero contra el contrato
-# entero (R-CI-008, R-CI-009, R-CI-011, R-CI-012), leyéndolo solo: antes se
-# medía contra el workflow de GitHub, y un espejo sin original no comprueba
-# nada.
+# El host del runner sólo tiene Python 3.14, así que cada entrada de la matriz
+# corre dentro de una imagen python:<versión>-slim en vez de usar
+# actions/setup-python.
+#
+# tests/test_ci_workflow.py comprueba este fichero contra el contrato entero
+# (R-CI-008, R-CI-009, R-CI-011, R-CI-012), leyéndolo solo: antes se medía
+# contra un segundo workflow, y un espejo sin original no comprueba nada.
 #
 # «github.event_name» en el «if» de evals no es una dependencia de GitHub: es
-# el nombre del contexto de expresión que Forgejo Actions implementa por
+# el nombre del contexto de expresión que la forja implementa por
 # compatibilidad, y el que han usado los runs reales que sí han corrido.
 
 on:
@@ -29,7 +32,7 @@ on:
 jobs:
   tests:
     name: tests (python ${{ matrix.python-version }})
-    runs-on: oa2p-debian
+    runs-on: ${{ vars.CI_RUNNER }}
     strategy:
       fail-fast: false
       matrix:
@@ -40,7 +43,7 @@ jobs:
       image: docker.io/library/python:${{ matrix.python-version }}-slim
     steps:
       # Las imágenes slim no traen git ni node, y actions/checkout necesita
-      # los dos: es una acción JavaScript y forgejo-runner no inyecta node en
+      # los dos: es una acción JavaScript y el runner no inyecta node en
       # el contenedor (primer run real, 2026-09-05: «exec: "node": executable
       # file not found in $PATH»).
       - name: git y node para el checkout
@@ -56,7 +59,7 @@ jobs:
 
   self-spec:
     name: self-spec
-    runs-on: oa2p-debian
+    runs-on: ${{ vars.CI_RUNNER }}
     container:
       image: docker.io/library/python:3.14-slim
     steps:
@@ -70,7 +73,7 @@ jobs:
 
   coverage:
     name: coverage
-    runs-on: oa2p-debian
+    runs-on: ${{ vars.CI_RUNNER }}
     container:
       image: docker.io/library/python:3.14-slim
     # tools/coverage.py mide contra umbrales por fichero: continue-on-error
@@ -91,7 +94,7 @@ jobs:
 
   plugin-validate:
     name: plugin-validate
-    runs-on: oa2p-node
+    runs-on: ${{ vars.CI_RUNNER_NODE }}
     # Apuesta B-004 del acta: si el CLI exige credenciales en un runner
     # limpio. Este run es el que puede resolverla; mientras, continue-on-error.
     continue-on-error: true
@@ -104,7 +107,7 @@ jobs:
 
   evals:
     name: evals
-    runs-on: oa2p-node
+    runs-on: ${{ vars.CI_RUNNER_NODE }}
     # Cuesta tokens y usa un LLM: nunca se dispara en push ni en
     # pull_request, sólo a mano. Ver evals/README.md y «## Verificar en CI».
     if: ${{ github.event_name == 'workflow_dispatch' }}
