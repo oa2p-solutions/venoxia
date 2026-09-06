@@ -19,7 +19,7 @@ claude plugin marketplace add oa2p-solutions/venoxia
 claude plugin install venoxia@venoxia
 ```
 
-El repositorio público está en [GitHub](https://github.com/oa2p-solutions/venoxia), y es de donde se instala. El desarrollo y el CI viven en el Forgejo interno de la organización, que hace de respaldo; ese espejo no es alcanzable desde fuera y no hace falta para usar el plugin.
+El repositorio está en [GitHub](https://github.com/oa2p-solutions/venoxia), y es de donde se instala.
 
 Requiere Python 3 en el `PATH` (la matriz de CI cubre 3.12, 3.13 y 3.14; en desarrollo se prueba con 3.14). Los scripts usan **sólo la biblioteca estándar**: no hay `pip install`, ni entorno virtual, ni dependencias que mantener. La suite de tests del propio plugin tampoco pide nada: es `unittest`, de la biblioteca estándar.
 
@@ -392,25 +392,49 @@ Y los ejemplos de este README no son decorado: el acta y el requisito que enseñ
 
 El propio repositorio adoptó Venoxia: `.venoxia/charter.md` y las capabilities retroactivas de `.venoxia/capabilities/` pasan `python3 scripts/charter_lint.py --root . --strict` y `python3 scripts/validate.py --root . --strict` con cero errores y cero avisos, igual que se le exige a cualquier proyecto que lo adopte.
 
-## Verificar en CI
+## Verificar un proyecto
 
-La tesis del plugin es que la spec «falla en CI cuando miente». Esto es lo que la hace cumplible: un CI para este repositorio y una plantilla para quien lo adopte.
+La tesis del plugin es que la spec «falla en CI cuando miente». Lo que la hace
+cumplible es un comando:
 
-**[`.forgejo/workflows/ci.yml`](.forgejo/workflows/ci.yml) es el CI de este repositorio, y el único que tiene.** El proyecto dejó de usar GitHub, así que no queda ningún workflow bajo `.github/`; `tests/test_forgejo_workflow.py` falla si vuelve a aparecer uno. Se dispara en `push` y `pull_request` sobre `main`, y también a mano con `workflow_dispatch`. Cinco jobs:
+```bash
+python3 scripts/gate.py --root <proyecto>
+```
 
-- `tests`: `python3 -m unittest discover -s tests -q` en una matriz de Python 3.12, 3.13 y 3.14.
-- `self-spec`: `python3 scripts/validate.py --root . --strict --json` y `python3 scripts/charter_lint.py --root . --strict --json` — el propio repo obedece su propio contrato, o el job falla.
-- `coverage`: `python3 tools/coverage.py` (véase «Verificar regresiones»). Lleva `continue-on-error` para que un umbral que baje no convierta el repo entero en rojo mientras se diagnostica.
-- `plugin-validate`: instala el CLI de Claude Code con `npm install -g @anthropic-ai/claude-code` y corre `claude plugin validate . --strict`. Lleva `continue-on-error` mientras no se sepa si ese comando exige credenciales en un runner limpio: es la apuesta `B-004` del acta.
-- `evals`: **sólo** con `workflow_dispatch`, nunca en `push` ni en `pull_request`. Corre `claude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *)' Write Read Glob Grep` con `secrets.ANTHROPIC_API_KEY`. Es manual a propósito: usa un LLM de verdad y cuesta tokens en cada corrida.
+`gate.py` corre las tres cosas que deciden si un proyecto cumple —el acta y el
+validador en estricto, y el oráculo de cada change en `verified`— y da un
+veredicto único, con los mismos códigos que el resto del núcleo: **`0`** si el
+proyecto pasa la puerta, **`1`** si no la pasa, y **`2`** si el uso es
+incorrecto o si algo impidió comprobar (falta `.venoxia/`, el acta no se lee,
+`venoxia.json` no sirve). **Un `2` bloquea igual que un `1`**: leerlo como «un
+error mío de invocación» deja pasar exactamente el `--root` mal escrito y el
+checkout a medias que la puerta existe para detener. Las tres comprobaciones se
+hacen siempre, sin pararse en la primera que falle, y cada una escribe su propia
+salida; el resumen de la puerta va al final.
 
-Corre sobre el `forgejo-runner` interno de la organización, que impone lo suyo: los jobs sólo pueden pedir sus dos etiquetas, `oa2p-debian` (Debian 13 slim) y `oa2p-node` (Node 22), y como el host sólo tiene Python 3.14, cada entrada de la matriz de `tests` corre dentro de la imagen `python:<versión>-slim` en vez de usar `actions/setup-python`. Las imágenes `slim` no traen `git` ni `node`, y `actions/checkout` necesita los dos (es una acción JavaScript y el runner no inyecta `node` en el contenedor), así que esos jobs los instalan con `apt-get` antes del checkout. Y como el contenedor corre como root, para quien no existen los ficheros sin permiso de lectura, `tests` y `coverage` crean un usuario sin privilegios y corren la suite con él: como root se saltaban 15 tests y `guardian.py` bajaba del umbral.
+Es un comando y no un fichero de CI a propósito. Un workflow obliga a declarar
+un runner, un checkout y una forma de autenticarse, y esas tres decisiones son
+de quien lo adopta, no de Venoxia. Sin ninguna de las tres, esto corre igual en
+cualquier CI, en un hook de pre-push o a mano.
 
-**Lo que el CI no puede hacer es apagarse sin que se note.** Es lo que más veces ha intentado el abogado del diablo de `/venoxia:diverge` sobre esta capability, y cada intento dejó una comprobación: sólo `coverage` y `plugin-validate` pueden llevar `continue-on-error`, y ningún paso puede llevarlo; sólo `evals` puede declarar `if:`; ningún job puede declarar `needs` sobre `evals`, que al ser manual los saltaría a todos en cada `push`; ningún comando puede llevar `||` ni `if !`; el comando de la suite tiene que **terminar** en `discover -s tests -q`, sin argumentos detrás que reduzcan lo que descubre; y `ANTHROPIC_API_KEY` sólo puede aparecer dentro de `evals`, porque en un `env:` de nivel de workflow la heredaría `tests`, que ejecuta el código de cada pull request.
+**Antes de meterlo en un CI, dos cosas.**
 
-**[`templates/ci/venoxia-gate.yml`](templates/ci/venoxia-gate.yml) es la plantilla para un proyecto que adopta Venoxia.** No se ejecuta en este repo: se copia a `.forgejo/workflows/venoxia-gate.yml` en el proyecto consumidor. Hace checkout del proyecto y, en un directorio auxiliar, checkout de `OA2P/venoxia` fijado a un tag (`VENOXIA_REF`) con `secrets.VENOXIA_TOKEN` porque el repositorio es privado; si esa variable no está definida, **falla antes del checkout** en vez de tomar la rama por defecto, que es exactamente la rama en movimiento que fijar una referencia trata de evitar. Corre `charter_lint.py --strict` y `validate.py --strict` sobre el proyecto, y ejecuta `oracle.py --change <id>` por cada change en `validated` o `verified`. Falla el job si algún oráculo queda en rojo, si falta `.venoxia/venoxia.json` y si algún `change.json` no se puede leer o no trae `state`: un paso que se salta en silencio convierte borrar o corromper un fichero en la forma de esquivar la puerta.
+La primera es de seguridad: la puerta ejecuta el `test_command` que declara el
+proyecto inspeccionado, y ese comando puede venir de un pull request. **No la
+ejecutes con secretos en su entorno sobre código que no es de fiar** —el de un
+fork, por ejemplo—: correrías comandos de quien lo escribió con las
+credenciales de tu runner. Al no ser un workflow, la puerta no puede poner esa
+barrera por ti; el aviso está también en `--help`, que es lo que se lee cuando
+uno pega un comando en un job.
 
-Dos cosas de esa plantilla conviene leerlas antes de copiarla. La primera es de seguridad: **el paso del oráculo ejecuta el `test_command` que declara el repositorio bajo prueba**, que puede venir de un pull request, así que corre sin ningún secreto en su entorno y todos los checkouts llevan `persist-credentials: false` — sin eso, un checkout con `token:` deja la credencial escrita en el `.git/config` del workspace y ese comando podría leerla de ahí. La segunda es una limitación: **no hay ningún `pip install`**, y para un proyecto consumidor cuya suite tenga dependencias eso significa que el oráculo fallará por `ModuleNotFoundError` hasta que añada su propio paso de instalación justo antes del paso del oráculo. La plantilla dice dónde va y advierte de que no le pase secretos.
+La segunda es de alcance: el oráculo se ejecuta **por change, y sólo para los
+que están en `verified`**. Los requisitos ya archivados viven en la capability,
+donde `V06`–`V08` siguen exigiendo que cada uno declare su test, que el fichero
+exista y que devuelva el `@covers`, pero quien los ejecuta es la suite del
+proyecto. La puerta no es el corredor de tests: en un proyecto maduro, con todo
+archivado, dirá «0 oráculos» y tendrá razón. Por eso su resumen dice siempre
+cuánto ha mirado —el acta, cuántos `spec.md`, cuántos changes, cuántos
+oráculos— y nombra los changes en `validated` que ha dejado sin ejecutar.
 
 ## Qué queda fuera de esta entrega
 

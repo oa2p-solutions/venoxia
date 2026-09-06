@@ -1,6 +1,7 @@
 {
   "scripts/charter_lint.py": 93,
   "scripts/diff_readings.py": 91,
+  "scripts/gate.py": 64,
   "scripts/guardian.py": 85,
   "scripts/oracle.py": 95,
   "scripts/validate.py": 91,

@@ -160,3 +160,4 @@
 {"ts": "2026-09-06T15:20:09Z", "change": "2026-09-06-divergence-additive", "tool": "Edit", "path": "tests/test_diff_readings.py"}
 {"ts": "2026-09-06T16:31:17Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".claude-plugin/plugin.json"}
 {"ts": "2026-09-06T16:31:23Z", "change": "2026-09-04-adopt-venoxia", "tool": "Edit", "path": ".claude-plugin/plugin.json"}
+{"ts": "2026-09-06T16:49:44Z", "change": "2026-09-06-portable-gate", "tool": "Write", "path": "tests/test_gate.py"}

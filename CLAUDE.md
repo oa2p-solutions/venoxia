@@ -46,11 +46,11 @@ python3 scripts/oracle.py --root . --change <id> --record      # ejecuta y añad
 python3 tools/coverage.py
 ```
 
-No hay linter ni formateador configurado (el núcleo es pequeño y las convenciones se sostienen por revisión y por los propios validadores). Sí hay CI: `.forgejo/workflows/ci.yml` (jobs `tests` en matriz de Python, `self-spec` con `validate.py`/`charter_lint.py --strict`, `coverage` con `tools/coverage.py`, `plugin-validate`, y `evals` sólo por `workflow_dispatch`), y es el único: el proyecto dejó de usar GitHub y no queda nada bajo `.github/`. `templates/ci/venoxia-gate.yml` es la plantilla que un proyecto consumidor copia a su `.forgejo/workflows/` para correr la misma puerta.
+No hay linter ni formateador configurado (el núcleo es pequeño y las convenciones se sostienen por revisión y por los propios validadores). Sí hay CI: `.forgejo/workflows/ci.yml` (jobs `tests` en matriz de Python, `self-spec` con `validate.py`/`charter_lint.py --strict`, `coverage` con `tools/coverage.py`, `plugin-validate`, y `evals` sólo por `workflow_dispatch`), y es el único: el proyecto dejó de usar GitHub y no queda nada bajo `.github/`. Un proyecto consumidor no copia ninguna plantilla: corre `python3 scripts/gate.py --root <proyecto>`, que no obliga a declarar runner, checkout ni autenticación.
 
 ## Arquitectura
 
-### Los cinco scripts y el paquete compartido
+### Los seis scripts y el paquete compartido
 
 | Script | Qué decide | Sobre qué |
 |---|---|---|
@@ -59,6 +59,7 @@ No hay linter ni formateador configurado (el núcleo es pequeño y las convencio
 | `scripts/diff_readings.py` | divergencia entre lecturas aisladas | `.venoxia/changes/<id>/readings/reader-*.json` + `devils-advocate.json` |
 | `scripts/guardian.py` | allow/deny de una edición | payload del hook por stdin; sólo lee `change.json` y `delta/` |
 | `scripts/oracle.py` | ejecuta `verifies:` por requisito y atribuye `green`/`red`/`missing`/`timeout`; con `--record` deja el historial en `changes/<id>/oracle.json` | el `delta/*.md` de un change y el `test_command` de `.venoxia/venoxia.json` |
+| `scripts/gate.py` | la puerta para un proyecto consumidor: acta y validador en estricto, y el oráculo de cada change en `verified`, con un veredicto único. **Fail-closed** (lo contrario del guardián) y ejecuta **sus propios** scripts, nunca los de la raíz inspeccionada | un proyecto entero, por `--root` |
 
 `scripts/venoxia/` (`parser.py`, `model.py`, `report.py`) lo comparten `validate.py` y `charter_lint.py`. `parser.py` convierte markdown en `Requirement`/`Scenario`/`Capability`/`Delta` y **nunca lanza**: todo problema de forma sale como `Finding` con código `P01`–`P05`. `model.py` define `Finding`, los niveles de confianza, las claves de metadatos y `RETIRED_META_KEYS` (`expires` → `revisit`). `report.py` produce el texto en español y el JSON versión 1.
 

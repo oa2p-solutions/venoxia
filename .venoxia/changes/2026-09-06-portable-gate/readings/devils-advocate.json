@@ -1,0 +1,12 @@
+[
+  {
+    "attack": "El escenario «A project without Venoxia is not an error» obliga a terminar con `0` cuando no hay directorio `.venoxia/`, así que una puerta que se invoca con un `--root` mal escrito, antes de que termine el checkout, o sobre un repositorio al que alguien le ha borrado `.venoxia/` en el mismo commit, sale verde sin haber corrido ni el acta, ni el validador, ni un solo test: el borrado completo sale gratis justo donde el requisito cierra esa misma asimetría para `change.json` («borrar el fichero saldría más barato que corromperlo»), y contradice su propio principio de que un `0` debe ser imposible de obtener por accidente. El aviso exigido no cambia nada, porque un job en verde no lo lee nadie.",
+    "requirement_id": "R-CI-016",
+    "severity": "high"
+  },
+  {
+    "attack": "Los tres escenarios de R-CI-017 sólo inspeccionan `templates/`, así que mover `templates/ci/venoxia-gate.yml` a `examples/ci/venoxia-gate.yml` (o a `docs/`) los cumple los tres al pie de la letra —`templates/ci/` no existe, no hay `.yml` bajo `templates/`, no hay `runs-on:` bajo `templates/`— mientras el plugin sigue publicando exactamente la plantilla de workflow con el runner fijado que este requisito existe para eliminar, y de paso queda fuera del alcance de R-CI-018, que tampoco mira ahí.",
+    "requirement_id": "R-CI-017",
+    "severity": "low"
+  }
+]

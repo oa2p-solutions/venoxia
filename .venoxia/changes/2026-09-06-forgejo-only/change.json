@@ -1,6 +1,6 @@
 {
   "id": "2026-09-06-forgejo-only",
-  "state": "verified",
+  "state": "archived",
   "via": "spec",
   "capabilities": [
     "ci"

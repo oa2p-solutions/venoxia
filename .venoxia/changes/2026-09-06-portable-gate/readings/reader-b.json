@@ -1,0 +1,364 @@
+[
+  {
+    "scenario": "A project that passes the gate",
+    "effect": "el proceso termina con éxito",
+    "status_code": "0",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A specification that does not conform",
+    "effect": "el proceso falla porque un requisito omite verifies",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A charter that does not conform",
+    "effect": "el proceso falla porque el acta incumple sus reglas",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A verified change with a red oracle",
+    "effect": "el proceso falla porque el oráculo de un verified está rojo",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A validated change with a red oracle does not close the gate",
+    "effect": "el proceso pasa aunque el oráculo de un validated esté rojo",
+    "status_code": "0",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The oracle runs for real",
+    "effect": "el proceso falla porque el oráculo corre sin --dry-run",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The gate writes no evidence",
+    "effect": "el proceso pasa sin modificar el oracle.json existente",
+    "status_code": "0",
+    "side_effects": [
+      "oracle.json queda igual, byte a byte, sin --record"
+    ],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A specified change whose test does not exist yet passes",
+    "effect": "el proceso pasa porque el delta de specified aún no se valida",
+    "status_code": "0",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The gate runs its own scripts, not the inspected project's",
+    "effect": "el proceso ejecuta sus propios scripts y falla por el acta real",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A check that cannot be carried out does not pass",
+    "effect": "el proceso termina en error de uso, nunca en verde",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The output of the three checks reaches whoever runs the gate",
+    "effect": "el proceso falla y muestra en stdout el código de la regla",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The three checks all run even when the first one fails",
+    "effect": "el proceso falla y muestra los dos incumplimientos, no sólo uno",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An active change with no requirement does not pass",
+    "effect": "el proceso falla porque el change activo no declara requisitos",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A project with no charter cannot be gated",
+    "effect": "el proceso termina en error de uso y nombra el acta",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A capability spec with no requirement does not pass",
+    "effect": "el proceso falla y nombra en stderr la capability vacía",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A capability directory without a spec does not pass",
+    "effect": "el proceso falla y nombra en stderr el directorio sin spec",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A change directory without change.json does not pass",
+    "effect": "el proceso falla y nombra en stderr el directorio sin change.json",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Every verified change's oracle runs",
+    "effect": "el proceso falla y nombra los dos changes en rojo",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The summary comes last, after every subprocess",
+    "effect": "el resumen real de la puerta aparece al final, tras el falso",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A passing gate says how much it looked at",
+    "effect": "el proceso pasa y reporta cuántos ficheros ha mirado",
+    "status_code": "0",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A failing gate says how much it looked at too",
+    "effect": "el proceso falla y también reporta cuántos ficheros ha mirado",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The gate names the validated changes it did not run",
+    "effect": "el proceso pasa y nombra el change validated no ejecutado",
+    "status_code": "0",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A mature project reports zero oracles",
+    "effect": "el proceso pasa y su resumen dice 0 oráculos",
+    "status_code": "0",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Changes in other states are left alone",
+    "effect": "el proceso pasa ignorando el oráculo de draft y specified",
+    "status_code": "0",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The state is read without regard to case or spacing",
+    "effect": "el proceso falla tratando 'Verified' igual que 'verified'",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unreadable change does not pass",
+    "effect": "el proceso falla por un change.json ilegible o inválido",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The unreadable change is named",
+    "effect": "el proceso falla y nombra en stderr el change ilegible",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A project with no active change passes",
+    "effect": "el proceso pasa sin ningún change en verified",
+    "status_code": "0",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A project with no active change is still checked",
+    "effect": "el proceso falla igual, sin changes activos, por el acta",
+    "status_code": "1",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A project without Venoxia cannot be gated",
+    "effect": "el proceso termina en error y nombra la raíz inspeccionada",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unusable oracle config is a usage error",
+    "effect": "el proceso termina en error por configuración de oráculo inutilizable",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The usage error names the unusable file",
+    "effect": "el proceso falla y nombra en stderr venoxia.json",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The template directory is gone",
+    "effect": "el directorio templates/ci/ no existe en el repositorio",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No workflow file under templates",
+    "effect": "ningún fichero bajo templates/ tiene extensión .yml o .yaml",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No file under templates pins a runner",
+    "effect": "ningún fichero bajo templates/ contiene la clave runs-on:",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No checkout or secret of a workflow ships in the repository",
+    "effect": "ningún fichero del repositorio contiene actions/checkout ni secrets. en {{ }}",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No workflow pinned to a runner ships in the repository",
+    "effect": "ningún fichero del repositorio contiene la clave runs-on seguida de dos puntos",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The README names the gate command",
+    "effect": "README.md nombra el comando scripts/gate.py",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The README explains the exit codes",
+    "effect": "README explica los códigos 0, 1 y 2, aclarando que 2 bloquea",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The gate warns about it in its own help",
+    "effect": "gate.py --help advierte que ejecuta test_command sin secretos",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The README warns that the gate runs the project's tests",
+    "effect": "README advierte que el comando ejecuta el test_command del proyecto",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The README says what the gate does not run",
+    "effect": "README aclara que archivados los ejecuta la suite del proyecto",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The published documentation does not name the internal forge",
+    "effect": "la documentación publicada no menciona 'forgejo' en ningún caso",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The published documentation does not name the internal runner labels",
+    "effect": "la documentación publicada no menciona etiquetas de runner ni el puerto 2222",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The published documentation does not name the backup mirror",
+    "effect": "la documentación publicada no menciona el espejo de respaldo",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]
