@@ -39,7 +39,7 @@ Venoxia empieza donde ya sabes qué comportamiento quieres, y durante la primera
 
 **5 · Escribes el test, con su `@covers`.** En la ruta exacta que dice `verifies:`, con el comentario `@covers R-XXX-000` dentro. El test falla, claro que falla: todavía no hay implementación. Lo que tiene que estar verde en este punto es el validador, no la suite. Vuelve a pasar `/venoxia:validate` hasta que salga `0`.
 
-**6 · `/venoxia:diverge`.** Dos lectores aislados con consignas distintas y el abogado del diablo leen el delta sin haber estado en la conversación donde nació, y el script calcula la divergencia y formula las preguntas cerradas. Con el validador y la divergencia los dos en `0`, y sólo entonces, el `change.json` pasa a `"state": "validated"`.
+**6 · `/venoxia:diverge`.** Dos lectores aislados con consignas distintas y el abogado del diablo leen el delta sin haber estado en la conversación donde nació, y el script calcula la divergencia y formula las preguntas cerradas. La skill las plantea una a una, como entrevista, y anota cada respuesta literal en `decisions.json` para que llegue al delta sin pasar por una reformulación. Con el validador y la divergencia los dos en `0`, y sólo entonces, el `change.json` pasa a `"state": "validated"`.
 
 **7 · `/venoxia:verify` graba el rojo.** El test ya existe y ya está enlazado con `@covers`, pero todavía no hay implementación: es el momento exacto de dejar constancia de que el oráculo está en rojo, antes de escribir una sola línea de código de producción. El primer run de `.venoxia/changes/<id>/oracle.json` queda con `all_green: false` y, casi siempre, con todos los requisitos en `missing` o `red` — el punto de partida documentado, no una inferencia de memoria. Con el change en `draft` o `specified`, la skill remite a `/venoxia:validate` y `/venoxia:diverge` y para: no hay nada que grabar sin divergencia comprobada.
 
@@ -215,7 +215,7 @@ Se usan en este orden:
 1. **`/venoxia:charter`** — la entrevista que define el proyecto antes de que exista código: propósito, usuarios, capabilities priorizadas, fuera de alcance y apuestas. Escribe `.venoxia/charter.md` y `.venoxia/principles.md`, y entrega el `/venoxia:specify` exacto de la capability de prioridad 1. Se usa una vez por proyecto; después sólo se vuelve al acta para añadir una fila o resolver una apuesta.
 2. **`/venoxia:specify "…"`** — lee el acta, los principios y las capabilities existentes, escribe la `proposal.md` y el delta en EARS, con `verifies:` y `confidence:` en cada requisito desde el primer borrador.
 3. **`/venoxia:validate`** — ejecuta el validador determinista sobre `.venoxia/` y presenta los findings agrupados por severidad, con la corrección concreta de cada uno.
-4. **`/venoxia:diverge`** — despacha dos lectores aislados y un abogado del diablo sobre el delta, y enfrenta sus lecturas para convertir cada desacuerdo en una pregunta cerrada.
+4. **`/venoxia:diverge`** — despacha dos lectores aislados y un abogado del diablo sobre el delta, y enfrenta sus lecturas para convertir cada desacuerdo en una pregunta cerrada. Las preguntas se plantean después como entrevista, una por llamada a `AskUserQuestion`, con la pregunta y las opciones literales del script; cada respuesta se anota tal cual en `.venoxia/changes/<id>/decisions.json`, y es ese texto —no una reformulación de la skill— el que va al escenario del delta.
 5. **`/venoxia:verify`** — envuelve `oracle.py`: graba el rojo antes de que exista el código, y el verde después. Sólo escribe `"state": "verified"` cuando el último run está en verde y el historial de `oracle.json` acredita que cada requisito estuvo antes en rojo o `missing`; con un verde que no tiene rojo detrás, avisa y pide confirmación explícita antes de escribirlo.
 
    Cómo se comparan las lecturas, que es de donde sale la utilidad del informe:
@@ -224,7 +224,7 @@ Se usan en este orden:
    |---|---|---|
    | `scenario` | presencia | Un escenario que sólo ve un lector es divergencia **dura** |
    | `status_code` | igualdad | Dos códigos distintos son divergencia **dura** |
-   | `side_effects` | cobertura contra el repertorio entero del otro lector —`effect` incluido— | Un efecto que nadie más recoge **en ningún campo** es divergencia **dura** |
+   | `side_effects` | cobertura contra el repertorio entero del otro lector —`effect` incluido— | Un efecto que nadie más recoge **en ningún campo** es divergencia **dura** sólo si el otro lo **contradice** —por negación, por alcance o por cifra—; si sólo añade, es **blanda**. El informe nombra la señal que lo hizo duro y el JSON la lleva en `signal` |
    | `effect` | Jaccard de tokens de contenido, umbral `0.6` | Por debajo, divergencia **blanda** |
 
    La prosa se compara **sin palabras vacías y sin conjugación**: «registra el plazo como 21 días» y «el plazo queda registrado como 21 días» son la misma lectura, y contar los artículos convertía cada diferencia de estilo en una pregunta. Las cifras, en cambio, no se diluyen nunca: si las dos lecturas no nombran los mismos números, la similitud es cero por mucho que compartan el resto —«21 días» contra «14 días» comparten cinco palabras de seis y describen escenarios distintos—.
@@ -340,7 +340,14 @@ El esquema JSON, versión 1 y estable como el de `validate.py`:
 
 Códigos de salida: `0` todos los requisitos en `green` (o `--dry-run`) · `1` alguno en `red`, `missing` o `timeout` · `2` error de uso.
 
-`--record` añade la ejecución a `.venoxia/changes/<id>/oracle.json` —`{"version": 1, "change": "<id>", "runs": [...]}`, con un tope de 50 runs— en vez de sustituirlo: así el historial de un change cuenta su propio ciclo rojo→verde. Un `oracle.json` que no se deja interpretar no detiene el registro: se avisa por `stderr` y se empieza un historial nuevo, con el mismo criterio que el guardián aplica a un `change.json` corrupto.
+`--record` añade la ejecución a `.venoxia/changes/<id>/oracle.json` —`{"version": 1, "change": "<id>", "runs": [...]}`, con un tope de 50 runs— en vez de sustituirlo: así el historial de un change cuenta su propio ciclo rojo→verde. Un `oracle.json` que no se deja interpretar no detiene el registro: se avisa por `stderr` y se empieza un historial nuevo, con el mismo criterio que el guardián aplica a un `change.json` corrupto. Pero el original no se pierde: antes de escribir el historial nuevo, los bytes del fichero corrupto se copian a `oracle.json.corrupt-<marca>` junto a él, con un nombre que nunca pisa una copia anterior, y el aviso nombra la copia. Si la copia no se puede escribir, el historial no se sustituye: quedarse sin el rojo que `V18` busca es peor que quedarse sin grabar un run.
+
+`--dry-run` y `--record` se excluyen: pedir los dos a la vez es un error de uso (código `2`, sin ejecutar ni escribir nada). Un run grabado sin haber ejecutado nada sería indistinguible de un verde para todo lo que lee `oracle.json` del disco —`V17`, `gate.py`, `/venoxia:verify`—, y ésa es exactamente la evidencia que el ciclo no puede fabricar.
+
+Dos límites del oráculo, declarados porque no tienen arreglo dentro de él:
+
+- **El `test_command` es del proyecto y el oráculo no lo juzga.** Lo único que comprueba es que traiga `{files}`; un comando que siempre termina en `0` pone todos los requisitos en verde. Quien revisa un `verified` mira también qué comando lo produjo, que por eso viaja en `runner.command` dentro de cada run.
+- **El presupuesto de `--timeout` es por requisito, no por change.** N requisitos con runners colgados tardan N × timeout en terminar. Con el valor por omisión (600 s) un change de diez requisitos puede llevar más de una hora en devolver su rojo; si eso importa, se baja el `--timeout`.
 
 ## El modelo de confianza del guardián
 

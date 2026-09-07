@@ -1,0 +1,12 @@
+[
+  {
+    "attack": "El escenario 2 obliga a clasificar como blanda una pareja cuyos textos difieren en mucho más que la negación («mensaje en stderr indicando que no se grabó el run» vs «stderr avisa de que el run no se ha grabado»), así que la única implementación que lo pasa es la laxa: «hay una negación después de que/cuando/porque/si → blanda». Con esa regla, «el guardián deniega cuando el change está validado» frente a «el guardián deniega cuando el change no está validado» sale blanda, diff_readings.py cierra con 0, /venoxia:diverge escribe state: validated y se abre el guardián al código sobre una contradicción de polaridad sin resolver.",
+    "requirement_id": "R-DIV-011",
+    "severity": "high"
+  },
+  {
+    "attack": "El requisito manda clasificar «la divergencia» como blanda, no la señal de polaridad, y no acota el efecto a la señal que la disparó: una implementación literal marca blanda toda la divergencia del escenario en cuanto detecta la variante ambos/ambas o la negación subordinada, silenciando de paso las señales duras que ese mismo escenario tuviera por otros motivos (efecto ausente en un lector, verbos opuestos como «se borra» vs «se conserva»), que quedan sin bloquear y sin arreglo salvo revisión manual.",
+    "requirement_id": "R-DIV-011",
+    "severity": "medium"
+  }
+]

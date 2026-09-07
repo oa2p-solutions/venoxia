@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "El requisito sólo prohíbe «escribir `oracle.json`» y el único escenario que lo observa se ejecuta sobre un change *sin* `oracle.json`; una implementación que abre el fichero de salida en modo escritura (truncándolo) al arrancar y sólo después detecta el conflicto de flags cumple los tres escenarios y sale con 2, pero deja vacío el historial de un change que sí lo tenía, destruyendo el run rojo previo que `/venoxia:verify` y V17 exigen para llegar a `verified`.",
+    "requirement_id": "R-ORC-011",
+    "severity": "high"
+  },
+  {
+    "attack": "El requisito exige copiar el original «antes de escribir el historial nuevo» pero no dice qué hacer si la copia no se puede escribir (permisos, disco lleno, nombre colisionado); una implementación que envuelve la copia en un try/except silencioso y continúa con el `--record` cumple los tres escenarios en el caso feliz y, en el caso de fallo, sobrescribe el `oracle.json` corrupto perdiendo para siempre los bytes originales, que era justo lo que el requisito venía a salvar.",
+    "requirement_id": "R-ORC-012",
+    "severity": "high"
+  },
+  {
+    "attack": "Nada obliga a que `<marca>` sea única: usar una constante (`oracle.json.corrupt-old`) o una marca de segundo entero satisface los tres escenarios, pero una segunda corrupción sobrescribe la copia de la primera y el único rastro del historial original desaparece sin aviso.",
+    "requirement_id": "R-ORC-012",
+    "severity": "medium"
+  }
+]

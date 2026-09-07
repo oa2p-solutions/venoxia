@@ -1,0 +1,14 @@
+[
+  {"scenario": "Both flags in one invocation", "effect": "el proceso termina sin ejecutar el runner", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "Nothing is written under both flags", "effect": "el proceso termina y no crea ningún fichero", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The usage error names both flags", "effect": "stderr muestra un aviso que nombra ambos flags", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "An existing history is left intact", "effect": "oracle.json queda sin modificar, byte a byte", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The original bytes survive in the copy", "effect": "se crea una copia con los bytes originales del historial corrupto", "status_code": "0", "side_effects": ["crea oracle.json.corrupt-<marca> con los bytes originales", "escribe el historial nuevo en oracle.json"], "unclear": false, "unclear_why": null},
+  {"scenario": "The warning names the copy", "effect": "stderr muestra un aviso que nombra la ruta de la copia", "status_code": "0", "side_effects": ["crea la copia del historial corrupto"], "unclear": false, "unclear_why": null},
+  {"scenario": "No history, no copy", "effect": "se crea únicamente el fichero oracle.json", "status_code": "0", "side_effects": ["crea oracle.json"], "unclear": false, "unclear_why": null},
+  {"scenario": "A copy that cannot be written keeps the original in place", "effect": "el historial corrupto original no se sustituye", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "A failed copy is reported as a run that was not recorded", "effect": "stderr avisa de que el run no se ha grabado", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "A run that could not be recorded is not a verdict", "effect": "el proceso termina sin registrar el run como verdicto", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "A readable history with extra keys is not corrupt", "effect": "el historial suma el run actual a los anteriores", "status_code": "0", "side_effects": ["añade el run actual a la lista runs existente", "no crea ninguna copia"], "unclear": false, "unclear_why": null},
+  {"scenario": "A second corruption never overwrites the first copy", "effect": "quedan dos copias distintas del historial corrupto", "status_code": "0", "side_effects": ["crea una segunda copia con sufijo numérico tras la marca", "no sobrescribe la primera copia"], "unclear": false, "unclear_why": null}
+]

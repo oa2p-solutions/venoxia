@@ -1,0 +1,12 @@
+[
+  {
+    "attack": "El requisito sólo exige «un sufijo numérico tras la marca si ese nombre ya existe» y el único escenario que lo prueba usa dos corrupciones; una implementación que, al ver ocupado `oracle.json.corrupt-<marca>`, escriba siempre `oracle.json.corrupt-<marca>-1` cumple el texto y los escenarios, pero en la tercera corrupción con la misma marca sobrescribe la copia anterior y destruye para siempre los bytes que el requisito promete conservar.",
+    "requirement_id": "R-ORC-012",
+    "severity": "medium"
+  },
+  {
+    "attack": "En la vía corrupta el delta sólo exige «escribir el historial nuevo» sin decir qué contiene (el escenario que obliga a «sus runs anteriores más el actual» es únicamente el del historial legible); una implementación que copie aparte el fichero corrupto y deje `oracle.json` como `{\"runs\": []}` pasa los siete escenarios, sale con código 0 y sin el aviso de «no se ha grabado», de modo que el usuario cree registrada una ejecución completa de la suite que en realidad no consta en ninguna parte y bloquea después la verificación.",
+    "requirement_id": "R-ORC-012",
+    "severity": "medium"
+  }
+]

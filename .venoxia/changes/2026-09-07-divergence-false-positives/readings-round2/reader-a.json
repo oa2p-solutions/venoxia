@@ -1,0 +1,42 @@
+[
+  {
+    "scenario": "Gender variants of the same quantifier",
+    "effect": "la diferencia de género del cuantificador no cuenta como divergencia dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A negation deep inside a subordinate clause",
+    "effect": "la negación dentro de la subordinada no cuenta como divergencia dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A condition dragged into one effect only",
+    "effect": "la condición que aparece en un solo efecto no cuenta como dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A negated condition against an affirmed one",
+    "effect": "la condición negada frente a la afirmada sí cuenta como divergencia dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A plain negation still contradicts",
+    "effect": "la negación simple del efecto cuenta como divergencia dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

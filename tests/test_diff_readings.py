@@ -11,6 +11,9 @@ Todo se ejecuta por subproceso sobre un proyecto en un directorio temporal, salv
 @covers R-DIV-005
 @covers R-DIV-006
 @covers R-DIV-007
+@covers R-DIV-008
+@covers R-DIV-011
+@covers R-DIV-012
 """
 
 from __future__ import annotations
@@ -59,7 +62,7 @@ TOP_LEVEL_KEYS = [
 COUNT_KEYS = ["hard", "soft", "gaps", "scenarios", "readers"]
 
 #: Las claves de una divergencia y de una laguna en el JSON del contrato.
-DIVERGENCE_KEYS = ["scenario", "field", "hardness", "readings", "question", "options"]
+DIVERGENCE_KEYS = ["scenario", "field", "hardness", "readings", "question", "options", "signal"]
 GAP_KEYS = ["scenario", "reader", "why"]
 
 #: El par de lecturas que diverge de forma **blanda**: dicen dos cosas
@@ -2300,6 +2303,176 @@ class TestAgentFrontmatter(unittest.TestCase):
             with self.subTest(agente=relpath):
                 data, _ = self.frontmatter(relpath)
                 self.assertEqual(data.get("name"), (REPO_ROOT / relpath).stem)
+
+
+class TestHardSignal(DiffCase):
+    """R-DIV-008 · una dura de side_effects dice qué señal la hizo dura, en el informe y en el JSON."""
+
+    # @covers R-DIV-008
+    def _side_effects(self, run: CompletedRun) -> list[dict]:
+        return [d for d in run.json["divergences"] if d["field"] == "side_effects"]
+
+    def test_a_negation_is_reported_as_polarity_and_the_report_names_the_mark(self):
+        run = self.diff(
+            {
+                "a": [reading("Budget", "procesa", "200", ["no se crea el presupuesto"])],
+                "b": [reading("Budget", "procesa", "200", ["se crea el presupuesto"])],
+            },
+            "--json",
+        )
+        hard = [d for d in self._side_effects(run) if d["hardness"] == "hard"]
+        self.assertEqual(len(hard), 1, run.describe())
+        self.assertEqual(hard[0]["signal"], "polarity", run.describe())
+
+        report = self.project.diff("d", "--no-color")
+        self.assertIn("«no»", report.stdout, report.describe())
+
+    def test_a_different_number_is_reported_as_numeric_with_both_numbers(self):
+        run = self.diff(
+            {
+                "a": [reading("Hold", "reserva", "200", ["la reserva dura 15 minutos"])],
+                "b": [reading("Hold", "reserva", "200", ["la reserva dura 30 minutos"])],
+            },
+            "--json",
+        )
+        hard = [d for d in self._side_effects(run) if d["hardness"] == "hard"]
+        self.assertEqual(len(hard), 1, run.describe())
+        self.assertEqual(hard[0]["signal"], "numeric", run.describe())
+
+        report = self.project.diff("d", "--no-color")
+        self.assertIn("15", report.stdout, report.describe())
+        self.assertIn("30", report.stdout, report.describe())
+
+    def test_a_soft_divergence_carries_no_signal(self):
+        run = self.diff(
+            {
+                "a": [reading("Mail", "envia", "200", ["queda registrado el envío en el histórico"])],
+                "b": [reading("Mail", "envia", "200", [])],
+            },
+            "--json",
+        )
+        soft = [d for d in self._side_effects(run) if d["hardness"] == "soft"]
+        self.assertEqual(len(soft), 1, run.describe())
+        self.assertIsNone(soft[0]["signal"], run.describe())
+
+
+class TestPolarityFalsePositives(DiffCase):
+    """R-DIV-011 · los falsos positivos reales del 2026-09-07, como regresión.
+
+    Los tres casos salieron de paneles reales el mismo día: los dos primeros
+    declaraban incompatibles a dos lectores que decían lo mismo, y el tercero
+    es el contrapunto que impide que la corrección se coma la señal entera.
+    """
+
+    # @covers R-DIV-011
+    def _hard_side_effects(self, run: CompletedRun) -> list[dict]:
+        return [
+            d for d in run.json["divergences"]
+            if d["field"] == "side_effects" and d["hardness"] == "hard"
+        ]
+
+    def test_gender_variants_of_the_same_quantifier_are_soft(self):
+        run = self.diff(
+            {
+                "a": [reading("Flags", "termina con codigo 2", "2", ["stderr nombra ambas flags"])],
+                "b": [reading("Flags", "termina con codigo 2", "2", ["stderr nombra ambos flags"])],
+            },
+            "--json",
+        )
+        self.assertEqual(self._hard_side_effects(run), [], run.describe())
+
+    def test_a_negation_deep_inside_a_subordinate_clause_is_soft(self):
+        run = self.diff(
+            {
+                "a": [reading("Copy", "avisa", None, ["mensaje en stderr indicando que no se grabó el run"])],
+                "b": [reading("Copy", "avisa", None, ["stderr avisa de que el run no se ha grabado"])],
+            },
+            "--json",
+        )
+        self.assertEqual(self._hard_side_effects(run), [], run.describe())
+
+    def test_a_condition_dragged_into_one_effect_only_is_soft(self):
+        run = self.diff(
+            {
+                "a": [reading("Oracle", "falla", None, ["un oráculo que no termina en verde deja el job en fallo"])],
+                "b": [reading("Oracle", "falla", None, ["el job queda en fallo"])],
+            },
+            "--json",
+        )
+        self.assertEqual(self._hard_side_effects(run), [], run.describe())
+
+    def test_a_negation_against_a_different_verb_is_soft(self):
+        run = self.diff(
+            {
+                "a": [reading("History", "intacto", "2", ["oracle.json no se modifica"])],
+                "b": [reading("History", "intacto", "2", ["oracle.json conserva su contenido byte a byte"])],
+            },
+            "--json",
+        )
+        self.assertEqual(self._hard_side_effects(run), [], run.describe())
+
+    def test_a_negated_condition_against_an_affirmed_one_is_hard(self):
+        run = self.diff(
+            {
+                "a": [reading("Guard", "decide", None, ["deniega cuando el change no está validado"])],
+                "b": [reading("Guard", "decide", None, ["deniega cuando el change está validado"])],
+            },
+            "--json",
+        )
+        self.assertEqual(len(self._hard_side_effects(run)), 1, run.describe())
+
+    def test_a_plain_negation_still_contradicts(self):
+        run = self.diff(
+            {
+                "a": [reading("Budget", "procesa", "200", ["se crea el presupuesto"])],
+                "b": [reading("Budget", "procesa", "200", ["no se crea el presupuesto"])],
+            },
+            "--json",
+        )
+        self.assertEqual(len(self._hard_side_effects(run)), 1, run.describe())
+
+
+class TestScopeClasses(DiffCase):
+    """R-DIV-012 · las marcas de alcance se comparan por clase, no por palabra."""
+
+    # @covers R-DIV-012
+    def _hard_side_effects(self, run: CompletedRun) -> list[dict]:
+        return [
+            d for d in run.json["divergences"]
+            if d["field"] == "side_effects" and d["hardness"] == "hard"
+        ]
+
+    def test_two_synonyms_of_the_same_class_are_not_a_contradiction(self):
+        run = self.diff(
+            {
+                "a": [reading("Record", "graba", "0", ["crea oracle.json como único fichero nuevo"])],
+                "b": [reading("Record", "graba", "0", ["crea sólo oracle.json"])],
+            },
+            "--json",
+        )
+        self.assertEqual(self._hard_side_effects(run), [], run.describe())
+
+    def test_a_mark_against_no_mark_is_not_a_contradiction(self):
+        run = self.diff(
+            {
+                "a": [reading("Record", "graba", "0", ["crea oracle.json"])],
+                "b": [reading("Record", "graba", "0", ["crea sólo oracle.json"])],
+            },
+            "--json",
+        )
+        self.assertEqual(self._hard_side_effects(run), [], run.describe())
+
+    def test_two_marks_of_different_classes_still_contradict(self):
+        run = self.diff(
+            {
+                "a": [reading("Hold", "reserva", "200", ["reserva creada para el pedido completo"])],
+                "b": [reading("Hold", "reserva", "200", ["reserva creada sólo para las unidades con stock"])],
+            },
+            "--json",
+        )
+        hard = self._hard_side_effects(run)
+        self.assertEqual(len(hard), 1, run.describe())
+        self.assertEqual(hard[0]["signal"], "scope", run.describe())
 
 
 if __name__ == "__main__":

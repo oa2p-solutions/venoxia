@@ -6,6 +6,7 @@ allowed-tools:
   - Read
   - Write
   - Glob
+  - AskUserQuestion
   - Agent(venoxia:reader, venoxia:devils-advocate)
   - Bash(mkdir -p *)
   - Bash(python3 "${CLAUDE_PLUGIN_ROOT}/scripts/diff_readings.py" *)
@@ -124,9 +125,44 @@ Si necesitas la salida en máquina, `--json` emite el mismo veredicto con las cl
 
 Y **no resumas ni reinterpretes el informe.** Las preguntas cerradas que escribe el script llevan las dos lecturas enfrentadas y sus opciones; se presentan al usuario con su texto, su orden y sus opciones tal como el script las emitió. No las agrupes, no las priorices, no contestes ninguna por tu cuenta y no añadas «esta probablemente sea menor»: la que te parece menor es la que nadie preguntará y la que aparecerá en producción.
 
-Lo que sí haces: decir dónde está el informe (`.venoxia/changes/<id>/divergence.md`), dar el recuento del script y reproducir las preguntas.
+Lo que sí haces: decir dónde está el informe (`.venoxia/changes/<id>/divergence.md`), dar el recuento del script, y luego plantear las preguntas como entrevista, que es el paso siguiente.
+
+Cuando una divergencia es dura, el informe dice **por qué señal** lo es —su negación, su alcance, la cifra, o que el otro lector no registró ningún efecto— y el JSON lo lleva en la clave `signal`. Repítelo tal cual al presentar la pregunta: es lo que permite reconocer a simple vista un falso positivo del motor (dos lecturas que dicen lo mismo y la señal las enfrenta por una palabra) y contarlos después con `grep '"signal": "polarity"'` sobre los informes en JSON.
 
 Los ataques del abogado del diablo aparecen en el informe pero **no** cuentan para el código de salida. Un ataque de severidad `high` con el script en `0` merece que lo pongas delante del usuario igualmente, señalado como lo que es: no bloquea el estado, pero es la clase de cosa que se descubre tarde.
+
+## Paso 4b · La entrevista: una pregunta por llamada
+
+Las preguntas del informe —las de `divergences` y las de `gap_questions`, en el JSON— se plantean al usuario con `AskUserQuestion`, **una pregunta por llamada**, en el orden del informe, y se paran cuando el usuario lo pida. Contestarlas en bloque es lo que este paso viene a evitar: las últimas de una lista larga se contestan sin mirar, y la que se contesta sin mirar es la ambigüedad que llega al código.
+
+Cómo se monta cada llamada:
+
+- **La pregunta y las opciones son las del script, literales.** El texto de `question` va como pregunta; cada entrada de `options` va como una opción, con su texto tal cual, en su orden. No se agrupan preguntas de escenarios distintos en una llamada, no se reordenan por importancia y no se reescriben las opciones para que suenen mejor: el usuario tiene que elegir entre lo que los lectores leyeron, no entre tu resumen de lo que leyeron.
+- **La descripción de cada opción sólo dice dos cosas**: de qué lector viene esa lectura (lo dice el propio informe) y qué tendría que decir el delta si se elige («el escenario pasaría a decir esto en su `THEN`»; «el delta tendría que decirlo explícitamente»; «las dos lecturas se dan por equivalentes y el delta no cambia»). Nada de recomendaciones, nada de «probablemente», nada de ventajas que el informe no diga: la skill no tiene voto sobre las lecturas, tampoco disfrazado de descripción.
+- **El encabezado** es el título del escenario, recortado si hace falta, y el detalle del informe —el párrafo que explica el desacuerdo y, en las duras, la señal que lo hizo duro— se muestra antes de la llamada, en el mensaje, para que la pregunta no llegue sin contexto.
+- Con dos lectores ninguna pregunta del script pasa de cuatro opciones, que es lo que admite la herramienta. Con tres lectores alguna podría pasar; si ocurre, plantéala en el mensaje con todas sus opciones y pide la letra, y dilo como límite conocido.
+
+## Paso 4c · Anotar cada respuesta tal cual
+
+Cada respuesta se **añade** a `.venoxia/changes/<id>/decisions.json` en cuanto llega, sin borrar las anteriores, con esta forma:
+
+```json
+{"version": 1, "change": "<id>",
+ "decisions": [
+   {"at": "2026-09-07T18:40:00Z",
+    "scenario": "<título literal del escenario>",
+    "field": "side_effects",
+    "question": "<texto literal de la pregunta>",
+    "options": ["<opción A literal>", "<opción B literal>"],
+    "chosen": 0,
+    "answer": "<texto literal de la opción elegida, o lo que el usuario escribió>"}
+ ]}
+```
+
+- `scenario`, `question` y `options` se copian del informe; `chosen` es el índice de la opción elegida, o `null` si el usuario escribió su propia respuesta; `answer` es el texto que va a ir al delta.
+- **Una respuesta escrita a mano se anota con las palabras del usuario**, no con las tuyas mejoradas. Ese texto es el dato; tu reformulación es una interpretación que nadie ha aprobado.
+- Si el fichero ya existe de una pasada anterior, se le añaden las entradas nuevas sin borrar las anteriores; cada entrada lleva su `at`, y ante dos entradas con el mismo `scenario` y la misma `question` vale la más reciente. Así una segunda divergencia sobre el delta corregido no pierde lo que ya se decidió, y tampoco lo confunde con lo nuevo.
+- Si el usuario para la entrevista a medias, el fichero conserva lo contestado hasta ahí y la entrega dice cuántas preguntas quedan.
 
 ## Paso 5 · El estado sólo cambia si pasan los dos
 
@@ -146,6 +182,6 @@ Con `validated` ya escrito, el siguiente paso tecleado es `/venoxia:verify`: ant
 
 ## Cuando el usuario responde las preguntas
 
-Las respuestas se llevan al delta —`/venoxia:specify` o edición manual—, no aquí: esta skill no edita deltas. Después se vuelve a pasar `/venoxia:validate` y `/venoxia:diverge`, con lecturas nuevas. Reutilizar las lecturas viejas contra un delta corregido no comprueba nada.
+Las respuestas se llevan al delta —`/venoxia:specify` o edición manual—, no aquí: esta skill no edita deltas. Quien las lleve copia al escenario el `answer` de `decisions.json` **literal**, sin reformularlo: la opción elegida es la lectura de un lector o las palabras del usuario, y en cuanto se «mejora» vuelve a ser texto que nadie ha leído a solas. Después se vuelve a pasar `/venoxia:validate` y `/venoxia:diverge`, con lecturas nuevas. Reutilizar las lecturas viejas contra un delta corregido no comprueba nada.
 
 Y una advertencia honesta sobre el alcance del panel: que dos lectores converjan demuestra que **estos dos** leyeron igual, no que el texto sea unívoco. Es un suelo, no una prueba. Dilo si el usuario le atribuye más de lo que da, pero no lo uses para poner en duda un veredicto del script.

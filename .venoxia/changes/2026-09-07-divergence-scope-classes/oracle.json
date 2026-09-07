@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "change": "2026-09-07-divergence-scope-classes",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-07T19:27:12Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-DIV-012",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 7651,
+          "output_tail": "      \"options\": [\n        \"«crea oracle.json como único fichero nuevo»\",\n        \"«crea sólo oracle.json»\",\n        \"Ninguno de esos efectos pertenece al escenario: sobran de la lectura\"\n      ],\n      \"signal\": \"scope\"\n    }\n  ],\n  \"gaps\": [],\n  \"attacks\": [],\n  \"advocate\": \"absent\"\n}\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 120 tests in 7.605s\n\nFAILED (failures=2)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 1,
+        "missing": 0,
+        "timeout": 0,
+        "total": 1
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-07T19:28:21Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-DIV-012",
+          "verifies": [
+            "tests/test_diff_readings.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 7229,
+          "output_tail": "........................................................................................................................\n----------------------------------------------------------------------\nRan 120 tests in 7.177s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 1,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 1
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

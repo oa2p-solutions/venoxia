@@ -1,0 +1,14 @@
+[
+  {"scenario": "Both flags in one invocation", "effect": "el proceso termina sin ejecutar nada", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "Nothing is written under both flags", "effect": "el proceso termina y no crea ningún fichero", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The usage error names both flags", "effect": "el proceso termina y avisa por stderr de ambos flags", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "An existing history is left intact", "effect": "el proceso termina y oracle.json queda igual", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The original bytes survive in the copy", "effect": "el proceso graba el run y conserva la copia corrupta original", "status_code": "0", "side_effects": ["crea oracle.json.corrupt-<marca> con los bytes originales", "escribe el historial nuevo en oracle.json"], "unclear": false, "unclear_why": null},
+  {"scenario": "The warning names the copy", "effect": "el proceso graba el run y avisa con la ruta de la copia", "status_code": "0", "side_effects": ["crea la copia corrupt-<marca>"], "unclear": false, "unclear_why": null},
+  {"scenario": "No history, no copy", "effect": "el proceso crea sólo oracle.json, sin copia", "status_code": "0", "side_effects": ["crea oracle.json"], "unclear": false, "unclear_why": null},
+  {"scenario": "A copy that cannot be written keeps the original in place", "effect": "oracle.json conserva su contenido original intacto", "status_code": null, "side_effects": [], "unclear": true, "unclear_why": "el escenario no indica el código de salida, aunque el texto del requisito general para este caso dice 2"},
+  {"scenario": "A failed copy is reported as a run that was not recorded", "effect": "stderr avisa que el run no se ha grabado", "status_code": null, "side_effects": [], "unclear": true, "unclear_why": "el escenario no indica el código de salida en su propio THEN"},
+  {"scenario": "A run that could not be recorded is not a verdict", "effect": "el proceso termina sin registrar el run", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "A readable history with extra keys is not corrupt", "effect": "el historial conserva runs previos y añade el actual", "status_code": "0", "side_effects": ["añade el run actual al historial existente"], "unclear": false, "unclear_why": null},
+  {"scenario": "A second corruption never overwrites the first copy", "effect": "cada invocación graba el run y crea una copia distinta", "status_code": "0", "side_effects": ["crea una segunda copia con sufijo numérico tras la marca"], "unclear": false, "unclear_why": null}
+]

@@ -335,21 +335,57 @@ NEGATION_MARKERS = frozenset(
 #: Deliberadamente **no** entran aquí los indefinidos y distributivos —«cada»,
 #: «alguno», «cualquier»—: aparecen y desaparecen por estilo entre dos
 #: redacciones del mismo hecho, y contarlos reinstauraría el falso positivo que
-#: este cambio existe para quitar.
-SCOPE_MARKERS = frozenset(
-    """
-    solo solamente unicamente unico unica
-    parcial parciales parcialmente
-    completo completa completos completas completamente
-    total totales totalmente
-    todo toda todos todas ambos ambas
-    """.split()
-)
+#: este cambio existe para quitar. Tampoco «ambos»/«ambas» (`R-DIV-011`): la
+#: primera versión los traía, y el tercer delta real que pasó por el motor
+#: declaró incompatibles «stderr nombra ambas flags» y «stderr nombra ambos
+#: flags», que sólo difieren en el género del cuantificador. Es un
+#: cuantificador de estilo, como «cada», no una elección entre parcial y total.
+#: Las tres clases del eje (`R-DIV-012`). Se comparan **clases**, no palabras:
+#: «único» y «sólo» acotan lo mismo, y contarlas como marcas distintas declaró
+#: incompatibles «crea oracle.json como único fichero nuevo» y «crea sólo
+#: oracle.json». Y una marca frente a ninguna tampoco contradice: «crea sólo
+#: oracle.json» precisa a «crea oracle.json», no lo niega.
+SCOPE_CLASSES: dict[str, frozenset[str]] = {
+    "only": frozenset("solo solamente unicamente unico unica".split()),
+    "partial": frozenset("parcial parciales parcialmente".split()),
+    "total": frozenset(
+        """
+        completo completa completos completas completamente
+        total totales totalmente
+        todo toda todos todas
+        """.split()
+    ),
+}
+SCOPE_MARKERS = frozenset().union(*SCOPE_CLASSES.values())
+
+
+def scope_classes(words: list[str]) -> frozenset[str]:
+    """Las clases de alcance que trae una lista de palabras normalizadas."""
+    return frozenset(name for name, marks in SCOPE_CLASSES.items() if any(w in marks for w in words))
+
+
+def scope_marks(text: object) -> list[str]:
+    """Las marcas de alcance literales de un texto, para nombrarlas en el informe."""
+    return [word for word in normalize(text).split() if word in SCOPE_MARKERS]
+
+
+def scope_differs(mine: frozenset[str], theirs: frozenset[str]) -> bool:
+    """El alcance sólo contradice cuando los dos lo acotan y lo acotan distinto."""
+    return bool(mine) and bool(theirs) and mine != theirs
 
 #: Todo lo que cambia el **sentido** de una frase en vez de añadirle detalle.
 #: Se descuenta del sujeto para poder preguntar «¿hablan de lo mismo?» aparte de
 #: «¿dicen lo mismo sobre ello?».
 CONTRADICTION_MARKERS = NEGATION_MARKERS | SCOPE_MARKERS
+
+#: Cuánto del efecto negado tiene que repetir el otro para que la negación
+#: cuente como contradicción (`R-DIV-011`). Con el umbral general (0,6) bastaba
+#: compartir el nombre del fichero: «oracle.json no se modifica» y «oracle.json
+#: conserva su contenido» se declaraban incompatibles por «oracle» y «json»,
+#: cuando lo que difiere es el verbo, y los antónimos verbales están declarados
+#: del lado blando en `R-DIV-005`. Una negación contradice a lo que niega, no a
+#: lo que se le parece: el predicado tiene que ser el mismo.
+NEGATION_SUBJECT_THRESHOLD = 0.8
 
 
 #: Las que abren una subordinada. Una negación detrás de una de ellas califica
@@ -360,13 +396,25 @@ CONTRADICTION_MARKERS = NEGATION_MARKERS | SCOPE_MARKERS
 SUBORDINATE_OPENERS = frozenset("que si cuando mientras aunque donde porque".split())
 
 
-def polarity(s: object) -> tuple[bool, frozenset[str]]:
-    """La polaridad de un texto: si niega, y con qué alcance.
+def polarity(s: object) -> tuple[bool, frozenset[str], bool | None]:
+    """La polaridad de un texto: si niega, con qué alcance, y qué niega su subordinada.
 
-    Dos dimensiones y dos maneras de compararlas, porque no se comportan igual.
-    La negación es un interruptor: da igual con cuántas partículas se exprese.
-    El alcance es una elección entre alternativas excluyentes, y ahí sí importa
-    **cuál**.
+    Tres dimensiones y tres maneras de compararlas, porque no se comportan
+    igual. La negación de la cláusula principal es un interruptor: da igual con
+    cuántas partículas se exprese. El alcance es una elección entre
+    alternativas excluyentes, y ahí sí importa **cuál**. Y la negación de la
+    **subordinada** —lo que va detrás del primer «que», «cuando», «si»…— se
+    devuelve aparte, o `None` si el texto no abre ninguna: la compara
+    `polarity_differs`, y sólo cuando los dos textos traen subordinada.
+
+    La primera versión ignoraba la negación pegada al subordinante y contaba
+    cualquier otra; el tercer delta real (`R-DIV-011`) declaró incompatibles
+    «indicando que no se grabó el run» y «avisa de que el run no se ha
+    grabado», donde el «no» está dentro de la subordinada en las dos pero sólo
+    en una va pegado al «que». Partir por cláusulas arregla eso sin perder el
+    caso contrario: «deniega cuando el change no está validado» frente a
+    «deniega cuando el change está validado» sigue siendo una contradicción,
+    porque las dos subordinadas se comparan entre sí.
 
     Se lee del texto **normalizado crudo**, no de `content_tokens`: varias de
     estas marcas —«todo», «todas»— son palabras vacías para comparar
@@ -374,12 +422,31 @@ def polarity(s: object) -> tuple[bool, frozenset[str]]:
     contrario de lo que hace falta aquí.
     """
     words = normalize(s).split()
-    negated = any(
-        word in NEGATION_MARKERS
-        and not (index and words[index - 1] in SUBORDINATE_OPENERS)
-        for index, word in enumerate(words)
+    opener = next((index for index, word in enumerate(words) if word in SUBORDINATE_OPENERS), None)
+    main = words if opener is None else words[:opener]
+    subordinate = None if opener is None else words[opener + 1 :]
+    negated = any(word in NEGATION_MARKERS for word in main)
+    negated_subordinate = (
+        None if subordinate is None else any(word in NEGATION_MARKERS for word in subordinate)
     )
-    return negated, frozenset(set(words) & SCOPE_MARKERS)
+    return negated, scope_classes(words), negated_subordinate
+
+
+def polarity_differs(mine: object, theirs: object) -> bool:
+    """¿Dicen lo contrario sobre el mismo sujeto, en negación o en alcance?
+
+    La cláusula principal y el alcance se comparan siempre. La subordinada sólo
+    cuando los dos textos la traen: si uno se trajo la condición del WHEN al
+    efecto y el otro no, la negación de esa condición no es un desacuerdo
+    sobre el efecto (`R-DIV-005`, `R-DIV-011`).
+    """
+    my_negated, my_scope, my_subordinate = polarity(mine)
+    their_negated, their_scope, their_subordinate = polarity(theirs)
+    if my_negated != their_negated or scope_differs(my_scope, their_scope):
+        return True
+    if my_subordinate is None or their_subordinate is None:
+        return False
+    return my_subordinate != their_subordinate
 
 
 def subject_tokens(s: object) -> set[str]:
@@ -604,6 +671,11 @@ class Divergence:
     question: str
     options: list[str]
     detail: str = ""
+    #: Qué señal hizo dura la divergencia (`R-DIV-008`): `polarity`, `scope`,
+    #: `numeric` o `empty-repertoire`. `None` en las blandas y en los campos que
+    #: no la usan. Es la clave que permite contar, sobre deltas reales, cuántas
+    #: duras de polaridad fueron desacuerdos de verdad.
+    signal: str | None = None
 
     def __post_init__(self) -> None:
         # Ninguna pregunta sale con dos opciones iguales, la construya quien la construya.
@@ -618,6 +690,7 @@ class Divergence:
             "readings": self.readings,
             "question": self.question,
             "options": list(self.options),
+            "signal": self.signal,
         }
 
 
@@ -1345,7 +1418,7 @@ def coverage(mine: object, theirs: object) -> float:
     mine_numbers, their_numbers = numeric_tokens(mine), numeric_tokens(theirs)
     if mine_numbers - their_numbers:
         return 0.0
-    if polarity(mine) != polarity(theirs):
+    if polarity_differs(mine, theirs):
         return 0.0
     my_tokens = content_tokens(mine)
     if not my_tokens:
@@ -1360,6 +1433,57 @@ def unmatched_effects(mine: list[str], theirs: list[str], threshold: float) -> l
         for item in mine
         if not any(coverage(item, other) >= threshold for other in theirs)
     ]
+
+
+SIGNAL_POLARITY = "polarity"
+SIGNAL_SCOPE = "scope"
+SIGNAL_NUMERIC = "numeric"
+SIGNAL_EMPTY_REPERTOIRE = "empty-repertoire"
+
+
+def negation_marks(text: object) -> list[str]:
+    """Las marcas de negación que trae el texto, en orden, para nombrarlas en el informe."""
+    return [word for word in normalize(text).split() if word in NEGATION_MARKERS]
+
+
+def contradiction_signals(item: str, other: str, threshold: float) -> list[tuple[str, str]]:
+    """Las señales por las que `other` contradice a `item`, con su explicación.
+
+    Cada elemento es `(señal, explicación)`. Se devuelven **todas** las que
+    disparan, no sólo la primera: ante «no se crea el presupuesto en 15
+    minutos» frente a «se crea el presupuesto en 30 minutos» el informe tiene
+    que nombrar la negación y la cifra, porque las dos son desacuerdos.
+    """
+    signals: list[tuple[str, str]] = []
+    my_negated, my_scope, my_sub = polarity(item)
+    their_negated, their_scope, their_sub = polarity(other)
+    negation_differs = my_negated != their_negated or (
+        my_sub is not None and their_sub is not None and my_sub != their_sub
+    )
+    if negation_differs and _same_predicate_for_polarity(item, other, threshold):
+        marks = negation_marks(item) or negation_marks(other)
+        signals.append((SIGNAL_POLARITY, f"su negación ({quote_list(marks)})"))
+    if scope_differs(my_scope, their_scope):
+        mine = quote_list(scope_marks(item))
+        theirs_ = quote_list(scope_marks(other))
+        signals.append((SIGNAL_SCOPE, f"su alcance ({mine} frente a {theirs_})"))
+    my_numbers, their_numbers = numeric_tokens(item), numeric_tokens(other)
+    if my_numbers != their_numbers:
+        mine = ", ".join(sorted(my_numbers)) if my_numbers else "ninguna cifra"
+        theirs_ = ", ".join(sorted(their_numbers)) if their_numbers else "ninguna cifra"
+        signals.append((SIGNAL_NUMERIC, f"la cifra ({mine} frente a {theirs_})"))
+    return signals
+
+
+def contradiction(item: str, theirs: list[str], threshold: float) -> list[tuple[str, str]]:
+    """Las señales del primer efecto ajeno que habla de lo mismo y dice lo contrario."""
+    for other in theirs:
+        if not same_subject(item, other, threshold):
+            continue
+        signals = contradiction_signals(item, other, threshold)
+        if signals:
+            return signals
+    return []
 
 
 def contradicts(item: str, theirs: list[str], threshold: float) -> bool:
@@ -1379,14 +1503,25 @@ def contradicts(item: str, theirs: list[str], threshold: float) -> bool:
     lector simplemente no dedujo esa consecuencia. Eso es una divergencia
     blanda, no una imposibilidad lógica.
     """
-    for other in theirs:
-        if not same_subject(item, other, threshold):
-            continue
-        if polarity(item) != polarity(other):
-            return True
-        if numeric_tokens(item) != numeric_tokens(other):
-            return True
-    return False
+    return bool(contradiction(item, theirs, threshold))
+
+
+def _same_predicate_for_polarity(item: str, other: str, threshold: float) -> bool:
+    """La negación exige el mismo predicado; el alcance se conforma con el mismo sujeto.
+
+    Una marca de alcance («completo» frente a «sólo») se reparte entre frases
+    que sí cambian de palabras —«el pedido completo», «sólo las unidades con
+    stock»—, así que se compara con el umbral general. Una negación, no: si el
+    otro no repite lo que ésta niega, no la está contradiciendo, está diciendo
+    otra cosa (`R-DIV-011`).
+    """
+    my_negated, my_scope, my_sub = polarity(item)
+    their_negated, their_scope, their_sub = polarity(other)
+    if scope_differs(my_scope, their_scope):
+        return True
+    return same_subject(item, other, max(threshold, NEGATION_SUBJECT_THRESHOLD)) and same_subject(
+        other, item, max(threshold, NEGATION_SUBJECT_THRESHOLD)
+    )
 
 
 def compare_side_effects(
@@ -1436,6 +1571,9 @@ def compare_side_effects(
     # sobre deltas largos, cuatro rondas seguidas de preguntas que no eran
     # desacuerdos. La regla entera está en `contradicts`.
     contradicted = False
+    # La primera señal que dispara decide `signal`; todas las que disparan se
+    # nombran en el detalle (`R-DIV-008`).
+    signals: list[tuple[str, str]] = []
     for name in present:
         missing: list[str] = []
         for other in present:
@@ -1447,8 +1585,14 @@ def compare_side_effects(
                 # Un repertorio ajeno vacío no acredita que el efecto «sólo
                 # añada»: no hay nada contra lo que comprobarlo, y el
                 # desacuerdo es máximo, no mínimo.
-                if not repertoires[other] or contradicts(item, repertoires[other], threshold):
+                if not repertoires[other]:
                     contradicted = True
+                    signals.append((SIGNAL_EMPTY_REPERTOIRE, "el otro lector no registra ningún efecto"))
+                else:
+                    found = contradiction(item, repertoires[other], threshold)
+                    if found:
+                        contradicted = True
+                        signals.extend(found)
         if missing:
             orphans[name] = missing
 
@@ -1472,8 +1616,12 @@ def compare_side_effects(
     # «nadie lo contradice» sería asegurarle al revisor un hecho que nadie ha
     # mirado. Y es ese revisor el último filtro antes de que el guardián abra la
     # puerta al código.
+    reasons: list[str] = []
+    for _signal, reason in signals:
+        if reason not in reasons:
+            reasons.append(reason)
     detail += (
-        " Además, lo que registra el otro lector lo contradice."
+        f" Además, lo que registra el otro lector lo contradice por {join_es(reasons)}."
         if contradicted
         else " Ninguna otra lectura lo niega ni le pone otra cifra: nadie lo contradice"
         " en lo que se ha podido comprobar, así que sólo añade."
@@ -1483,6 +1631,7 @@ def compare_side_effects(
         scenario=group.title,
         field=FIELD_SIDE_EFFECTS,
         hardness=HARDNESS_HARD if contradicted else HARDNESS_SOFT,
+        signal=signals[0][0] if contradicted and signals else None,
         # Sólo lo enfrentado. Los efectos que los dos lectores recogen no están
         # en discusión, y meterlos aquí ponía en la pregunta lecturas que
         # ninguna opción ofrecía: quien la contesta tendría que elegir entre

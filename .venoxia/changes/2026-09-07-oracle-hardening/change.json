@@ -1,0 +1,9 @@
+{
+  "id": "2026-09-07-oracle-hardening",
+  "state": "verified",
+  "via": "spec",
+  "capabilities": [
+    "oracle"
+  ],
+  "created": "2026-09-07T17:05:00Z"
+}

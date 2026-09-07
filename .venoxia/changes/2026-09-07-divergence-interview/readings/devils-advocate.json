@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "La clave `signal` es única y el delta no fija precedencia cuando concurren dos señales: ante «no se crea el presupuesto en 15 minutos» frente a «se crea el presupuesto en 30 minutos», una implementación que emite `signal: \"numeric\"` y nombra sólo el 15 y el 30 cumple los cuatro escenarios (el escenario de la negación sólo aplica a su propio caso), pero el informe y la entrevista posterior nunca mencionan que un lector dice que el efecto no ocurre: el usuario resuelve la duración y la contradicción de fondo sobre si el presupuesto se crea sigue viva en el delta.",
+    "requirement_id": "R-DIV-008",
+    "severity": "medium"
+  },
+  {
+    "attack": "«Nombrar en el informe la señal que la hizo dura» se satisface imprimiendo la palabra `scope` o `empty-repertoire`, porque sólo los escenarios de `polarity` y `numeric` exigen contenido (la marca «no», los dos números); para las otras dos señales el informe puede no decir qué difiere entre las lecturas, y el usuario tiene que contestar la pregunta cerrada a ciegas y esa respuesta se copia literal al delta por R-DIV-010.",
+    "requirement_id": "R-DIV-008",
+    "severity": "medium"
+  },
+  {
+    "attack": "«Sin borrar las respuestas ya anotadas» convierte `decisions.json` en un fichero que nadie limpia ni acota al informe en curso: una segunda pasada de `/venoxia:diverge` sobre el delta ya corregido deja dos entradas con el mismo `scenario` y la misma `question` y `chosen` contradictorios, y como ninguna frase dice cuál gana, el paso que copia el texto al escenario puede pegar la decisión obsoleta —o la que el usuario ya rectificó— en el requisito.",
+    "requirement_id": "R-DIV-010",
+    "severity": "medium"
+  }
+]

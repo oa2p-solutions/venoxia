@@ -1,0 +1,82 @@
+[
+  {
+    "scenario": "Both flags in one invocation",
+    "effect": "el proceso termina con código 2",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Nothing is written under both flags",
+    "effect": "termina con código 2 y no crea ningún fichero",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The usage error names both flags",
+    "effect": "termina con código 2, stderr nombra ambos flags",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An existing history is left intact",
+    "effect": "termina con código 2, oracle.json queda intacto",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The original bytes survive in the copy",
+    "effect": "se crea copia con el contenido original íntegro",
+    "status_code": null,
+    "side_effects": ["se crea oracle.json.corrupt-<marca> con los bytes originales"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The warning names the copy",
+    "effect": "stderr nombra la ruta de la copia creada",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No history, no copy",
+    "effect": "no se crea ningún fichero de copia",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A copy that cannot be written keeps the original in place",
+    "effect": "oracle.json conserva su contenido original íntegro",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A failed copy is reported as a run that was not recorded",
+    "effect": "stderr avisa de que el run no se ha grabado",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A second corruption never overwrites the first copy",
+    "effect": "existen dos copias, la segunda con sufijo numérico",
+    "status_code": null,
+    "side_effects": ["se crea una segunda copia con sufijo numérico tras la marca"],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

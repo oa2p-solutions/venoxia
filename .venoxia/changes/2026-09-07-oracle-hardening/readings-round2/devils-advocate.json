@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "El requisito sólo exige que la copia «exista» antes de escribir el historial nuevo, no que esté completa: una implementación crea `oracle.json.corrupt-<marca>` vacío, sobrescribe `oracle.json` con el historial nuevo y sólo entonces vuelca en la copia los bytes originales. Pasa los cuatro escenarios, que únicamente observan el estado final; si el proceso muere entre medias, el único rastro de los runs anteriores (incluido el rojo previo que `verify` exige) queda destruido de forma irreversible en un fichero vacío.",
+    "requirement_id": "R-ORC-012",
+    "severity": "high"
+  },
+  {
+    "attack": "El escenario «A copy that cannot be written keeps the original in place» sólo obliga a conservar `oracle.json` byte a byte, y nada exige código de salida distinto de 0 ni aviso: una implementación que, al fallar la copia, se salta silenciosamente el registro y termina con éxito cumple la letra, y el usuario cree haber registrado un run del oráculo que no está en disco en ninguna parte.",
+    "requirement_id": "R-ORC-012",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-ORC-011 prohíbe invocar el runner y escribir `oracle.json`, pero no prohíbe otras escrituras: una implementación que aplique primero R-ORC-012 (detecta `oracle.json` corrupto, crea la copia `oracle.json.corrupt-<marca>`) y sólo después detecte el conflicto de flags y salga con 2 pasa los cuatro escenarios, y cada errata de invocación con `--dry-run --record` deja un fichero basura nuevo en el change que nadie borra ni contabiliza.",
+    "requirement_id": "R-ORC-011",
+    "severity": "low"
+  }
+]

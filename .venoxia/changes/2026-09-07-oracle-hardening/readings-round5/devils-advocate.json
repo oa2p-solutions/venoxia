@@ -1,0 +1,12 @@
+[
+  {
+    "attack": "R-ORC-012 obliga a copiar los bytes corruptos aparte y «escribir el historial nuevo», pero no exige que ese historial nuevo conserve rastro alguno de los runs descartados: una implementación literal deja un `oracle.json` con un único run verde, indistinguible de un primer run legítimo. Basta con que un byte deje el fichero inválido (o con que una escritura previa se interrumpa) para que todo el historial rojo que `verify`/V17 exigen desaparezca del disco y un change quede declarable `verified` sin que jamás conste el rojo previo.",
+    "requirement_id": "R-ORC-012",
+    "severity": "high"
+  },
+  {
+    "attack": "Nada en R-ORC-012 exige comprobar la legibilidad de `oracle.json` antes de invocar el runner ni reparar el fichero cuando la copia falla: una implementación literal ejecuta la suite entera, intenta la copia, falla, tira el resultado verde y sale con 2 dejando el `oracle.json` corrupto intacto. Cada reintento repite la suite completa y vuelve a salir 2, de modo que el change no puede alcanzar `verified` hasta que alguien borre el fichero a mano, y el `2` es además indistinguible de un error de uso para `gate.py`.",
+    "requirement_id": "R-ORC-012",
+    "severity": "medium"
+  }
+]

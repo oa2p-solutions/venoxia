@@ -1,0 +1,74 @@
+[
+  {
+    "scenario": "A negation makes it hard",
+    "effect": "el elemento de divergences lleva signal con valor polarity",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The report names the negation",
+    "effect": "el informe nombra la marca «no» como causa de dureza",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A different number makes it hard",
+    "effect": "signal vale numeric y el informe nombra ambos números",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A soft divergence carries no signal",
+    "effect": "el elemento de divergences lleva signal con valor null",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The tool is declared",
+    "effect": "el frontmatter de la skill incluye AskUserQuestion en allowed-tools",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The body forbids grouping and rewording",
+    "effect": "el cuerpo exige una pregunta por llamada, orden y texto literal",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The body still refuses to edit deltas",
+    "effect": "el cuerpo declara que la skill no edita deltas",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The body names the decisions file and its shape",
+    "effect": "el cuerpo nombra decisions.json y sus cinco claves",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A hand-written answer is kept verbatim",
+    "effect": "el cuerpo declara que la respuesta manual se anota literal",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

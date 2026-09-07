@@ -125,6 +125,16 @@ Título del requisito en inglés, narrativa y escenarios en español. Las palabr
 
 Un requisito, un patrón, una frase. Si necesitas dos frases con dos disparadores, son dos requisitos (`V02`).
 
+### Tres reglas para que dos lectores lean lo mismo
+
+Después de `/venoxia:validate` viene `/venoxia:diverge`: dos lectores que no estuvieron en esta conversación leen el delta a solas y el script cuenta en qué difieren. Un delta bien formado puede no converger nunca sin que haya un solo desacuerdo sobre el comportamiento, y las tres causas más frecuentes se evitan al redactar:
+
+1. **Un hecho por escenario.** Un `THEN` con dos consecuencias —«queda `missing` y el proceso termina con código `1`»— produce dos lecturas que difieren en cuál de las dos recogen, y el script las enfrenta aunque ninguna niegue a la otra. Si son dos hechos, son dos escenarios.
+2. **Ningún código de salida ni valor dentro del `WHEN`.** El `WHEN` describe la condición; el resultado —código, estado, cifra— va sólo en el `THEN`. Cuando el `WHEN` ya trae el resultado, un lector se lo lleva al efecto y el otro no, y la divergencia que sale no habla del sistema sino de dónde puso cada uno la misma frase.
+3. **El mismo sustantivo para la misma cosa en todo el delta.** Si el delta llama «runner» a lo que tres párrafos después llama «el comando» y en los metadatos `test_command`, los lectores heredan una palabra cada uno y dos efectos que dicen lo mismo salen con similitud cero. Elige la palabra en el primer requisito y no la cambies.
+
+El caso que fijó las tres: el delta de `oracle` (13 escenarios de línea de comandos) pasó cuatro rondas de divergencia sin converger, con seis duras en la última, y ninguna era un desacuerdo sobre comportamiento. En «A runner that sleeps past the limit» un lector escribió «mata el proceso del test_command» y el otro «marca el requisito como timeout»: el mismo escenario contaba dos hechos, y cada lector recogió uno. Con un hecho por escenario, el resultado fuera del `WHEN` y una sola palabra para el runner, la relectura dio cero duras.
+
 ### `verifies:` y `confidence:` se escriben con el requisito, nunca después
 
 Esto no es un detalle de estilo. **Un oráculo añadido al final se escribe para que el validador calle, no para que la spec sea verdad.** Cuando el requisito ya está redactado y sólo falta rellenar `verifies:`, la pregunta que te haces es «¿qué ruta hace que pase `V07`?»; cuando lo escribes a la vez, la pregunta es «¿qué test falla si esto se incumple?», que es una pregunta sobre el comportamiento y a menudo cambia la redacción del requisito.

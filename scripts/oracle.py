@@ -18,6 +18,8 @@ Uso:
         --timeout SECS  presupuesto por requisito, en segundos (por defecto 600)
         --record        añade la ejecución a .venoxia/changes/<ID>/oracle.json
         --dry-run       imprime el comando de cada requisito y no ejecuta nada
+                        (excluyente con --record: grabar lo que no se ejecutó
+                        sería fabricar evidencia; los dos juntos son error de uso)
         --json          salida JSON con el esquema estable
         --no-color      sin colores ANSI
 
@@ -31,8 +33,15 @@ raíz del proyecto.
 
 Códigos de salida: `0` todos los requisitos en `green` (o `--dry-run`) · `1`
 alguno en `red`, `missing` o `timeout` · `2` error de uso: no existe
-`.venoxia/`, el change no existe, falta `venoxia.json` o está mal escrito, o
-`test_command` no trae `{files}`.
+`.venoxia/`, el change no existe, falta `venoxia.json` o está mal escrito,
+`test_command` no trae `{files}`, se pidieron `--dry-run` y `--record` a la
+vez, o `--record` no pudo dejar el run en disco.
+
+Un `oracle.json` que no es JSON válido o no trae la lista `runs` no se pisa
+sin más: sus bytes se copian antes a `oracle.json.corrupt-<marca>` junto a él
+—con un sufijo numérico si ese nombre ya existe— y sólo entonces se empieza el
+historial nuevo. Si la copia no se puede escribir, el historial original se
+queda como está, el run no se graba y el proceso sale con `2`.
 """
 
 from __future__ import annotations
@@ -453,50 +462,87 @@ def render_json(payload: dict) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _load_history(path: Path) -> list[dict]:
-    """Los runs ya grabados, o una lista vacía si el fichero no existe o está roto.
+def _read_history(path: Path) -> tuple[list[dict], str | None]:
+    """Los runs ya grabados y, si el fichero estaba corrupto, su texto original.
 
-    Un `oracle.json` que no se deja interpretar no detiene el registro: se
-    avisa por stderr y se empieza un historial nuevo. Es lo mismo que hace
-    `find_active_change` del guardián con un `change.json` corrupto: el
-    fichero del usuario está mal, y eso no es un fallo del oráculo.
+    Devuelve `(runs, None)` cuando el historial se lee bien o no existe, y
+    `([], texto)` cuando existe pero no es JSON válido o no trae la lista
+    `runs`: ese texto es lo que `record` copia aparte antes de empezar un
+    historial nuevo (`R-ORC-012`). Un fallo de E/S al leer también empieza un
+    historial nuevo, avisando: ahí no hay bytes que copiar.
     """
     try:
         text = path.read_text(encoding="utf-8")
     except FileNotFoundError:
-        return []
+        return [], None
     except OSError as error:
         print(
             f"venoxia: no se pudo leer «{path}» ({error}); se empieza un historial nuevo.",
             file=sys.stderr,
         )
-        return []
+        return [], None
 
     try:
         data = json.loads(text)
     except ValueError as error:
-        print(
-            f"venoxia: «{path}» no es JSON válido ({error}); se sustituye por un "
-            "historial nuevo.",
-            file=sys.stderr,
-        )
-        return []
+        print(f"venoxia: «{path}» no es JSON válido ({error}).", file=sys.stderr)
+        return [], text
 
     if not isinstance(data, dict) or not isinstance(data.get("runs"), list):
+        print(f"venoxia: «{path}» no trae la lista «runs» del historial.", file=sys.stderr)
+        return [], text
+
+    return [run for run in data["runs"] if isinstance(run, dict)], None
+
+
+def _load_history(path: Path) -> list[dict]:
+    """Los runs ya grabados, o una lista vacía si el fichero no existe o está roto."""
+    return _read_history(path)[0]
+
+
+def _corrupt_copy_path(path: Path, ran_at: object) -> Path:
+    """Un nombre libre para la copia: `oracle.json.corrupt-<marca>`, y `-2`, `-3`… si ya existe.
+
+    La marca es el `ran_at` del run que la crea sin «:» ni «-», válido en
+    cualquier sistema de ficheros. Dos corrupciones con la misma marca dejan
+    dos copias: la evidencia no se pisa por comodidad (`R-ORC-012`).
+    """
+    stamp = "".join(ch for ch in str(ran_at or "") if ch.isalnum()) or "sin-marca"
+    candidate = path.with_name(f"{path.name}.corrupt-{stamp}")
+    counter = 1
+    while candidate.exists():
+        counter += 1
+        candidate = path.with_name(f"{path.name}.corrupt-{stamp}-{counter}")
+    return candidate
+
+
+def record(path: Path, change: str, payload: dict, keep: int = MAX_RUNS) -> bool:
+    """Añade `payload` (sin «change») al historial y conserva como mucho `keep` runs.
+
+    Devuelve `True` si el run quedó en disco. Con un historial corrupto, los
+    bytes originales se copian aparte **antes** de escribir el nuevo, y si esa
+    copia no se puede escribir el historial original se queda como está y el
+    run no se graba: quedarse sin el rojo que `V18` busca es peor que quedarse
+    sin grabar un run (`R-ORC-012`).
+    """
+    entry = {key: value for key, value in payload.items() if key != "change"}
+    runs, corrupt_text = _read_history(path)
+    if corrupt_text is not None:
+        copy_path = _corrupt_copy_path(path, payload.get("ran_at"))
+        try:
+            copy_path.write_text(corrupt_text, encoding="utf-8")
+        except OSError as error:
+            print(
+                f"venoxia: no se pudo escribir la copia «{copy_path}» ({error}); "
+                f"«{path}» se conserva tal cual y este run no se ha grabado.",
+                file=sys.stderr,
+            )
+            return False
         print(
-            f"venoxia: «{path}» no tiene la forma esperada; se sustituye por un "
-            "historial nuevo.",
+            f"venoxia: el contenido original de «{path}» se ha copiado a «{copy_path}»; "
+            "se empieza un historial nuevo.",
             file=sys.stderr,
         )
-        return []
-
-    return [run for run in data["runs"] if isinstance(run, dict)]
-
-
-def record(path: Path, change: str, payload: dict, keep: int = MAX_RUNS) -> None:
-    """Añade `payload` (sin «change») al historial y conserva como mucho `keep` runs."""
-    entry = {key: value for key, value in payload.items() if key != "change"}
-    runs = _load_history(path)
     runs.append(entry)
     if len(runs) > keep:
         runs = runs[-keep:]
@@ -509,7 +555,12 @@ def record(path: Path, change: str, payload: dict, keep: int = MAX_RUNS) -> None
             encoding="utf-8",
         )
     except OSError as error:
-        print(f"venoxia: no se pudo escribir «{path}»: {error}.", file=sys.stderr)
+        print(
+            f"venoxia: no se pudo escribir «{path}»: {error}; este run no se ha grabado.",
+            file=sys.stderr,
+        )
+        return False
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -577,7 +628,9 @@ def build_parser() -> argparse.ArgumentParser:
         ),
         epilog=(
             "Códigos de salida: 0 todos en green (o --dry-run) · 1 alguno en red, "
-            "missing o timeout · 2 error de uso."
+            "missing o timeout · 2 error de uso, --dry-run junto a --record, o un "
+            "--record que no pudo dejar el run en disco. Un oracle.json corrupto se "
+            "copia a oracle.json.corrupt-<marca> antes de sustituirlo."
         ),
     )
     cli.add_argument(
@@ -622,6 +675,16 @@ def main(argv: list[str] | None = None) -> int:
     cli = build_parser()
     args = cli.parse_args(argv)
 
+    # R-ORC-011: antes de tocar el disco. Grabar un run que no ejecutó nada
+    # sería fabricar la evidencia que V17, gate.py y /venoxia:verify leen.
+    if args.dry_run and args.record:
+        print(
+            "venoxia: «--dry-run» y «--record» se excluyen: no se graba un run que no se "
+            "ha ejecutado. Quita uno de los dos.",
+            file=sys.stderr,
+        )
+        return EXIT_USAGE
+
     root = Path(os.path.expanduser(args.root)) if args.root else Path.cwd()
     if not root.is_dir():
         print(f"venoxia: la raíz «{root}» no existe o no es un directorio.", file=sys.stderr)
@@ -651,14 +714,20 @@ def main(argv: list[str] | None = None) -> int:
     results = run_all(requirements, root, cfg, args.timeout)
     payload = build_payload(args.change, cfg, results)
 
+    recorded = True
     if args.record:
         record_path = root / VENOXIA_DIR / CHANGES_DIR / args.change / RECORD_FILENAME
-        record(record_path, args.change, payload)
+        recorded = record(record_path, args.change, payload)
 
     if args.json:
         print(render_json(payload))
     else:
         print(render_text(payload, no_color=args.no_color))
+
+    if not recorded:
+        # Se pidió grabar y no se pudo: no hay veredicto en disco, y decir 0 o
+        # 1 haría creer que sí (R-ORC-012).
+        return EXIT_USAGE
 
     counts = payload["counts"]
     failed = counts[STATUS_RED] or counts[STATUS_MISSING] or counts[STATUS_TIMEOUT]

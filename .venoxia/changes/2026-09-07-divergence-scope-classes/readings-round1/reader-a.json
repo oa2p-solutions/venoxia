@@ -1,0 +1,18 @@
+[
+  {
+    "scenario": "Two synonyms of the same class",
+    "effect": "esa diferencia no hace dura la divergencia",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Two marks of different classes",
+    "effect": "esa diferencia hace dura la divergencia",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

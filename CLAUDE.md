@@ -39,8 +39,8 @@ python3 scripts/diff_readings.py --readings evals/clean-spec/project/.venoxia/ch
 echo '{"tool_name":"Write","tool_input":{"file_path":"/x/src/a.ts"},"cwd":"/x"}' | python3 scripts/guardian.py
 
 # El oráculo: ejecuta verifies: por requisito y atribuye green/red/missing/timeout
-python3 scripts/oracle.py --root . --change <id> --dry-run     # sólo lista los comandos, no ejecuta nada
-python3 scripts/oracle.py --root . --change <id> --record      # ejecuta y añade el run a changes/<id>/oracle.json
+python3 scripts/oracle.py --root . --change <id> --dry-run     # sólo lista los comandos, no ejecuta nada (excluyente con --record: los dos juntos son código 2)
+python3 scripts/oracle.py --root . --change <id> --record      # ejecuta y añade el run a changes/<id>/oracle.json; un oracle.json corrupto se copia antes a oracle.json.corrupt-<marca>
 
 # Cobertura con la stdlib (trace), subprocesos incluidos; falla si algún fichero baja de su umbral
 python3 tools/coverage.py
@@ -102,7 +102,7 @@ guardian          → permite Edit/Write de código cuando hay change validated 
                     state: verified  SÓLO si el oráculo queda en verde y el rojo previo está en el historial
 ```
 
-Reglas duras del flujo: `specify` nunca escribe `validated` ni `verified`; `diverge` es la única que escribe `validated`; `verify` es la única que escribe `verified`; ninguna skill toca código de producción; `readings/` se guarda **crudo**, sin arreglar, y la skill no tiene voto sobre si dos lecturas «dicen lo mismo». Los agentes `reader` y `devils-advocate` reciben **sólo la ruta del delta**, deliberadamente sin el contexto de la conversación. `guardian.py` sigue abriendo la puerta al código en `validated`, no en `verified`: escribir el código es justo lo que convierte el rojo del oráculo en verde.
+Reglas duras del flujo: `specify` nunca escribe `validated` ni `verified`; `diverge` es la única que escribe `validated`; `verify` es la única que escribe `verified`; ninguna skill toca código de producción; `readings/` se guarda **crudo**, sin arreglar, y la skill no tiene voto sobre si dos lecturas «dicen lo mismo». `diverge` plantea las preguntas del informe como entrevista (`AskUserQuestion`, una por llamada, opciones literales del script) y anota cada respuesta tal cual en `changes/<id>/decisions.json`; el texto elegido va al delta sin reformular. Una divergencia dura de `side_effects` nombra la señal que la hizo dura (`signal`: `polarity`, `scope`, `numeric`, `empty-repertoire`), que es como se cuentan los falsos positivos del motor sobre prosa real. Los agentes `reader` y `devils-advocate` reciben **sólo la ruta del delta**, deliberadamente sin el contexto de la conversación. `guardian.py` sigue abriendo la puerta al código en `validated`, no en `verified`: escribir el código es justo lo que convierte el rojo del oráculo en verde.
 
 ### Tests
 

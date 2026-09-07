@@ -1,0 +1,12 @@
+[
+  {
+    "attack": "El requisito manda «dejar fuera de la señal de polaridad» esa diferencia, pero no obliga a conservar el resto: una implementación que, al detectar una diferencia «ambos»/«ambas» o una negación subordinada presente en un solo efecto, descarta el par de efectos completo del cómputo de polaridad pasa los cinco escenarios y, a la vez, oculta la contradicción real que viaje en la misma frase (lector A: «stderr nombra ambas flags y el exit code es 0»; lector B: «stderr nombra ambos flags y el exit code no es 0»): la divergencia sale blanda, /venoxia:diverge escribe state validated y el guardián abre la puerta al código sobre dos lecturas opuestas.",
+    "requirement_id": "R-DIV-011",
+    "severity": "high"
+  },
+  {
+    "attack": "Los THEN sólo exigen «no hace dura la divergencia», así que una implementación puede normalizar los dos efectos a idénticos y no registrar divergencia alguna, ni blanda: el par «se borra el directorio del change cuando el change no está archivado» / «se borra el directorio del change» se reporta como acuerdo total y el revisor nunca ve que un lector leyó una condición de guarda sobre un borrado irreversible y el otro un borrado incondicional.",
+    "requirement_id": "R-DIV-011",
+    "severity": "medium"
+  }
+]

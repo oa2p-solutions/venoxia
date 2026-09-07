@@ -16,6 +16,14 @@ Las que necesitan forzar un `OSError` en un método concreto de `Path` (un
 disco que falla, no un fichero mal escrito) importan `scripts/oracle.py`
 directamente y parchean ese método sólo durante la llamada — no hay forma de
 provocar esas condiciones por subproceso sin depender de permisos de SO.
+
+`OracleFlagConflictTest` y los dos tests de copia de `OracleRecordTest` son
+del change `2026-09-07-oracle-hardening`: dos ataques del abogado del diablo
+que el código no cerraba. Nacen en rojo, que es lo que `oracle.py --record`
+graba antes de tocar `scripts/oracle.py`.
+
+@covers R-ORC-011
+@covers R-ORC-012
 """
 
 from __future__ import annotations
@@ -227,6 +235,57 @@ class OracleDryRunTest(unittest.TestCase):
             self.assertTrue(run.stdout.strip())
 
 
+class OracleFlagConflictTest(unittest.TestCase):
+    """R-ORC-011 · «--dry-run» y «--record» se excluyen: no se graba lo que no se ejecutó."""
+
+    def _project(self, project: Project) -> Path:
+        project.oracle_config(FAKE_RUNNER_COMMAND)
+        reqs = [requirement(id="R-ORC-711", title="Uno", verifies=project.oracle("R-ORC-711"))]
+        project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+        return project.path(f".venoxia/changes/{CHANGE_ID}/oracle.json")
+
+    def test_both_flags_are_a_usage_error_that_writes_nothing(self):
+        """@covers R-ORC-011"""
+        with Project() as project:
+            record_path = self._project(project)
+            log_path = project.path("runner.log")
+            before = sorted(p.name for p in record_path.parent.iterdir())
+
+            run = project.run_oracle(
+                "--change", CHANGE_ID, "--dry-run", "--record",
+                env={"FAKE_RUNNER_LOG": str(log_path)},
+            )
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertFalse(record_path.exists(), run.describe())
+            self.assertEqual(sorted(p.name for p in record_path.parent.iterdir()), before)
+            self.assertEqual(_log_lines(log_path), [])
+            self.assertNotIn("Traceback", run.stderr)
+
+    def test_an_existing_history_is_left_intact(self):
+        """@covers R-ORC-011"""
+        with Project() as project:
+            record_path = self._project(project)
+            before = '{"version": 1, "change": "c1", "runs": [{"ran_at": "antes"}]}\n'
+            record_path.write_text(before, encoding="utf-8")
+
+            run = project.run_oracle("--change", CHANGE_ID, "--dry-run", "--record")
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertEqual(record_path.read_text(encoding="utf-8"), before)
+
+    def test_the_usage_error_names_both_flags(self):
+        """@covers R-ORC-011"""
+        with Project() as project:
+            self._project(project)
+
+            run = project.run_oracle("--change", CHANGE_ID, "--dry-run", "--record")
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("--dry-run", run.stderr, run.describe())
+            self.assertIn("--record", run.stderr, run.describe())
+
+
 class OracleRecordTest(unittest.TestCase):
     """R-ORC-007 · el historial se acumula y sobrevive a un fichero corrupto."""
 
@@ -265,6 +324,123 @@ class OracleRecordTest(unittest.TestCase):
             self.assertNotIn("Traceback", run.stderr)
             history = self._oracle_json(project)
             self.assertEqual(len(history["runs"]), 1)
+
+    def _corrupt_copies(self, project: Project) -> list[Path]:
+        change_dir = project.path(f".venoxia/changes/{CHANGE_ID}")
+        return sorted(change_dir.glob("oracle.json.corrupt-*"))
+
+    def test_corrupt_history_is_copied_aside_byte_for_byte(self):
+        """@covers R-ORC-012"""
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            reqs = [requirement(id="R-ORC-712", title="Uno", verifies=project.oracle("R-ORC-712"))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+            garbage = "{ esto no es JSON · ni lo será\n"
+            project.write(f".venoxia/changes/{CHANGE_ID}/oracle.json", garbage)
+
+            run = project.run_oracle_json("--change", CHANGE_ID, "--record")
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            copies = self._corrupt_copies(project)
+            self.assertEqual(len(copies), 1, run.describe())
+            self.assertEqual(copies[0].read_text(encoding="utf-8"), garbage)
+            self.assertIn(copies[0].name, run.stderr, run.describe())
+            self.assertEqual(len(self._oracle_json(project)["runs"]), 1)
+
+    def test_a_missing_history_leaves_no_copy_behind(self):
+        """@covers R-ORC-012"""
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            reqs = [requirement(id="R-ORC-713", title="Uno", verifies=project.oracle("R-ORC-713"))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID, "--record")
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertEqual(self._corrupt_copies(project), [])
+
+    def test_a_copy_that_cannot_be_written_keeps_the_original_in_place(self):
+        """@covers R-ORC-012 · sin copia no hay sustitución: los bytes originales se quedan."""
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "oracle.json"
+            garbage = "{ roto"
+            path.write_text(garbage, encoding="utf-8")
+            payload = {"version": 1, "change": CHANGE_ID, "ran_at": "2026-09-07T17:00:00Z", "results": []}
+            real_write_text = pathlib.Path.write_text
+
+            def failing_copy(self, *args, **kwargs):
+                if ".corrupt-" in self.name:
+                    raise OSError(28, "No space left on device")
+                return real_write_text(self, *args, **kwargs)
+
+            stderr = __import__("io").StringIO()
+            with unittest.mock.patch.object(pathlib.Path, "write_text", failing_copy), \
+                    unittest.mock.patch("sys.stderr", stderr):
+                oracle.record(path, CHANGE_ID, payload)
+
+            self.assertEqual(path.read_text(encoding="utf-8"), garbage)
+            self.assertEqual(sorted(Path(tmp).glob("oracle.json.corrupt-*")), [])
+            self.assertIn("no se ha grabado", stderr.getvalue())
+
+    def test_a_run_that_could_not_be_recorded_exits_with_two(self):
+        """@covers R-ORC-012 · si --record no pudo grabar, no hay veredicto: código 2."""
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            reqs = [requirement(id="R-ORC-714", title="Uno", verifies=project.oracle("R-ORC-714"))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+            record_path = project.path(f".venoxia/changes/{CHANGE_ID}/oracle.json")
+            record_path.write_text("{ roto", encoding="utf-8")
+            real_write_text = pathlib.Path.write_text
+
+            def failing_copy(self, *args, **kwargs):
+                if ".corrupt-" in self.name:
+                    raise OSError(28, "No space left on device")
+                return real_write_text(self, *args, **kwargs)
+
+            stderr, stdout = __import__("io").StringIO(), __import__("io").StringIO()
+            with unittest.mock.patch.object(pathlib.Path, "write_text", failing_copy), \
+                    unittest.mock.patch("sys.stderr", stderr), unittest.mock.patch("sys.stdout", stdout):
+                code = oracle.main(["--root", str(project.root), "--change", CHANGE_ID, "--record", "--json"])
+
+            self.assertEqual(code, 2, stderr.getvalue())
+            self.assertEqual(record_path.read_text(encoding="utf-8"), "{ roto")
+
+    def test_a_readable_history_with_extra_keys_is_not_corrupt(self):
+        """@covers R-ORC-012 · una clave de más no convierte un historial válido en basura."""
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            reqs = [requirement(id="R-ORC-715", title="Uno", verifies=project.oracle("R-ORC-715"))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+            record_path = project.path(f".venoxia/changes/{CHANGE_ID}/oracle.json")
+            record_path.write_text(
+                json.dumps({"version": 1, "change": CHANGE_ID, "runs": [{"ran_at": "antes"}], "extra": True}),
+                encoding="utf-8",
+            )
+
+            run = project.run_oracle_json("--change", CHANGE_ID, "--record")
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertEqual(self._corrupt_copies(project), [])
+            self.assertEqual(len(self._oracle_json(project)["runs"]), 2)
+
+    def test_a_second_corruption_never_overwrites_the_first_copy(self):
+        """@covers R-ORC-012 · dos corrupciones con la misma marca dejan dos copias."""
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "oracle.json"
+            payload = {"version": 1, "change": CHANGE_ID, "ran_at": "2026-09-07T17:00:00Z", "results": []}
+            stderr = __import__("io").StringIO()
+            with unittest.mock.patch("sys.stderr", stderr):
+                path.write_text("{ primera", encoding="utf-8")
+                oracle.record(path, CHANGE_ID, payload)
+                path.write_text("{ segunda", encoding="utf-8")
+                oracle.record(path, CHANGE_ID, payload)
+
+            copies = sorted(Path(tmp).glob("oracle.json.corrupt-*"))
+            self.assertEqual(len(copies), 2, [c.name for c in copies])
+            self.assertRegex(copies[1].name, r"^oracle\.json\.corrupt-\w+-2$")
+            self.assertEqual(
+                sorted(c.read_text(encoding="utf-8") for c in copies), ["{ primera", "{ segunda"]
+            )
 
     def test_keeps_only_the_last_fifty_runs(self):
         """--record no deja crecer el historial sin límite."""

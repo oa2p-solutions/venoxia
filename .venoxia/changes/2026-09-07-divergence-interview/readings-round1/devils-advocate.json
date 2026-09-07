@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "El requisito sólo se activa «cuando marca como dura una divergencia de side_effects» y exige que la señal sea una de cuatro; una implementación literal garantiza el consecuente estrechando el antecedente: marca dura únicamente lo que encaja en `polarity`, `scope`, `numeric` o `empty-repertoire`, y degrada a blanda cualquier otra contradicción entre lectores (p. ej. un lector dice que se escribe en `drift/` y el otro que se escribe en `oracle.json`). Así `diff_readings.py` sale con 0, la skill escribe `validated` y el guardián abre la puerta al código con dos lecturas incompatibles del mismo delta.",
+    "requirement_id": "R-DIV-008",
+    "severity": "high"
+  },
+  {
+    "attack": "«Emitir esa misma señal ... con uno de los valores» permite emitir una sola señal por divergencia aunque concurran varias: ante «no se crea el presupuesto de 15 minutos» frente a «se crea el presupuesto de 30 minutos», la implementación reporta `polarity` y el informe nombra sólo la marca «no»; la discrepancia numérica queda invisible, sin pregunta y sin decisión, y llega al código como 15 o 30 minutos al azar.",
+    "requirement_id": "R-DIV-008",
+    "severity": "medium"
+  },
+  {
+    "attack": "«Anotar la respuesta tal cual en decisions.json» no exige acumular ni conservar lo ya anotado: escribir el fichero entero con la última respuesta en cada iteración cumple la frase literalmente y borra las anteriores, de modo que tras una entrevista de ocho preguntas sólo sobrevive una decisión y el resto hay que volver a preguntárselas al usuario. Los dos escenarios sólo inspeccionan el texto de `SKILL.md`, así que la pérdida no se observa.",
+    "requirement_id": "R-DIV-010",
+    "severity": "medium"
+  }
+]

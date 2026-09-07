@@ -1,0 +1,50 @@
+[
+  {
+    "scenario": "Both flags in one invocation",
+    "effect": "el proceso termina sin ejecutar el runner",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Nothing is written under both flags",
+    "effect": "oracle.json sigue sin existir tras la invocación",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The usage error names both flags",
+    "effect": "stderr recibe un aviso que nombra ambas flags",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The original bytes survive in the copy",
+    "effect": "aparece una copia del oracle.json original",
+    "status_code": null,
+    "side_effects": ["se escribe oracle.json.corrupt-<marca> con el contenido original byte a byte"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The warning names the copy",
+    "effect": "stderr recibe un aviso que nombra la ruta de la copia",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No history, no copy",
+    "effect": "no aparece ningún fichero oracle.json.corrupt-<marca>",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

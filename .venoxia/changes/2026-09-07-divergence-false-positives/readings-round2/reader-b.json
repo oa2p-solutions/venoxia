@@ -1,0 +1,42 @@
+[
+  {
+    "scenario": "Gender variants of the same quantifier",
+    "effect": "la divergencia no se marca como dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A negation deep inside a subordinate clause",
+    "effect": "la divergencia no se marca como dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A condition dragged into one effect only",
+    "effect": "la divergencia no se marca como dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A negated condition against an affirmed one",
+    "effect": "la divergencia se marca como dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A plain negation still contradicts",
+    "effect": "la divergencia se marca como dura",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

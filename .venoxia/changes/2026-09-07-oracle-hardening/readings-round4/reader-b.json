@@ -1,0 +1,98 @@
+[
+  {
+    "scenario": "Both flags in one invocation",
+    "effect": "el proceso termina con error de uso",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Nothing is written under both flags",
+    "effect": "el proceso termina con error y no crea ficheros",
+    "status_code": "2",
+    "side_effects": ["el directorio del change no gana ningún fichero"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The usage error names both flags",
+    "effect": "el proceso termina y stderr nombra ambas banderas",
+    "status_code": "2",
+    "side_effects": ["stderr recibe un aviso que nombra --dry-run y --record"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An existing history is left intact",
+    "effect": "el proceso termina sin tocar el historial existente",
+    "status_code": "2",
+    "side_effects": ["oracle.json conserva su contenido byte a byte"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The original bytes survive in the copy",
+    "effect": "se crea una copia con el contenido corrupto original",
+    "status_code": null,
+    "side_effects": ["se escribe oracle.json.corrupt-<marca> con los bytes originales"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The warning names the copy",
+    "effect": "stderr avisa nombrando la ruta de la copia creada",
+    "status_code": null,
+    "side_effects": ["stderr recibe un aviso que nombra la ruta de la copia"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No history, no copy",
+    "effect": "se graba el historial nuevo sin crear ninguna copia",
+    "status_code": null,
+    "side_effects": ["no se crea ningún fichero oracle.json.corrupt-<marca>"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A copy that cannot be written keeps the original in place",
+    "effect": "el historial original queda intacto sin sustituir",
+    "status_code": "2",
+    "side_effects": ["oracle.json conserva su contenido original byte a byte"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A failed copy is reported as a run that was not recorded",
+    "effect": "stderr avisa que el run no se ha grabado",
+    "status_code": "2",
+    "side_effects": ["stderr recibe un aviso de que el run no se ha grabado"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A run that could not be recorded is not a verdict",
+    "effect": "el proceso termina sin grabar ningún run",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A readable history with extra keys is not corrupt",
+    "effect": "el historial se actualiza con los runs previos más el actual",
+    "status_code": null,
+    "side_effects": ["no se crea ninguna copia", "el historial conserva runs anteriores más el actual"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A second corruption never overwrites the first copy",
+    "effect": "quedan dos copias distintas, ninguna sobrescrita",
+    "status_code": null,
+    "side_effects": ["existen dos ficheros oracle.json.corrupt-<marca>", "la segunda copia lleva un sufijo numérico tras la marca"],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

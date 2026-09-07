@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "change": "2026-09-07-oracle-hardening",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-07T19:28:34Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-ORC-011",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 2911,
+          "output_tail": "  ],\n  \"counts\": {\n    \"green\": 1,\n    \"red\": 0,\n    \"missing\": 0,\n    \"timeout\": 0,\n    \"total\": 1\n  },\n  \"all_green\": true,\n  \"all_red\": false\n}\n\nstderr:\nvenoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-uisckvk7/project/.venoxia/changes/c1/oracle.json» no es JSON válido (Expecting property name enclosed in double quotes: line 1 column 3 (char 2)); se sustituye por un historial nuevo.\n\n\n----------------------------------------------------------------------\nRan 48 tests in 2.852s\n\nFAILED (failures=7)"
+        },
+        {
+          "requirement_id": "R-ORC-012",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 2931,
+          "output_tail": "  ],\n  \"counts\": {\n    \"green\": 1,\n    \"red\": 0,\n    \"missing\": 0,\n    \"timeout\": 0,\n    \"total\": 1\n  },\n  \"all_green\": true,\n  \"all_red\": false\n}\n\nstderr:\nvenoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-vl8xpm3j/project/.venoxia/changes/c1/oracle.json» no es JSON válido (Expecting property name enclosed in double quotes: line 1 column 3 (char 2)); se sustituye por un historial nuevo.\n\n\n----------------------------------------------------------------------\nRan 48 tests in 2.873s\n\nFAILED (failures=7)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 2,
+        "missing": 0,
+        "timeout": 0,
+        "total": 2
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-07T19:29:57Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-ORC-011",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 2918,
+          "output_tail": "......................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-lvjx6yys/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-2x1_m3m2/project/.venoxia/changes/c1/oracle.json» no trae la lista «runs» del historial.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-c_hbqd0d/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n........................\n----------------------------------------------------------------------\nRan 48 tests in 2.863s\n\nOK"
+        },
+        {
+          "requirement_id": "R-ORC-012",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 2932,
+          "output_tail": "......................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-i1me0axe/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-hophd5fv/project/.venoxia/changes/c1/oracle.json» no trae la lista «runs» del historial.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-rnifoswz/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n........................\n----------------------------------------------------------------------\nRan 48 tests in 2.871s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 2,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 2
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}
