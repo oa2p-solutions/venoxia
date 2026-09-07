@@ -6,9 +6,8 @@ El CI del plugin vive en `.github/workflows/ci.yml`, pero el primer run real
 en GitHub Actions (`oa2p-solutions/venoxia`, 2026-09-05) se quedó en cola
 más de veinte minutos sin que ningún runner lo recogiera y terminó
 cancelado. Las apuestas `B-003` y `B-004` del acta siguen sin resolver
-porque nunca llegó a ejecutarse nada. La organización tiene un la forja interna
-interno de la organización con la forja interna activado y un
-`el runner interno` propio, y el repo ya está espejado en
+porque nunca llegó a ejecutarse nada. La organización tiene una forja interna
+con Actions activado y un runner propio, y el repo ya está espejado en
 `OA2P/venoxia`. Un workflow allí es la forma de que el contrato «falla en CI
 cuando miente» tenga por fin un testigo que corre.
 

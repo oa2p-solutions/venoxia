@@ -6,12 +6,13 @@ Hacer cumplible la tesis del plugin —«la spec falla en CI cuando miente»—
 ejecutando en cada `push` la misma puerta que un desarrollador corre en
 local: la suite, el validador y el acta en estricto, la cobertura y la
 estructura del plugin. El CI del repositorio vive en la forja interna sobre
-el runner interno de la organización; `templates/ci/venoxia-gate.yml` es la
-misma puerta empaquetada para un proyecto que adopta Venoxia.
+el runner interno de la organización; `scripts/gate.py` es la misma puerta
+como comando para un proyecto que adopta Venoxia, y `tools/check.py` la
+ejecuta en local antes de cada `push`.
 
 ## Requirements
 
-### R-CI-008 · The la forja interna workflow declares the same triggers and jobs on the internal runner
+### R-CI-008 · The internal forge workflow declares the same triggers and jobs on the internal runner
 
 WHEN se busca `.forgejo/workflows/ci.yml` en el repositorio, el sistema DEBE
 tener un workflow que se dispare en `push` y `pull_request` sobre la rama
@@ -70,7 +71,7 @@ no existe.
   repositorio
 - **THEN** el directorio no existe
 
-#### Scenario: The la forja interna workflow is the one on disk
+#### Scenario: The internal forge workflow is the one on disk
 - **WHEN** se busca `.forgejo/workflows/ci.yml` en la raíz del repositorio
 - **THEN** el fichero existe
 
@@ -78,7 +79,7 @@ verifies:   tests/test_ci_workflow.py
 confidence: high
 from:       README.md#verificar-en-ci
 
-### R-CI-012 · The la forja interna workflow states its commands and safety nets on its own
+### R-CI-012 · The internal forge workflow states its commands and safety nets on its own
 
 WHEN se parsea `.forgejo/workflows/ci.yml`, el sistema DEBE declarar el
 comando de la suite en el job `tests`, los dos comandos del validador y del
@@ -617,7 +618,7 @@ request con las credenciales del runner, y sólo puede evitarlo si lo sabe.
 
 #### Scenario: The published documentation does not name the internal forge
 - **WHEN** se leen los ficheros de documentación publicada
-- **THEN** en ninguno aparece `la forja interna` en ninguna combinación de mayúsculas y
+- **THEN** en ninguno aparece el nombre propio del software de la forja interna —el test lo escribe literal— en ninguna combinación de mayúsculas y
   minúsculas
 
 #### Scenario: The published documentation does not name the internal runner labels

@@ -66,21 +66,28 @@ no cambian de comportamiento.
 
 ## Pendiente
 
-Divergencia pasada el 2026-09-05 desde la sesión principal, en cuatro rondas
-con lectores nuevos cada vez, y **no converge**: la última ronda dio 6 duras,
-11 blandas y 0 lagunas sobre 13 escenarios. Ninguna de las duras es un
-desacuerdo sobre comportamiento: los dos lectores coinciden en los códigos de
-salida y en el efecto de cada escenario, y difieren en cuántos efectos
-colaterales deducen del contexto (uno anota «no invoca el runner» o «termina
-la ejecución del test_command» como colateral y el otro no lo anota porque ya
-está en el efecto principal). `diff_readings.py` mide la cobertura de cada
-colateral contra el repertorio del otro lector y lo cuenta como duro cuando
-nadie más lo recoge. Es la debilidad conocida del motor sobre deltas largos de
-línea de comandos, recogida en la Fase 11 del `TODO.md`.
+Resuelto el 2026-09-07. La divergencia del 2026-09-05 (cuatro rondas, 6 duras
+en la última, ninguna un desacuerdo de comportamiento) no convergía por un
+defecto del motor, no del delta: `diff_readings.py` contaba como dura cada
+colateral que el otro lector no recogía aunque no lo contradijera. El change
+`2026-09-06-divergence-additive` lo arregló. Con el motor corregido, las
+lecturas de aquella ronda ya daban 0 duras; se despachó un panel nuevo (dos
+lectores y abogado) sobre el mismo delta y salió con **0 duras, 17 blandas y
+0 lagunas** sobre 13 escenarios. Las 17 blandas son paráfrasis del mismo
+efecto con los mismos códigos de salida en los dos lectores; el validador y
+la divergencia salieron los dos con `0` y el change pasó a `validated`.
 
-El change se queda en `specified`, con `readings/` y `divergence.md` de la
-última ronda en disco. Su `oracle.json` acredita el ciclo rojo→verde (rojo
-real del 2026-09-04 apartando `scripts/oracle.py`, verde después), así que lo
-único que le falta para `validated` es que el motor deje de contar como dura
-una diferencia de granularidad. Hasta entonces, el estado dice la verdad: la
-spec no ha pasado la divergencia.
+El oráculo se volvió a grabar el mismo día (`ran_at` 2026-09-07T14:13:45Z):
+8 en verde, y el historial acredita el rojo previo de cada requisito, así que
+el change pasa a `verified`.
+
+El abogado del diablo dejó seis ataques, cinco `high`. Contrastados con el
+código que ya existe: `R-ORC-008` (inyección por `verifies:`) está cerrado
+porque `oracle.py` entrecomilla con `shlex.quote` y ejecuta con
+`shell=False`; `R-ORC-001` (delta vacío como verde) está cerrado porque
+`all_green` exige `total > 0`. Quedan abiertos, y anotados en la Fase 13 del
+cuaderno: `--dry-run` combinado con `--record` graba un run sin ejecutar
+nada; el historial corrupto se sustituye sin copia previa; el `test_command`
+sólo se comprueba por la presencia de `{files}`; y el timeout por requisito
+no tiene cota agregada. Ninguno bloquea el estado: el abogado no cuenta para
+el código de salida.

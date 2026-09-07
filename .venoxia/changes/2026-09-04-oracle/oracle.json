@@ -397,6 +397,105 @@
       },
       "all_green": true,
       "all_red": false
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-07T14:13:45Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-ORC-001",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 2615,
+          "output_tail": "...................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-e5gutj78/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-_yyz5z97/project/.venoxia/changes/c1/oracle.json» no tiene la forma esperada; se sustituye por un historial nuevo.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-7iqk6q22/project/.venoxia/changes/c1/oracle.json»: disco lleno.\n..................\n----------------------------------------------------------------------\nRan 39 tests in 2.557s\n\nOK"
+        },
+        {
+          "requirement_id": "R-ORC-002",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 2643,
+          "output_tail": "...................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-r1wnfpxc/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-9bpywlo8/project/.venoxia/changes/c1/oracle.json» no tiene la forma esperada; se sustituye por un historial nuevo.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-76imvm1u/project/.venoxia/changes/c1/oracle.json»: disco lleno.\n..................\n----------------------------------------------------------------------\nRan 39 tests in 2.588s\n\nOK"
+        },
+        {
+          "requirement_id": "R-ORC-003",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 2693,
+          "output_tail": "...................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-n_g88sts/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-ya3kkidv/project/.venoxia/changes/c1/oracle.json» no tiene la forma esperada; se sustituye por un historial nuevo.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-kji15l3q/project/.venoxia/changes/c1/oracle.json»: disco lleno.\n..................\n----------------------------------------------------------------------\nRan 39 tests in 2.640s\n\nOK"
+        },
+        {
+          "requirement_id": "R-ORC-004",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 2753,
+          "output_tail": "...................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-1o_m8nps/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-08n5j7rq/project/.venoxia/changes/c1/oracle.json» no tiene la forma esperada; se sustituye por un historial nuevo.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-sxgiubak/project/.venoxia/changes/c1/oracle.json»: disco lleno.\n..................\n----------------------------------------------------------------------\nRan 39 tests in 2.688s\n\nOK"
+        },
+        {
+          "requirement_id": "R-ORC-005",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 2706,
+          "output_tail": "...................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-e29roie3/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-dv35ywe8/project/.venoxia/changes/c1/oracle.json» no tiene la forma esperada; se sustituye por un historial nuevo.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-zdskh_5j/project/.venoxia/changes/c1/oracle.json»: disco lleno.\n..................\n----------------------------------------------------------------------\nRan 39 tests in 2.642s\n\nOK"
+        },
+        {
+          "requirement_id": "R-ORC-006",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 2729,
+          "output_tail": "...................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-lmlbsz3l/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-c98ps6cz/project/.venoxia/changes/c1/oracle.json» no tiene la forma esperada; se sustituye por un historial nuevo.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-plqc_6ln/project/.venoxia/changes/c1/oracle.json»: disco lleno.\n..................\n----------------------------------------------------------------------\nRan 39 tests in 2.667s\n\nOK"
+        },
+        {
+          "requirement_id": "R-ORC-007",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 2701,
+          "output_tail": "...................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-ktundd0_/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-jcmuk7uc/project/.venoxia/changes/c1/oracle.json» no tiene la forma esperada; se sustituye por un historial nuevo.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-u9hgpnqi/project/.venoxia/changes/c1/oracle.json»: disco lleno.\n..................\n----------------------------------------------------------------------\nRan 39 tests in 2.642s\n\nOK"
+        },
+        {
+          "requirement_id": "R-ORC-008",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 2607,
+          "output_tail": "...................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-iqimjmg5/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-dfwg69sx/project/.venoxia/changes/c1/oracle.json» no tiene la forma esperada; se sustituye por un historial nuevo.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-6o2j5uny/project/.venoxia/changes/c1/oracle.json»: disco lleno.\n..................\n----------------------------------------------------------------------\nRan 39 tests in 2.554s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 8,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 8
+      },
+      "all_green": true,
+      "all_red": false
     }
   ]
 }

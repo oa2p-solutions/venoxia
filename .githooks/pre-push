@@ -1,0 +1,15 @@
+#!/bin/sh
+# Venoxia · pre-push: la puerta local antes de enviar nada.
+#
+# Se activa una vez por clon:
+#     git config core.hooksPath .githooks
+#
+# Git ejecuta los hooks desde la raíz del árbol de trabajo con la ruta del hook
+# en $0, así que la raíz es el directorio padre de .githooks/. Sin git de por
+# medio: el hook funciona igual donde no haya cliente git en el PATH.
+#
+# La comprobación se invoca sin opciones, a propósito: un hook que la
+# recortara cumpliría la forma y vaciaría el fondo. Quien necesite empujar sin
+# comprobar tiene «git push --no-verify», que deja rastro en la orden.
+root="$(cd "$(dirname "$0")/.." && pwd)" || exit 2
+exec python3 "$root/tools/check.py"

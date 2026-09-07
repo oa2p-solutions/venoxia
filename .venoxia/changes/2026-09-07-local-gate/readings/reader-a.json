@@ -1,0 +1,18 @@
+[
+  {"scenario": "The four steps by name", "effect": "lista los cuatro pasos con su comando, sin ejecutar nada", "status_code": "0", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "One step fails", "effect": "marca el paso en rojo y muestra el final de su salida", "status_code": "1", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "Every step passes", "effect": "la comprobación local termina en verde", "status_code": "0", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "A required executable is missing", "effect": "aborta y el mensaje nombra el ejecutable que falta", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "An unknown option", "effect": "rechaza la invocación y muestra el mensaje de uso", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "One container per version of the matrix", "effect": "lista un docker run por versión con --rm", "status_code": "0", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The suite fails in one version", "effect": "marca matrix en rojo y muestra la salida del contenedor fallido", "status_code": "1", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "Never as root", "effect": "cada comando incluye --user con uid y gid del invocador", "status_code": "0", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The matrix cannot be read from the workflow", "effect": "aborta y el mensaje nombra el fichero del workflow", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "Docker is not usable", "effect": "aborta y el mensaje nombra la opción --no-docker", "status_code": "2", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The matrix is skipped on purpose", "effect": "matrix aparece omitido a petición y el resto pasa", "status_code": "0", "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The hook is an executable that runs the local check", "effect": "el hook es ejecutable e invoca tools/check.py de la raíz", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The hook propagates a failed check", "effect": "git aborta el push con el mismo código de la comprobación", "status_code": "1", "side_effects": ["git aborta el push"], "unclear": false, "unclear_why": null},
+  {"scenario": "The hook propagates a check that could not run", "effect": "git aborta el push con el mismo código de la comprobación", "status_code": "2", "side_effects": ["git aborta el push"], "unclear": false, "unclear_why": null},
+  {"scenario": "The hook passes no options", "effect": "la invocación no lleva --no-docker ni --list", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The README says how to enable it", "effect": "la sección nombra tools/check.py y el comando de activación", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null}
+]

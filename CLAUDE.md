@@ -44,6 +44,11 @@ python3 scripts/oracle.py --root . --change <id> --record      # ejecuta y añad
 
 # Cobertura con la stdlib (trace), subprocesos incluidos; falla si algún fichero baja de su umbral
 python3 tools/coverage.py
+
+# La puerta local, antes de cada push: matriz 3.12/3.13/3.14 en Docker (sin root), coverage, gate.py y plugin validate.
+# Exige docker y claude en el PATH (sin ellos sale con 2). El hook .githooks/pre-push la invoca; se activa por clon con:
+python3 tools/check.py            # --list imprime los comandos sin ejecutar; --no-docker omite la matriz a la vista
+git config core.hooksPath .githooks
 ```
 
 No hay linter ni formateador configurado (el núcleo es pequeño y las convenciones se sostienen por revisión y por los propios validadores). Sí hay CI: un único workflow (jobs `tests` en matriz de Python, `self-spec` con `validate.py`/`charter_lint.py --strict`, `coverage` con `tools/coverage.py`, `plugin-validate`, y `evals` sólo por `workflow_dispatch`), y es el único: el proyecto dejó de usar GitHub y no queda nada bajo `.github/`. Un proyecto consumidor no copia ninguna plantilla: corre `python3 scripts/gate.py --root <proyecto>`, que no obliga a declarar runner, checkout ni autenticación.
