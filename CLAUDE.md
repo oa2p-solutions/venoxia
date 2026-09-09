@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Lo primero de cada sesión: hay una conversación pendiente
+
+**Antes de responder a nada**, lee `2026-09-08-vision-conversacion.md` (raíz del repo) y dile al usuario, en una línea, que está pendiente de retomar y en qué punto quedó. Si el fichero no existe, no digas nada y sigue.
+
+Recoge el hilo donde lo dejó, sin volver a explicar lo que ya está escrito ahí. Lo que quedó abierto:
+
+- **La visión incluye el eje técnico.** Stack, despliegue, estrategia de pruebas, valores por defecto y constantes son parte del contrato, no sólo el comportamiento funcional. Hoy viven en `principles.md` como prosa sin oráculo, mientras sus verificaciones reales (`tools/coverage.py`, `tools/check.py`) viven fuera del modelo. La tesis pendiente: *una decisión técnica sin verificación es una intención*, simétrica a *un requisito sin `verifies:` es una opinión*.
+- **Un hueco verificado del guardián.** Con el change en `specified`, escribir el fichero de test que el propio flujo manda escribir en ese punto se **deniega** (un test no es spec path y el camino 3 exige `validated`). Sólo muerde cuando quien programa es Claude Code. Sin arreglar.
+- **Falta el comando del paso 8.** «Implementa el change» es el paso central y el único sin skill.
+
+El siguiente movimiento acordado era especificar el eje técnico por el propio ciclo, como capability nueva.
+
 ## Qué es este repo
 
 Venoxia es un **plugin de Claude Code** (no una librería ni una app) que convierte la especificación en un contrato verificable: cada requisito nace con `verifies:` (ruta del test que lo resuelve) y `confidence:`, y un validador determinista lo rechaza si falta cualquiera de los dos. El plugin se compone de skills (`skills/*/SKILL.md`), agentes (`agents/*.md`), un hook `PreToolUse` (`hooks/hooks.json` → `scripts/guardian.py`) y scripts Python que son la única lógica ejecutable.

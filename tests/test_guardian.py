@@ -163,6 +163,97 @@ class GuardianDecisionPathsTest(GuardianTestCase):
 
 
 # ---------------------------------------------------------------------------
+# El oráculo que declara un cambio en «specified»
+# ---------------------------------------------------------------------------
+
+
+class GuardianSpecifiedOracleTest(GuardianTestCase):
+    """La puerta del paso 5 del flujo: escribir el test que la spec ya declaró.
+
+    Con el cambio en «specified» el flujo manda escribir el fichero de test, y
+    hasta este change el guardián lo denegaba con el mismo mensaje que da al
+    código de producción. La puerta no la abre la **forma** de la ruta —lo que
+    parezca un test— sino que algún «verifies:» del delta la nombre: el vínculo
+    doble spec↔test ya existe en el modelo y es lo único que acredita que ese
+    fichero es el oráculo de un requisito y no código colado por la ventana.
+    """
+
+    #: Lo que el delta del andamio declara en «verifies:» para R-CHK-014.
+    DECLARED_ORACLE = "test/checkout/reservation.spec.ts"
+
+    #: Un fichero con la misma forma que el anterior y que nadie ha declarado.
+    UNDECLARED_ORACLE = "test/checkout/otro.spec.ts"
+
+    def specified(self, project: Project) -> Path:
+        """Deja el cambio del andamio en «specified», que es el paso 5 del flujo."""
+        return project.change("c1", state="specified", via="spec")
+
+    # @covers R-GRD-006
+    def test_allows_the_path_the_delta_declares_in_verifies(self):
+        """El oráculo declarado se puede escribir con el cambio en «specified»."""
+        project = self.make_project()
+        self.specified(project)
+
+        run = project.guardian(file_path=self.DECLARED_ORACLE)
+
+        self.assert_allow(run)
+        self.assertIn("specified", run.reason, run.describe())
+        self.assertIn("verifies", run.reason, run.describe())
+
+    # @covers R-GRD-006
+    def test_denies_a_test_shaped_path_that_nobody_declared(self):
+        """Parecer un test no abre nada: la puerta la abre el «verifies:»."""
+        project = self.make_project()
+        self.specified(project)
+
+        run = project.guardian(file_path=self.UNDECLARED_ORACLE)
+
+        self.assert_deny(run)
+
+    # @covers R-GRD-006
+    def test_denies_production_code_with_that_same_specified_change(self):
+        """El código de producción sigue esperando a «validated»."""
+        project = self.make_project()
+        self.specified(project)
+
+        run = project.guardian(file_path=CODE_PATH)
+
+        self.assert_deny(run)
+
+    # @covers R-GRD-007
+    def test_the_deny_names_the_declared_oracle_and_what_unblocks(self):
+        """El «deny» en «specified» nombra el fichero que toca escribir ahora.
+
+        Mandar «/venoxia:specify» aquí es un callejón sin salida: es lo que se
+        acaba de hacer, y «/venoxia:diverge» no escribe «validated» mientras
+        «validate.py» no salga 0, que no puede sin el test (V07).
+        """
+        project = self.make_project()
+        self.specified(project)
+
+        run = project.guardian(file_path=CODE_PATH)
+
+        self.assert_deny(run)
+        self.assertIn(self.DECLARED_ORACLE, run.reason, run.describe())
+        for command in ("/venoxia:validate", "/venoxia:diverge"):
+            with self.subTest(command=command):
+                self.assertIn(command, run.reason, run.describe())
+        self.assertNotIn("/venoxia:specify", run.reason, run.describe())
+
+    # @covers R-GRD-007
+    def test_a_specified_change_without_verifies_keeps_the_generic_remedy(self):
+        """Sin ningún «verifies:» que nombrar, el remedio de siempre se queda."""
+        project = self.make_project()
+        project.delta("c1", "checkout", raw=DELTA_MARKDOWN)
+        self.specified(project)
+
+        run = project.guardian(file_path=CODE_PATH)
+
+        self.assert_deny(run)
+        self.assertIn("/venoxia:specify", run.reason, run.describe())
+
+
+# ---------------------------------------------------------------------------
 # El anclaje de las rutas de especificación (paso 2)
 # ---------------------------------------------------------------------------
 

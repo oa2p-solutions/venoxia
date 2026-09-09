@@ -1,0 +1,9 @@
+{
+  "id": "2026-09-09-guardian-oracle-path",
+  "state": "specified",
+  "via": "spec",
+  "capabilities": [
+    "guardian"
+  ],
+  "created": "2026-09-09T16:39:40Z"
+}

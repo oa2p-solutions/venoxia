@@ -20,6 +20,5 @@
     "traceability",
     "divergence",
     "drift"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }
