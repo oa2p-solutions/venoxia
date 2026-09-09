@@ -12,32 +12,42 @@ ejecuta en local antes de cada `push`.
 
 ## Requirements
 
-### R-CI-008 · The internal forge workflow declares the same triggers and jobs on the internal runner
+### R-CI-008 · The workflow declares its triggers, its jobs and a runner it does not name
 
-WHEN se busca `.forgejo/workflows/ci.yml` en el repositorio, el sistema DEBE
-tener un workflow que se dispare en `push` y `pull_request` sobre la rama
-`main`, y también en `workflow_dispatch`, que declare los cinco jobs
-`tests`, `self-spec`, `coverage`, `plugin-validate` y `evals`, y cuyos jobs
-corran sólo sobre las etiquetas `CI_RUNNER` u `CI_RUNNER_NODE` del runner
-interno.
+WHEN se busca el workflow del repositorio, el sistema DEBE tener uno que se
+dispare en `push` y `pull_request` sobre la rama `main`, y también en
+`workflow_dispatch`, que declare los cinco jobs `tests`, `self-spec`,
+`coverage`, `plugin-validate` y `evals`, y cuyos `runs-on` tomen el nombre del
+runner de una variable del repositorio en vez de escribirlo.
+
+El repositorio es público, así que una etiqueta literal publica a cada persona
+que lo clona el mapa de una infraestructura que no es suya y que no le sirve
+para nada. Un workflow tiene que decir en qué runner corre; no tiene que
+decirlo **aquí**, y quien administre la forja declara esas variables una vez.
+
+La frontera, declarada: el directorio `.forgejo/workflows/` se queda. Es la
+ruta que la forja exige, y moverlo a `.github/` quitaría la palabra a cambio de
+un problema peor, porque GitHub Actions ejecutaría el workflow en el
+repositorio público y fallaría por runners que allí no existen.
 
 #### Scenario: Triggers read from disk
-- **WHEN** se parsea `.forgejo/workflows/ci.yml`
+- **WHEN** se parsea el workflow del repositorio
 - **THEN** declara `push` y `pull_request` acotados a `main`, y
   `workflow_dispatch`
 
 #### Scenario: The five jobs by name
-- **WHEN** se parsea `.forgejo/workflows/ci.yml`
+- **WHEN** se parsea el workflow del repositorio
 - **THEN** declara los cinco jobs `tests`, `self-spec`, `coverage`,
   `plugin-validate` y `evals`
 
-#### Scenario: Only the internal runner labels
-- **WHEN** se parsea `.forgejo/workflows/ci.yml`
-- **THEN** cada `runs-on` vale `CI_RUNNER` u `CI_RUNNER_NODE`
+#### Scenario: No runner label is written down
+- **WHEN** se parsea el workflow del repositorio
+- **THEN** cada `runs-on` es una expresión que lee una variable del
+  repositorio, y ninguno contiene una etiqueta escrita a mano
 
 verifies:   tests/test_ci_workflow.py
 confidence: high
-from:       README.md#verificar-en-ci
+from:       README.md#verificar-un-proyecto
 
 ### R-CI-009 · The tests job takes each Python from a container image
 
@@ -548,92 +558,196 @@ from:       README.md#verificar-un-proyecto
 
 WHEN se lee la documentación que el plugin publica a quien lo instala —
 `README.md`, `CONTRIBUTING.md`, `docs/**`, `skills/**`, `agents/**`,
-`templates/**`, `scripts/**`, `hooks/**` y `.claude-plugin/**`—, el
-sistema DEBE explicar cómo verificar un proyecto nombrando `scripts/gate.py` y
-sus códigos de salida, DEBE advertir de que la puerta ejecuta el
-`test_command` que declara el proyecto inspeccionado, y DEBE no nombrar la
-forja interna de la organización, sus etiquetas de runner ni el espejo de
-respaldo, porque cómo se ejecutan el respaldo y las pruebas internas no es de
-interés para quien instala el plugin.
+`templates/**`, `scripts/**`, `hooks/**`, `.claude-plugin/**` **y el workflow
+de CI**—, el sistema DEBE explicar cómo verificar un proyecto nombrando
+`scripts/gate.py` y sus códigos de salida, DEBE advertir de que la puerta
+ejecuta el `test_command` que declara el proyecto inspeccionado, y DEBE no
+nombrar la forja interna de la organización, sus etiquetas de runner ni el
+espejo de respaldo.
 
-Y como toda comprobación por lista, ésta es un cable trampa contra el
-descuido —el párrafo que se queda pegado de una sesión anterior—, y no una
-censura. Quien quiera describir la infraestructura interna con otras palabras
-puede hacerlo, y lo que lo impide es la revisión del commit. Añadir un término a la
-lista cuando aparezca un escape real es el mantenimiento previsto, no un
-parche.
+El workflow entra ahora en el barrido, y ésa es toda la diferencia con la
+versión anterior de este requisito. Antes quedaba fuera con un argumento que
+era cierto: un workflow **tiene** que decir en qué runner corre. Desde
+`R-CI-008` lo dice leyendo una variable del repositorio, así que la excepción
+ya no se sostiene y el fichero se mide como cualquier otro: comentarios
+incluidos, que son lo primero que lee quien lo abre.
 
-El alcance es ese conjunto y no «el repositorio entero», y conviene no
-venderlo por más: `.forgejo/workflows/ci.yml` **tiene** que nombrar sus
-etiquetas de runner —es el CI de verdad, y sin ellas no arranca—, igual que
-la capability que lo especifica, el acta que apuesta por él y los ficheros con
-los que se trabaja en este repositorio, `CLAUDE.md` y `TODO.md`. Ésos
-describen cómo se construye Venoxia, no qué hace Venoxia, y quien los abre ya
-está mirando el taller y no el producto. Lo que la regla impide es que esa
-información viaje dentro del plugin como si fuera documentación de producto,
-y que baste mover un párrafo del README a otro fichero **de ese conjunto**
-para esquivarla. Por eso el alcance son las skills y los agentes **enteros**,
-no sólo sus `SKILL.md`, y por eso incluye `scripts/`, `hooks/` y
-`.claude-plugin/`: un fichero hermano dentro de la misma skill se instala
-exactamente igual, y el `--help` o el docstring de `gate.py` —el comando que
-el README manda ejecutar— llega a cada instalador tal cual. Dejar la regla a
-un directorio de distancia es no ponerla.
+Lo que sigue fuera, y por qué: la capability que especifica el CI y el acta
+que apuesta por él viven bajo `.venoxia/`, que es el registro de cómo se
+construye Venoxia y no lo que Venoxia hace. Y una precisión incómoda que
+conviene no tapar: **una lista de términos prohibidos publica lo que
+prohíbe**. Los tres que quedan viven en un solo sitio, el test que los mantiene
+fuera de todo lo demás; quitarlos de ahí es quitar el cable trampa.
 
-La advertencia no es adorno: al dejar de ser un workflow, la puerta ya no
-trae `persist-credentials: false` ni un paso sin secretos: quien la meta en su
-CI sobre código de un fork estará ejecutando comandos del autor del pull
-request con las credenciales del runner, y sólo puede evitarlo si lo sabe.
-
-#### Scenario: The README names the gate command
-- **WHEN** se lee `README.md`
-- **THEN** nombra `scripts/gate.py`
-
-#### Scenario: The README explains the exit codes
-- **WHEN** se lee `README.md`
-- **THEN** explica los tres códigos con los que termina el comando: `0` si el
-   proyecto pasa la puerta, `1` si no la pasa, y `2` si el uso es incorrecto o
-   si la puerta no ha podido comprobar —diciendo que `2` bloquea igual que
-   `1`, porque leerlo como «error mío de invocación» deja pasar justo el
-   `--root` mal escrito y el checkout a medias que el diseño fail-closed
-   existe para detener
-
-#### Scenario: The gate warns about it in its own help
-- **WHEN** se ejecuta `scripts/gate.py --help`
-- **THEN** su texto dice que el comando ejecuta el `test_command` del proyecto
-  inspeccionado y que no debe correr con secretos en su entorno sobre código
-  que no es de fiar: quien pega el comando en un job disparado por pull
-  requests de un fork lee el `--help`, no el README
-
-#### Scenario: The README warns that the gate runs the project's tests
-- **WHEN** se lee la sección «## Verificar un proyecto» de `README.md`
-- **THEN** dice que el comando ejecuta el `test_command` del proyecto y que no
-  debe correr con secretos en su entorno sobre código que no es de fiar
-
-#### Scenario: The README says what the gate does not run
-- **WHEN** se lee la sección «## Verificar un proyecto» de `README.md`
-- **THEN** dice que el oráculo cubre los changes en `verified` y que los
-  requisitos ya archivados en las capabilities los ejecuta la suite del propio
-  proyecto, para que «verificar un proyecto» no se entienda por más de lo que
-  la puerta hace
-
-#### Scenario: The published documentation does not name the internal forge
+#### Scenario: The workflow is scanned like everything else
 - **WHEN** se leen los ficheros de documentación publicada
-- **THEN** en ninguno aparece el nombre propio del software de la forja interna —el test lo escribe literal— en ninguna combinación de mayúsculas y
-  minúsculas
+- **THEN** el workflow de CI está entre ellos
 
-#### Scenario: The published documentation does not name the internal runner labels
-- **WHEN** se leen los ficheros de documentación publicada
-- **THEN** en ninguno aparece `CI_RUNNER`, `CI_RUNNER_NODE`, el dominio interno
-  `oa2p-solutions.com` —a secas, no sólo con un subdominio delante— ni el
-  puerto `2222` de su acceso por SSH, en ninguna combinación de mayúsculas y
-  minúsculas
+#### Scenario: The workflow does not name the internal forge
+- **WHEN** se lee el texto del workflow, comentarios incluidos
+- **THEN** no aparece el nombre de la forja interna en ninguna combinación de
+  mayúsculas y minúsculas
 
-#### Scenario: The published documentation does not name the backup mirror
-- **WHEN** se leen los ficheros de documentación publicada
-- **THEN** en ninguno aparece ninguna de las expresiones «repositorio de
-  respaldo», «espejo de respaldo», «respaldo interno» ni «copia de seguridad»,
-  en cualquier combinación de mayúsculas y minúsculas
+#### Scenario: The workflow does not name the internal runner labels
+- **WHEN** se lee el texto del workflow, comentarios incluidos
+- **THEN** no aparece ninguna de las dos etiquetas del runner interno
 
 verifies:   tests/test_gate.py
 confidence: high
 from:       README.md#verificar-un-proyecto
+
+### R-CI-019 · The local check runs the CI gate as one command
+
+WHEN se ejecuta `tools/check.py` desde la raíz del repositorio, el sistema
+DEBE ejecutar cuatro pasos —`matrix`, `coverage`, `gate` y `plugin-validate`—
+y DEBE terminar con código `0` sólo si los cuatro terminan en verde, con `1`
+si alguno falla y con `2` si un paso no se pudo ejecutar o la invocación es
+incorrecta.
+
+Los cuatro pasos son los jobs del CI, en local: `matrix` es la suite en cada
+versión de Python soportada, `coverage` es `tools/coverage.py`, `gate` es
+`scripts/gate.py --root .` sobre este mismo repositorio —que ya incluye el
+acta y el validador en estricto y el oráculo de cada change en `verified`—, y
+`plugin-validate` es `claude plugin validate . --strict`. El job `evals` se
+queda fuera a propósito: cuesta tokens y se lanza a mano.
+
+Un paso que no se pudo ejecutar no es un paso en rojo ni en verde: es una
+comprobación que no ocurrió, y aprobarla sería aprobar lo que no se ha
+mirado. Por eso el código es `2`, el mismo que el resto del núcleo reserva
+para el error de uso.
+
+#### Scenario: The four steps by name
+- **WHEN** se pide la lista de pasos con `--list`
+- **THEN** la salida nombra `matrix`, `coverage`, `gate` y `plugin-validate`
+  con el comando de cada uno, no se ejecuta ninguno y la comprobación termina
+  con código `0`
+
+#### Scenario: One step fails
+- **WHEN** un paso termina en fallo
+- **THEN** el resumen lo marca en rojo, muestra el final de su salida y la
+  comprobación termina con código `1`
+
+#### Scenario: Every step passes
+- **WHEN** los cuatro pasos terminan en verde
+- **THEN** la comprobación termina con código `0`
+
+#### Scenario: A required executable is missing
+- **WHEN** falta en el `PATH` un ejecutable que un paso necesita
+- **THEN** la comprobación termina con código `2` y el mensaje nombra el
+  ejecutable que falta
+
+#### Scenario: An unknown option
+- **WHEN** se invoca con una opción que no existe
+- **THEN** la comprobación termina con código `2` y el mensaje de uso
+
+verifies:   tests/test_check.py
+confidence: high
+from:       README.md#verificar-regresiones
+
+### R-CI-020 · The Python matrix runs in containers as an unprivileged user
+
+WHEN la comprobación local ejecuta el paso `matrix`, el sistema DEBE lanzar la
+suite una vez por cada versión de Python que declara la matriz del workflow de
+CI, cada una dentro de un contenedor con la imagen `python:<versión>-slim`,
+con el usuario y el grupo de quien invoca en vez de root, y las tres en
+paralelo; el paso queda en verde sólo cuando los tres contenedores han
+terminado en verde.
+
+Las versiones se toman de la misma matriz que el workflow y no de una lista
+aparte, porque dos listas envejecen por separado. El usuario sin privilegios
+no es un detalle: como root, quince tests de permisos se saltan y la cobertura
+del guardián cae por debajo de su umbral, y eso ya pasó una vez en el CI.
+
+Un cliente `docker` sin demonio en marcha, o ausente, impide comprobar; la
+única forma de seguir sin la matriz es pedirlo con `--no-docker`, que deja el
+paso como omitido a petición y a la vista en el resumen. Es una frontera que
+se declara aquí: con `--no-docker` el código de salida es el que dicten los
+otros tres pasos, igual que si la matriz hubiera pasado, y la diferencia está
+sólo en el resumen. Se acepta porque la opción se escribe a mano cada vez y el hook
+de `pre-push` nunca la pasa (`R-CI-021`). Una matriz que no se puede leer del
+workflow, o que está vacía, tampoco es un verde: cero contenedores no
+comprueban nada, y el código es `2`.
+
+#### Scenario: One container per version of the matrix
+- **WHEN** se listan los comandos del paso `matrix`
+- **THEN** hay un comando `docker run` por cada versión de la matriz del
+  workflow, cada uno usa la imagen `python:<versión>-slim` de su versión y
+  lleva `--rm` para que el contenedor se borre al terminar, y la lista termina
+  con código `0`
+
+#### Scenario: The suite fails in one version
+- **WHEN** la suite termina en fallo en al menos uno de los contenedores de la
+  matriz
+- **THEN** el paso `matrix` se marca en rojo, muestra el final de la salida
+  del contenedor que falló y la comprobación termina con código `1`
+
+#### Scenario: Never as root
+- **WHEN** se listan los comandos del paso `matrix`
+- **THEN** cada comando lleva `--user` con el uid y el gid de quien invoca, y
+  la lista termina con código `0`
+
+#### Scenario: The matrix cannot be read from the workflow
+- **WHEN** el workflow no declara una matriz de versiones legible, o la declara
+  vacía
+- **THEN** la comprobación termina con código `2` y el mensaje nombra el
+  fichero del workflow
+
+#### Scenario: Docker is not usable
+- **WHEN** no hay un cliente `docker` utilizable y no se ha pedido `--no-docker`
+- **THEN** la comprobación termina con código `2` y el mensaje nombra
+  `--no-docker`
+
+#### Scenario: The matrix is skipped on purpose
+- **WHEN** se pasa `--no-docker` y los otros tres pasos terminan en verde
+- **THEN** el paso `matrix` aparece como omitido a petición en el resumen y la
+  comprobación termina con código `0`
+
+verifies:   tests/test_check.py
+confidence: high
+from:       README.md#verificar-regresiones
+
+### R-CI-021 · A pre-push hook runs the local check
+
+WHEN se hace `git push` con `core.hooksPath` apuntando a `.githooks/`, el
+sistema DEBE ejecutar la comprobación local antes de enviar nada y DEBE
+terminar el hook con el mismo código que la comprobación, de modo que git
+aborte el `push` cuando no queda en verde.
+
+El hook vive en el repositorio y no en `.git/hooks/`, que no se versiona:
+activarlo es una línea por clon, y el README la da en el mismo sitio donde
+explica el resto de la verificación. Quien de verdad necesite empujar sin
+comprobar tiene `git push --no-verify`, que deja rastro en la orden y no en
+el silencio. Por lo mismo, el hook invoca la comprobación sin opciones: un
+hook que pasara `--no-docker` o `--list` cumpliría la forma y vaciaría el
+fondo. Frontera declarada: el hook comprueba el árbol de trabajo de quien
+empuja, no las referencias que git le entrega, así que empujar una rama que no
+es la que está desplegada, o con cambios sin commitear, comprueba otra cosa que
+lo que se envía. Es el límite de un hook de una sola línea, y se acepta porque
+en este repositorio se empuja la rama en la que se trabaja.
+
+#### Scenario: The hook is an executable that runs the local check
+- **WHEN** se lee `.githooks/pre-push`
+- **THEN** es un fichero ejecutable que invoca `tools/check.py` de la raíz del
+  repositorio
+
+#### Scenario: The hook propagates a failed check
+- **WHEN** la comprobación local termina en fallo
+- **THEN** el hook termina con código `1`, el mismo de la comprobación, y git
+  aborta el `push`
+
+#### Scenario: The hook propagates a check that could not run
+- **WHEN** la comprobación local no se pudo ejecutar
+- **THEN** el hook termina con código `2`, el mismo de la comprobación, y git
+  aborta el `push`
+
+#### Scenario: The hook passes no options
+- **WHEN** se lee `.githooks/pre-push`
+- **THEN** la invocación de `tools/check.py` no lleva `--no-docker` ni `--list`
+
+#### Scenario: The README says how to enable it
+- **WHEN** se lee la sección «## Verificar regresiones» de `README.md`
+- **THEN** nombra `tools/check.py` y `git config core.hooksPath .githooks`
+
+verifies:   tests/test_check.py
+confidence: high
+from:       README.md#verificar-regresiones
