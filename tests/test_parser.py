@@ -1476,9 +1476,9 @@ class TestModelConstants(unittest.TestCase):
         self.assertEqual(model.CONFIDENCE_LEVELS, ("high", "medium", "low"))
 
     def test_meta_keys(self):
-        """Las cinco claves de metadatos reconocidas."""
+        """Las seis claves de metadatos reconocidas («runner» llegó con los runners con nombre)."""
         self.assertEqual(
-            model.META_KEYS, ("verifies", "confidence", "why", "revisit", "from")
+            model.META_KEYS, ("verifies", "runner", "confidence", "why", "revisit", "from")
         )
 
     def test_requirement_id_regex_accepts_the_canonical_form(self):

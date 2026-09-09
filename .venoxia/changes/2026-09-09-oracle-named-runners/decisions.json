@@ -1,0 +1,481 @@
+{
+  "version": 1,
+  "change": "2026-09-09-oracle-named-runners",
+  "decisions": [
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "The placeholder of a named runner is substituted",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The placeholder of a named runner is substituted» es la correcta?",
+      "options": [
+        "«sustituye {files} por las rutas de verifies»",
+        "«el comando lleva las rutas de verifies en {files}»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "decidida por Claude: vocabulario, el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "A runner with its own cwd runs there",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A runner with its own cwd runs there» es la correcta?",
+      "options": [
+        "«ejecuta el comando en el cwd declarado por el runner»",
+        "«el comando corre con el cwd propio del runner»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "decidida por Claude: vocabulario, el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "A failing named runner is a red requirement",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «A failing named runner is a red requirement»?",
+      "options": [
+        "«el requisito se marca con status: red y exit_code: 1»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«el requisito se marca con status: red y exit_code: 1»",
+      "decided_by": "claude",
+      "note": "decidida por Claude: el THEN ya dice status red y exit_code 1; el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "A failing named runner is a red requirement",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A failing named runner is a red requirement» es la correcta?",
+      "options": [
+        "«el requisito queda rojo tras fallar el runner»",
+        "«el requisito queda en status red con exit_code 1»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "decidida por Claude: vocabulario, el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "The command runs character for character",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The command runs character for character» es la correcta?",
+      "options": [
+        "«ejecuta el command del runner tal cual, sin sustituir»",
+        "«se ejecuta el command del runner coverage sin sustituciones»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "decidida por Claude: vocabulario, el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "A verbatim runner that passes is a green requirement",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A verbatim runner that passes is a green requirement» es la correcta?",
+      "options": [
+        "«el requisito queda verde tras pasar el runner»",
+        "«el requisito queda con status green»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "decidida por Claude: vocabulario, el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "The default runner still demands the placeholder",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The default runner still demands the placeholder» es la correcta?",
+      "options": [
+        "«el proceso termina sin ejecutar nada»",
+        "«el proceso termina en error de uso»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "decidida por Claude: vocabulario, el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "Nothing runs, not even the other requirements",
+      "field": "status_code_absent",
+      "question": "¿Qué código de estado debe devolver el sistema en «Nothing runs, not even the other requirements»?",
+      "options": [
+        "2",
+        "Ninguno, el escenario no devuelve código de estado"
+      ],
+      "chosen": 0,
+      "answer": "2",
+      "decided_by": "claude",
+      "note": "decidida por Claude: el código 2 ya está en la narrativa de R-ORC-015; se escribe en el THEN del escenario, como en R-ORC-011/012"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "The message names the runner and the file",
+      "field": "status_code_absent",
+      "question": "¿Qué código de estado debe devolver el sistema en «The message names the runner and the file»?",
+      "options": [
+        "2",
+        "Ninguno, el escenario no devuelve código de estado"
+      ],
+      "chosen": 0,
+      "answer": "2",
+      "decided_by": "claude",
+      "note": "decidida por Claude: el código 2 ya está en la narrativa de R-ORC-015; se escribe en el THEN del escenario, como en R-ORC-011/012"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "Nothing is recorded",
+      "field": "status_code_absent",
+      "question": "¿Qué código de estado debe devolver el sistema en «Nothing is recorded»?",
+      "options": [
+        "2",
+        "Ninguno, el escenario no devuelve código de estado"
+      ],
+      "chosen": 0,
+      "answer": "2",
+      "decided_by": "claude",
+      "note": "decidida por Claude: el código 2 ya está en la narrativa de R-ORC-015; se escribe en el THEN del escenario, como en R-ORC-011/012"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "A missing requirement carries its runner too",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A missing requirement carries its runner too» es la correcta?",
+      "options": [
+        "«el resultado trae la clave runner igual que los demás»",
+        "«su elemento de results trae la clave runner también»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "decidida por Claude: vocabulario, el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "The top level keeps its eight keys",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The top level keeps its eight keys» es la correcta?",
+      "options": [
+        "«el documento mantiene exactamente sus ocho claves»",
+        "«las claves de primer nivel del documento siguen siendo ocho»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "decidida por Claude: vocabulario, el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T19:52:27Z",
+      "scenario": "An undeclared runner name",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An undeclared runner name» es la correcta?",
+      "options": [
+        "«salta V19 y es el único hallazgo»",
+        "«salta V19 sobre ese requisito y es la única regla»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "decidida por Claude: vocabulario, el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T19:58:45Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-ORC-013",
+      "question": "Ataque high sobre R-ORC-013: si un runner declara su propio cwd (p. ej. packages/web) y su command lleva {files}, las rutas de verifies: son relativas a la raíz del proyecto y, pegadas tal cual, no existen desde ese cwd. Un runner que sale con 0 cuando no encuentra ficheros (pytest, jest, go test) daría un verde falso. ¿Cómo se sustituye {files} cuando el runner corre en un cwd distinto de la raíz?",
+      "options": [
+        "Relativas al cwd del runner",
+        "Rutas absolutas",
+        "Aceptar como límite declarado"
+      ],
+      "chosen": 0,
+      "answer": "Relativas al cwd del runner",
+      "decided_by": "user"
+    },
+    {
+      "at": "2026-09-09T19:58:45Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-ORC-014",
+      "question": "Ataque high sobre R-ORC-014: un runner con nombre sin {files} corre tal cual, así que runners.coverage.command = \"true\" pone en verde cualquier requisito que lo declare sin ejecutar ningún test. Es la misma clase de límite que el README ya declara para test_command («sólo se comprueba por la presencia de {files}»), y la decisión D7 del plan lo permite a propósito para poder declarar la cobertura como runner. ¿Qué hacemos con este ataque?",
+      "options": [
+        "Aceptar como límite declarado",
+        "Exigir que el command nombre un fichero del repo",
+        "Reabrir D7: no permitir runners sin {files}"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado",
+      "decided_by": "user"
+    },
+    {
+      "at": "2026-09-09T19:58:45Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-VAL-008",
+      "question": "Ataque medium sobre R-VAL-008: V19 no ve un runners que no es objeto ni un cwd inexistente; el oráculo sale con 2 para todo el proyecto sin que ningún gate anterior lo señale.",
+      "options": [
+        "V19 cubre también el cwd inexistente del runner declarado; el resto queda como límite",
+        "Dejar V19 como está"
+      ],
+      "chosen": 0,
+      "answer": "V19 cubre también el cwd inexistente del runner declarado; el resto queda como límite",
+      "decided_by": "claude",
+      "note": "decidida por Claude: es el alcance de una regla del validador sobre un delta propio, no una decisión de producto"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "The command runs character for character",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The command runs character for character» es la correcta?",
+      "options": [
+        "«ejecuta el command del runner sin sustituir nada»",
+        "«ejecuta el command del runner coverage tal cual»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "A missing anchor does not run the verbatim command",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A missing anchor does not run the verbatim command» es la correcta?",
+      "options": [
+        "«no se ejecuta el comando de ese runner»",
+        "«no ejecuta el comando cuando falta el fichero de verifies»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "The default runner still demands the placeholder",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The default runner still demands the placeholder» es la correcta?",
+      "options": [
+        "«el proceso termina por falta del placeholder»",
+        "«el proceso termina con código 2»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "An undeclared name is a usage error",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An undeclared name is a usage error» es la correcta?",
+      "options": [
+        "«el proceso termina como error de uso»",
+        "«el proceso termina con código 2»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "Nothing runs, not even the other requirements",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Nothing runs, not even the other requirements» es la correcta?",
+      "options": [
+        "«el proceso termina y no ejecuta ningún comando»",
+        "«el proceso termina con código 2, ningún comando corre»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "The message names the runner and the file",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The message names the runner and the file» es la correcta?",
+      "options": [
+        "«el proceso termina y stderr avisa nombrando el runner y el fichero»",
+        "«termina con código 2 y stderr nombra runner y fichero»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "Nothing is recorded",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Nothing is recorded» es la correcta?",
+      "options": [
+        "«el proceso termina sin escribir ningún fichero nuevo»",
+        "«el proceso termina con código 2 y no crea ningún fichero»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "Dry run is a usage error too",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Dry run is a usage error too» es la correcta?",
+      "options": [
+        "«el proceso termina como error de uso»",
+        "«el proceso termina con código 2»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "A runner without a command",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A runner without a command» es la correcta?",
+      "options": [
+        "«el proceso termina como error de uso»",
+        "«el proceso termina con código 2»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "A runners key that is not an object",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A runners key that is not an object» es la correcta?",
+      "options": [
+        "«el proceso termina como error de uso»",
+        "«el proceso termina con código 2»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "A runner whose cwd does not exist",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A runner whose cwd does not exist» es la correcta?",
+      "options": [
+        "«el proceso termina como error de uso»",
+        "«el proceso termina con código 2»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "A named runner is named in its result",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A named runner is named in its result» es la correcta?",
+      "options": [
+        "«el resultado del requisito incluye runner.name igual a alt»",
+        "«el elemento de results trae runner.name igual a alt»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "The top level keeps its eight keys",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The top level keeps its eight keys» es la correcta?",
+      "options": [
+        "«el documento mantiene exactamente ocho claves de primer nivel»",
+        "«las claves de primer nivel son las ocho de R-ORC-008»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": "An undeclared runner name",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An undeclared runner name» es la correcta?",
+      "options": [
+        "«salta V19 sobre el requisito y es la única regla que salta»",
+        "«salta V19 sobre el requisito y ninguna otra regla»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (los dos lectores dan el mismo status_code), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-ORC-014",
+      "question": "Ronda 2, ataque high: command «true» o un solo espacio pone en verde sin ejecutar el test.",
+      "options": [
+        "Ya decidido por el usuario en la ronda 1: límite declarado; «no vacío» se implementa tras strip()",
+        "Reabrir"
+      ],
+      "chosen": 0,
+      "answer": "Ya decidido por el usuario en la ronda 1: límite declarado; «no vacío» se implementa tras strip()",
+      "decided_by": "claude"
+    },
+    {
+      "at": "2026-09-09T20:02:52Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-ORC-015",
+      "question": "Ronda 2, ataque medium: un cwd que apunta a un fichero regular «existe en disco», la ejecución arranca y el fallo se atribuye como red.",
+      "options": [
+        "Implementar «existe» como «es un directorio», igual que el cwd global; el delta no cambia",
+        "Cambiar el texto del delta y repetir el panel"
+      ],
+      "chosen": 0,
+      "answer": "Implementar «existe» como «es un directorio», igual que el cwd global; el delta no cambia",
+      "decided_by": "claude",
+      "note": "no es decisión de producto: el cwd global ya se comprueba con is_dir y el runner con nombre hereda el mismo criterio"
+    }
+  ]
+}

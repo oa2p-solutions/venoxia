@@ -1,0 +1,10 @@
+{
+  "id": "2026-09-09-oracle-named-runners",
+  "state": "verified",
+  "via": "spec",
+  "capabilities": [
+    "oracle",
+    "validator"
+  ],
+  "created": "2026-09-09T19:41:38Z"
+}

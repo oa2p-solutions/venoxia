@@ -18,6 +18,7 @@ Se ejecuta con cualquiera de las tres formas::
 
 from __future__ import annotations
 
+import json
 import unittest
 
 from tests.venoxia_fixtures import (
@@ -288,6 +289,143 @@ class TestRulesV17V18JsonSchema(unittest.TestCase):
                     self.assertEqual(finding["severity"], "error")
                 if finding["rule"] == "V18":
                     self.assertEqual(finding["severity"], "warning")
+
+
+class TestRuleV19RunnerMustBeDeclared(unittest.TestCase):
+    """V19 · un «runner:» declarado tiene que existir en venoxia.json.
+
+    Del change `2026-09-09-oracle-named-runners`: `runner:` pasa a ser una
+    clave reconocida del bloque de metadatos y el validador comprueba, sin
+    ejecutar nada, que `.venoxia/venoxia.json` declare ese nombre bajo
+    `runners` con un `command` no vacío. Lo que aquí es un error del
+    validador sería, en `oracle.py`, un código `2` sin veredicto.
+    """
+
+    def _config(self, project: Project, runners: object) -> None:
+        project.write(
+            ".venoxia/venoxia.json",
+            json.dumps(
+                {
+                    "version": 1,
+                    "test_command": "python3 -m unittest {files}",
+                    "cwd": ".",
+                    "runners": runners,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+        )
+
+    def _delta_with_runner(self, project: Project, runner: str) -> None:
+        project.delta(
+            CHANGE_ID,
+            CAPABILITY_NAME,
+            added=[requirement(extra_meta=(("runner", runner),))],
+        )
+
+    def test_fires_on_an_undeclared_runner_name(self):
+        """@covers R-VAL-008"""
+        with Project() as project:
+            self._config(project, {"alt": {"command": "python3 tools/coverage.py"}})
+            self._delta_with_runner(project, "nope")
+            run = project.validate_json("--strict")
+            self.assertEqual(run.returncode, 1, run.describe())
+            self.assertEqual(run.rule_set(), {"V19"}, run.describe())
+            finding = run.findings_for("V19")[0]
+            self.assertEqual(finding["severity"], "error")
+            self.assertEqual(finding["requirement_id"], DEFAULT_REQUIREMENT_ID)
+            self.assertIn("nope", finding["message"])
+            self.assertIn("venoxia.json", finding["message"])
+
+    def test_fires_without_venoxia_json(self):
+        """@covers R-VAL-008"""
+        with Project() as project:
+            self._delta_with_runner(project, "alt")
+            run = project.validate_json("--strict")
+            self.assertEqual(run.returncode, 1, run.describe())
+            self.assertEqual(run.rule_set(), {"V19"}, run.describe())
+            self.assertEqual(run.findings_for("V19")[0]["requirement_id"], DEFAULT_REQUIREMENT_ID)
+
+    def test_a_declared_runner_is_silent(self):
+        """@covers R-VAL-008"""
+        with Project() as project:
+            self._config(project, {"alt": {"command": "python3 tools/coverage.py"}})
+            self._delta_with_runner(project, "alt")
+            run = project.validate_json("--strict")
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertEqual(run.rule_set(), set(), run.describe())
+
+    def test_no_runner_no_rule(self):
+        """@covers R-VAL-008"""
+        with Project() as project:
+            run = project.validate_json("--strict")
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertNotIn("V19", run.rule_set(), run.describe())
+
+    def test_fires_on_an_empty_runner(self):
+        """@covers R-VAL-008"""
+        with Project() as project:
+            self._config(project, {"alt": {"command": "python3 tools/coverage.py"}})
+            self._delta_with_runner(project, "")
+            run = project.validate_json("--strict")
+            self.assertEqual(run.returncode, 1, run.describe())
+            self.assertIn("V19", run.rule_set(), run.describe())
+            self.assertIn("no nombra", run.findings_for("V19")[0]["message"])
+
+    def test_fires_on_a_declared_runner_without_a_command(self):
+        """@covers R-VAL-008"""
+        for runners in ({"alt": {}}, {"alt": {"command": ""}}, {"alt": "no-es-un-objeto"}):
+            with self.subTest(runners=runners), Project() as project:
+                self._config(project, runners)
+                self._delta_with_runner(project, "alt")
+                run = project.validate_json("--strict")
+                self.assertEqual(run.returncode, 1, run.describe())
+                self.assertEqual(run.rule_set(), {"V19"}, run.describe())
+
+    def test_fires_on_a_declared_runner_whose_cwd_does_not_exist(self):
+        """@covers R-VAL-008"""
+        with Project() as project:
+            self._config(
+                project,
+                {"alt": {"command": "python3 tools/coverage.py", "cwd": "no-such-directory"}},
+            )
+            self._delta_with_runner(project, "alt")
+            run = project.validate_json("--strict")
+            self.assertEqual(run.returncode, 1, run.describe())
+            self.assertEqual(run.rule_set(), {"V19"}, run.describe())
+            self.assertIn("no-such-directory", run.findings_for("V19")[0]["message"])
+
+    def test_a_corrupt_venoxia_json_does_not_crash_the_validator(self):
+        """@covers R-VAL-008"""
+        with Project() as project:
+            project.write(".venoxia/venoxia.json", "{ esto no es JSON")
+            self._delta_with_runner(project, "alt")
+            run = project.validate_json("--strict")
+            self.assertEqual(run.returncode, 1, run.describe())
+            self.assertEqual(run.rule_set(), {"V19"}, run.describe())
+            self.assertIn("no se pudo leer", run.findings_for("V19")[0]["message"])
+            self.assertNotIn("Traceback", run.stderr)
+
+    def test_the_hint_shows_the_entry_to_add(self):
+        """@covers R-VAL-008"""
+        with Project() as project:
+            self._config(project, {"other": {"command": "python3 tools/coverage.py"}})
+            self._delta_with_runner(project, "alt")
+            run = project.validate_json("--strict")
+            self.assertEqual(run.rule_set(), {"V19"}, run.describe())
+            self.assertIn('"alt"', run.findings_for("V19")[0]["hint"])
+
+    def test_v19_does_not_disturb_the_json_schema(self):
+        """@covers R-VAL-008"""
+        with Project() as project:
+            self._delta_with_runner(project, "alt")
+            run = project.validate_json("--strict")
+            # Las siete del esquema más «adopted», que el CLI añade por contrato.
+            self.assertEqual(
+                set(run.json.keys()),
+                {"version", "ok", "strict", "root", "counts", "findings", "budget", "adopted"},
+            )
 
 
 if __name__ == "__main__":

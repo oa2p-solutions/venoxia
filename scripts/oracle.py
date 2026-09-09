@@ -25,17 +25,31 @@ Uso:
 
 Configuración del proyecto, en `.venoxia/venoxia.json`:
 
-    {"version": 1, "test_command": "python3 -m unittest {files}", "cwd": "."}
+    {"version": 1, "test_command": "python3 -m unittest {files}", "cwd": ".",
+     "runners": {"coverage": {"command": "python3 tools/coverage.py"}}}
 
 `{files}` se sustituye por las rutas de `verifies:` del requisito, separadas
 por un espacio y entrecomilladas con `shlex.quote`. `cwd` es relativo a la
 raíz del proyecto.
 
+`runners` es opcional: runners con nombre, cada uno con su `command` y, si
+hace falta, su `cwd` (relativo a la raíz; sin él, el del proyecto). Un
+requisito elige el suyo con `runner: <name>` en su bloque de metadatos; sin
+`runner:`, corre el `test_command`. El `command` de un runner con nombre puede
+no llevar `{files}`: entonces corre tal cual y el `verifies:` del requisito es
+sólo el ancla del `@covers` (tiene que existir igual: si no, `missing`). Cuando
+el runner corre en un `cwd` distinto de la raíz, las rutas de `{files}` se
+reescriben en relación a ese `cwd`, para que sigan apuntando al mismo fichero.
+Un `runner:` que nombra algo que `runners` no declara es un error de uso:
+código `2` antes de ejecutar nada, nunca un rojo falso (`V19` lo señala
+antes, en `validate.py`).
+
 Códigos de salida: `0` todos los requisitos en `green` (o `--dry-run`) · `1`
 alguno en `red`, `missing` o `timeout` · `2` error de uso: no existe
 `.venoxia/`, el change no existe, falta `venoxia.json` o está mal escrito,
-`test_command` no trae `{files}`, se pidieron `--dry-run` y `--record` a la
-vez, o `--record` no pudo dejar el run en disco.
+`test_command` no trae `{files}`, `runners` está mal formado o algún requisito
+nombra un runner que no existe, se pidieron `--dry-run` y `--record` a la vez,
+o `--record` no pudo dejar el run en disco.
 
 Un `oracle.json` que no es JSON válido o no trae la lista `runs` no se pisa
 sin más: sus bytes se copian antes a `oracle.json.corrupt-<marca>` junto a él
@@ -72,6 +86,11 @@ DELTA_DIR = "delta"
 CONFIG_FILENAME = "venoxia.json"
 RECORD_FILENAME = "oracle.json"
 
+# La clave de `venoxia.json` con los runners con nombre, y la del bloque de
+# metadatos con la que un requisito elige uno de ellos.
+RUNNERS_KEY = "runners"
+RUNNER_META_KEY = "runner"
+
 STATUS_GREEN = "green"
 STATUS_RED = "red"
 STATUS_MISSING = "missing"
@@ -87,7 +106,8 @@ OUTPUT_TAIL_LINES = 20
 # `.venoxia/venoxia.json`. Es texto, nunca se ejecuta.
 CONFIG_EXAMPLE = (
     '{\n  "version": 1,\n  "test_command": "python3 -m unittest {files}",\n'
-    '  "cwd": "."\n}'
+    '  "cwd": ".",\n'
+    '  "runners": {"coverage": {"command": "python3 tools/coverage.py"}}\n}'
 )
 
 ANSI_RED = "\033[31m"
@@ -132,19 +152,100 @@ def paint(text: str, color: str, enabled: bool) -> str:
 
 
 @dataclass(frozen=True)
+class Runner:
+    """Quién ejecuta el oráculo de un requisito: un runner con nombre o el `test_command`.
+
+    `name` es `None` para el `test_command` por defecto; `command` es la
+    plantilla tal como está escrita en `venoxia.json` (con o sin `{files}`);
+    `cwd` ya está resuelto contra la raíz del proyecto.
+    """
+
+    name: str | None
+    command: str
+    cwd: Path
+
+
+@dataclass(frozen=True)
 class OracleConfig:
     """El contenido ya validado de `.venoxia/venoxia.json`."""
 
     test_command: str
     cwd: Path
+    runners: dict[str, Runner] = field(default_factory=dict)
+
+    def default_runner(self) -> Runner:
+        """El `test_command`, visto como un runner sin nombre."""
+        return Runner(name=None, command=self.test_command, cwd=self.cwd)
+
+
+def _resolve_cwd(root: Path, raw_cwd: str) -> Path:
+    """Un `cwd` de `venoxia.json`, relativo a la raíz salvo que venga absoluto."""
+    return (root / raw_cwd) if not Path(raw_cwd).is_absolute() else Path(raw_cwd)
+
+
+def _is_dir(path: Path) -> bool:
+    try:
+        return path.is_dir()
+    except OSError:
+        return False
+
+
+def _load_runners(root: Path, data: dict, default_cwd: Path) -> dict[str, Runner]:
+    """Los runners con nombre de `venoxia.json`, validados uno a uno.
+
+    `runners` es opcional, pero si está tiene que ser un objeto de objetos con
+    un `command` no vacío y un `cwd` que sea un directorio; «existe en disco»
+    se lee como «es un directorio», el mismo criterio que el `cwd` global. Un
+    runner sin `cwd` hereda `default_cwd`, el del proyecto. Un `command` sin
+    `{files}` es legítimo aquí (R-ORC-014): corre tal cual.
+    """
+    raw = data.get(RUNNERS_KEY)
+    if raw is None:
+        return {}
+    if not isinstance(raw, dict):
+        raise UsageError(
+            f"«{RUNNERS_KEY}» de «{VENOXIA_DIR}/{CONFIG_FILENAME}» debe ser un objeto "
+            f"de runners con nombre, no «{type(raw).__name__}». Ejemplo:\n\n{CONFIG_EXAMPLE}"
+        )
+    runners: dict[str, Runner] = {}
+    for name, entry in raw.items():
+        if not isinstance(entry, dict):
+            raise UsageError(
+                f"el runner «{name}» de «{VENOXIA_DIR}/{CONFIG_FILENAME}» debe ser un "
+                f"objeto con «command», no «{type(entry).__name__}». Ejemplo:\n\n"
+                f"{CONFIG_EXAMPLE}"
+            )
+        command = entry.get("command")
+        if not isinstance(command, str) or not command.strip():
+            raise UsageError(
+                f"el runner «{name}» de «{VENOXIA_DIR}/{CONFIG_FILENAME}» no declara "
+                f"«command»: el comando que ejecuta. Ejemplo:\n\n{CONFIG_EXAMPLE}"
+            )
+        raw_cwd = entry.get("cwd")
+        if raw_cwd is None or raw_cwd == "":
+            cwd = default_cwd
+        else:
+            if not isinstance(raw_cwd, str):
+                raise UsageError(
+                    f"el «cwd» del runner «{name}» de «{VENOXIA_DIR}/{CONFIG_FILENAME}» "
+                    f"debe ser una cadena, no «{type(raw_cwd).__name__}»."
+                )
+            cwd = _resolve_cwd(root, raw_cwd)
+            if not _is_dir(cwd):
+                raise UsageError(
+                    f"el «cwd» del runner «{name}» de «{VENOXIA_DIR}/{CONFIG_FILENAME}» "
+                    f"(«{raw_cwd}») no existe o no es un directorio: buscado en «{cwd}»."
+                )
+        runners[name] = Runner(name=name, command=command, cwd=cwd)
+    return runners
 
 
 def load_config(root: Path) -> OracleConfig:
     """Lee y valida `.venoxia/venoxia.json`. Lanza `UsageError` si algo falta.
 
-    Las tres formas de fallar tienen su propio mensaje, con un ejemplo de
-    contenido válido delante: sin esto, quien lo lee tiene que adivinar el
-    formato en vez de copiarlo.
+    Cada forma de fallar tiene su propio mensaje, con un ejemplo de contenido
+    válido delante: sin esto, quien lo lee tiene que adivinar el formato en
+    vez de copiarlo.
     """
     config_path = root / VENOXIA_DIR / CONFIG_FILENAME
     try:
@@ -194,18 +295,55 @@ def load_config(root: Path) -> OracleConfig:
     raw_cwd = data.get("cwd", ".")
     if not isinstance(raw_cwd, str) or not raw_cwd:
         raw_cwd = "."
-    cwd = (root / raw_cwd) if not Path(raw_cwd).is_absolute() else Path(raw_cwd)
-    try:
-        cwd_is_dir = cwd.is_dir()
-    except OSError:
-        cwd_is_dir = False
-    if not cwd_is_dir:
+    cwd = _resolve_cwd(root, raw_cwd)
+    if not _is_dir(cwd):
         raise UsageError(
             f"el «cwd» de «{VENOXIA_DIR}/{CONFIG_FILENAME}» («{raw_cwd}») no existe: "
             f"buscado en «{cwd}»."
         )
 
-    return OracleConfig(test_command=test_command, cwd=cwd)
+    runners = _load_runners(root, data, cwd)
+    return OracleConfig(test_command=test_command, cwd=cwd, runners=runners)
+
+
+def resolve_runner(requirement: Requirement, cfg: OracleConfig) -> Runner:
+    """El runner que ejecuta este requisito: el que nombra `runner:` o el `test_command`.
+
+    Un `runner:` que `venoxia.json` no declara es un error de uso, no un rojo:
+    el oráculo no llegó a mirar nada (R-ORC-015). Un `runner:` vacío tampoco
+    nombra nada y se trata igual.
+    """
+    raw_name = requirement.meta.get(RUNNER_META_KEY)
+    if raw_name is None:
+        return cfg.default_runner()
+    name = raw_name.strip()
+    label = requirement.id or "«sin identificador»"
+    if not name:
+        raise UsageError(
+            f"el requisito {label} declara «{RUNNER_META_KEY}:» sin nombrar ningún runner: "
+            f"pon el nombre de uno de los «{RUNNERS_KEY}» de "
+            f"«{VENOXIA_DIR}/{CONFIG_FILENAME}» o quita la línea."
+        )
+    runner = cfg.runners.get(name)
+    if runner is None:
+        declared = ", ".join(f"«{known}»" for known in sorted(cfg.runners)) or "ninguno"
+        raise UsageError(
+            f"el requisito {label} declara «{RUNNER_META_KEY}: {name}» y "
+            f"«{VENOXIA_DIR}/{CONFIG_FILENAME}» no declara «{name}» bajo «{RUNNERS_KEY}» "
+            f"(declarados: {declared}). No se ha ejecutado ningún comando. Declara el "
+            f"runner, por ejemplo:\n\n{CONFIG_EXAMPLE}"
+        )
+    return runner
+
+
+def check_runners(requirements: list[Requirement], cfg: OracleConfig) -> None:
+    """Resuelve el runner de cada requisito antes de ejecutar ninguno.
+
+    Así un `runner:` no declarado sale con `2` sin que ningún comando —tampoco
+    el de los requisitos anteriores— haya llegado a correr (R-ORC-015).
+    """
+    for requirement in requirements:
+        resolve_runner(requirement, cfg)
 
 
 # ---------------------------------------------------------------------------
@@ -269,6 +407,9 @@ class Result:
     exit_code: int | None = None
     duration_ms: int = 0
     output_tail: str = ""
+    runner_name: str | None = None
+    runner_command: str = ""
+    runner_cwd: str = ""
 
     def to_dict(self) -> dict:
         return {
@@ -278,13 +419,45 @@ class Result:
             "exit_code": self.exit_code,
             "duration_ms": self.duration_ms,
             "output_tail": self.output_tail,
+            # Quién produjo este veredicto (R-ORC-016): el nombre del runner
+            # (`null` para el `test_command`), el comando ya sustituido y el
+            # directorio desde el que corrió. Es lo que permite leer un run y
+            # saber qué se ejecutó de verdad, no sólo si salió verde.
+            "runner": {
+                "name": self.runner_name,
+                "command": self.runner_command,
+                "cwd": self.runner_cwd,
+            },
         }
 
 
 def build_command(template: str, files: list[str]) -> str:
-    """Sustituye «{files}» por las rutas, entrecomilladas con `shlex.quote`."""
+    """Sustituye «{files}» por las rutas, entrecomilladas con `shlex.quote`.
+
+    Una plantilla sin «{files}» se devuelve tal cual: es el runner con nombre
+    que corre verbatim (R-ORC-014). Que el `test_command` por defecto sí lo
+    traiga lo exige `load_config`, no esta función.
+    """
+    if FILES_PLACEHOLDER not in template:
+        return template
     joined = " ".join(shlex.quote(path) for path in files)
     return template.replace(FILES_PLACEHOLDER, joined)
+
+
+def files_for_cwd(root: Path, runner: Runner, written: list[str]) -> list[str]:
+    """Las rutas de «verifies:» tal como las verá el comando desde el `cwd` del runner.
+
+    Con el runner corriendo en la raíz, las rutas van tal como se escribieron:
+    ni un byte cambia respecto a un `venoxia.json` sin `runners`. Con un `cwd`
+    distinto se reescriben en relación a él, porque pegadas tal cual no
+    existirían desde allí y un runner que sale con `0` sin ficheros daría un
+    verde falso (decisión del usuario, 2026-09-09, sobre R-ORC-013).
+    """
+    if os.path.normpath(str(runner.cwd)) == os.path.normpath(str(root)):
+        return list(written)
+    return [
+        os.path.relpath(str(_resolve(root, path)), str(runner.cwd)) for path in written
+    ]
 
 
 def _tail(text: str, lines: int = OUTPUT_TAIL_LINES) -> str:
@@ -303,7 +476,15 @@ def run_one(requirement: Requirement, root: Path, cfg: OracleConfig, timeout: fl
     invocación con todas sus rutas.
     """
     written = _verifies_paths(requirement)
-    result = Result(requirement_id=requirement.id or "", verifies=written)
+    runner = resolve_runner(requirement, cfg)
+    command = build_command(runner.command, files_for_cwd(root, runner, written))
+    result = Result(
+        requirement_id=requirement.id or "",
+        verifies=written,
+        runner_name=runner.name,
+        runner_command=command,
+        runner_cwd=str(runner.cwd),
+    )
 
     if not written:
         result.status = STATUS_MISSING
@@ -314,23 +495,22 @@ def run_one(requirement: Requirement, root: Path, cfg: OracleConfig, timeout: fl
         result.status = STATUS_MISSING
         return result
 
-    command = build_command(cfg.test_command, written)
     try:
         argv = shlex.split(command)
     except ValueError as error:
-        # Comillas desparejadas en un test_command escrito a mano: no es un
-        # fallo del requisito, es la configuración del proyecto. Se cuenta
-        # como «red» porque el oráculo no se pudo correr, y se explica en la
-        # cola de salida en vez de reventar.
+        # Comillas desparejadas en un comando escrito a mano: no es un fallo
+        # del requisito, es la configuración del proyecto. Se cuenta como
+        # «red» porque el oráculo no se pudo correr, y se explica en la cola
+        # de salida en vez de reventar.
         result.status = STATUS_RED
-        result.output_tail = f"«test_command» no se pudo interpretar: {error}."
+        result.output_tail = f"«{_runner_label(runner)}» no se pudo interpretar: {error}."
         return result
 
     started = time.perf_counter()
     try:
         completed = subprocess.run(
             argv,
-            cwd=str(cfg.cwd),
+            cwd=str(runner.cwd),
             shell=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -357,9 +537,14 @@ def run_one(requirement: Requirement, root: Path, cfg: OracleConfig, timeout: fl
         elapsed_ms = int((time.perf_counter() - started) * 1000)
         result.status = STATUS_RED
         result.duration_ms = elapsed_ms
-        result.output_tail = f"no se pudo lanzar «{cfg.test_command}»: {os_error}."
+        result.output_tail = f"no se pudo lanzar «{runner.command}»: {os_error}."
 
     return result
+
+
+def _runner_label(runner: Runner) -> str:
+    """Cómo se llama al runner en los mensajes: «test_command» o «runner <name>»."""
+    return "test_command" if runner.name is None else f"runner {runner.name}"
 
 
 def _resolve(root: Path, path: str) -> Path:
@@ -403,7 +588,10 @@ def dry_run_lines(requirements: list[Requirement], root: Path, cfg: OracleConfig
             listed = ", ".join(f"«{path}»" for path in missing)
             lines.append(f"{label}: (no existe {listed}, no se invocaría el runner)")
             continue
-        lines.append(f"{label}: {build_command(cfg.test_command, written)}")
+        runner = resolve_runner(requirement, cfg)
+        lines.append(
+            f"{label}: {build_command(runner.command, files_for_cwd(root, runner, written))}"
+        )
     return lines
 
 
@@ -702,6 +890,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         cfg = load_config(root)
         requirements = collect_requirements(root, args.change)
+        # R-ORC-015: un «runner:» que venoxia.json no declara se descubre aquí,
+        # antes de ejecutar o listar nada, para que ningún comando corra ni
+        # ningún fichero se escriba.
+        check_runners(requirements, cfg)
     except UsageError as error:
         print(f"venoxia: {error}", file=sys.stderr)
         return EXIT_USAGE

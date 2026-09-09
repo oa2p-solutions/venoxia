@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import shlex
 import tempfile
 import unittest
 import unittest.mock
@@ -866,6 +867,536 @@ class OracleInternalErrorPathsTest(unittest.TestCase):
                 # No debe reventar: llegar a la siguiente línea ya lo demuestra.
                 oracle.record(history_path, CHANGE_ID, {"version": 1, "results": []})
             self.assertFalse(history_path.exists())
+
+
+# ---------------------------------------------------------------------------
+# Runners con nombre · change 2026-09-09-oracle-named-runners
+# ---------------------------------------------------------------------------
+
+# Un runner con nombre que también recibe las rutas. El runner falso anota
+# «--alt» como si fuera una ruta más, y eso es lo que distingue en el log una
+# invocación suya de una del «test_command».
+ALT_RUNNER_COMMAND = f"python3 {FAKE_RUNNER_PY} --alt {{files}}"
+
+# Un runner con nombre sin «{files}»: corre tal cual y el log recibe
+# exactamente «--verbatim», sin ninguna ruta detrás.
+VERBATIM_RUNNER_COMMAND = f"python3 {FAKE_RUNNER_PY} --verbatim"
+
+# Un runner que anota su directorio de trabajo en el fichero que se le pasa.
+_CWD_PROBE = (
+    "import os, sys; "
+    "open(sys.argv[1], 'a', encoding='utf-8').write(os.getcwd() + '\\n')"
+)
+
+
+def _cwd_probe_command(log_path: Path) -> str:
+    """El comando del runner sonda: escribe su `cwd` en `log_path`, una línea por invocación."""
+    return f"python3 -c {shlex.quote(_CWD_PROBE)} {shlex.quote(str(log_path))}"
+
+
+def _runners_config(
+    project: Project,
+    runners: object,
+    *,
+    test_command: str = FAKE_RUNNER_COMMAND,
+    cwd: str = ".",
+) -> Path:
+    """Escribe `.venoxia/venoxia.json` con `runners` además del `test_command`.
+
+    `Project.oracle_config` no conoce `runners`: este fichero es el único que
+    los necesita, y el andamio no forma parte del oráculo de estos requisitos.
+    `runners` se serializa tal cual, también cuando no es un objeto: así se
+    fabrica el caso negativo de `R-ORC-015`.
+    """
+    return project.write(
+        ".venoxia/venoxia.json",
+        json.dumps(
+            {"version": 1, "test_command": test_command, "cwd": cwd, "runners": runners},
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+    )
+
+
+def _with_runner(
+    project: Project,
+    identifier: str,
+    runner: str,
+    *,
+    result: str | None = None,
+    verifies: str | None = None,
+) -> str:
+    """Un requisito canónico con `runner: <name>` en su bloque de metadatos.
+
+    Sin `verifies` explícito se crea el fichero de test con `project.oracle`,
+    igual que en el resto de la suite; con él se escribe la ruta tal cual, que
+    es como se fabrica un ancla que no existe en disco.
+    """
+    path = verifies if verifies is not None else project.oracle(identifier, result=result)
+    return requirement(
+        id=identifier,
+        title=f"Requisito {identifier}",
+        verifies=path,
+        extra_meta=(("runner", runner),),
+    )
+
+
+class OracleNamedRunnerTest(unittest.TestCase):
+    """R-ORC-013 · un requisito elige su runner por nombre."""
+
+    def test_the_named_runner_replaces_the_default_for_that_requirement(self):
+        """@covers R-ORC-013"""
+        with Project() as project:
+            _runners_config(project, {"alt": {"command": ALT_RUNNER_COMMAND}})
+            log_path = project.path("runner.log")
+            reqs = [_with_runner(project, "R-ORC-131", "alt")]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json(
+                "--change", CHANGE_ID, env={"FAKE_RUNNER_LOG": str(log_path)}
+            )
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            lines = _log_lines(log_path)
+            self.assertEqual(len(lines), 1, lines)
+            self.assertTrue(lines[0].startswith("--alt\t"), lines)
+
+    def test_a_requirement_without_runner_keeps_the_default(self):
+        """@covers R-ORC-013"""
+        with Project() as project:
+            _runners_config(project, {"alt": {"command": ALT_RUNNER_COMMAND}})
+            log_path = project.path("runner.log")
+            default_path = project.oracle("R-ORC-133")
+            reqs = [
+                _with_runner(project, "R-ORC-132", "alt"),
+                requirement(id="R-ORC-133", title="Por defecto", verifies=default_path),
+            ]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json(
+                "--change", CHANGE_ID, env={"FAKE_RUNNER_LOG": str(log_path)}
+            )
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            lines = _log_lines(log_path)
+            self.assertEqual(len(lines), 2, lines)
+            self.assertIn(default_path, lines, lines)
+            self.assertEqual(sum(1 for line in lines if line.startswith("--alt\t")), 1, lines)
+
+    def test_the_placeholder_of_a_named_runner_is_substituted(self):
+        """@covers R-ORC-013"""
+        with Project() as project:
+            _runners_config(project, {"alt": {"command": ALT_RUNNER_COMMAND}})
+            log_path = project.path("runner.log")
+            path = project.oracle("R-ORC-134")
+            reqs = [_with_runner(project, "R-ORC-134", "alt", verifies=path)]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json(
+                "--change", CHANGE_ID, env={"FAKE_RUNNER_LOG": str(log_path)}
+            )
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertEqual(_log_lines(log_path), [f"--alt\t{path}"])
+
+    def test_a_runner_with_its_own_cwd_runs_there(self):
+        """@covers R-ORC-013"""
+        with Project() as project:
+            sub = project.path("sub")
+            sub.mkdir()
+            probe_log = project.path("cwd.log")
+            _runners_config(
+                project, {"probe": {"command": _cwd_probe_command(probe_log), "cwd": "sub"}}
+            )
+            reqs = [_with_runner(project, "R-ORC-135", "probe")]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            lines = _log_lines(probe_log)
+            self.assertEqual(len(lines), 1, lines)
+            self.assertEqual(Path(lines[0]).resolve(), sub.resolve())
+
+    def test_the_paths_follow_the_runner_into_its_cwd(self):
+        """@covers R-ORC-013"""
+        with Project() as project:
+            project.path("sub").mkdir()
+            _runners_config(project, {"alt": {"command": ALT_RUNNER_COMMAND, "cwd": "sub"}})
+            log_path = project.path("runner.log")
+            path = project.oracle("R-ORC-138", result="red")
+            reqs = [_with_runner(project, "R-ORC-138", "alt", verifies=path)]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json(
+                "--change", CHANGE_ID, env={"FAKE_RUNNER_LOG": str(log_path)}
+            )
+
+            # La ruta llega reescrita respecto a «sub» («../test/…»), y la
+            # prueba de que apunta al mismo fichero es que el runner falso,
+            # que la abre desde «sub», encuentra su marcador y sale en rojo.
+            self.assertEqual(_log_lines(log_path), [f"--alt\t../{path}"])
+            self.assertEqual(run.json["results"][0]["status"], "red", run.describe())
+
+    def test_a_runner_without_cwd_inherits_the_project_cwd(self):
+        """@covers R-ORC-013"""
+        with Project() as project:
+            base = project.path("base")
+            base.mkdir()
+            probe_log = project.path("cwd.log")
+            _runners_config(
+                project, {"probe": {"command": _cwd_probe_command(probe_log)}}, cwd="base"
+            )
+            reqs = [_with_runner(project, "R-ORC-136", "probe")]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            lines = _log_lines(probe_log)
+            self.assertEqual(len(lines), 1, lines)
+            self.assertEqual(Path(lines[0]).resolve(), base.resolve())
+
+    def test_a_failing_named_runner_is_a_red_requirement(self):
+        """@covers R-ORC-013"""
+        with Project() as project:
+            _runners_config(project, {"alt": {"command": ALT_RUNNER_COMMAND}})
+            reqs = [_with_runner(project, "R-ORC-137", "alt", result="red")]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 1, run.describe())
+            result = run.json["results"][0]
+            self.assertEqual(result["status"], "red")
+            self.assertEqual(result["exit_code"], 1)
+
+
+class OracleVerbatimRunnerTest(unittest.TestCase):
+    """R-ORC-014 · un runner con nombre sin «{files}» corre tal cual."""
+
+    REQUIREMENT_ID = "R-ORC-141"
+
+    def _project(self, project: Project, *, verifies: str | None = None) -> Path:
+        _runners_config(project, {"coverage": {"command": VERBATIM_RUNNER_COMMAND}})
+        reqs = [_with_runner(project, self.REQUIREMENT_ID, "coverage", verifies=verifies)]
+        project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+        return project.path("runner.log")
+
+    def test_the_command_runs_character_for_character(self):
+        """@covers R-ORC-014"""
+        with Project() as project:
+            log_path = self._project(project)
+
+            run = project.run_oracle_json(
+                "--change", CHANGE_ID, env={"FAKE_RUNNER_LOG": str(log_path)}
+            )
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertEqual(_log_lines(log_path), ["--verbatim"])
+
+    def test_a_verbatim_runner_that_passes_is_a_green_requirement(self):
+        """@covers R-ORC-014"""
+        with Project() as project:
+            self._project(project)
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertEqual(run.json["results"][0]["status"], "green")
+
+    def test_the_verifies_path_is_still_the_anchor(self):
+        """@covers R-ORC-014"""
+        with Project() as project:
+            self._project(project, verifies="test/generated/never-written.spec.ts")
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 1, run.describe())
+            self.assertEqual(run.json["results"][0]["status"], "missing")
+
+    def test_a_missing_anchor_does_not_run_the_verbatim_command(self):
+        """@covers R-ORC-014"""
+        with Project() as project:
+            log_path = self._project(project, verifies="test/generated/never-written.spec.ts")
+
+            project.run_oracle_json("--change", CHANGE_ID, env={"FAKE_RUNNER_LOG": str(log_path)})
+
+            self.assertEqual(_log_lines(log_path), [])
+
+    def test_dry_run_prints_the_verbatim_command(self):
+        """@covers R-ORC-014"""
+        with Project() as project:
+            log_path = self._project(project)
+
+            run = project.run_oracle(
+                "--change", CHANGE_ID, "--dry-run", env={"FAKE_RUNNER_LOG": str(log_path)}
+            )
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertIn(f"{self.REQUIREMENT_ID}: {VERBATIM_RUNNER_COMMAND}", run.stdout)
+            self.assertEqual(_log_lines(log_path), [])
+
+    def test_the_default_runner_still_demands_the_placeholder(self):
+        """@covers R-ORC-014"""
+        with Project() as project:
+            _runners_config(
+                project,
+                {"coverage": {"command": VERBATIM_RUNNER_COMMAND}},
+                test_command=f"python3 {FAKE_RUNNER_PY}",
+            )
+            reqs = [_with_runner(project, self.REQUIREMENT_ID, "coverage")]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("{files}", run.stderr)
+
+
+class OracleUndeclaredRunnerTest(unittest.TestCase):
+    """R-ORC-015 · un runner no declarado o mal formado es error de uso, nunca un rojo."""
+
+    DECLARED = {"alt": {"command": ALT_RUNNER_COMMAND}}
+
+    def _project(
+        self,
+        project: Project,
+        runners: object = None,
+        *,
+        runner: str = "nope",
+        with_default: bool = False,
+    ) -> Path:
+        _runners_config(project, self.DECLARED if runners is None else runners)
+        reqs = []
+        if with_default:
+            reqs.append(
+                requirement(id="R-ORC-150", title="Por defecto", verifies=project.oracle("R-ORC-150"))
+            )
+        reqs.append(_with_runner(project, "R-ORC-151", runner))
+        project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+        return project.path("runner.log")
+
+    def test_an_undeclared_name_is_a_usage_error(self):
+        """@covers R-ORC-015"""
+        with Project() as project:
+            self._project(project)
+
+            run = project.run_oracle("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertNotIn("Traceback", run.stderr)
+
+    def test_nothing_runs_not_even_the_other_requirements(self):
+        """@covers R-ORC-015"""
+        with Project() as project:
+            log_path = self._project(project, with_default=True)
+
+            run = project.run_oracle("--change", CHANGE_ID, env={"FAKE_RUNNER_LOG": str(log_path)})
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertEqual(_log_lines(log_path), [])
+
+    def test_the_message_names_the_runner_and_the_file(self):
+        """@covers R-ORC-015"""
+        with Project() as project:
+            self._project(project)
+
+            run = project.run_oracle("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("nope", run.stderr)
+            self.assertIn("venoxia.json", run.stderr)
+
+    def test_nothing_is_recorded(self):
+        """@covers R-ORC-015"""
+        with Project() as project:
+            self._project(project)
+            change_dir = project.path(f".venoxia/changes/{CHANGE_ID}")
+            before = sorted(path.name for path in change_dir.iterdir())
+
+            run = project.run_oracle("--change", CHANGE_ID, "--record")
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertEqual(sorted(path.name for path in change_dir.iterdir()), before)
+            self.assertFalse((change_dir / "oracle.json").exists())
+
+    def test_dry_run_is_a_usage_error_too(self):
+        """@covers R-ORC-015"""
+        with Project() as project:
+            self._project(project)
+
+            run = project.run_oracle("--change", CHANGE_ID, "--dry-run")
+
+            self.assertEqual(run.returncode, 2, run.describe())
+
+    def test_a_runner_without_a_command(self):
+        """@covers R-ORC-015"""
+        for runners in ({"alt": {}}, {"alt": {"command": ""}}, {"alt": "no-es-un-objeto"}):
+            with self.subTest(runners=runners), Project() as project:
+                self._project(project, runners, runner="alt")
+
+                run = project.run_oracle("--change", CHANGE_ID)
+
+                self.assertEqual(run.returncode, 2, run.describe())
+                self.assertNotIn("Traceback", run.stderr)
+
+    def test_a_runners_key_that_is_not_an_object(self):
+        """@covers R-ORC-015"""
+        with Project() as project:
+            _runners_config(project, ["alt"])
+            reqs = [requirement(id="R-ORC-152", title="Sin runner", verifies=project.oracle("R-ORC-152"))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertNotIn("Traceback", run.stderr)
+
+    def test_a_runner_whose_cwd_does_not_exist(self):
+        """@covers R-ORC-015"""
+        with Project() as project:
+            self._project(
+                project,
+                {"alt": {"command": ALT_RUNNER_COMMAND, "cwd": "no-such-directory"}},
+                runner="alt",
+            )
+
+            run = project.run_oracle("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("no-such-directory", run.stderr)
+
+
+class OracleResultRunnerTest(unittest.TestCase):
+    """R-ORC-016 · cada elemento de «results» dice qué runner lo produjo."""
+
+    RUNNER_KEYS = {"name", "command", "cwd"}
+
+    def test_a_named_runner_is_named_in_its_result(self):
+        """@covers R-ORC-016"""
+        with Project() as project:
+            _runners_config(project, {"alt": {"command": ALT_RUNNER_COMMAND}})
+            reqs = [_with_runner(project, "R-ORC-161", "alt")]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            runner = run.json["results"][0]["runner"]
+            self.assertEqual(set(runner.keys()), self.RUNNER_KEYS)
+            self.assertEqual(runner["name"], "alt")
+
+    def test_the_command_recorded_is_the_one_that_ran(self):
+        """@covers R-ORC-016"""
+        with Project() as project:
+            _runners_config(project, {"alt": {"command": ALT_RUNNER_COMMAND}})
+            path = project.oracle("R-ORC-162")
+            reqs = [_with_runner(project, "R-ORC-162", "alt", verifies=path)]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            command = run.json["results"][0]["runner"]["command"]
+            self.assertEqual(command, f"python3 {FAKE_RUNNER_PY} --alt {shlex.quote(path)}")
+            self.assertNotIn("{files}", command)
+
+    def test_the_default_runner_has_no_name(self):
+        """@covers R-ORC-016"""
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            reqs = [requirement(id="R-ORC-163", title="Por defecto", verifies=project.oracle("R-ORC-163"))]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            runner = run.json["results"][0]["runner"]
+            self.assertEqual(set(runner.keys()), self.RUNNER_KEYS)
+            self.assertIsNone(runner["name"])
+
+    def test_the_default_runner_still_records_its_command(self):
+        """@covers R-ORC-016"""
+        with Project() as project:
+            project.oracle_config(FAKE_RUNNER_COMMAND)
+            path = project.oracle("R-ORC-164")
+            reqs = [requirement(id="R-ORC-164", title="Por defecto", verifies=path)]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            command = run.json["results"][0]["runner"]["command"]
+            self.assertEqual(command, f"python3 {FAKE_RUNNER_PY} {shlex.quote(path)}")
+
+    def test_the_working_directory_is_recorded(self):
+        """@covers R-ORC-016"""
+        with Project() as project:
+            sub = project.path("sub")
+            sub.mkdir()
+            _runners_config(project, {"alt": {"command": ALT_RUNNER_COMMAND, "cwd": "sub"}})
+            # La ruta de «verifies:» es relativa a la raíz y el runner corre
+            # en «sub»: al runner falso le da igual (no abre ficheros que no
+            # existen), lo que se mira aquí es el «cwd» que queda grabado.
+            reqs = [_with_runner(project, "R-ORC-165", "alt")]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            recorded = run.json["results"][0]["runner"]["cwd"]
+            self.assertEqual(Path(recorded).resolve(), sub.resolve())
+
+    def test_a_missing_requirement_carries_its_runner_too(self):
+        """@covers R-ORC-016"""
+        with Project() as project:
+            _runners_config(project, {"alt": {"command": ALT_RUNNER_COMMAND}})
+            reqs = [
+                _with_runner(
+                    project, "R-ORC-166", "alt", verifies="test/generated/never-written.spec.ts"
+                )
+            ]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 1, run.describe())
+            result = run.json["results"][0]
+            self.assertEqual(result["status"], "missing")
+            self.assertEqual(set(result["runner"].keys()), self.RUNNER_KEYS)
+            self.assertEqual(result["runner"]["name"], "alt")
+
+    def test_the_recorded_history_carries_it(self):
+        """@covers R-ORC-016"""
+        with Project() as project:
+            _runners_config(project, {"alt": {"command": ALT_RUNNER_COMMAND}})
+            reqs = [_with_runner(project, "R-ORC-167", "alt")]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle("--change", CHANGE_ID, "--record")
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            history_path = project.path(f".venoxia/changes/{CHANGE_ID}/oracle.json")
+            history = json.loads(history_path.read_text(encoding="utf-8"))
+            recorded = history["runs"][-1]["results"][0]["runner"]
+            self.assertEqual(recorded["name"], "alt")
+
+    def test_the_top_level_keeps_its_eight_keys(self):
+        """@covers R-ORC-016"""
+        with Project() as project:
+            _runners_config(project, {"alt": {"command": ALT_RUNNER_COMMAND}})
+            reqs = [_with_runner(project, "R-ORC-168", "alt")]
+            project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+
+            run = project.run_oracle_json("--change", CHANGE_ID)
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertEqual(
+                set(run.json.keys()),
+                {"version", "change", "ran_at", "runner", "results", "counts", "all_green", "all_red"},
+            )
 
 
 if __name__ == "__main__":

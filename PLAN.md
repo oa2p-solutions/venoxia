@@ -11,8 +11,9 @@
 | C2 `2026-09-09-guardian-docs-are-spec` | **`verified`** | commit `c675175`; rojo `19:08Z` → verde `19:11Z`; todo `*.md` es spec-path |
 | Push | hecho | `main` → GitHub `origin` y espejo Forgejo en `c675175`; puerta local en verde (matrix 195 s, coverage 95 s, gate 100 s) |
 | Instalación | al día | `venoxia@venoxia` reinstalado desde HEAD (`c675175`); el hook nuevo ya actúa (comprobado: un `.md` en la raíz se escribe sin change y sin línea de deriva) |
-| C3 `oracle-named-runners` | **siguiente** | arrancar con `/venoxia:specify` (texto de partida en su bloque más abajo) |
-| C4 · C5 · C6 · F4 | pendientes | en orden; C4.0 (consolidar `capabilities/oracle/spec.md`) antes de la fila 7 del acta |
+| C3 `2026-09-09-oracle-named-runners` | **`verified`** | rojo `20:03Z` → verde `20:12Z`; divergencia en dos rondas (3 duras de código heredado → `soft_only`); 886 tests; cifras de evals intactas |
+| C4 `technical-contract` | **siguiente** | empezar por C4.0 (consolidar `capabilities/oracle/spec.md` con R-ORC-001…016) antes de la fila 7 del acta; después `/venoxia:specify` |
+| C5 · C6 · F4 | pendientes | en orden |
 
 **Lo que una sesión nueva tiene que saber antes de tocar nada:**
 
@@ -22,6 +23,8 @@
 4. **La memoria del proyecto** (`~/.claude-b2bcarts/projects/-Users-afroxstudio-Developments-ia-venoxia/memory/`) tiene el estado corto del plan y las trampas operativas; este fichero tiene el detalle.
 5. **Decisión añadida en sesión (2026-09-09):** el ataque del abogado sobre C2 —en un plugin las skills son markdown y con D3 se editan sin change— se aceptó; queda escrito en la propuesta de C2 y compensa que cada skill tiene su comportamiento con test.
 6. **Trampa del panel:** los lectores devuelven a veces el JSON con valla de código o una línea de «ruta leída» detrás; se guarda sólo el JSON (la valla es embalaje). Los ataques del abogado pueden llegar con `&lt;` escapado por el canal; se escribe `<`.
+7. **El oráculo que graba `/venoxia:verify` es el del plugin instalado.** Hasta reinstalar tras C3, ese `oracle.py` no conoce `runners` ni escribe `results[i].runner`: los dos primeros runs de C3 en `oracle.json` tienen el esquema viejo y el tercero (grabado con `scripts/oracle.py` del repo) el nuevo. C4 declara `runners.coverage` y **necesita** el plugin reinstalado desde el commit de C3 para que `/venoxia:verify` lo ejecute: el oráculo instalado viejo descarta `runner:` como clave desconocida (`P02`) y correría el `test_command` sobre `tools/coverage.py`, un verde que no mide nada. Empujar y reinstalar antes de C4 (comando en el punto 1).
+8. **Decisiones tomadas en C3** (todas en `decisions.json` del change): `results[i].runner.name` es `null` para el `test_command`; con un `cwd` de runner distinto de la raíz, `{files}` se reescribe relativo a ese `cwd` (usuario); un runner sin `{files}` que no ejecuta nada (`true`) es límite declarado (usuario); `V19` cubre nombre, `command` y `cwd` del runner declarado, no un bloque `runners` que nadie usa (Claude).
 
 ## Contexto
 
@@ -110,8 +113,9 @@ C2 ∥ C3 es posible (worktrees). C4 depende de C3 (usa `runner:`). C5 depende d
 
 ## Fase 2 · El eje técnico entra al contrato
 
-### C3 · `oracle-named-runners`
-- **Capability:** `oracle` (prefijo `R-ORC-`, siguiente libre `R-ORC-013`) · **Depende de:** C1.
+### C3 · `2026-09-09-oracle-named-runners` — **HECHO (2026-09-09, `verified`)**
+- **Estado:** `verified`; rojo `20:03Z`, verde `20:12Z`; ronda 1 de divergencia con 3 duras (código de salida heredado en R-ORC-015, cerradas poniendo el `2` en cada `THEN`) y dos ataques `high` subidos al usuario; ronda 2 `soft_only` (14 blandas de vocabulario). Requisitos finales: R-ORC-013…016 y R-VAL-008 (`V19`); 886 tests en verde; `tests/test_parser.py` cambió la tupla de `META_KEYS` a seis claves; siguiente libre `R-ORC-017`.
+- **Capability:** `oracle` (prefijo `R-ORC-`) · **Depende de:** C1.
 - **Qué cambia:** `venoxia.json` admite `"runners": {"<name>": {"command": "...", "cwd": "..."}}` (opcional); un requisito puede declarar `runner: <name>`; sin `runner:` se usa `test_command` como hoy. Un runner sin `{files}` corre tal cual y el `verifies:` es sólo el ancla del `@covers`. Un `runner:` que nombra algo no declarado es error de uso del oráculo (exit 2, «no hay veredicto», nunca un rojo falso) y `V19` lo señala antes.
 - **Requisitos (borrador):** `R-ORC-013` runner por requisito elegido por `runner:`; `R-ORC-014` un runner **con nombre** sin `{files}` corre verbatim (escenario negativo explícito: no es el exit 2 que `oracle.py:187-192` reserva al `test_command` por defecto, que sigue exigiendo `{files}`); `R-ORC-015` runner no declarado ⇒ exit 2 sin ejecutar nada; `R-ORC-016` cada `results[i]` de `oracle.json` lleva `runner` (nombre y comando resuelto) — **sin añadir ninguna clave de primer nivel**: `tests/test_oracle.py:472-495` fija las ocho actuales y la global `runner` se conserva (esquema v1: añadir sí, renombrar no). Capability `validator`: `R-VAL-008 · V19` — `runner:` presente exige que `venoxia.json` lo declare (error). `verifies: tests/test_oracle.py`, `tests/test_rules_oracle.py`.
 - **Código:**

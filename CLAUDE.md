@@ -23,7 +23,7 @@ Convenciones fijas de todo el repo:
 ## Comandos
 
 ```bash
-# Suite completa (735 tests, ~30 s). unittest de la stdlib, sin -t .
+# Suite completa (886 tests, ~40 s). unittest de la stdlib, sin -t .
 python3 -m unittest discover -s tests -q
 
 # Un fichero, una clase, un test. El import cualificado tests.venoxia_fixtures exige lanzarlo desde la raíz.
@@ -65,11 +65,11 @@ No hay linter ni formateador configurado (el núcleo es pequeño y las convencio
 
 | Script | Qué decide | Sobre qué |
 |---|---|---|
-| `scripts/validate.py` | reglas `V01`–`V18` sobre requisitos (incluye `V17`/`V18`, que leen `oracle.json` sin ejecutar nada) | `.venoxia/capabilities/*/spec.md` y `.venoxia/changes/<id>/delta/*.md` |
+| `scripts/validate.py` | reglas `V01`–`V19` sobre requisitos (incluye `V17`/`V18`, que leen `oracle.json` sin ejecutar nada, y `V19`, que lee `venoxia.json`) | `.venoxia/capabilities/*/spec.md` y `.venoxia/changes/<id>/delta/*.md` |
 | `scripts/charter_lint.py` | 19 reglas `C01`–`C19` sobre el acta | `.venoxia/charter.md` (y lee `principles.md` para C17, `capabilities/` para C16) |
 | `scripts/diff_readings.py` | divergencia entre lecturas aisladas | `.venoxia/changes/<id>/readings/reader-*.json` + `devils-advocate.json` |
 | `scripts/guardian.py` | allow/deny de una edición | payload del hook por stdin; sólo lee `change.json` y `delta/` |
-| `scripts/oracle.py` | ejecuta `verifies:` por requisito y atribuye `green`/`red`/`missing`/`timeout`; con `--record` deja el historial en `changes/<id>/oracle.json` | el `delta/*.md` de un change y el `test_command` de `.venoxia/venoxia.json` |
+| `scripts/oracle.py` | ejecuta `verifies:` por requisito y atribuye `green`/`red`/`missing`/`timeout`; con `--record` deja el historial en `changes/<id>/oracle.json` | el `delta/*.md` de un change y el `test_command` de `.venoxia/venoxia.json`, o el runner con nombre (`runners.<name>`) que el requisito elija con `runner:`; un runner con nombre puede no llevar `{files}` y corre tal cual |
 | `scripts/gate.py` | la puerta para un proyecto consumidor: acta y validador en estricto, y el oráculo de cada change en `verified`, con un veredicto único. **Fail-closed** (lo contrario del guardián) y ejecuta **sus propios** scripts, nunca los de la raíz inspeccionada | un proyecto entero, por `--root` |
 
 `scripts/venoxia/` (`parser.py`, `model.py`, `report.py`) lo comparten `validate.py` y `charter_lint.py`. `parser.py` convierte markdown en `Requirement`/`Scenario`/`Capability`/`Delta` y **nunca lanza**: todo problema de forma sale como `Finding` con código `P01`–`P05`. `model.py` define `Finding`, los niveles de confianza, las claves de metadatos y `RETIRED_META_KEYS` (`expires` → `revisit`). `report.py` produce el texto en español y el JSON versión 1.
@@ -115,7 +115,7 @@ Reglas duras del flujo: `specify` nunca escribe `validated` ni `verified`; `dive
 
 `tests/venoxia_fixtures.py` es el andamio de toda la suite: `Project()` monta un `.venoxia/` limpio en un `tempfile.TemporaryDirectory` que pasa las 16 reglas en `--strict`, y los scripts se ejecutan **por subproceso** (`Project.run` → `sys.executable script`), con `HOME` falso y timeout de 30 s. El patrón de cada test de regla es: proyecto limpio, romper una sola cosa, comprobar que salta una sola regla (`run.rule_set() == {"V06"}`). `requirement(...)` genera el markdown canónico de un requisito y admite `omit=` para quitar metadatos. `tests/conftest.py` sólo ajusta `sys.path`; unittest no lo carga, por eso `venoxia_fixtures.py` repite el ajuste.
 
-Los tests importan como `from tests.venoxia_fixtures import Project` (funciona con discover, con módulo y con pytest). Reglas del validador: V01–V08 en `test_rules_early.py`, V09–V16 en `test_rules_late.py`, V17/V18 en `test_rules_oracle.py`.
+Los tests importan como `from tests.venoxia_fixtures import Project` (funciona con discover, con módulo y con pytest). Reglas del validador: V01–V08 en `test_rules_early.py`, V09–V16 en `test_rules_late.py`, V17–V19 en `test_rules_oracle.py`.
 
 Cuando la variable de entorno `VENOXIA_TRACE_DIR` está definida, `Project.run` antepone `tools/trace_run.py` al argv de cada subproceso en vez de lanzar el script tal cual; sin la variable, el argv no cambia. `tools/trace_run.py` (stdlib, sin dependencias) ejecuta el objetivo con `runpy` dentro de `trace.Trace.runctx`, conserva el código de salida real —incluido el de `sys.exit(N)`, que `trace.main()` por sí solo enmascara— y vuelca las cuentas acumuladas antes de un `os._exit`, sin tocar `guardian.py`. `tools/coverage.py` es quien pone esa variable: lanza la suite entera bajo el envoltorio, acumula un único fichero de cuentas entre el proceso principal y todos los subprocesos (la suite es secuencial), y calcula el porcentaje ejecutado por fichero de `scripts/**/*.py` contra `tools/coverage-threshold.json`, fallando si alguno baja de su umbral.
 

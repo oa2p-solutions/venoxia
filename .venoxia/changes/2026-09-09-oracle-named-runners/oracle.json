@@ -1,0 +1,238 @@
+{
+  "version": 1,
+  "change": "2026-09-09-oracle-named-runners",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-09T20:03:44Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-ORC-013",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 4847,
+          "output_tail": "FAIL: test_the_command_runs_character_for_character (tests.test_oracle.OracleVerbatimRunnerTest.test_the_command_runs_character_for_character)\n@covers R-ORC-014\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_oracle.py\", line 1097, in test_the_command_runs_character_for_character\n    self.assertEqual(_log_lines(log_path), [\"--verbatim\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['test/generated/r-orc-141.spec.ts'] != ['--verbatim']\n\nFirst differing element 0:\n'test/generated/r-orc-141.spec.ts'\n'--verbatim'\n\n- ['test/generated/r-orc-141.spec.ts']\n+ ['--verbatim']\n\n----------------------------------------------------------------------\nRan 77 tests in 4.788s\n\nFAILED (failures=18, errors=7)"
+        },
+        {
+          "requirement_id": "R-ORC-014",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 4775,
+          "output_tail": "FAIL: test_the_command_runs_character_for_character (tests.test_oracle.OracleVerbatimRunnerTest.test_the_command_runs_character_for_character)\n@covers R-ORC-014\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_oracle.py\", line 1097, in test_the_command_runs_character_for_character\n    self.assertEqual(_log_lines(log_path), [\"--verbatim\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['test/generated/r-orc-141.spec.ts'] != ['--verbatim']\n\nFirst differing element 0:\n'test/generated/r-orc-141.spec.ts'\n'--verbatim'\n\n- ['test/generated/r-orc-141.spec.ts']\n+ ['--verbatim']\n\n----------------------------------------------------------------------\nRan 77 tests in 4.716s\n\nFAILED (failures=18, errors=7)"
+        },
+        {
+          "requirement_id": "R-ORC-015",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 4891,
+          "output_tail": "FAIL: test_the_command_runs_character_for_character (tests.test_oracle.OracleVerbatimRunnerTest.test_the_command_runs_character_for_character)\n@covers R-ORC-014\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_oracle.py\", line 1097, in test_the_command_runs_character_for_character\n    self.assertEqual(_log_lines(log_path), [\"--verbatim\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['test/generated/r-orc-141.spec.ts'] != ['--verbatim']\n\nFirst differing element 0:\n'test/generated/r-orc-141.spec.ts'\n'--verbatim'\n\n- ['test/generated/r-orc-141.spec.ts']\n+ ['--verbatim']\n\n----------------------------------------------------------------------\nRan 77 tests in 4.832s\n\nFAILED (failures=18, errors=7)"
+        },
+        {
+          "requirement_id": "R-ORC-016",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 4815,
+          "output_tail": "FAIL: test_the_command_runs_character_for_character (tests.test_oracle.OracleVerbatimRunnerTest.test_the_command_runs_character_for_character)\n@covers R-ORC-014\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_oracle.py\", line 1097, in test_the_command_runs_character_for_character\n    self.assertEqual(_log_lines(log_path), [\"--verbatim\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['test/generated/r-orc-141.spec.ts'] != ['--verbatim']\n\nFirst differing element 0:\n'test/generated/r-orc-141.spec.ts'\n'--verbatim'\n\n- ['test/generated/r-orc-141.spec.ts']\n+ ['--verbatim']\n\n----------------------------------------------------------------------\nRan 77 tests in 4.756s\n\nFAILED (failures=18, errors=7)"
+        },
+        {
+          "requirement_id": "R-VAL-008",
+          "verifies": [
+            "tests/test_rules_oracle.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 1081,
+          "output_tail": "FAIL: test_v19_does_not_disturb_the_json_schema (tests.test_rules_oracle.TestRuleV19RunnerMustBeDeclared.test_v19_does_not_disturb_the_json_schema)\n@covers R-VAL-008\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_rules_oracle.py\", line 424, in test_v19_does_not_disturb_the_json_schema\n    self.assertEqual(\n    ~~~~~~~~~~~~~~~~^\n        set(run.json.keys()),\n        ^^^^^^^^^^^^^^^^^^^^^\n        {\"version\", \"ok\", \"strict\", \"root\", \"counts\", \"findings\", \"budget\"},\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: Items in the first set but not the second:\n'adopted'\n\n----------------------------------------------------------------------\nRan 22 tests in 1.042s\n\nFAILED (failures=11)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 5,
+        "missing": 0,
+        "timeout": 0,
+        "total": 5
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-09T20:12:12Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-ORC-013",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4767,
+          "output_tail": "......................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-bdl2wfvm/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-5jy5dpql/project/.venoxia/changes/c1/oracle.json» no trae la lista «runs» del historial.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-zek2r0n9/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n.....................................................\n----------------------------------------------------------------------\nRan 77 tests in 4.694s\n\nOK"
+        },
+        {
+          "requirement_id": "R-ORC-014",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4770,
+          "output_tail": "......................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-jx5cp6tc/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-lfe7ctdh/project/.venoxia/changes/c1/oracle.json» no trae la lista «runs» del historial.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-1tpqw4m9/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n.....................................................\n----------------------------------------------------------------------\nRan 77 tests in 4.712s\n\nOK"
+        },
+        {
+          "requirement_id": "R-ORC-015",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4790,
+          "output_tail": "......................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-22hlx349/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-vk2uw812/project/.venoxia/changes/c1/oracle.json» no trae la lista «runs» del historial.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-67eyqvi5/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n.....................................................\n----------------------------------------------------------------------\nRan 77 tests in 4.724s\n\nOK"
+        },
+        {
+          "requirement_id": "R-ORC-016",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4692,
+          "output_tail": "......................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-ycc15i3c/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-wdbx_4j8/project/.venoxia/changes/c1/oracle.json» no trae la lista «runs» del historial.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-dyou1_g8/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n.....................................................\n----------------------------------------------------------------------\nRan 77 tests in 4.631s\n\nOK"
+        },
+        {
+          "requirement_id": "R-VAL-008",
+          "verifies": [
+            "tests/test_rules_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 1096,
+          "output_tail": "......................\n----------------------------------------------------------------------\nRan 22 tests in 1.055s\n\nOK"
+        }
+      ],
+      "counts": {
+        "green": 5,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 5
+      },
+      "all_green": true,
+      "all_red": false
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-09T20:13:05Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-ORC-013",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4898,
+          "output_tail": "......................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-xbmo8wgt/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-zxm52k4x/project/.venoxia/changes/c1/oracle.json» no trae la lista «runs» del historial.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-3s8x_6fy/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n.....................................................\n----------------------------------------------------------------------\nRan 77 tests in 4.835s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_oracle.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-ORC-014",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4866,
+          "output_tail": "......................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-8ohna9sf/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-3zeke7vi/project/.venoxia/changes/c1/oracle.json» no trae la lista «runs» del historial.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-_tcekg4b/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n.....................................................\n----------------------------------------------------------------------\nRan 77 tests in 4.805s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_oracle.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-ORC-015",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4889,
+          "output_tail": "......................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-2eba7u0i/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-ntp5l5e9/project/.venoxia/changes/c1/oracle.json» no trae la lista «runs» del historial.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-7rbnq58u/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n.....................................................\n----------------------------------------------------------------------\nRan 77 tests in 4.828s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_oracle.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-ORC-016",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4916,
+          "output_tail": "......................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-r7ov304r/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-9d7rny4y/project/.venoxia/changes/c1/oracle.json» no trae la lista «runs» del historial.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-8m13tfey/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n.....................................................\n----------------------------------------------------------------------\nRan 77 tests in 4.849s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_oracle.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-VAL-008",
+          "verifies": [
+            "tests/test_rules_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 1182,
+          "output_tail": "......................\n----------------------------------------------------------------------\nRan 22 tests in 1.139s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_rules_oracle.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 5,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 5
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

@@ -10,7 +10,7 @@ La tesis es corta y cabe en tres frases. **Una especificación es una apuesta so
 
 En la práctica eso significa que cada requisito nace con dos campos que ninguna otra herramienta exige: `verifies:`, la ruta del test que resuelve la apuesta, y `confidence:`, el nivel de confianza declarado. Sin oráculo, no compila. Y como el validador es un script de Python sin modelo detrás, el veredicto es el mismo en tu portátil, en el CI y dentro de la conversación.
 
-Esta entrega cubre el **núcleo verificable**: el acta del proyecto y su linter de 19 reglas, el formato del requisito, el validador de 18 reglas, el guardián y el motor de divergencia.
+Esta entrega cubre el **núcleo verificable**: el acta del proyecto y su linter de 19 reglas, el formato del requisito, el validador de 19 reglas, el guardián y el motor de divergencia.
 
 ## Instalación
 
@@ -201,6 +201,7 @@ El ID vive en el encabezado (`### R-CHK-014 · Título`): estable, linkable y pa
 | Clave | ¿Obligatoria? | Qué contiene | Por qué existe |
 |---|---|---|---|
 | `verifies` | Sí | Ruta (o rutas separadas por coma o espacio) del fichero de test que decide si el requisito se cumple. | Es el corazón del sistema: la apuesta declara cómo se resuelve. Un requisito sin oráculo es una opinión, y el validador lo rechaza (`V06`, `V07`). |
+| `runner` | No | El nombre de uno de los `runners` de `.venoxia/venoxia.json`, que ejecuta el `verifies:` de este requisito en lugar del `test_command`. | Permite que un requisito técnico —la cobertura, una comprobación sobre el árbol entero— tenga su oráculo con el mismo formato que los demás. Un nombre que `venoxia.json` no declara es error (`V19`). |
 | `confidence` | Sí | `high`, `medium` o `low`. | Obliga a separar lo que se sabe de lo que se supone, en el momento de escribirlo y no después del incidente (`V09`). |
 | `why` | Recomendada | Una frase en español que explica por qué la confianza es esa y no otra. | Convierte «medium» en información accionable: dice **qué** parte concreta es la apuesta. |
 | `revisit` | Sí cuando `confidence: low` | El hecho que resuelve la apuesta. No una fecha: `V10` las rechaza. | Lo que cierra una suposición no es que pase el tiempo, es que llegue un dato. El hecho dice qué habrá que mirar y se reconoce cuando ocurre; una fecha llega esté la respuesta o no, y entonces sólo se puede posponer. |
@@ -247,7 +248,7 @@ Cinco estados, siempre en este orden; ninguna skill escribe uno que no le toca y
 
 `guardian.py` no cambia con esto: sigue abriendo la puerta al código en `validated`, porque escribir el código es justo lo que convierte el rojo del oráculo en verde. Exigir `verified` antes de escribir sería pedirle al código que exista antes de poder existir.
 
-## Las 18 reglas del validador
+## Las 19 reglas del validador
 
 Todas deterministas: ninguna consulta a un modelo. `scripts/validate.py` sale con `0` si el ámbito es conforme, `1` si no lo es y `2` ante un error de uso. Con `--strict`, los avisos también hacen fallar.
 
@@ -271,6 +272,7 @@ Todas deterministas: ninguna consulta a un modelo. `scripts/validate.py` sale co
 | `V16` | Un test declara `@covers <ID>` de un ID que no existe en ninguna spec: comportamiento no especificado. | warning |
 | `V17` | Un change en `state: verified` tiene un `oracle.json` legible cuyo último run está en verde y cubre todos los IDs del delta. Se evalúa sólo sobre los changes en `verified`. | error |
 | `V18` | Un requisito en verde en el último run de `oracle.json` tuvo un run anterior con ese mismo requisito en rojo. Se evalúa sobre cualquier change con `oracle.json`, sin mirar su estado. | warning |
+| `V19` | Un requisito que declara `runner:` nombra un runner que `.venoxia/venoxia.json` declara bajo `runners`, con un `command` no vacío y, si trae `cwd`, un directorio que existe. Se evalúa sólo sobre los requisitos con `runner:`; lo que aquí es un error sería en `oracle.py` un código `2` sin veredicto. | error |
 
 Además de las reglas, el parser emite sus propios findings de forma: `P01` (error, fichero ilegible o inexistente), `P02` (aviso, clave de metadatos desconocida), `P03` (aviso, clave repetida; gana la última), `P04` (aviso, bullet de escenario que no encaja en `- **KW** texto`) y `P05` (aviso, un `### ` con forma de requisito que cae dentro de un bloque de código y por tanto no se ha leído como requisito). El parser nunca lanza una excepción: todo problema sale como finding.
 
@@ -302,6 +304,22 @@ El proyecto declara cómo se corren sus tests una sola vez, en `.venoxia/venoxia
 
 `{files}` se sustituye por las rutas de `verifies:` del requisito —todas, si declara varias—, separadas por un espacio y entrecomilladas con `shlex.quote`; `cwd` es relativo a la raíz del proyecto. Hay una plantilla en `templates/venoxia.json`. Sin este fichero, o con un `test_command` que no trae `{files}`, `oracle.py` no adivina nada: sale con el código `2` y un mensaje que nombra lo que falta.
 
+El `test_command` es el runner por defecto, y no siempre basta: la cobertura no recibe ficheros, corre sobre el árbol entero. Para eso `venoxia.json` admite **runners con nombre**, y un requisito elige el suyo con `runner:` en su bloque de metadatos:
+
+```json
+{
+  "version": 1,
+  "test_command": "python3 -m unittest {files}",
+  "cwd": ".",
+  "runners": {
+    "coverage": {"command": "python3 tools/coverage.py"},
+    "web": {"command": "npx vitest run {files}", "cwd": "packages/web"}
+  }
+}
+```
+
+Las reglas son cuatro. Sin `runner:`, el requisito corre con el `test_command`, exactamente como antes de que existiera `runners`. El `command` de un runner con nombre **puede** no llevar `{files}`: entonces corre tal cual, y el `verifies:` del requisito es sólo el ancla del `@covers` (tiene que existir igual, o el requisito queda `missing`; el `test_command` sigue exigiendo `{files}`). Un runner sin `cwd` hereda el del proyecto; con uno propio, las rutas de `{files}` se reescriben en relación a ese directorio, porque pegadas tal cual no existirían desde allí y un runner que sale con `0` sin ficheros daría un verde falso. Y un `runner:` que nombra algo que `runners` no declara —o un bloque `runners` mal formado— es un error de uso: código `2` antes de ejecutar nada, nunca un rojo falso; `V19` lo señala antes, en el validador.
+
 Uso directo, sobre un change concreto:
 
 ```bash
@@ -329,7 +347,8 @@ El esquema JSON, versión 1 y estable como el de `validate.py`:
       "status": "green",
       "exit_code": 0,
       "duration_ms": 42,
-      "output_tail": ""
+      "output_tail": "",
+      "runner": {"name": null, "command": "python3 -m unittest test/checkout/reservation.spec.ts", "cwd": "/ruta/al/proyecto"}
     }
   ],
   "counts": {"green": 1, "red": 0, "missing": 0, "timeout": 0, "total": 1},
@@ -337,6 +356,8 @@ El esquema JSON, versión 1 y estable como el de `validate.py`:
   "all_red": false
 }
 ```
+
+Cada elemento de `results` dice quién lo produjo en `runner`: el `name` del runner (`null` cuando fue el `test_command`), el `command` ya sustituido y el `cwd` desde el que corrió. El `runner` de primer nivel sigue siendo el `test_command` del proyecto.
 
 Códigos de salida: `0` todos los requisitos en `green` (o `--dry-run`) · `1` alguno en `red`, `missing` o `timeout` · `2` error de uso.
 
@@ -346,7 +367,7 @@ Códigos de salida: `0` todos los requisitos en `green` (o `--dry-run`) · `1` a
 
 Dos límites del oráculo, declarados porque no tienen arreglo dentro de él:
 
-- **El `test_command` es del proyecto y el oráculo no lo juzga.** Lo único que comprueba es que traiga `{files}`; un comando que siempre termina en `0` pone todos los requisitos en verde. Quien revisa un `verified` mira también qué comando lo produjo, que por eso viaja en `runner.command` dentro de cada run.
+- **El `test_command` es del proyecto y el oráculo no lo juzga.** Lo único que comprueba es que traiga `{files}`; un comando que siempre termina en `0` pone todos los requisitos en verde. Lo mismo, con más motivo, para un runner con nombre sin `{files}`: `"command": "true"` pone en verde todo lo que lo declare sin ejecutar ningún test, y el oráculo no puede saberlo. Quien declara un runner firma que verifica algo, y quien revisa un `verified` mira también qué comando lo produjo, que por eso viaja en `runner.command` dentro de cada resultado.
 - **El presupuesto de `--timeout` es por requisito, no por change.** N requisitos con runners colgados tardan N × timeout en terminar. Con el valor por omisión (600 s) un change de diez requisitos puede llevar más de una hora en devolver su rojo; si eso importa, se baja el `--timeout`.
 
 ## El modelo de confianza del guardián

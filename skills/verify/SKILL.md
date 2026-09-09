@@ -60,7 +60,7 @@ Muestra la salida completa **antes** de ejecutar nada de verdad: es el comando e
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/oracle.py" --root "<raíz>" --change "<id>" --record --json --no-color
 ```
 
-Siempre con `--record`: sin historial no hay forma de comprobar, en el siguiente paso, que un verde estuvo antes en rojo. Siempre con `--json`: es lo que te permite leer `results`, `counts`, `all_green` y `all_red` sin adivinar nada de un informe de texto.
+Siempre con `--record`: sin historial no hay forma de comprobar, en el siguiente paso, que un verde estuvo antes en rojo. Siempre con `--json`: es lo que te permite leer `results`, `counts`, `all_green` y `all_red` sin adivinar nada de un informe de texto. Cada elemento de `results` trae además `runner` —`name` (`null` si fue el `test_command`), `command` ya sustituido y `cwd`—: cuando un requisito declara `runner:`, es ahí donde se ve qué comando produjo de verdad su veredicto, y conviene nombrarlo en la entrega.
 
 ## 5. Lee el código de salida antes que nada
 

@@ -116,6 +116,7 @@ Mantén el orden de findings que trae el JSON dentro de cada grupo: ya viene ord
 | `V16` (aviso) | Un test declara `@covers` de un ID que no existe | Corrige el ID del test, o especifica el comportamiento que ese test ya está comprobando |
 | `V17` | Un change `verified` sin `oracle.json` en verde que cubra todos sus IDs | Ejecuta `/venoxia:verify` sobre el change: graba el oráculo antes de dejarlo en `verified` |
 | `V18` (aviso) | Un requisito llegó a verde sin haber pasado antes por rojo en ningún run | Comprueba que el test de verdad falla sin la implementación; si ya se comprobó, no hay nada que hacer |
+| `V19` | Un requisito declara `runner:` y `.venoxia/venoxia.json` no declara ese nombre bajo `runners` (o lo declara sin `command`, o con un `cwd` que no existe) | Declara el runner en `venoxia.json` —`"runners": {"<name>": {"command": "…"}}`— o quita la línea para que corra con el `test_command` |
 | `P01` | Fichero ilegible o inexistente | Comprueba la ruta y los permisos |
 | `P02` (aviso) | Clave de metadatos desconocida | Usa sólo `verifies`, `confidence`, `why`, `revisit`, `from` |
 | `P03` (aviso) | Clave de metadatos repetida | Deja una sola; el parser se queda con la última |

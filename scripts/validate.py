@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validador determinista de Venoxia: el contrato que la especificación cumple o no.
 
-Aquí viven las dieciocho reglas del formato. Todas son deterministas: ninguna
+Aquí viven las diecinueve reglas del formato. Todas son deterministas: ninguna
 consulta a un modelo ni toca la red, y `V10` rechaza tanto una fecha como una
 fórmula vacía en `revisit:`: la apuesta debe declarar el hecho que la
 resuelve, no un plazo. Dos ejecuciones sobre el mismo árbol producen el mismo
@@ -60,6 +60,7 @@ CHANGES_DIR = "changes"
 DELTA_DIR = "delta"
 SPEC_FILENAME = "spec.md"
 CHANGE_FILENAME = "change.json"
+CONFIG_FILENAME = "venoxia.json"
 ORACLE_FILENAME = "oracle.json"
 
 # El estado que V17 exige ver acreditado en oracle.json. Literal y no
@@ -464,7 +465,7 @@ def _novelty(ctx: Context, requirement: Requirement) -> str | None:
 
 
 # ---------------------------------------------------------------------------
-# Las dieciocho reglas
+# Las diecinueve reglas
 # ---------------------------------------------------------------------------
 
 
@@ -1563,6 +1564,124 @@ def rule_v18(ctx: Context) -> list[Finding]:
     return findings
 
 
+# ---------------------------------------------------------------------------
+# V19: un «runner:» declarado tiene que existir en venoxia.json
+# ---------------------------------------------------------------------------
+
+RUNNER_META_KEY = "runner"
+RUNNERS_KEY = "runners"
+
+
+def _runners_block(ctx: Context) -> tuple[dict | None, str]:
+    """El bloque `runners` de `.venoxia/venoxia.json`, o `(None, motivo)`.
+
+    Se lee del disco sin ejecutar nada, con el mismo criterio que V17 aplica a
+    `oracle.json`: un fichero ausente, ilegible, que no es JSON, que no es un
+    objeto o que no trae un objeto `runners` son cinco formas de «no declara
+    ningún runner», y el motivo —en español, sin traza— es lo que el hallazgo
+    necesita para decir cuál fue.
+    """
+    path = f"{VENOXIA_DIR}/{CONFIG_FILENAME}"
+    if not ctx.is_file(path):
+        return None, f"«{path}» no existe"
+    text, failure = ctx.read_with_failure(path)
+    if failure is not None or text is None:
+        detail = f" ({failure.message})" if failure is not None else ""
+        return None, f"«{path}» no se pudo leer{detail}"
+    try:
+        data = json.loads(text)
+    except ValueError as error:
+        return None, f"«{path}» no se pudo leer como JSON ({error})"
+    if not isinstance(data, dict):
+        return None, f"«{path}» no es un objeto JSON"
+    runners = data.get(RUNNERS_KEY)
+    if runners is None:
+        return None, f"«{path}» no declara ningún bloque «{RUNNERS_KEY}»"
+    if not isinstance(runners, dict):
+        return None, f"el bloque «{RUNNERS_KEY}» de «{path}» no es un objeto"
+    return runners, ""
+
+
+def _runner_problem(ctx: Context, runners: dict | None, reason: str, name: str) -> str | None:
+    """Por qué el runner `name` no se puede usar, o `None` si está bien declarado."""
+    path = f"{VENOXIA_DIR}/{CONFIG_FILENAME}"
+    if runners is None:
+        return reason
+    entry = runners.get(name)
+    if not isinstance(entry, dict):
+        declared = ", ".join(f"«{known}»" for known in sorted(runners)) or "ninguno"
+        return f"«{path}» no declara «{name}» bajo «{RUNNERS_KEY}» (declarados: {declared})"
+    command = entry.get("command")
+    if not isinstance(command, str) or not command.strip():
+        return f"el runner «{name}» de «{path}» no trae un «command» no vacío"
+    raw_cwd = entry.get("cwd")
+    if raw_cwd is not None and raw_cwd != "":
+        if not isinstance(raw_cwd, str):
+            return f"el «cwd» del runner «{name}» de «{path}» no es una cadena"
+        if not ctx.is_dir(raw_cwd):
+            return (
+                f"el «cwd» del runner «{name}» de «{path}» («{raw_cwd}») no existe en disco: "
+                f"buscado en «{ctx.resolve(raw_cwd)}»"
+            )
+    return None
+
+
+def rule_v19(ctx: Context) -> list[Finding]:
+    """V19 · Un requisito con «runner:» nombra un runner que venoxia.json declara.
+
+    Se evalúa sólo sobre los requisitos que traen `runner:`; los demás corren
+    con el `test_command` y no tienen nada que declarar. El runner tiene que
+    existir bajo `runners` con un `command` no vacío y, si declara `cwd`, con
+    un directorio que exista. Lo que aquí es un error del validador sería, en
+    `oracle.py`, un código `2` sin veredicto (R-ORC-015): mejor verlo antes.
+    """
+    findings: list[Finding] = []
+    block: tuple[dict | None, str] | None = None
+    for requirement in ctx.all_requirements:
+        if RUNNER_META_KEY not in requirement.meta:
+            continue
+        name = (requirement.meta.get(RUNNER_META_KEY) or "").strip()
+        if not name:
+            message = (
+                f"{requirement.label} declara «{RUNNER_META_KEY}:» sin valor: no nombra "
+                "ningún runner."
+            )
+            hint = (
+                f"Escribe el nombre de uno de los «{RUNNERS_KEY}» de "
+                f"«{VENOXIA_DIR}/{CONFIG_FILENAME}» —«{RUNNER_META_KEY}: coverage», por "
+                "ejemplo— o quita la línea para que el requisito corra con el "
+                "«test_command»."
+            )
+        else:
+            if block is None:
+                block = _runners_block(ctx)
+            problem = _runner_problem(ctx, block[0], block[1], name)
+            if problem is None:
+                continue
+            message = (
+                f"{requirement.label} declara «{RUNNER_META_KEY}: {name}» y {problem}: "
+                "el oráculo no sabría con qué comando ejecutarlo."
+            )
+            hint = (
+                f"Declara el runner en «{VENOXIA_DIR}/{CONFIG_FILENAME}», con su comando y, "
+                f'si no corre en la raíz, su directorio: "{RUNNERS_KEY}": {{"{name}": '
+                '{"command": "python3 tools/coverage.py", "cwd": "."}}. Un «command» sin '
+                "«{files}» corre tal cual."
+            )
+        findings.append(
+            Finding(
+                rule="V19",
+                severity=SEVERITY_ERROR,
+                message=message,
+                file=requirement.source_file,
+                line=_meta_line(requirement, RUNNER_META_KEY),
+                requirement_id=requirement.id,
+                hint=hint,
+            )
+        )
+    return findings
+
+
 RULES: list[Rule] = [
     Rule("V01", SEVERITY_ERROR, "El ID está, tiene la forma «R-XXX-000» y es único", rule_v01),
     Rule("V02", SEVERITY_ERROR, "La narrativa encaja en exactamente un patrón EARS", rule_v02),
@@ -1582,11 +1701,12 @@ RULES: list[Rule] = [
     Rule("V16", SEVERITY_WARNING, "Ningún test cubre un ID inexistente", rule_v16),
     Rule("V17", SEVERITY_ERROR, "Un change «verified» tiene su oráculo en verde", rule_v17),
     Rule("V18", SEVERITY_WARNING, "Ningún verde llegó sin pasar antes por rojo", rule_v18),
+    Rule("V19", SEVERITY_ERROR, "Un «runner:» declarado existe en venoxia.json", rule_v19),
 ]
 
 
 def run_rules(ctx: Context) -> list[Finding]:
-    """Aplica las dieciocho reglas en orden y devuelve todos sus hallazgos.
+    """Aplica las diecinueve reglas en orden y devuelve todos sus hallazgos.
 
     Una regla que se cayera no puede tumbar la validación entera: el fallo se
     convierte en un hallazgo con su código y el resto sigue.
@@ -1871,7 +1991,7 @@ def build_parser() -> argparse.ArgumentParser:
     cli = argparse.ArgumentParser(
         prog="validate.py",
         description=(
-            "Valida la especificación de Venoxia contra las dieciocho reglas del "
+            "Valida la especificación de Venoxia contra las diecinueve reglas del "
             "contrato. Determinista: ninguna regla consulta a un modelo."
         ),
         epilog=(

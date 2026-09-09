@@ -24,8 +24,10 @@ BLOCK_NAMES = ("ADDED", "MODIFIED", "REMOVED", "RENAMED")
 # Valores admitidos en «confidence:», de más a menos certeza.
 CONFIDENCE_LEVELS = ("high", "medium", "low")
 
-# Claves reconocidas del bloque de metadatos de un requisito.
-META_KEYS = ("verifies", "confidence", "why", "revisit", "from")
+# Claves reconocidas del bloque de metadatos de un requisito. «runner» es
+# opcional: nombra, de los `runners` de `.venoxia/venoxia.json`, el que ejecuta
+# el «verifies:» de este requisito en vez del `test_command` por defecto.
+META_KEYS = ("verifies", "runner", "confidence", "why", "revisit", "from")
 
 # «expires:» era el nombre de «revisit:» cuando la revisión de una apuesta se
 # declaraba con una fecha. Se conserva aquí, y sólo aquí, para poder dar un

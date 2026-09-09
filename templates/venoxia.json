@@ -1,5 +1,8 @@
 {
   "version": 1,
   "test_command": "npx vitest run {files}",
-  "cwd": "."
+  "cwd": ".",
+  "runners": {
+    "coverage": {"command": "npx vitest run --coverage"}
+  }
 }
