@@ -1,0 +1,35 @@
+[
+  {
+    "scenario": "The README at the root, with nothing backing it",
+    "question": "¿Cuál de estas lecturas del efecto de «The README at the root, with nothing backing it» es la correcta?",
+    "options": [
+      "(A) «permite la edición del README sin exigir change»",
+      "(B) «permite la edición y la razón menciona markdown»",
+      "(C) Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+    ],
+    "chosen": "C",
+    "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real. Decidido por Claude, no por el usuario: las dos lecturas afirman «allow»; B añade la mención a «markdown» que el escenario exige y A la deja en side_effects."
+  },
+  {
+    "scenario": "Markdown nested under a directory that is not a spec directory",
+    "question": "¿Cuál de estas lecturas del efecto de «Markdown nested under a directory that is not a spec directory» es la correcta?",
+    "options": [
+      "(A) «permite editar el markdown aunque el change esté en draft»",
+      "(B) «permite la edición del markdown anidado»",
+      "(C) Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+    ],
+    "chosen": "C",
+    "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real. Decidido por Claude, no por el usuario: «allow» en los dos; A subraya la precondición (draft), B la ruta (anidado)."
+  },
+  {
+    "scenario": "Markdown inside a code directory that mimics a spec directory",
+    "question": "¿Cuál de estas lecturas del efecto de «Markdown inside a code directory that mimics a spec directory» es la correcta?",
+    "options": [
+      "(A) «permite editar el markdown pese a estar bajo ruta tipo prfaq»",
+      "(B) «permite la edición del markdown pese al nombre de carpeta»",
+      "(C) Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+    ],
+    "chosen": "C",
+    "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real. Decidido por Claude, no por el usuario: «allow» en los dos; «ruta tipo prfaq» y «nombre de carpeta» nombran la misma condición."
+  }
+]

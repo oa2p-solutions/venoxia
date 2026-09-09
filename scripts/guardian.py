@@ -93,11 +93,9 @@ CHANGES_DISPLAY = f"{VENOXIA_DIRNAME}/{CHANGES_DIRNAME}/"
 # anclaje, un «mkdir src/prfaq» bastaría para sacar del alcance del guardián
 # cualquier fichero, de cualquier extensión, metido dentro.
 SPEC_DIR_NAMES = frozenset({VENOXIA_DIRNAME, "prfaq"})
-# Directorios **de primer nivel** que albergan markdown de especificación.
-SPEC_PARENT_DIR_NAMES = frozenset({"specs"})
-# Nombres de fichero markdown que son especificación vayan donde vayan.
-SPEC_FILENAMES = frozenset({"spec.md", "proposal.md"})
-SPEC_FILENAME_PREFIXES = ("delta",)
+# El markdown es documentación vaya donde vaya: no tiene comportamiento que
+# vigilar. Sólo «.md»; «.mdx» puede llevar JSX, y eso ya es código.
+MARKDOWN_SUFFIX = ".md"
 
 # Clave de ruta preferida por herramienta; el resto de claves quedan de reserva.
 PATH_KEYS_BY_TOOL = {"NotebookEdit": ("notebook_path", "file_path")}
@@ -551,19 +549,22 @@ def relative_to_root(root: str, raw_path: str) -> str | None:
 
 
 def is_spec_path(relative: str) -> bool:
-    """¿La ruta es especificación (o material del que nace la especificación)?
+    """¿La ruta es especificación, documentación o material del que nace la spec?
 
-    Cubre lo que dice el contrato (§6, paso 2) con las rutas **ancladas a la raíz
-    del proyecto**: cualquier cosa bajo «.venoxia/» o «prfaq/» de primer nivel, y
-    el markdown de spec, es decir «*.md» bajo «docs/spec*/» o «specs/» —también
-    de primer nivel— o cuyo nombre sea «spec.md», «proposal.md» o «delta*.md»,
-    éstos sí a cualquier profundidad pero sólo si son markdown.
+    Cubre lo que dice el contrato (§6, paso 2) con dos reglas: cualquier cosa
+    bajo «.venoxia/» o «prfaq/» **de primer nivel**, y cualquier fichero cuyo
+    nombre termine en «.md», a cualquier profundidad. El markdown es
+    documentación: no tiene comportamiento que un test ejecute ni que un
+    usuario observe, y vigilarlo sólo convertía la vía «direct» en parte del
+    flujo normal —70 de las 193 líneas del diario de deriva de este repo eran
+    documentación—.
 
-    El anclaje es lo que impide el rodeo: reconocer «prfaq» o «specs» a
-    cualquier profundidad convertía un «mkdir src/prfaq/» en un desvío que
-    anulaba al guardián para todo lo que se metiera dentro. Ante la duda se
-    elige lo restrictivo: un «deny» de más le cuesta al usuario un comando; un
-    «allow» de más le cuesta al producto su premisa.
+    El anclaje de los directorios es lo que impide el rodeo para lo que **no**
+    es markdown: reconocer «prfaq» a cualquier profundidad convertía un «mkdir
+    src/prfaq/» en un desvío que anulaba al guardián para todo lo que se
+    metiera dentro. Ahí, ante la duda, se elige lo restrictivo: un «deny» de
+    más le cuesta al usuario un comando; un «allow» de más le cuesta al
+    producto su premisa.
 
     «relative» ya viene normalizada y dentro del proyecto (véase
     «relative_to_root»); aquí sólo hay aritmética de cadenas, sin tocar disco.
@@ -572,18 +573,20 @@ def is_spec_path(relative: str) -> bool:
     if not parts:
         return False
     directories, filename = parts[:-1], parts[-1].lower()
-    root_dir = directories[0] if directories else ""
+    if directories and directories[0] in SPEC_DIR_NAMES:
+        return True
+    return filename.endswith(MARKDOWN_SUFFIX)
 
-    if root_dir in SPEC_DIR_NAMES:
-        return True
-    if not filename.endswith(".md"):
-        return False
-    if filename in SPEC_FILENAMES or filename.startswith(SPEC_FILENAME_PREFIXES):
-        return True
-    lowered = [part.lower() for part in directories]
-    if lowered and lowered[0] in SPEC_PARENT_DIR_NAMES:
-        return True
-    return len(lowered) >= 2 and lowered[0] == "docs" and lowered[1].startswith("spec")
+
+def spec_path_reason(relative: str) -> str:
+    """La razón del «allow» del paso 2: la spec siempre, el markdown también."""
+    parts = [part for part in relative.split("/") if part not in ("", ".")]
+    if len(parts) > 1 and parts[0] in SPEC_DIR_NAMES:
+        return f"Venoxia: «{relative}» es especificación; escribir la spec siempre está permitido."
+    return (
+        f"Venoxia: «{relative}» es markdown; la documentación no tiene comportamiento "
+        "que vigilar y siempre se puede escribir."
+    )
 
 
 # --- El cambio activo --------------------------------------------------------
@@ -928,11 +931,7 @@ def decide(payload: dict) -> None:
         )
         return
     if is_spec_path(relative):
-        emit(
-            DECISION_ALLOW,
-            f"Venoxia: «{relative}» es especificación; "
-            "escribir la spec siempre está permitido.",
-        )
+        emit(DECISION_ALLOW, spec_path_reason(relative))
         return
 
     status, change_id, change_dirname, change = find_active_change(root)

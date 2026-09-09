@@ -1,0 +1,34 @@
+[
+  {
+    "scenario": "The README at the root, with nothing backing it",
+    "effect": "permite la edición y la razón menciona markdown",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Markdown nested under a directory that is not a spec directory",
+    "effect": "permite la edición del markdown anidado",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Markdown inside a code directory that mimics a spec directory",
+    "effect": "permite la edición del markdown pese al nombre de carpeta",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Code under a nested spec-named directory stays code",
+    "effect": "deniega la edición del fichero de código",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "El requisito afirma que todo `.md` es documentación «never production code» y ordena permitir su edición sin cambio que la respalde; en un plugin de Claude Code el comportamiento ejecutable vive en markdown (`skills/*/SKILL.md`, `agents/*.md`, `CLAUDE.md`, `templates/*.md`), así que la implementación literal deja reescribir la lógica del producto sin acta, sin delta, sin lectores y sin oráculo: el guardián deja de vigilar exactamente el artefacto que decide qué hace el sistema.",
+    "requirement_id": "R-GRD-008",
+    "severity": "high"
+  },
+  {
+    "attack": "«Cualquier ruta del proyecto cuyo nombre de fichero termine en `.md`, a cualquier profundidad y sin exigir ningún cambio que la respalde» incluye `.venoxia/changes/<id>/delta/*.md` y `.venoxia/charter.md`: la implementación literal permite reescribir el delta de un change ya `validated` o `verified` en cualquier momento, de modo que el contrato que firmaron los dos lectores y que el oráculo dio por verde puede cambiar debajo sin que nada lo detecte.",
+    "requirement_id": "R-GRD-008",
+    "severity": "medium"
+  },
+  {
+    "attack": "Los escenarios sólo observan `allow` y que la razón mencione «markdown», y el requisito no exige registrar nada: una implementación permite cada edición de markdown sin anotarla en `.venoxia/drift/direct.log` ni en ningún otro sitio, dejando ciega justamente la medición de deriva (70 de 193 líneas) con la que este cambio se justifica.",
+    "requirement_id": "R-GRD-008",
+    "severity": "medium"
+  }
+]

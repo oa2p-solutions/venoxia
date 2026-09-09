@@ -1,0 +1,34 @@
+[
+  {
+    "scenario": "The README at the root, with nothing backing it",
+    "effect": "permite la edición del README sin exigir change",
+    "status_code": null,
+    "side_effects": ["la razón de la decisión menciona la palabra «markdown»"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Markdown nested under a directory that is not a spec directory",
+    "effect": "permite editar el markdown aunque el change esté en draft",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Markdown inside a code directory that mimics a spec directory",
+    "effect": "permite editar el markdown pese a estar bajo ruta tipo prfaq",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Code under a nested spec-named directory stays code",
+    "effect": "deniega la edición del fichero de código no markdown",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

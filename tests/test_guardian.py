@@ -290,11 +290,12 @@ class GuardianSpecifiedOracleTest(GuardianTestCase):
 class GuardianSpecPathAnchoringTest(GuardianTestCase):
     """El paso 2 no puede convertirse en un rodeo al guardián.
 
-    El contrato (§6, paso 2, y §8) escribe «.venoxia/», «prfaq/», «docs/spec*» y
-    «specs/» **ancladas a la raíz del proyecto**. Reconocerlas a cualquier
-    profundidad haría que un simple «mkdir src/prfaq/» dejara fuera del alcance
-    del guardián todo lo que se metiera dentro: el producto entero anulado por
-    un directorio con el nombre adecuado.
+    El contrato (§6, paso 2, y §8) escribe «.venoxia/» y «prfaq/» **ancladas a
+    la raíz del proyecto**. Reconocerlas a cualquier profundidad haría que un
+    simple «mkdir src/prfaq/» dejara fuera del alcance del guardián todo lo que
+    se metiera dentro: el producto entero anulado por un directorio con el
+    nombre adecuado. El anclaje protege lo que **no** es markdown; el markdown
+    es documentación vaya donde vaya (véase «GuardianMarkdownIsDocumentationTest»).
 
     El proyecto de estos tests trae el andamio por defecto, cuyo cambio activo
     está en «state»: «draft» y «via»: «spec»: cualquier ruta que **no** sea
@@ -313,7 +314,6 @@ class GuardianSpecPathAnchoringTest(GuardianTestCase):
             "a/b/prfaq/checkout.ts",
             "a/b/.venoxia/changes/c1/change.json",
             "src/prfaq/nested/deep/todavia-codigo.py",
-            "src/prfaq/notas.md",
         )
         for relative in bypass_paths:
             with self.subTest(path=relative):
@@ -321,22 +321,6 @@ class GuardianSpecPathAnchoringTest(GuardianTestCase):
                 self.assert_deny(
                     run,
                     f"«{relative}» no está en la raíz: no puede pasar por especificación",
-                )
-
-    def test_nested_specs_and_docs_directories_do_not_launder_markdown(self):
-        """«specs/» y «docs/spec*» sólo valen en la raíz: anidados, el markdown se deniega."""
-        bypass_paths = (
-            "lib/specs/x.md",
-            "src/vendor/specs/notas.md",
-            "src/docs/specs/x.md",
-            "a/b/docs/spec/x.md",
-        )
-        for relative in bypass_paths:
-            with self.subTest(path=relative):
-                run = self.project.guardian(file_path=relative)
-                self.assert_deny(
-                    run,
-                    f"«{relative}» no cuelga de la raíz: no puede pasar por especificación",
                 )
 
     def test_root_anchored_specification_paths_are_still_allowed(self):
@@ -378,6 +362,65 @@ class GuardianSpecPathAnchoringTest(GuardianTestCase):
             with self.subTest(path=relative):
                 run = self.project.guardian(file_path=relative)
                 self.assert_allow(run, f"«{relative}» queda fuera del proyecto: fail-open")
+
+
+# ---------------------------------------------------------------------------
+# El markdown es documentación (paso 2)
+# ---------------------------------------------------------------------------
+
+
+class GuardianMarkdownIsDocumentationTest(GuardianTestCase):
+    """Todo «*.md» del proyecto se escribe sin cambio que lo respalde.
+
+    El guardián protege comportamiento, y el markdown no tiene: ningún test de
+    aceptación lo ejecuta y reescribirlo entero no cambia lo que hace el
+    sistema. Vigilarlo sólo convertía la vía «direct» en parte del flujo normal
+    —70 de las 193 líneas del diario de deriva de este repo eran documentación—.
+    El anclaje a la raíz sigue en pie para lo que **no** es markdown: ahí es
+    donde el rodeo «mkdir src/prfaq/» hacía daño.
+
+    El andamio trae el cambio activo en «draft» y «via»: «spec»: nada que no sea
+    especificación pasa por otro camino, así que un «allow» aquí es del paso 2.
+    """
+
+    def setUp(self) -> None:
+        self.project = self.make_project()
+
+    # @covers R-GRD-008
+    def test_the_root_readme_is_allowed_with_nothing_backing_it(self):
+        """El README de la raíz se escribe sin cambio validado ni vía «direct»."""
+        run = self.project.guardian(file_path="README.md")
+
+        self.assert_allow(run)
+        self.assertIn("markdown", run.reason.lower(), run.describe())
+
+    # @covers R-GRD-008
+    def test_markdown_anywhere_is_allowed(self):
+        """A cualquier profundidad y se llame como se llame el directorio que lo contiene."""
+        markdown_paths = (
+            "docs/guia/instalacion.md",
+            "src/notas.md",
+            "src/prfaq/notas.md",
+            "lib/specs/x.md",
+            "src/vendor/specs/notas.md",
+            "a/b/docs/spec/x.md",
+            "CHANGELOG.MD",
+        )
+        for relative in markdown_paths:
+            with self.subTest(path=relative):
+                run = self.project.guardian(file_path=relative)
+                self.assert_allow(run, f"«{relative}» es markdown y debía permitirse")
+
+    # @covers R-GRD-008
+    def test_code_under_a_nested_spec_named_directory_stays_code(self):
+        """Lo que no es markdown sigue anclado: «src/prfaq/checkout.ts» es código.
+
+        «.mdx» también: puede llevar JSX, y eso ya es comportamiento.
+        """
+        for relative in ("src/prfaq/checkout.ts", "docs/guia.mdx"):
+            with self.subTest(path=relative):
+                run = self.project.guardian(file_path=relative)
+                self.assert_deny(run, f"«{relative}» no es markdown: sigue siendo código")
 
 
 # ---------------------------------------------------------------------------
