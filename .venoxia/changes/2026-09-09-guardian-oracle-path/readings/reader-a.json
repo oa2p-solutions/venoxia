@@ -1,0 +1,42 @@
+[
+  {
+    "scenario": "The path the delta declares as its oracle",
+    "effect": "permite editar la ruta que el delta declara como verifies",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A test-shaped path that nobody declared",
+    "effect": "deniega editar un test que ningún verifies nombra",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Production code with that same change",
+    "effect": "deniega editar código de producción no declarado",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The deny names the declared oracle",
+    "effect": "la razón nombra el test pendiente y ofrece validate/diverge",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Nothing declared, the generic remedy stands",
+    "effect": "la razón mantiene el remedio genérico con specify",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

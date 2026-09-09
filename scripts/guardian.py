@@ -54,6 +54,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 import traceback
 
@@ -71,9 +72,17 @@ DELTA_SUFFIX = ".md"
 DRIFT_DIRNAME = "drift"
 DRIFT_LOG_FILENAME = "direct.log"
 
+STATE_SPECIFIED = "specified"
 STATE_VALIDATED = "validated"
 STATE_ARCHIVED = "archived"
 VIA_DIRECT = "direct"
+
+# La línea «verifies:» de un requisito, a ras de margen, como la escribe el
+# parser del validador; el valor admite varias rutas separadas por coma o
+# espacio (la misma partición que aplica el validador). Se leen con un regex y
+# no con el parser a propósito: el guardián no importa el paquete compartido.
+VERIFIES_LINE_RE = re.compile(r"^verifies:[ \t]*(\S[^\r\n]*)$", re.MULTILINE)
+VERIFIES_SPLIT_RE = re.compile(r"[,\s]+")
 
 # Rutas relativas que se muestran en los mensajes al usuario.
 DRIFT_LOG_DISPLAY = f"{VENOXIA_DIRNAME}/{DRIFT_DIRNAME}/{DRIFT_LOG_FILENAME}"
@@ -721,6 +730,58 @@ def has_delta_evidence(root: str, change_dirname: str) -> bool | None:
         return None
 
 
+def declared_oracle_paths(root: str, change_dirname: str) -> set[str] | None:
+    """Las rutas que los «verifies:» del «delta/» del cambio nombran, normalizadas.
+
+    Es lo que abre la puerta del paso 5: con el cambio en «specified», el único
+    fichero de fuera de la especificación que se puede escribir es el oráculo
+    que la propia especificación declara. La puerta la abre el vínculo, no la
+    forma de la ruta: un «tests/otro.py» que ningún «verifies:» nombra se queda
+    fuera igual que «src/».
+
+    Devuelve el conjunto (vacío si no hay delta o ningún «verifies:»), o
+    **None** si no se pudo leer el directorio o alguno de sus deltas: eso es un
+    fallo del guardián y se resuelve por fail-open, nunca denegando. Los topes
+    son los mismos que ya acotan el «delta/» y el «change.json»: un delta más
+    grande que MAX_CHANGE_BYTES no es nuestro y se ignora.
+
+    Las rutas se comparan relativas a la raíz y normalizadas (`os.path.normpath`),
+    que es exactamente la forma en que «relative_to_root» entrega la ruta
+    editada; un «verifies:» absoluto se reduce a la raíz por el mismo camino.
+    """
+    delta_dir = os.path.join(root, VENOXIA_DIRNAME, CHANGES_DIRNAME, change_dirname, DELTA_DIRNAME)
+    declared: set[str] = set()
+    try:
+        with os.scandir(delta_dir) as entries:
+            for seen, entry in enumerate(entries):
+                if seen >= MAX_DELTA_ENTRIES:
+                    break
+                if not entry.name.lower().endswith(DELTA_SUFFIX):
+                    continue
+                if not entry.is_file() or entry.stat().st_size > MAX_CHANGE_BYTES:
+                    continue
+                with open(entry.path, "rb") as handle:
+                    text = handle.read(MAX_CHANGE_BYTES).decode("utf-8", "replace")
+                for match in VERIFIES_LINE_RE.finditer(text):
+                    for token in VERIFIES_SPLIT_RE.split(match.group(1)):
+                        if not token:
+                            continue
+                        if os.path.isabs(token):
+                            inside = relative_to_root(root, token)
+                            if inside is None:
+                                continue
+                            token = inside
+                        declared.add(os.path.normpath(token))
+        return declared
+    except FileNotFoundError:
+        return set()
+    except NotADirectoryError:
+        return set()
+    except OSError:
+        trace()
+        return None
+
+
 # --- Diario de deriva --------------------------------------------------------
 
 
@@ -765,7 +826,9 @@ def record_direct_edit(
 # --- El mensaje de denegación ------------------------------------------------
 
 
-def deny_reason(relative: str, change_dirname: str, motive: str) -> str:
+def deny_reason(
+    relative: str, change_dirname: str, motive: str, declared: tuple[str, ...] = ()
+) -> str:
     """Redacta el «deny»: qué ha pasado, por qué, qué teclear y cómo saltárselo.
 
     La ruta que se ofrece al usuario se construye con el **nombre del
@@ -773,17 +836,36 @@ def deny_reason(relative: str, change_dirname: str, motive: str) -> str:
     cosa en cualquier proyecto normal, pero si difieren, la única que existe en
     el disco es la primera, y un mensaje que manda editar un fichero que no
     está es peor que no decir nada.
+
+    «declared» son los oráculos que el delta del cambio activo nombra en
+    «verifies:». Cuando hay alguno, el cambio está en «specified» y el remedio
+    no es volver a «/venoxia:specify» —eso ya está hecho y no desbloquea nada—,
+    sino escribir esos ficheros y pasar la divergencia: son lo único que saca a
+    un cambio de «specified».
     """
     change_ref = f"{CHANGES_DISPLAY}{change_dirname or '<id>'}/{CHANGE_FILENAME}"
+    if declared:
+        oracles = "\n".join(f"     «{path}»" for path in declared)
+        remedy = (
+            f"Para desbloquearlo, en este orden:\n"
+            f"  1. Escribe el oráculo que el delta declara en «verifies:»:\n"
+            f"{oracles}\n"
+            f"  2. /venoxia:validate\n"
+            f"  3. /venoxia:diverge\n"
+        )
+    else:
+        remedy = (
+            f"Para desbloquearlo, dos comandos:\n"
+            f'  1. /venoxia:specify "describe en una frase el cambio que vas a hacer"\n'
+            f"  2. /venoxia:validate\n"
+        )
     return (
         f"Venoxia ha bloqueado la edición de «{relative}».\n"
         f"\n"
         f"{motive}\n"
         f"Escribir el comportamiento antes que el código es justo lo que este plugin protege.\n"
         f"\n"
-        f"Para desbloquearlo, dos comandos:\n"
-        f'  1. /venoxia:specify "describe en una frase el cambio que vas a hacer"\n'
-        f"  2. /venoxia:validate\n"
+        f"{remedy}"
         f"\n"
         f"¿Con prisa y sin especificación? Pon \"via\": \"direct\" en «{change_ref}»:\n"
         f"la edición pasará y quedará anotada en «{DRIFT_LOG_DISPLAY}»."
@@ -825,7 +907,7 @@ def deny_motive(status: str, change_id: str, change_dirname: str, state: str, un
 
 
 def decide(payload: dict) -> None:
-    """Aplica los cinco pasos del contrato, en orden, y emite la decisión."""
+    """Aplica los seis pasos del contrato, en orden, y emite la decisión."""
     root = project_root(payload)
 
     # Paso 1 · el proyecto no ha adoptado Venoxia: el guardián no estorba.
@@ -927,13 +1009,46 @@ def decide(payload: dict) -> None:
         )
         return
 
-    # Paso 5 · no hay especificación validada que respalde esta edición.
+    # Paso 5 · el cambio activo está en «specified» y la ruta es el oráculo que
+    # su delta declara en «verifies:». El test nace antes que el código: es el
+    # paso del flujo que sigue a «specify», y sin esta puerta se denegaba con el
+    # mismo mensaje que una edición de producción. Va **después** de la vía
+    # «direct» a propósito: un cambio que ya está fuera del flujo anota todo, y
+    # anotar de más es el error que el proyecto prefiere.
+    declared: set[str] = set()
+    if status == CHANGE_FOUND and state == STATE_SPECIFIED:
+        oracles = declared_oracle_paths(root, change_dirname)
+        if oracles is None:
+            # No se pudo leer el «delta/»: fallo nuestro, y los fallos nuestros
+            # se resuelven permitiendo y anotando, igual que en el paso 3.
+            record_direct_edit(
+                root, change_id, tool_name(payload), relative, note=NOTE_DELTA_UNCHECKED
+            )
+            emit(
+                DECISION_ALLOW,
+                f"Venoxia: el cambio «{change_id}» está en «{STATE_SPECIFIED}» y no se pudo "
+                f"leer su «{DELTA_DIRNAME}/»; se permite por prudencia (fail-open) y queda "
+                f"anotado en «{DRIFT_LOG_DISPLAY}». La traza está en stderr.",
+            )
+            return
+        declared = oracles
+        if os.path.normpath(relative) in declared:
+            emit(
+                DECISION_ALLOW,
+                f"Venoxia: el cambio «{change_id}» está en «state»: «{STATE_SPECIFIED}» y "
+                f"«{relative}» es el oráculo que su delta declara en «verifies:»: el test "
+                "se escribe antes que el código.",
+            )
+            return
+
+    # Paso 6 · no hay especificación validada que respalde esta edición.
     emit(
         DECISION_DENY,
         deny_reason(
             relative,
             change_dirname,
             deny_motive(status, change_id, change_dirname, state, unbacked),
+            declared=tuple(sorted(declared)),
         ),
     )
 

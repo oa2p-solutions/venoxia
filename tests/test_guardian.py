@@ -20,9 +20,11 @@ Lo que defiende esta suite, por orden de importancia:
    El `change.json` corrupto **no** está en esa lista: es un fichero del
    usuario que está mal, no un fallo nuestro, y tiene su propia clase.
 3. **El mensaje de `deny` es el producto.** Tiene que nombrar el fichero,
-   ofrecer `/venoxia:specify` y `/venoxia:validate`, y decir cómo saltárselo.
-   Denegar sin decir qué teclear es peor que no denegar.
-4. Los cinco caminos de decisión, su precedencia y el diario de deriva.
+   ofrecer los comandos que de verdad desbloquean —`/venoxia:specify` y
+   `/venoxia:validate`, o, con el change en «specified», el oráculo que el
+   delta declara más `/venoxia:validate` y `/venoxia:diverge`— y decir cómo
+   saltárselo. Denegar sin decir qué teclear es peor que no denegar.
+4. Los seis caminos de decisión, su precedencia y el diario de deriva.
 """
 
 from __future__ import annotations
@@ -93,12 +95,16 @@ class GuardianTestCase(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Los cinco caminos de decisión (§6)
+# Los seis caminos de decisión (§6)
 # ---------------------------------------------------------------------------
 
 
 class GuardianDecisionPathsTest(GuardianTestCase):
-    """Los cinco pasos del orden de decisión, uno por test."""
+    """Los pasos del orden de decisión, uno por test.
+
+    El paso 5 —el oráculo que declara un cambio en «specified»— tiene su propia
+    clase más abajo, «GuardianSpecifiedOracleTest».
+    """
 
     # @covers R-GRD-002
     def test_step1_allows_when_the_project_has_no_venoxia_directory(self):
@@ -152,8 +158,8 @@ class GuardianDecisionPathsTest(GuardianTestCase):
         self.assert_allow(run)
         self.assertIn("direct", run.reason)
 
-    def test_step5_denies_when_nothing_backs_the_edit(self):
-        """Paso 5: sin cambio validado ni «via»: «direct», editar código se deniega."""
+    def test_step6_denies_when_nothing_backs_the_edit(self):
+        """Paso 6: sin cambio validado, ni «via»: «direct», ni oráculo declarado, se deniega."""
         project = self.make_project()
         project.change("c1", state="draft", via="spec")
 
@@ -251,6 +257,29 @@ class GuardianSpecifiedOracleTest(GuardianTestCase):
 
         self.assert_deny(run)
         self.assertIn("/venoxia:specify", run.reason, run.describe())
+
+    # @covers R-GRD-006
+    def test_an_unreadable_delta_in_specified_fails_open_and_is_logged(self):
+        """Si el «delta/» no se deja leer, es fallo nuestro: se permite y se anota.
+
+        Lo señaló el abogado del diablo sobre el delta: «denegarla en cualquier
+        otro caso», al pie de la letra, convertiría un EACCES propio en un
+        «deny» e invertiría el fail-open del guardián. Misma frontera que el
+        paso 3: contenido malo no acredita; no poder leer, permite anotando.
+        """
+        if os.geteuid() == 0:
+            self.skipTest("como root, «chmod 000» no impide leer")
+        project = self.make_project()
+        self.specified(project)
+        delta_dir = project.path(".venoxia/changes/c1/delta")
+        os.chmod(delta_dir, 0o000)
+        self.addCleanup(os.chmod, delta_dir, 0o755)
+
+        run = project.guardian(file_path=CODE_PATH)
+
+        self.assert_allow(run)
+        entry = json.loads(self.drift_lines(project)[-1])
+        self.assertEqual("delta-no-comprobable", entry["note"])
 
 
 # ---------------------------------------------------------------------------

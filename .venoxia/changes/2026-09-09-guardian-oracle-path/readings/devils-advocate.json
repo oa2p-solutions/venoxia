@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "El requisito abre la puerta por «la ruta que algún `verifies:` nombra» y su propio `why:` descarta mirar la forma de la ruta; una implementación literal permite, con el change sólo en `specified`, escribir cualquier fichero que el delta haya declarado en un `verifies:` —`scripts/guardian.py`, `src/pagos.py`, `.venoxia/venoxia.json`—, de modo que basta una línea en un delta que nadie ha validado ni sometido a divergencia para saltarse por completo la puerta de `validated` y editar código de producción o el propio guardián.",
+    "requirement_id": "R-GRD-006",
+    "severity": "high"
+  },
+  {
+    "attack": "«Denegarla en cualquier otro caso» no exceptúa que otro change acreditado esté abierto: en un proyecto con un change en `validated` y otro recién puesto en `specified`, una implementación que resuelve «el cambio activo» al segundo deniega todas las escrituras de código que el primero sí acredita, y el usuario queda bloqueado para implementar un change ya validado hasta que archive o retroceda el otro.",
+    "requirement_id": "R-GRD-006",
+    "severity": "medium"
+  },
+  {
+    "attack": "«Denegarla en cualquier otro caso» incluye el caso de no poder leer `delta/` por un fallo de E/S: la implementación literal responde `deny` ante un error de lectura propio, invirtiendo la garantía fail-open del guardián, y el mensaje que R-GRD-007 impone («ejecuta /venoxia:validate y /venoxia:diverge») no resuelve nada, dejando al usuario sin salida por un fallo que no es suyo.",
+    "requirement_id": "R-GRD-006",
+    "severity": "medium"
+  },
+  {
+    "attack": "Nada fija cómo se compara la ruta editada (absoluta, del payload del hook) con el valor relativo del `verifies:`; comparar por sufijo o por nombre de fichero cumple «esa ruta es una de las que algún verifies: nombra» y permite escribir `/cualquier/sitio/fuera/del/proyecto/tests/test_x.py`, es decir, autorizar escrituras fuera de la raíz inspeccionada con la sola excusa de coincidir de nombre.",
+    "requirement_id": "R-GRD-006",
+    "severity": "medium"
+  }
+]

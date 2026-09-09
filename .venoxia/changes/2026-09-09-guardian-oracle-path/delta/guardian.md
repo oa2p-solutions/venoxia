@@ -4,9 +4,10 @@
 
 ### R-GRD-006 · A specified change backs writing the oracle it declares
 
-WHEN el cambio activo declara `"state": "specified"`, el sistema DEBE
-permitir la edición si la ruta editada es una de las que algún `verifies:`
-de su `delta/` nombra, y denegarla en cualquier otro caso.
+WHEN el cambio activo declara `"state": "specified"` y la ruta editada no es
+especificación, el sistema DEBE permitir la edición sólo si esa ruta es una
+de las que algún `verifies:` de su `delta/` nombra, y denegarla en cualquier
+otro caso.
 
 #### Scenario: The path the delta declares as its oracle
 - **WHEN** el cambio activo está en «specified» y su delta declara «verifies: tests/test_x.py»

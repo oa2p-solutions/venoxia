@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Recoge el hilo donde lo dejó, sin volver a explicar lo que ya está escrito ahí. Lo que quedó abierto:
 
 - **La visión incluye el eje técnico.** Stack, despliegue, estrategia de pruebas, valores por defecto y constantes son parte del contrato, no sólo el comportamiento funcional. Hoy viven en `principles.md` como prosa sin oráculo, mientras sus verificaciones reales (`tools/coverage.py`, `tools/check.py`) viven fuera del modelo. La tesis pendiente: *una decisión técnica sin verificación es una intención*, simétrica a *un requisito sin `verifies:` es una opinión*.
-- **Un hueco verificado del guardián.** Con el change en `specified`, escribir el fichero de test que el propio flujo manda escribir en ese punto se **deniega** (un test no es spec path y el camino 3 exige `validated`). Sólo muerde cuando quien programa es Claude Code. Sin arreglar.
+- **Un hueco verificado del guardián.** Con el change en `specified`, escribir el fichero de test que el propio flujo manda escribir en ese punto se **deniega** (un test no es spec path y el camino 3 exige `validated`). Sólo muerde cuando quien programa es Claude Code. **Cerrado el 2026-09-09** por el change `2026-09-09-guardian-oracle-path`: el camino 5 del guardián abre en `specified` la ruta que el delta declara en `verifies:`.
 - **Falta el comando del paso 8.** «Implementa el change» es el paso central y el único sin skill.
 
 El siguiente movimiento acordado era especificar el eje técnico por el propio ciclo, como capability nueva.
@@ -86,7 +86,7 @@ Contrato común a validate, charter_lint y diff_readings: flags `--json`, `--no-
 
 ### El guardián es distinto a todo lo demás
 
-`guardian.py` tiene una garantía que ningún otro script tiene: **siempre código 0 y exactamente un JSON de decisión por stdout**, pase lo que pase (`os._exit(0)` en `finally`, escritura en bytes ASCII a `sys.stdout.buffer`, stderr sustituido por un sumidero si falla). Es **fail-open**: cualquier excepción propia → `allow`. La frontera que hay que respetar al tocarlo: un `change.json` con **contenido** malo (JSON corrupto) es culpa del usuario y **no acredita** nada (sigue buscando, y si no queda ninguno, `deny`); un fallo de **E/S** al leerlo es culpa nuestra y permite anotando en `.venoxia/drift/direct.log`. Confundir las dos cosas fue una puerta trasera real. Los cinco caminos de decisión están en `decide()` y documentados en el README («El modelo de confianza del guardián»).
+`guardian.py` tiene una garantía que ningún otro script tiene: **siempre código 0 y exactamente un JSON de decisión por stdout**, pase lo que pase (`os._exit(0)` en `finally`, escritura en bytes ASCII a `sys.stdout.buffer`, stderr sustituido por un sumidero si falla). Es **fail-open**: cualquier excepción propia → `allow`. La frontera que hay que respetar al tocarlo: un `change.json` con **contenido** malo (JSON corrupto) es culpa del usuario y **no acredita** nada (sigue buscando, y si no queda ninguno, `deny`); un fallo de **E/S** al leerlo es culpa nuestra y permite anotando en `.venoxia/drift/direct.log`. Confundir las dos cosas fue una puerta trasera real. Los seis caminos de decisión están en `decide()` y documentados en el README («El modelo de confianza del guardián»); el quinto abre, con el change en `specified`, sólo la ruta que su `delta/` declara en `verifies:` (el test nace antes que el código), y va después de la vía `direct` a propósito.
 
 ### Ciclo de vida de un change y quién escribe cada estado
 
@@ -104,12 +104,13 @@ Cinco estados, siempre en este orden; ninguna skill escribe uno que no le toca y
 /venoxia:charter  → .venoxia/charter.md + principles.md      (charter_lint hasta verde)
 /venoxia:specify  → changes/<id>/{change.json,proposal.md,delta/*.md}   state: draft → specified
                     (validate.py; V07/V08 en rojo es lo esperado: el test aún no existe)
-   el usuario escribe el test con «@covers R-XXX-000»
+   quien programa (Claude Code o el usuario) escribe el test con «@covers R-XXX-000»
+                    (el guardián lo permite en specified: es la ruta que el delta declara en verifies:)
 /venoxia:validate → validate.py en verde
 /venoxia:diverge  → 2 lectores + abogado del diablo → readings/*.json → diff_readings.py
                     state: validated  SÓLO si validador Y divergencia salen 0
 guardian          → permite Edit/Write de código cuando hay change validated con delta/*.md no vacío
-   el usuario escribe el código hasta que el test pasa
+   quien programa escribe el código hasta que el test pasa
 /venoxia:verify   → oracle.py --record (rojo antes del código, verde después)
                     state: verified  SÓLO si el oráculo queda en verde y el rojo previo está en el historial
 ```

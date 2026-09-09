@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "change": "2026-09-09-guardian-oracle-path",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-09T18:38:15Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-GRD-006",
+          "verifies": [
+            "tests/test_guardian.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 4305,
+          "output_tail": "======================================================================\nFAIL: test_the_deny_names_the_declared_oracle_and_what_unblocks (tests.test_guardian.GuardianSpecifiedOracleTest.test_the_deny_names_the_declared_oracle_and_what_unblocks)\nEl «deny» en «specified» nombra el fichero que toca escribir ahora.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_guardian.py\", line 237, in test_the_deny_names_the_declared_oracle_and_what_unblocks\n    self.assertIn(self.DECLARED_ORACLE, run.reason, run.describe())\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'test/checkout/reservation.spec.ts' not found in 'Venoxia ha bloqueado la edición de «src/checkout.ts».\\n\\nNingún cambio tiene la especificación validada: el cambio activo «c1» está en «state»: «specified» y hace falta «validated».\\nEscribir el comportamiento antes que el código es justo lo que este plugin protege.\\n\\nPara desbloquearlo, dos comandos:\\n  1. /venoxia:specify \"describe en una frase el cambio que vas a hacer\"\\n  2. /venoxia:validate\\n\\n¿Con prisa y sin especificación? Pon \"via\": \"direct\" en «.venoxia/changes/c1/change.json»:\\nla edición pasará y quedará anotada en «.venoxia/drift/direct.log».' : comando: /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/afroxstudio/Developments/ia/venoxia/scripts/guardian.py\nreturncode: 0\nstdout:\n{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"deny\", \"permissionDecisionReason\": \"Venoxia ha bloqueado la edici\\u00f3n de \\u00absrc/checkout.ts\\u00bb.\\n\\nNing\\u00fan cambio tiene la especificaci\\u00f3n validada: el cambio activo \\u00abc1\\u00bb est\\u00e1 en \\u00abstate\\u00bb: \\u00abspecified\\u00bb y hace falta \\u00abvalidated\\u00bb.\\nEscribir el comportamiento antes que el c\\u00f3digo es justo lo que este plugin protege.\\n\\nPara desbloquearlo, dos comandos:\\n  1. /venoxia:specify \\\"describe en una frase el cambio que vas a hacer\\\"\\n  2. /venoxia:validate\\n\\n\\u00bfCon prisa y sin especificaci\\u00f3n? Pon \\\"via\\\": \\\"direct\\\" en \\u00ab.venoxia/changes/c1/change.json\\u00bb:\\nla edici\\u00f3n pasar\\u00e1 y quedar\\u00e1 anotada en \\u00ab.venoxia/drift/direct.log\\u00bb.\"}, \"systemMessage\": \"Venoxia ha bloqueado la edici\\u00f3n de \\u00absrc/checkout.ts\\u00bb.\\n\\nNing\\u00fan cambio tiene la especificaci\\u00f3n validada: el cambio activo \\u00abc1\\u00bb est\\u00e1 en \\u00abstate\\u00bb: \\u00abspecified\\u00bb y hace falta \\u00abvalidated\\u00bb.\\nEscribir el comportamiento antes que el c\\u00f3digo es justo lo que este plugin protege.\\n\\nPara desbloquearlo, dos comandos:\\n  1. /venoxia:specify \\\"describe en una frase el cambio que vas a hacer\\\"\\n  2. /venoxia:validate\\n\\n\\u00bfCon prisa y sin especificaci\\u00f3n? Pon \\\"via\\\": \\\"direct\\\" en \\u00ab.venoxia/changes/c1/change.json\\u00bb:\\nla edici\\u00f3n pasar\\u00e1 y quedar\\u00e1 anotada en \\u00ab.venoxia/drift/direct.log\\u00bb.\"}\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 95 tests in 4.257s\n\nFAILED (failures=2, skipped=1)"
+        },
+        {
+          "requirement_id": "R-GRD-007",
+          "verifies": [
+            "tests/test_guardian.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 4212,
+          "output_tail": "======================================================================\nFAIL: test_the_deny_names_the_declared_oracle_and_what_unblocks (tests.test_guardian.GuardianSpecifiedOracleTest.test_the_deny_names_the_declared_oracle_and_what_unblocks)\nEl «deny» en «specified» nombra el fichero que toca escribir ahora.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_guardian.py\", line 237, in test_the_deny_names_the_declared_oracle_and_what_unblocks\n    self.assertIn(self.DECLARED_ORACLE, run.reason, run.describe())\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'test/checkout/reservation.spec.ts' not found in 'Venoxia ha bloqueado la edición de «src/checkout.ts».\\n\\nNingún cambio tiene la especificación validada: el cambio activo «c1» está en «state»: «specified» y hace falta «validated».\\nEscribir el comportamiento antes que el código es justo lo que este plugin protege.\\n\\nPara desbloquearlo, dos comandos:\\n  1. /venoxia:specify \"describe en una frase el cambio que vas a hacer\"\\n  2. /venoxia:validate\\n\\n¿Con prisa y sin especificación? Pon \"via\": \"direct\" en «.venoxia/changes/c1/change.json»:\\nla edición pasará y quedará anotada en «.venoxia/drift/direct.log».' : comando: /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/afroxstudio/Developments/ia/venoxia/scripts/guardian.py\nreturncode: 0\nstdout:\n{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"deny\", \"permissionDecisionReason\": \"Venoxia ha bloqueado la edici\\u00f3n de \\u00absrc/checkout.ts\\u00bb.\\n\\nNing\\u00fan cambio tiene la especificaci\\u00f3n validada: el cambio activo \\u00abc1\\u00bb est\\u00e1 en \\u00abstate\\u00bb: \\u00abspecified\\u00bb y hace falta \\u00abvalidated\\u00bb.\\nEscribir el comportamiento antes que el c\\u00f3digo es justo lo que este plugin protege.\\n\\nPara desbloquearlo, dos comandos:\\n  1. /venoxia:specify \\\"describe en una frase el cambio que vas a hacer\\\"\\n  2. /venoxia:validate\\n\\n\\u00bfCon prisa y sin especificaci\\u00f3n? Pon \\\"via\\\": \\\"direct\\\" en \\u00ab.venoxia/changes/c1/change.json\\u00bb:\\nla edici\\u00f3n pasar\\u00e1 y quedar\\u00e1 anotada en \\u00ab.venoxia/drift/direct.log\\u00bb.\"}, \"systemMessage\": \"Venoxia ha bloqueado la edici\\u00f3n de \\u00absrc/checkout.ts\\u00bb.\\n\\nNing\\u00fan cambio tiene la especificaci\\u00f3n validada: el cambio activo \\u00abc1\\u00bb est\\u00e1 en \\u00abstate\\u00bb: \\u00abspecified\\u00bb y hace falta \\u00abvalidated\\u00bb.\\nEscribir el comportamiento antes que el c\\u00f3digo es justo lo que este plugin protege.\\n\\nPara desbloquearlo, dos comandos:\\n  1. /venoxia:specify \\\"describe en una frase el cambio que vas a hacer\\\"\\n  2. /venoxia:validate\\n\\n\\u00bfCon prisa y sin especificaci\\u00f3n? Pon \\\"via\\\": \\\"direct\\\" en \\u00ab.venoxia/changes/c1/change.json\\u00bb:\\nla edici\\u00f3n pasar\\u00e1 y quedar\\u00e1 anotada en \\u00ab.venoxia/drift/direct.log\\u00bb.\"}\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 95 tests in 4.168s\n\nFAILED (failures=2, skipped=1)"
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 2,
+        "missing": 0,
+        "timeout": 0,
+        "total": 2
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-09T18:52:56Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-GRD-006",
+          "verifies": [
+            "tests/test_guardian.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4198,
+          "output_tail": ".................................s..............................................................\n----------------------------------------------------------------------\nRan 96 tests in 4.145s\n\nOK (skipped=1)"
+        },
+        {
+          "requirement_id": "R-GRD-007",
+          "verifies": [
+            "tests/test_guardian.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4190,
+          "output_tail": ".................................s..............................................................\n----------------------------------------------------------------------\nRan 96 tests in 4.153s\n\nOK (skipped=1)"
+        }
+      ],
+      "counts": {
+        "green": 2,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 2
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}
