@@ -2,17 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Lo primero de cada sesión: hay una conversación pendiente
+## Lo primero de cada sesión: hay un plan en marcha
 
-**Antes de responder a nada**, lee `2026-09-08-vision-conversacion.md` (raíz del repo) y dile al usuario, en una línea, que está pendiente de retomar y en qué punto quedó. Si el fichero no existe, no digas nada y sigue.
+**Antes de responder a nada**, lee `PLAN.md` (raíz del repo): su tabla «Estado de ejecución» dice qué está hecho y cuál es el siguiente paso, y su lista «Lo que una sesión nueva tiene que saber» evita repetir los tropiezos de la primera sesión. Dile al usuario en una línea en qué punto está el plan. Si el fichero no existe, no digas nada y sigue.
 
-Recoge el hilo donde lo dejó, sin volver a explicar lo que ya está escrito ahí. Lo que quedó abierto:
-
-- **La visión incluye el eje técnico.** Stack, despliegue, estrategia de pruebas, valores por defecto y constantes son parte del contrato, no sólo el comportamiento funcional. Hoy viven en `principles.md` como prosa sin oráculo, mientras sus verificaciones reales (`tools/coverage.py`, `tools/check.py`) viven fuera del modelo. La tesis pendiente: *una decisión técnica sin verificación es una intención*, simétrica a *un requisito sin `verifies:` es una opinión*.
-- **Un hueco verificado del guardián.** Con el change en `specified`, escribir el fichero de test que el propio flujo manda escribir en ese punto se **deniega** (un test no es spec path y el camino 3 exige `validated`). Sólo muerde cuando quien programa es Claude Code. **Cerrado el 2026-09-09** por el change `2026-09-09-guardian-oracle-path`: el camino 5 del guardián abre en `specified` la ruta que el delta declara en `verifies:`.
-- **Falta el comando del paso 8.** «Implementa el change» es el paso central y el único sin skill.
-
-El siguiente movimiento acordado era especificar el eje técnico por el propio ciclo, como capability nueva.
+El plan nace de `2026-09-08-vision-conversacion.md` (la corrección de la visión: el eje técnico es parte del contrato) y tiene seis changes en orden, C1→C6; cada uno pasa por el ciclo completo de Venoxia. Las decisiones D1–D12 del plan están cerradas: no se reabren durante la ejecución. Ejecutar un paso no es afirmar que está hecho: lo está cuando su `change.json` dice `verified` y la aceptación común del plan sale en verde.
 
 ## Qué es este repo
 

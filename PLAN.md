@@ -1,0 +1,178 @@
+# Venoxia · Plan para completar el plugin
+
+**Fecha:** 2026-09-09 · **Origen:** `2026-09-08-vision-conversacion.md` + análisis de `.venoxia/drift/direct.log` (193 líneas, todas de la última semana: 34 % tests, 36 % documentación, 17 en `tools/`).
+
+## Estado de ejecución (actualizado 2026-09-09, fin de la primera sesión)
+
+| Paso | Estado | Evidencia |
+|---|---|---|
+| F0 | hecho | commit `3029e26` (conversación de visión, `plugin.json` sin clave `hooks`) |
+| C1 `2026-09-09-guardian-oracle-path` | **`verified`** | commit `e973fe4`; rojo `18:38Z` → verde `18:52Z`; guardián con seis caminos |
+| C2 `2026-09-09-guardian-docs-are-spec` | **`verified`** | commit `c675175`; rojo `19:08Z` → verde `19:11Z`; todo `*.md` es spec-path |
+| Push | hecho | `main` → GitHub `origin` y espejo Forgejo en `c675175`; puerta local en verde (matrix 195 s, coverage 95 s, gate 100 s) |
+| Instalación | al día | `venoxia@venoxia` reinstalado desde HEAD (`c675175`); el hook nuevo ya actúa (comprobado: un `.md` en la raíz se escribe sin change y sin línea de deriva) |
+| C3 `oracle-named-runners` | **siguiente** | arrancar con `/venoxia:specify` (texto de partida en su bloque más abajo) |
+| C4 · C5 · C6 · F4 | pendientes | en orden; C4.0 (consolidar `capabilities/oracle/spec.md`) antes de la fila 7 del acta |
+
+**Lo que una sesión nueva tiene que saber antes de tocar nada:**
+
+1. **El plugin que corre es el instalado desde GitHub, no el repo.** `installed_plugins.json` guarda el `gitCommitSha`. Tras cambiar scripts o skills: empujar a `origin` y `claude plugin marketplace update venoxia && claude plugin uninstall venoxia@venoxia && claude plugin install venoxia@venoxia -y` (`claude plugin update` sólo compara versiones y `plugin.json` sigue en `0.2.0`). El hook toma efecto sin reiniciar; las skills se leen del disco al invocarse.
+2. **Ciclo por change, sin atajos:** `specify` → test con `@covers` (el guardián lo permite en `specified` desde C1) → `validate` → `diverge` → `verify` rojo → código → `verify` verde → docs → commit. `via: direct` no debería hacer falta ya para tests ni para markdown; si hace falta, es un hallazgo.
+3. **Divergencias de vocabulario sobre deltas escritos por Claude las cierra Claude** (opción C del script, anotadas en `decisions.json` diciendo que las decidió Claude). Al usuario sólo se le sube lo que cambia el producto — y los ataques `high` del abogado del diablo, siempre.
+4. **La memoria del proyecto** (`~/.claude-b2bcarts/projects/-Users-afroxstudio-Developments-ia-venoxia/memory/`) tiene el estado corto del plan y las trampas operativas; este fichero tiene el detalle.
+5. **Decisión añadida en sesión (2026-09-09):** el ataque del abogado sobre C2 —en un plugin las skills son markdown y con D3 se editan sin change— se aceptó; queda escrito en la propuesta de C2 y compensa que cada skill tiene su comportamiento con test.
+6. **Trampa del panel:** los lectores devuelven a veces el JSON con valla de código o una línea de «ruta leída» detrás; se guarda sólo el JSON (la valla es embalaje). Los ataques del abogado pueden llegar con `&lt;` escapado por el canal; se escribe `<`.
+
+## Contexto
+
+El plugin tiene el aparato completo para la deriva **funcional** (qué hace el sistema) y casi nada para la deriva **técnica** (cómo está hecho), y su propio flujo obliga a saltarse el guardián en los pasos que más ejecuta quien lo usa como está diseñado: alguien que dirige a Claude Code y no escribe código a mano. Tres huecos, verificados sobre el código:
+
+1. **El guardián deniega el test que el flujo manda escribir** (change en `specified`; un test no es spec-path). Y trata la documentación como código de producción. Juntos son el 70 % de la deriva registrada.
+2. **El eje técnico no está en el contrato.** `principles.md` afirma sin oráculo (y ya miente: dice «probado con 3.14», la matriz real es 3.12–3.14); sus oráculos reales (`tools/coverage.py`, `tools/check.py`, el escaneo de imports en `tests/test_guardian.py:636`, `tests/test_report.py:189`) existen sin que nada los reclame; y `venoxia.json` sólo admite **un** runner para todo el proyecto. La premisa que sostiene todo veredicto —«ningún script consulta a un modelo»— no tiene ningún oráculo.
+3. **«Implementa el change» es el único paso sin skill.** Es el 80 % de la jornada del usuario y hoy depende de que el agente encuentre el delta, lea `decisions.json`, respete los principios y sepa que el criterio de parada es el oráculo.
+
+**Resultado esperado:** el diario de deriva vuelve a medir deriva real; la deriva técnica la atrapa el gate y no una persona leyendo código; `principles.md` deja de mentir; un proyecto que adopta Venoxia tiene una sola puerta para comportamiento y contrato técnico; y el paso central del flujo tiene dueño.
+
+## Decisiones cerradas (no reabrir durante la ejecución)
+
+| # | Decisión | Por qué |
+|---|---|---|
+| D1 | El guardián abre `specified` **sólo** para las rutas que algún `verifies:` del delta nombra. Nunca por la forma de la ruta. | El vínculo doble spec↔test ya existe; una heurística concede permiso a una clase entera de rutas sin nada en la spec que lo respalde. |
+| D2 | El camino nuevo va **después** de la vía `direct`. | Un change en `direct` está fuera del flujo entero; anotar de más es el error que el proyecto declaró preferir. No se modifica `R-GRD-004`. |
+| D3 | **Todo `*.md` del proyecto es documentación** y el guardián lo permite siempre (decisión del usuario, 2026-09-09). | El guardián protege comportamiento; el markdown no tiene comportamiento. |
+| D4 | **Ningún formato nuevo** para el eje técnico. Las decisiones técnicas verificables son requisitos EARS de una capability cuyo sujeto es el repositorio (`technical-contract`, prefijo `R-TEC-`). | `ci` ya es eso con nombre estrecho; un `decisions.md` con linter propio duplicaría `validate.py`. |
+| D5 | `principles.md` se reduce a **principios de arbitraje** (lo que por naturaleza no se verifica) más los tres del método. Sin sección «Convenciones técnicas». | Es lo que `C17` pide de él. Lo verificable va a `technical-contract`; lo abierto va a `## Bets`. |
+| D6 | **No existe «`runner: none`»**. Una decisión técnica sin oráculo posible **no es un requisito**: es una apuesta del acta (`## Bets`, con el hecho que la haría verificable) o un principio de arbitraje. | `V06` es el corazón del sistema y no se le hace excepción. |
+| D7 | `venoxia.json` gana **runners con nombre**; `test_command` sigue siendo el runner por defecto. Un runner **puede** no llevar `{files}` (corre tal cual). | Único mecanismo nuevo. Compatible hacia atrás: ningún fixture ni proyecto existente cambia. |
+| D8 | `gate.py` **no** necesita un paso nuevo: ya ejecuta `oracle.py --change` por cada change `verified` (`scripts/gate.py:224-247`, `GATED_STATES = {"verified"}`), y los requisitos técnicos viven en changes. `tools/check.py` pierde su paso `coverage` cuando C4 quede `verified`, porque el gate lo ejecuta ya como runner (evita correr dos veces algo «del orden de dos minutos», `tools/coverage.py:72-74`). | Límites conocidos, preexistentes: un change `archived` deja de ejecutarse en el gate (la consolidación sigue fuera de alcance del acta); `gate.py:146-164` exige `test_command` aunque haya `runners`. |
+| D11 | Las capabilities `technical-contract` e `implementation` **sí** tienen `spec.md`, y para no disparar `C16` (`charter_lint.py:2035-2070`: una capability viva detrás de una pendiente) antes se consolida a mano `capabilities/oracle/spec.md` desde los deltas `verified` (R-ORC-001…012, versión vigente de cada ID), como ya se hizo con `ci`. | La fila 6 `oracle` del acta no tiene `spec.md`; añadir la 7 con `spec.md` la dejaría detrás de una pendiente. La consolidación manual de una capability no es la consolidación automática que el acta deja fuera. |
+| D12 | Los requisitos técnicos cuyo test **ya pasa** (R-TEC-001/002/003/006) nacerán en verde sin rojo previo: `V18` avisa y `/venoxia:verify` pide confirmación. Se acepta **explícitamente** como adopción retroactiva, igual que hizo `adopt-venoxia`. | Es el caso legítimo de brownfield descrito en el README; fingir un rojo sería peor. |
+| D9 | `/venoxia:implement` **escribe el código** (decisión del usuario, 2026-09-09), acotado: nunca edita `.venoxia/` ni ningún fichero que un `verifies:` nombre; se detiene cuando `oracle.py` sale `0`; **no** graba (`--record` es de `/venoxia:verify`). | La regla «ninguna skill toca código» protege que spec y código no nazcan en el mismo impulso; aquí la spec ya está validada y congelada. |
+| D10 | No se inventan constantes ni valores por defecto el día 1; se cierran antes del change que los consume. Lo fuera de alcance del acta (triaje, worktrees, panel, consolidación) sigue fuera. | Regla del repo: ningún campo pide un valor inventado. |
+
+## Cómo consumir este plan con un workflow
+
+- **Cada `C<n>` es un change de Venoxia completo** y pasa por su propio ciclo: `specify` → escribir tests (`@covers`) → `validate` → `diverge` → `verify` (rojo) → código → `verify` (verde) → docs → commit. Un agente no marca un change como hecho si `change.json` no dice `verified`.
+- **`/venoxia:diverge` es un punto de sincronización con el usuario**: hace entrevista (`AskUserQuestion`) y un agente en segundo plano no puede. El workflow agrupa las divergencias entre fases y las resuelve la sesión principal.
+- **Paralelismo sólo en worktrees separados** (`isolation: worktree`). El guardián toma como activo el `change.json` de mtime más reciente **del árbol**: dos agentes con dos changes en el mismo árbol se deniegan mutuamente. `drift/direct.log` y `oracle.json` son append-only: conflictos de merge triviales pero reales.
+- **C1 va primero y en la sesión principal**: es el que permite que los demás escriban sus tests sin `via: direct`. C2 antes que cualquier change que toque README/CLAUDE.md desde `specified`.
+- **Aceptación común de todo change** (la ejecuta el agente, no la afirma):
+  ```bash
+  python3 -m unittest discover -s tests -q                      # verde
+  python3 scripts/validate.py --root . --strict                 # 0
+  python3 scripts/charter_lint.py --root . --strict             # 0
+  python3 scripts/oracle.py --root . --change <id>              # 0, y change.json en «verified»
+  python3 tools/check.py                                        # antes de cada push (docker + claude en PATH)
+  ```
+- Convenciones fijas: Python 3 stdlib sin dependencias; tags/IDs en inglés, prosa en español; ningún script consulta a un modelo; regla nueva ⇒ fila en la tabla del README **y** en la de remedios de `skills/validate/SKILL.md` (`tests/test_docs_sync.py` lo exige) y cifras de `evals/README.md:116-155` comprobadas.
+
+## Orden y dependencias
+
+```
+F0 ──► C1 ──► C2 ──┬──► C3 ──► C4 ──► C5 ──┐
+                   │                        ├──► C6 ──► F4
+                   └────────────────────────┘
+```
+C2 ∥ C3 es posible (worktrees). C4 depende de C3 (usa `runner:`). C5 depende de C4 (la skill apunta a la capability). C6 al final: es el más caro y sólo tiene sentido con un contrato completo que ejecutar.
+
+---
+
+## F0 · Cierre de lo pendiente (sesión principal, sin agentes)
+
+- **F0.1** `.claude-plugin/plugin.json` tiene quitada la clave `"hooks"` sin commitear. El guardián ha seguido actuando (línea de hoy en `drift/direct.log`), así que Claude Code carga `hooks/hooks.json` por convención. Confirmar con `claude plugin validate . --strict` en las dos variantes; commitear la que valide (`README.md:401` afirma que validate «comprueba el hook declarado»: si sólo valida con la clave, se restaura).
+- **F0.2** Commitear `2026-09-08-vision-conversacion.md` y el change `2026-09-09-guardian-oracle-path` tal como está (specified, tests en rojo), con la sección nueva de `CLAUDE.md`. Al terminar F4, esa sección se sustituye por un puntero a `PLAN.md`.
+
+## Fase 1 · El guardián deja de estorbar al flujo
+
+### C1 · `2026-09-09-guardian-oracle-path` — **HECHO (2026-09-09, `verified`)**
+- **Capability:** `guardian` · **Estado:** `verified`; rojo `18:38Z`, verde `18:52Z`; divergencia convergente en dos rondas (la primera precisó «y la ruta editada no es especificación»); 845 tests en verde; docs actualizadas (seis caminos). Commit posterior a `3029e26`.
+- Nota para C2+: el ataque «un `verifies: src/x.py` abre código en `specified`» se aceptó como límite declarado (mismas dos escrituras bajo `.venoxia/` que hoy) y está escrito en el README.
+- **Requisitos:** `R-GRD-006` (specified abre la ruta declarada en `verifies:`), `R-GRD-007` (el deny en specified nombra el fichero y ofrece `validate`+`diverge`, no `specify`). Ya escritos en `.venoxia/changes/2026-09-09-guardian-oracle-path/delta/guardian.md`.
+- **Queda:** `/venoxia:diverge` → `/venoxia:verify` (rojo) → código → `/venoxia:verify` (verde) → docs → commit.
+- **Código (`scripts/guardian.py`):**
+  - Nueva `declared_oracle_paths(root, change_dirname) -> set[str] | None`: recorre `delta/*.md` con los topes existentes (`MAX_DELTA_ENTRIES` `:100`, `MAX_CHANGE_BYTES` `:99`), regex `^verifies:\s*(.+)$` y partición `[,\s]+` (misma que `validate.py:133`), rutas normalizadas con `os.path.normpath`. Devuelve `None` sólo ante fallo de E/S (fail-open, misma frontera que `has_delta_evidence` `:687`). **Sin importar el parser** (presupuesto <100 ms, y el guardián no importa el paquete por contrato).
+  - En `decide()` (`:827`): nuevo paso **5** tras la vía `direct` (`:909-928`) y antes del deny: `status == CHANGE_FOUND and state == "specified" and relative in declared` → `allow` con razón que menciona «specified» y «verifies». El deny pasa a ser el paso **6**.
+  - `deny_motive()`/`deny_reason()` (`:768-821`): variante para `state == specified` con rutas declaradas → nombra las rutas, ofrece `/venoxia:validate` y `/venoxia:diverge`, **no** `/venoxia:specify`. Sin rutas declaradas, el texto actual.
+  - Constante `STATE_SPECIFIED = "specified"` junto a `STATE_VALIDATED`.
+- **Docs (cinco caminos → seis):** `README.md:352-383` (lista `:358-364`; `:399` «los cinco caminos» → seis; `:46` «tercer camino» sigue siendo el tercero); `CLAUDE.md:89` y el diagrama del ciclo; `tests/test_guardian.py:25`, `:96`, `:101`; `skills/specify/SKILL.md:181` (la entrega dice que escribir esos tests ya está permitido en `specified`). README paso 5 (`:40`): «Escribes el test» → quien escribe es Claude Code.
+- **Hecho cuando:** aceptación común + `python3 -m unittest tests.test_guardian -q` sin fallos + los dos escenarios reproducidos a mano: `specified` + `Write tests/test_x.py` declarado → `allow`; `specified` + `Write src/a.py` → `deny` cuyo texto contiene la ruta declarada y no `/venoxia:specify`.
+
+### C2 · `2026-09-09-guardian-docs-are-spec` — **HECHO (2026-09-09, `verified`)**
+- **Estado:** `verified`; rojo `19:08Z`, verde `19:11Z`; divergencia `soft_only` (3 blandas de vocabulario, cerradas por Claude en `decisions.json`); ataque `high` del abogado (las skills de un plugin son markdown) aceptado por el usuario y escrito en la propuesta; 847 tests en verde.
+- **Aviso operativo:** el hook que corre en las sesiones es el del plugin instalado (`venoxia@venoxia`, commit `d515011`): ni C1 ni C2 están vivos hasta empujar y `claude plugin update venoxia@venoxia`, o arrancar con `claude --plugin-dir ~/Developments/ia/venoxia`. Hasta entonces, escribir tests sigue exigiendo `via: direct`.
+- **Capability:** `guardian` · **Depende de:** C1 · **Paralelizable con:** C3 (worktree).
+- **Qué cambia:** cualquier ruta del proyecto cuyo nombre termine en `.md` es especificación (camino 2), a cualquier profundidad. Lo no-markdown no cambia: `.venoxia/**` y `prfaq/**` siguen siendo spec; `src/prfaq/x.ts` sigue siendo código (el anclaje de `is_spec_path` se conserva para lo que no es markdown).
+- **Requisitos (borrador):** `R-GRD-008 · Markdown anywhere is documentation, never production code` — escenarios: `README.md` en la raíz → allow sin change; `docs/guia/x.md` → allow; `src/notes.md` → allow; `src/prfaq/x.ts` → deny (el anclaje sigue). `verifies: tests/test_guardian.py`.
+- **Código:** `is_spec_path()` (`scripts/guardian.py:544-577`): `if filename.endswith(".md"): return True` tras el chequeo de `SPEC_DIR_NAMES`; `SPEC_FILENAMES`, `SPEC_FILENAME_PREFIXES`, `SPEC_PARENT_DIR_NAMES` y la rama `docs/spec*` quedan subsumidas → eliminarlas y su docstring.
+- **Tests cuya expectativa cambia** (`tests/test_guardian.py`, clase `GuardianSpecPathAnchoringTest`): `test_nested_specs_and_docs_directories_do_not_launder_markdown` (`:297-309`) espera `deny` para `lib/specs/x.md`, `src/vendor/specs/notas.md`, `src/docs/specs/x.md`, `a/b/docs/spec/x.md` → se invierte a `allow` (o se retira: ya no hay «lavado» que impedir); `test_code_under_a_nested_spec_directory_is_denied` (`:279-296`) incluye `src/prfaq/notas.md` → quitar esa ruta y dejar las no-markdown; `test_spec_filenames_travel_anywhere_but_only_as_markdown` (`:331-345`) sigue válido tal cual.
+- **Docs:** `README.md:368-370` (qué permite / qué ya no permite), sección del guardián; `CLAUDE.md` (camino 2). El `TODO.md` ignorado (`.gitignore:12`) deja de necesitar `via: direct`; actualizar la memoria `venoxia-todo-en-taller` al cerrar.
+- **Hecho cuando:** aceptación común + reproducción: sin change activo, `Write README.md` → allow; `Write src/prfaq/x.ts` → deny.
+
+## Fase 2 · El eje técnico entra al contrato
+
+### C3 · `oracle-named-runners`
+- **Capability:** `oracle` (prefijo `R-ORC-`, siguiente libre `R-ORC-013`) · **Depende de:** C1.
+- **Qué cambia:** `venoxia.json` admite `"runners": {"<name>": {"command": "...", "cwd": "..."}}` (opcional); un requisito puede declarar `runner: <name>`; sin `runner:` se usa `test_command` como hoy. Un runner sin `{files}` corre tal cual y el `verifies:` es sólo el ancla del `@covers`. Un `runner:` que nombra algo no declarado es error de uso del oráculo (exit 2, «no hay veredicto», nunca un rojo falso) y `V19` lo señala antes.
+- **Requisitos (borrador):** `R-ORC-013` runner por requisito elegido por `runner:`; `R-ORC-014` un runner **con nombre** sin `{files}` corre verbatim (escenario negativo explícito: no es el exit 2 que `oracle.py:187-192` reserva al `test_command` por defecto, que sigue exigiendo `{files}`); `R-ORC-015` runner no declarado ⇒ exit 2 sin ejecutar nada; `R-ORC-016` cada `results[i]` de `oracle.json` lleva `runner` (nombre y comando resuelto) — **sin añadir ninguna clave de primer nivel**: `tests/test_oracle.py:472-495` fija las ocho actuales y la global `runner` se conserva (esquema v1: añadir sí, renombrar no). Capability `validator`: `R-VAL-008 · V19` — `runner:` presente exige que `venoxia.json` lo declare (error). `verifies: tests/test_oracle.py`, `tests/test_rules_oracle.py`.
+- **Código:**
+  - `scripts/venoxia/model.py:28` — `META_KEYS` += `"runner"` (si no, `parser.py:845` lo descarta con `P02`). **Cambia de expectativa** `tests/test_parser.py:1478-1482`, que fija la tupla exacta (pasa a seis claves); el `hint` de `P02` (`parser.py:830`) lista `META_KEYS` y se actualiza solo.
+  - `scripts/oracle.py` — `OracleConfig` (`:134-139`) gana `runners`; `load_config()` (`:142-208`) valida cada entrada (comando no vacío; `{files}` opcional); `run_one()` (`:317`) y `dry_run_lines()` (`:406`) eligen plantilla por `requirement.meta.get("runner")`; `build_command()` (`:284`) tolera plantilla sin `{files}`; `Result.to_dict()` (`:273`) añade `runner`; `build_payload()` (`:447`) conserva el global. `CONFIG_EXAMPLE` (`:88-91`) y `templates/venoxia.json` muestran un runner con nombre.
+  - `scripts/validate.py` — `rule_v19` con el patrón de `V17` (lee disco, no ejecuta: `_read_oracle_runs` `:1374` como modelo); registro en `RULES` (`:1566-1585`).
+  - Unificar la partición de `verifies:` (`validate.py:133` y `oracle.py:102` están duplicadas) es opcional; si se hace, en `model.py`.
+- **Docs:** `README.md:289-303` (esquema de `venoxia.json`), tabla «Las 18 reglas del validador» → 19 (`README.md:250`; `tests/test_docs_sync.py` lo exige), `skills/validate/SKILL.md` (remedio de V19), `skills/verify/SKILL.md` (qué lee de `oracle.json`), `evals/README.md:116-155` (ninguna cifra debería moverse: ningún fixture usa `runner:`; comprobarlo).
+- **Hecho cuando:** aceptación común + `python3 scripts/oracle.py --root evals/oracle-red-then-green/project --change 2026-09-04-oracle-demo` da el mismo resultado que hoy + los seis fixtures de evals conservan sus cifras.
+
+### C4 · `technical-contract` (capability nueva)
+- **Capability:** `technical-contract` (prefijo `R-TEC-`) — **fila 7** en `## Capabilities` de `.venoxia/charter.md` · **Depende de:** C3.
+- **C4.0 · Paso previo (D11), sin change:** escribir `.venoxia/capabilities/oracle/spec.md` consolidando a mano R-ORC-001…012 desde los deltas `verified` de `2026-09-04-oracle`, `2026-09-04-verify-skill` y `2026-09-07-oracle-hardening` (versión vigente de cada ID, mismos `verifies:`). Es spec-path: el guardián lo permite. `validate.py --strict` y `charter_lint.py --strict` en `0` antes de seguir; si no, `C16` se dispara al añadir la fila 7.
+- **Qué cambia:** las decisiones técnicas verificables de este repo pasan de prosa en `principles.md` a requisitos con oráculo. `principles.md` se reescribe según D5.
+- **Requisitos (borrador) y su oráculo:**
+  - `R-TEC-001 · Scripts and tools import only the standard library` — AST sobre `scripts/**/*.py` y `tools/*.py`, imports ⊂ `sys.stdlib_module_names` ∪ módulos propios. Test nuevo `tests/test_technical_contract.py`.
+  - `R-TEC-002 · No script opens a network connection or calls a model` — AST: prohibidos `urllib`, `http`, `socket`, `ssl`, `smtplib`, `ftplib`, `xmlrpc` y cualquier cliente de modelo, en `scripts/`. Mismo test. **Es el oráculo que hoy no existe de la premisa central.**
+  - `R-TEC-003 · The guardian imports nothing shared` — ya probado en `tests/test_guardian.py:636`; sólo añadir `@covers R-TEC-003`.
+  - `R-TEC-004 · Every script stays above its coverage threshold` — `runner: coverage` = `python3 tools/coverage.py` (sin `{files}`); `verifies: tools/coverage.py` con `@covers` en su docstring.
+  - `R-TEC-005 · The CLIs share exit codes 0/1/2` — los cinco (`validate`, `charter_lint`, `diff_readings`, `oracle`, `gate`): flag desconocido ⇒ 2; proyecto limpio ⇒ 0. Se dice en la narrativa que en `gate` el 2 es fail-closed («no pude mirar»), no error de uso a secas. Test nuevo.
+  - `R-TEC-006 · The JSON report keeps schema version 1` — ya probado en `tests/test_report.py:189-223`; añadir `@covers`.
+  - **No** declarar `tools/check.py` como runner: ejecuta `gate.py`, que ejecuta el oráculo ⇒ recursión. La matriz 3.12–3.14 ya es `R-CI-009`/`R-CI-020`. Imports actuales de `scripts/` y `tools/` comprobados: todos stdlib, ninguno de red ⇒ R-TEC-001/002 nacen en verde (D12).
+  - **Sobre `ci`, en el mismo change (D8):** `tools/check.py:140` pierde el paso `coverage` (el gate lo ejecuta ya como runner de R-TEC-004); `R-CI-019` pasa a `MODIFIED` en `delta/ci.md` (tres pasos: `matrix`, `gate`, `plugin-validate`) y `tests/test_check.py:103-113` (`TestTheFourSteps`) cambia de expectativa. Hasta que C4 esté `verified`, el paso se queda: es lo único que corre la cobertura en el intervalo.
+  - Lo que se queda en `principles.md` (`## Principios de dominio`): «un falso positivo pesa más que un falso negativo», «el fail-open es exclusivo del guardián», «tags e identificadores en inglés, prosa en español». Lo que ya cubre un `R-DIV` («las cifras nunca se diluyen») se enlaza, no se duplica.
+- **Código:** `.venoxia/venoxia.json` gana `runners.coverage`; `tests/test_technical_contract.py`; `@covers` añadidos en los tests existentes; `principles.md` reescrito; `charter.md` fila 7 (y B-002/B-003/B-004 revisadas: B-003 referencia un runner que `CLAUDE.md` da por desaparecido — cerrar o corregir la apuesta).
+- **Docs:** `CLAUDE.md` «Convenciones fijas» apunta a la capability; `README.md` una frase en la sección de principios.
+- **Hecho cuando:** aceptación común + `python3 scripts/oracle.py --root . --change <C4>` en verde ejecutando `coverage` como runner + `charter_lint --strict` 0 con la fila nueva.
+
+### C5 · `charter-technical-axis`
+- **Capability:** `charter-lint` (`R-CHL-006`, primer requisito sobre la skill; patrón de `R-DIV-009/010`) · **Depende de:** C4.
+- **Qué cambia:** `/venoxia:charter` deja de escribir `## Convenciones técnicas` como prosa (`skills/charter/SKILL.md:314-337`). La tanda de convenciones técnicas (`:198`, `:205`) produce **dos salidas**: lo decidido → primer change de la capability `technical-contract` (requisito con `verifies:`); lo abierto → `## Bets` con el hecho que lo cierra. `principles.md` sale con los tres del método + principios de dominio. `/venoxia:specify` (`skills/specify/SKILL.md:48`): un juicio técnico sin principio que lo gobierne va a `technical-contract` o a `## Bets`, nunca a prosa.
+- **Requisitos (borrador):** `R-CHL-006 · The charter skill writes technical decisions as verifiable requirements or bets, never as prose` — escenarios sobre el texto de la skill (patrón `tests/test_verify_skill.py`: frontmatter + frases literales). `verifies: tests/test_charter_skill.py` (nuevo).
+- **`charter_lint.py` no necesita regla nueva:** `C17` sólo mira `## Principios de dominio` (`charter_lint.py:346`); el fixture de `tests/test_charter_lint.py:305`, que trae un `## Convenciones técnicas` de prueba, sigue pasando.
+- **Hecho cuando:** aceptación común + `claude plugin validate . --strict`.
+
+## Fase 3 · El paso central tiene dueño
+
+### C6 · `implement-skill`
+- **Capability:** `implementation` (prefijo `R-IMP-`) — fila 8 del acta · **Depende de:** C1, C2 (C5 recomendable).
+- **Qué hace `/venoxia:implement <change-id>`:**
+  1. Precondición: `state` es `validated` y `oracle.json` tiene un run con algún `red`; si no, se detiene y remite a `/venoxia:diverge` o a `/venoxia:verify` (el rojo se graba antes de escribir código).
+  2. Lee, en este orden: `delta/*.md`, `decisions.json` (respuestas literales), `principles.md`, `capabilities/<slug>/spec.md` de cada capability tocada, y los ficheros de `verifies:` (el contrato ejecutable).
+  3. Escribe código de producción. **Prohibido:** editar `.venoxia/**`, editar cualquier fichero que un `verifies:` nombre, ejecutar `--record`.
+  4. Bucle: `oracle.py --root . --change <id>` (sin `--record`); termina con `0`. Si un requisito sigue en rojo y la causa es una decisión no escrita, **pregunta** (`AskUserQuestion`) y anota la respuesta como `decisions.json` lo hace hoy; no elige en silencio.
+  5. Entrega: estado por requisito, ficheros tocados, y el siguiente comando: `/venoxia:verify`.
+- **Frontmatter:** `name: implement`, `argument-hint: <change-id>`, `model: opus`, `effort: xhigh`, `allowed-tools`: `Read`, `Glob`, `Grep`, `Edit`, `Write`, `AskUserQuestion`, `Bash(python3 "${CLAUDE_PLUGIN_ROOT}/scripts/oracle.py" *)`. Sin `Bash` genérico: el criterio de parada es el oráculo, no un comando a ojo (decisión `medium`; se revisa cuando el primer change real lo ejercite). `Write` crea los directorios padre; borrar o mover un fichero se pide al usuario.
+- **El guardián sigue vigilando a la skill.** Los hooks `PreToolUse` interceptan todo `Edit|Write|NotebookEdit` de la sesión, dentro de una skill también: verificado en esta sesión (un `Edit` hecho desde `/venoxia:specify` quedó anotado en `drift/direct.log`). Nada en el repo lo documenta; `R-IMP-002` se apoya en ese hecho y el README lo escribe.
+- **Requisitos (borrador):** `R-IMP-001` precondiciones y parada; `R-IMP-002` nunca edita `.venoxia/` ni oráculos; `R-IMP-003` no graba; `R-IMP-004` la entrega nombra cada requisito con su estado. `verifies: tests/test_implement_skill.py` (patrón de `tests/test_verify_skill.py:38-176`).
+- **Docs:** `README.md:26-69` — el flujo se reescribe con los roles reales (el usuario contesta; Claude Code escribe test y código; los scripts deciden); paso 8 (`:46`) pasa a `/venoxia:implement`. `CLAUDE.md` diagrama del ciclo. `.claude-plugin/plugin.json` `keywords`.
+- **Hecho cuando:** aceptación común + `claude plugin validate . --strict` + dogfooding: el primer change que se implemente **con** la skill es el siguiente de este plan que quede.
+
+## F4 · Consolidación
+
+- **F4.1** Versión `0.2.0 → 0.3.0` en `.claude-plugin/plugin.json` y `marketplace.json`.
+- **F4.2** `skills/verify/SKILL.md` §6 acepta `red` **o** `missing` como rojo previo; `V18` (`scripts/validate.py:1539`) sólo `red`. Alinear la skill con `V18` (`missing` no demuestra que el test midiera nada). Es un change pequeño sobre `oracle` (`R-ORC-009/010`).
+- **F4.3** ~~Copiar este plan a `PLAN.md`~~ Hecho el 2026-09-09, adelantado para el traspaso entre sesiones: `PLAN.md` vive en la raíz y `CLAUDE.md` manda leerlo. La copia en `~/.claude-b2bcarts/plans/` queda como origen histórico; la del repo es la que se mantiene.
+- **F4.4** `python3 tools/check.py` completo; `git push`. Actualizar memorias: `venoxia-todo-en-taller` (ya no exige `direct`), y una nueva con la ubicación del plan.
+- **Hueco conocido que este plan no cierra:** ningún eval ejercita el guardián (`evals/*/case.yaml` sólo validador, divergencia y oráculo). Candidato a siguiente entrega, no a ésta.
+
+## Verificación de punta a punta (al cerrar F4)
+
+1. Proyecto de juguete nuevo en un temporal: `/venoxia:charter` → `/venoxia:specify` → Claude Code escribe el test con `Write` **sin `via: direct`** → `/venoxia:validate` → `/venoxia:diverge` → `/venoxia:verify` (rojo) → `/venoxia:implement` → `/venoxia:verify` (verde). Cero líneas nuevas en `drift/direct.log`.
+2. En este repo: `python3 scripts/gate.py --root .` en `0` ejecutando el runner `coverage` de `R-TEC-004`; `principles.md` sin ninguna afirmación verificable; `grep -c . .venoxia/drift/direct.log` no crece durante la ejecución del plan a partir de C2.
+3. `python3 tools/check.py` en verde; `claude plugin validate . --strict` en verde.
