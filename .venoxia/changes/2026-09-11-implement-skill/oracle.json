@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "change": "2026-09-11-implement-skill",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-11T15:16:31Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-IMP-001",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 42,
+          "output_tail": "AssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/implement/SKILL.md»: falta la skill /venoxia:implement que escribe el código de un change validado.\n\n======================================================================\nFAIL: test_no_progress_stops_the_loop (tests.test_implement_skill.ImplementSkillStopRulesTest.test_no_progress_stops_the_loop)\n@covers R-IMP-003\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 257, in test_no_progress_stops_the_loop\n    _body(_read_skill()),\n          ~~~~~~~~~~~^^\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 59, in _read_skill\n    raise AssertionError(\n    ...<2 lines>...\n    )\nAssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/implement/SKILL.md»: falta la skill /venoxia:implement que escribe el código de un change validado.\n\n----------------------------------------------------------------------\nRan 21 tests in 0.002s\n\nFAILED (failures=21)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-IMP-002",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 39,
+          "output_tail": "AssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/implement/SKILL.md»: falta la skill /venoxia:implement que escribe el código de un change validado.\n\n======================================================================\nFAIL: test_no_progress_stops_the_loop (tests.test_implement_skill.ImplementSkillStopRulesTest.test_no_progress_stops_the_loop)\n@covers R-IMP-003\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 257, in test_no_progress_stops_the_loop\n    _body(_read_skill()),\n          ~~~~~~~~~~~^^\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 59, in _read_skill\n    raise AssertionError(\n    ...<2 lines>...\n    )\nAssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/implement/SKILL.md»: falta la skill /venoxia:implement que escribe el código de un change validado.\n\n----------------------------------------------------------------------\nRan 21 tests in 0.002s\n\nFAILED (failures=21)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-IMP-003",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 37,
+          "output_tail": "AssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/implement/SKILL.md»: falta la skill /venoxia:implement que escribe el código de un change validado.\n\n======================================================================\nFAIL: test_no_progress_stops_the_loop (tests.test_implement_skill.ImplementSkillStopRulesTest.test_no_progress_stops_the_loop)\n@covers R-IMP-003\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 257, in test_no_progress_stops_the_loop\n    _body(_read_skill()),\n          ~~~~~~~~~~~^^\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 59, in _read_skill\n    raise AssertionError(\n    ...<2 lines>...\n    )\nAssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/implement/SKILL.md»: falta la skill /venoxia:implement que escribe el código de un change validado.\n\n----------------------------------------------------------------------\nRan 21 tests in 0.002s\n\nFAILED (failures=21)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-IMP-004",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 37,
+          "output_tail": "AssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/implement/SKILL.md»: falta la skill /venoxia:implement que escribe el código de un change validado.\n\n======================================================================\nFAIL: test_no_progress_stops_the_loop (tests.test_implement_skill.ImplementSkillStopRulesTest.test_no_progress_stops_the_loop)\n@covers R-IMP-003\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 257, in test_no_progress_stops_the_loop\n    _body(_read_skill()),\n          ~~~~~~~~~~~^^\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 59, in _read_skill\n    raise AssertionError(\n    ...<2 lines>...\n    )\nAssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/implement/SKILL.md»: falta la skill /venoxia:implement que escribe el código de un change validado.\n\n----------------------------------------------------------------------\nRan 21 tests in 0.002s\n\nFAILED (failures=21)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 4,
+        "missing": 0,
+        "timeout": 0,
+        "total": 4
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-11T15:17:32Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-IMP-001",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 38,
+          "output_tail": "@covers R-IMP-001\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 127, in test_the_body_refuses_a_missing_test\n    self.assertIn(\n    ~~~~~~~~~~~~~^\n        \"algún requisito del change en `missing`\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        _body(_read_skill()),\n        ^^^^^^^^^^^^^^^^^^^^^\n        \"skills/implement/SKILL.md no se detiene ante un requisito en missing\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'algún requisito del change en `missing`' not found in '\\n# Venoxia · implementar\\n\\nChange a implementar: **$ARGUMENTS**\\n\\nEs el paso central del flujo y hasta ahora era el único sin dueño: la spec está validada, el test existe y está en rojo, y alguien tiene que escribir el código que lo pone en verde. Esa skill es ésta. Su contrato es corto y no tiene excepciones: lee todo antes de editar nada, escribe sólo código de producción, el criterio de parada lo dicta `oracle.py` y la grabación del verde no es suya.\\n\\n## Qué es tuyo y qué no\\n\\nTuyo: comprobar las precondiciones, leer el inventario completo, escribir y corregir código de producción, ejecutar el oráculo sin grabar, preguntar cuando una decisión no está escrita, y entregar el estado de cada requisito.\\n\\n**Nunca edita `.venoxia/`.** Ni el delta, ni `change.json`, ni `oracle.json`, ni el acta, ni los principios. La única excepción es el `decisions.json` del propio change, donde anota las respuestas del usuario a las preguntas de esta skill: es **el único fichero de `.venoxia/` que escribe**, y en él **añade sin borrar lo que ya hay** —las decisiones que `/venoxia:diverge` recogió son el único registro de por qué el change llegó a `validated`, y se conservan intactas—.\\n\\n**Nunca edita los oráculos.** Ni ningún fichero que un `verifies:` nombre, **ni ningún otro fichero del directorio que contiene a cada uno de ellos, subdirectorios incluidos**: un helper, un fixture o un `conftest` vaciado ponen el test en verde sin implementar nada, y ese verde es el que `/venoxia:verify` grabaría como prueba. La prohibición no se limita al delta de este change: alcanza a todo fichero que cualquier `verifies:` de `.venoxia/` nombre, porque el oráculo de otra capability es un comportamiento ya contratado. Dos límites conocidos: un módulo que el test importe desde fuera de esos directorios no se puede acotar sin analizar imports, y en un proyecto con los tests junto al código (`src/checkout/total.test.ts`) la regla se reduce a los ficheros de test de ese directorio —los que comparten patrón con el que `verifies:` nombra—, porque de otro modo cubriría el propio código que hay que escribir.\\n\\n**Nunca pasa `--record`** a `oracle.py`, ni `--dry-run`: `--record` es de `/venoxia:verify` —grabar el verde es afirmar que el ciclo rojo→verde ocurrió, y eso lo afirma quien lo audita, no quien escribe el código— y `--dry-run` no ejecuta nada, así que su `0` no dice nada del comportamiento.\\n\\n**El guardián sigue vigilando.** Los hooks `PreToolUse` interceptan todo `Edit` y `Write` de la sesión, dentro de una skill también: **el guardián intercepta también las ediciones hechas desde la skill**. Que el change esté en `validated` es justo lo que le hace abrir la puerta al código; si la deniega, algo de arriba no se cumple, y el remedio es el que el mensaje del guardián dice, no rodearlo.\\n\\n## 1. Precondiciones: sólo desde un change validado con un rojo grabado\\n\\nLee `.venoxia/changes/<id>/change.json`. Esta skill **sólo trabaja sobre un change en `validated`**: con `draft` o `specified` no hay contrato aceptado —remite a `/venoxia:validate` y `/venoxia:diverge`—; con `verified` no hay nada que implementar; con `archived`, menos.\\n\\nLee `.venoxia/changes/<id>/oracle.json` y mira su último run como lo mira `V17`: tiene que traer todos los requisitos del change, **ningún requisito del change en `missing`** y **algún requisito en `red`**. Si no existe, o el último run no cumple las tres cosas, se detiene sin editar nada y remite a `/venoxia:verify`: el rojo se graba **antes** de escribir código, y un test que todavía no existe (`missing`) no es un rojo, es un test que alguien tiene que escribir primero. Un run que no menciona a todos los requisitos tampoco vale: `missing` es una atribución del oráculo, y un requisito que el run no vio no está en ningún estado.\\n\\nCon las dos precondiciones, sigue. Sin ellas, la entrega dice cuál falla y qué skill la resuelve, y aquí termina.\\n\\n## 2. El inventario, antes de editar nada\\n\\nEn este orden, y **antes de editar nada**:\\n\\n1. `.venoxia/changes/<id>/delta/*.md` — el contrato: cada requisito con sus escenarios es lo que el código tiene que cumplir, ni más ni menos.\\n2. `.venoxia/changes/<id>/decisions.json` — las respuestas literales del usuario en la divergencia. Una decisión anotada ahí gobierna la implementación aunque el delta no la repita palabra por palabra.\\n3. `.venoxia/principles.md` — los tres del método y los principios de dominio; los de dominio deciden los desempates que ningún requisito recoge.\\n4. `.venoxia/capabilities/<slug>/spec.md` de cada capability que el change toca — el comportamiento vivo que el delta modifica o al que se suma, para no romper lo que ya está contratado.\\n5. Los ficheros que cada `verifies:` del delta nombra — el contrato ejecutable. Se leen enteros: dicen exactamente qué va a comprobar el oráculo, y se leen para implementar contra ellos, nunca para editarlos.\\n\\n## 3. Escribir el código, con el oráculo como único criterio\\n\\nEscribe el código de producción con `Edit` y `Write` (`Write` crea los directorios padre que falten; borrar o mover un fichero se pide al usuario, no se hace). Después de cada tanda de cambios, ejecuta el oráculo **sin grabar**:\\n\\n```bash\\npython3 \"${CLAUDE_PLUGIN_ROOT}/scripts/oracle.py\" --root \"<raíz>\" --change \"<id>\" --json --no-color\\n```\\n\\nLee `results` y `all_green` del JSON. La skill **termina en cuanto el oráculo queda todo en verde**: `all_green: true`, código `0`. Ahí se para de escribir código, aunque se te ocurra una mejora: lo que el oráculo no pide no es de este change.\\n\\nTres paradas más, porque un bucle sin salida es peor que un rojo entregado:\\n\\n- **Una decisión no escrita.** Si un requisito sigue en rojo y la causa es algo que ni el delta, ni `decisions.json`, ni los principios deciden —qué valor por defecto, qué ocurre en un caso que el escenario no cubre—, **no lo elijas en silencio**: se pregunta con `AskUserQuestion`, una pregunta por llamada, y la respuesta **se anota en `decisions.json`** con la misma forma que usa `/venoxia:diverge` (`at`, `scenario`, `question`, `options`, `chosen`, `answer`), añadiendo sin borrar. Si la respuesta **cambia el comportamiento observable** —hace falta un escenario o un requisito que el delta no tiene—, la skill se detiene y remite a `/venoxia:specify`: el delta va antes que el código, y un comportamiento pactado sólo en `decisions.json` es exactamente la conducta fuera de la especificación que Venoxia existe para impedir.\\n- **Sin progreso.** Se detiene cuando un intento **no cambia el estado de ningún requisito**, y también cuando el conjunto de estados repite uno ya visto en un intento anterior (poner `R1` en verde rompiendo `R2` y a la inversa es no avanzar). Entrega el rojo tal cual, con el diagnóstico.\\n- **El guardián deniega.** No se rodea: se entrega el mensaje del guardián y qué falta.\\n\\n## 4. La entrega\\n\\nTermina con un informe corto:\\n\\n- **Cada requisito del change con su estado** en la última ejecución del oráculo (`green`, `red`, `missing`, `timeout`), con su ID.\\n- **Los ficheros tocados**, con ruta, todos.\\n- Las decisiones que hubo que preguntar, con la respuesta literal y dónde quedó anotada.\\n- Cuál de las paradas aplicó: todo en verde, sin progreso, una respuesta que devuelve el change a `/venoxia:specify`, o una precondición que no se cumplía.\\n- **El siguiente paso**: con todo en verde, `/venoxia:verify`, que es quien graba el verde y escribe `verified`; con rojo, qué falta para que la próxima ejecución llegue al verde.\\n' : skills/implement/SKILL.md no se detiene ante un requisito en missing\n\n----------------------------------------------------------------------\nRan 21 tests in 0.002s\n\nFAILED (failures=6)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-IMP-002",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 45,
+          "output_tail": "@covers R-IMP-001\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 127, in test_the_body_refuses_a_missing_test\n    self.assertIn(\n    ~~~~~~~~~~~~~^\n        \"algún requisito del change en `missing`\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        _body(_read_skill()),\n        ^^^^^^^^^^^^^^^^^^^^^\n        \"skills/implement/SKILL.md no se detiene ante un requisito en missing\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'algún requisito del change en `missing`' not found in '\\n# Venoxia · implementar\\n\\nChange a implementar: **$ARGUMENTS**\\n\\nEs el paso central del flujo y hasta ahora era el único sin dueño: la spec está validada, el test existe y está en rojo, y alguien tiene que escribir el código que lo pone en verde. Esa skill es ésta. Su contrato es corto y no tiene excepciones: lee todo antes de editar nada, escribe sólo código de producción, el criterio de parada lo dicta `oracle.py` y la grabación del verde no es suya.\\n\\n## Qué es tuyo y qué no\\n\\nTuyo: comprobar las precondiciones, leer el inventario completo, escribir y corregir código de producción, ejecutar el oráculo sin grabar, preguntar cuando una decisión no está escrita, y entregar el estado de cada requisito.\\n\\n**Nunca edita `.venoxia/`.** Ni el delta, ni `change.json`, ni `oracle.json`, ni el acta, ni los principios. La única excepción es el `decisions.json` del propio change, donde anota las respuestas del usuario a las preguntas de esta skill: es **el único fichero de `.venoxia/` que escribe**, y en él **añade sin borrar lo que ya hay** —las decisiones que `/venoxia:diverge` recogió son el único registro de por qué el change llegó a `validated`, y se conservan intactas—.\\n\\n**Nunca edita los oráculos.** Ni ningún fichero que un `verifies:` nombre, **ni ningún otro fichero del directorio que contiene a cada uno de ellos, subdirectorios incluidos**: un helper, un fixture o un `conftest` vaciado ponen el test en verde sin implementar nada, y ese verde es el que `/venoxia:verify` grabaría como prueba. La prohibición no se limita al delta de este change: alcanza a todo fichero que cualquier `verifies:` de `.venoxia/` nombre, porque el oráculo de otra capability es un comportamiento ya contratado. Dos límites conocidos: un módulo que el test importe desde fuera de esos directorios no se puede acotar sin analizar imports, y en un proyecto con los tests junto al código (`src/checkout/total.test.ts`) la regla se reduce a los ficheros de test de ese directorio —los que comparten patrón con el que `verifies:` nombra—, porque de otro modo cubriría el propio código que hay que escribir.\\n\\n**Nunca pasa `--record`** a `oracle.py`, ni `--dry-run`: `--record` es de `/venoxia:verify` —grabar el verde es afirmar que el ciclo rojo→verde ocurrió, y eso lo afirma quien lo audita, no quien escribe el código— y `--dry-run` no ejecuta nada, así que su `0` no dice nada del comportamiento.\\n\\n**El guardián sigue vigilando.** Los hooks `PreToolUse` interceptan todo `Edit` y `Write` de la sesión, dentro de una skill también: **el guardián intercepta también las ediciones hechas desde la skill**. Que el change esté en `validated` es justo lo que le hace abrir la puerta al código; si la deniega, algo de arriba no se cumple, y el remedio es el que el mensaje del guardián dice, no rodearlo.\\n\\n## 1. Precondiciones: sólo desde un change validado con un rojo grabado\\n\\nLee `.venoxia/changes/<id>/change.json`. Esta skill **sólo trabaja sobre un change en `validated`**: con `draft` o `specified` no hay contrato aceptado —remite a `/venoxia:validate` y `/venoxia:diverge`—; con `verified` no hay nada que implementar; con `archived`, menos.\\n\\nLee `.venoxia/changes/<id>/oracle.json` y mira su último run como lo mira `V17`: tiene que traer todos los requisitos del change, **ningún requisito del change en `missing`** y **algún requisito en `red`**. Si no existe, o el último run no cumple las tres cosas, se detiene sin editar nada y remite a `/venoxia:verify`: el rojo se graba **antes** de escribir código, y un test que todavía no existe (`missing`) no es un rojo, es un test que alguien tiene que escribir primero. Un run que no menciona a todos los requisitos tampoco vale: `missing` es una atribución del oráculo, y un requisito que el run no vio no está en ningún estado.\\n\\nCon las dos precondiciones, sigue. Sin ellas, la entrega dice cuál falla y qué skill la resuelve, y aquí termina.\\n\\n## 2. El inventario, antes de editar nada\\n\\nEn este orden, y **antes de editar nada**:\\n\\n1. `.venoxia/changes/<id>/delta/*.md` — el contrato: cada requisito con sus escenarios es lo que el código tiene que cumplir, ni más ni menos.\\n2. `.venoxia/changes/<id>/decisions.json` — las respuestas literales del usuario en la divergencia. Una decisión anotada ahí gobierna la implementación aunque el delta no la repita palabra por palabra.\\n3. `.venoxia/principles.md` — los tres del método y los principios de dominio; los de dominio deciden los desempates que ningún requisito recoge.\\n4. `.venoxia/capabilities/<slug>/spec.md` de cada capability que el change toca — el comportamiento vivo que el delta modifica o al que se suma, para no romper lo que ya está contratado.\\n5. Los ficheros que cada `verifies:` del delta nombra — el contrato ejecutable. Se leen enteros: dicen exactamente qué va a comprobar el oráculo, y se leen para implementar contra ellos, nunca para editarlos.\\n\\n## 3. Escribir el código, con el oráculo como único criterio\\n\\nEscribe el código de producción con `Edit` y `Write` (`Write` crea los directorios padre que falten; borrar o mover un fichero se pide al usuario, no se hace). Después de cada tanda de cambios, ejecuta el oráculo **sin grabar**:\\n\\n```bash\\npython3 \"${CLAUDE_PLUGIN_ROOT}/scripts/oracle.py\" --root \"<raíz>\" --change \"<id>\" --json --no-color\\n```\\n\\nLee `results` y `all_green` del JSON. La skill **termina en cuanto el oráculo queda todo en verde**: `all_green: true`, código `0`. Ahí se para de escribir código, aunque se te ocurra una mejora: lo que el oráculo no pide no es de este change.\\n\\nTres paradas más, porque un bucle sin salida es peor que un rojo entregado:\\n\\n- **Una decisión no escrita.** Si un requisito sigue en rojo y la causa es algo que ni el delta, ni `decisions.json`, ni los principios deciden —qué valor por defecto, qué ocurre en un caso que el escenario no cubre—, **no lo elijas en silencio**: se pregunta con `AskUserQuestion`, una pregunta por llamada, y la respuesta **se anota en `decisions.json`** con la misma forma que usa `/venoxia:diverge` (`at`, `scenario`, `question`, `options`, `chosen`, `answer`), añadiendo sin borrar. Si la respuesta **cambia el comportamiento observable** —hace falta un escenario o un requisito que el delta no tiene—, la skill se detiene y remite a `/venoxia:specify`: el delta va antes que el código, y un comportamiento pactado sólo en `decisions.json` es exactamente la conducta fuera de la especificación que Venoxia existe para impedir.\\n- **Sin progreso.** Se detiene cuando un intento **no cambia el estado de ningún requisito**, y también cuando el conjunto de estados repite uno ya visto en un intento anterior (poner `R1` en verde rompiendo `R2` y a la inversa es no avanzar). Entrega el rojo tal cual, con el diagnóstico.\\n- **El guardián deniega.** No se rodea: se entrega el mensaje del guardián y qué falta.\\n\\n## 4. La entrega\\n\\nTermina con un informe corto:\\n\\n- **Cada requisito del change con su estado** en la última ejecución del oráculo (`green`, `red`, `missing`, `timeout`), con su ID.\\n- **Los ficheros tocados**, con ruta, todos.\\n- Las decisiones que hubo que preguntar, con la respuesta literal y dónde quedó anotada.\\n- Cuál de las paradas aplicó: todo en verde, sin progreso, una respuesta que devuelve el change a `/venoxia:specify`, o una precondición que no se cumplía.\\n- **El siguiente paso**: con todo en verde, `/venoxia:verify`, que es quien graba el verde y escribe `verified`; con rojo, qué falta para que la próxima ejecución llegue al verde.\\n' : skills/implement/SKILL.md no se detiene ante un requisito en missing\n\n----------------------------------------------------------------------\nRan 21 tests in 0.003s\n\nFAILED (failures=6)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-IMP-003",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 40,
+          "output_tail": "@covers R-IMP-001\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 127, in test_the_body_refuses_a_missing_test\n    self.assertIn(\n    ~~~~~~~~~~~~~^\n        \"algún requisito del change en `missing`\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        _body(_read_skill()),\n        ^^^^^^^^^^^^^^^^^^^^^\n        \"skills/implement/SKILL.md no se detiene ante un requisito en missing\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'algún requisito del change en `missing`' not found in '\\n# Venoxia · implementar\\n\\nChange a implementar: **$ARGUMENTS**\\n\\nEs el paso central del flujo y hasta ahora era el único sin dueño: la spec está validada, el test existe y está en rojo, y alguien tiene que escribir el código que lo pone en verde. Esa skill es ésta. Su contrato es corto y no tiene excepciones: lee todo antes de editar nada, escribe sólo código de producción, el criterio de parada lo dicta `oracle.py` y la grabación del verde no es suya.\\n\\n## Qué es tuyo y qué no\\n\\nTuyo: comprobar las precondiciones, leer el inventario completo, escribir y corregir código de producción, ejecutar el oráculo sin grabar, preguntar cuando una decisión no está escrita, y entregar el estado de cada requisito.\\n\\n**Nunca edita `.venoxia/`.** Ni el delta, ni `change.json`, ni `oracle.json`, ni el acta, ni los principios. La única excepción es el `decisions.json` del propio change, donde anota las respuestas del usuario a las preguntas de esta skill: es **el único fichero de `.venoxia/` que escribe**, y en él **añade sin borrar lo que ya hay** —las decisiones que `/venoxia:diverge` recogió son el único registro de por qué el change llegó a `validated`, y se conservan intactas—.\\n\\n**Nunca edita los oráculos.** Ni ningún fichero que un `verifies:` nombre, **ni ningún otro fichero del directorio que contiene a cada uno de ellos, subdirectorios incluidos**: un helper, un fixture o un `conftest` vaciado ponen el test en verde sin implementar nada, y ese verde es el que `/venoxia:verify` grabaría como prueba. La prohibición no se limita al delta de este change: alcanza a todo fichero que cualquier `verifies:` de `.venoxia/` nombre, porque el oráculo de otra capability es un comportamiento ya contratado. Dos límites conocidos: un módulo que el test importe desde fuera de esos directorios no se puede acotar sin analizar imports, y en un proyecto con los tests junto al código (`src/checkout/total.test.ts`) la regla se reduce a los ficheros de test de ese directorio —los que comparten patrón con el que `verifies:` nombra—, porque de otro modo cubriría el propio código que hay que escribir.\\n\\n**Nunca pasa `--record`** a `oracle.py`, ni `--dry-run`: `--record` es de `/venoxia:verify` —grabar el verde es afirmar que el ciclo rojo→verde ocurrió, y eso lo afirma quien lo audita, no quien escribe el código— y `--dry-run` no ejecuta nada, así que su `0` no dice nada del comportamiento.\\n\\n**El guardián sigue vigilando.** Los hooks `PreToolUse` interceptan todo `Edit` y `Write` de la sesión, dentro de una skill también: **el guardián intercepta también las ediciones hechas desde la skill**. Que el change esté en `validated` es justo lo que le hace abrir la puerta al código; si la deniega, algo de arriba no se cumple, y el remedio es el que el mensaje del guardián dice, no rodearlo.\\n\\n## 1. Precondiciones: sólo desde un change validado con un rojo grabado\\n\\nLee `.venoxia/changes/<id>/change.json`. Esta skill **sólo trabaja sobre un change en `validated`**: con `draft` o `specified` no hay contrato aceptado —remite a `/venoxia:validate` y `/venoxia:diverge`—; con `verified` no hay nada que implementar; con `archived`, menos.\\n\\nLee `.venoxia/changes/<id>/oracle.json` y mira su último run como lo mira `V17`: tiene que traer todos los requisitos del change, **ningún requisito del change en `missing`** y **algún requisito en `red`**. Si no existe, o el último run no cumple las tres cosas, se detiene sin editar nada y remite a `/venoxia:verify`: el rojo se graba **antes** de escribir código, y un test que todavía no existe (`missing`) no es un rojo, es un test que alguien tiene que escribir primero. Un run que no menciona a todos los requisitos tampoco vale: `missing` es una atribución del oráculo, y un requisito que el run no vio no está en ningún estado.\\n\\nCon las dos precondiciones, sigue. Sin ellas, la entrega dice cuál falla y qué skill la resuelve, y aquí termina.\\n\\n## 2. El inventario, antes de editar nada\\n\\nEn este orden, y **antes de editar nada**:\\n\\n1. `.venoxia/changes/<id>/delta/*.md` — el contrato: cada requisito con sus escenarios es lo que el código tiene que cumplir, ni más ni menos.\\n2. `.venoxia/changes/<id>/decisions.json` — las respuestas literales del usuario en la divergencia. Una decisión anotada ahí gobierna la implementación aunque el delta no la repita palabra por palabra.\\n3. `.venoxia/principles.md` — los tres del método y los principios de dominio; los de dominio deciden los desempates que ningún requisito recoge.\\n4. `.venoxia/capabilities/<slug>/spec.md` de cada capability que el change toca — el comportamiento vivo que el delta modifica o al que se suma, para no romper lo que ya está contratado.\\n5. Los ficheros que cada `verifies:` del delta nombra — el contrato ejecutable. Se leen enteros: dicen exactamente qué va a comprobar el oráculo, y se leen para implementar contra ellos, nunca para editarlos.\\n\\n## 3. Escribir el código, con el oráculo como único criterio\\n\\nEscribe el código de producción con `Edit` y `Write` (`Write` crea los directorios padre que falten; borrar o mover un fichero se pide al usuario, no se hace). Después de cada tanda de cambios, ejecuta el oráculo **sin grabar**:\\n\\n```bash\\npython3 \"${CLAUDE_PLUGIN_ROOT}/scripts/oracle.py\" --root \"<raíz>\" --change \"<id>\" --json --no-color\\n```\\n\\nLee `results` y `all_green` del JSON. La skill **termina en cuanto el oráculo queda todo en verde**: `all_green: true`, código `0`. Ahí se para de escribir código, aunque se te ocurra una mejora: lo que el oráculo no pide no es de este change.\\n\\nTres paradas más, porque un bucle sin salida es peor que un rojo entregado:\\n\\n- **Una decisión no escrita.** Si un requisito sigue en rojo y la causa es algo que ni el delta, ni `decisions.json`, ni los principios deciden —qué valor por defecto, qué ocurre en un caso que el escenario no cubre—, **no lo elijas en silencio**: se pregunta con `AskUserQuestion`, una pregunta por llamada, y la respuesta **se anota en `decisions.json`** con la misma forma que usa `/venoxia:diverge` (`at`, `scenario`, `question`, `options`, `chosen`, `answer`), añadiendo sin borrar. Si la respuesta **cambia el comportamiento observable** —hace falta un escenario o un requisito que el delta no tiene—, la skill se detiene y remite a `/venoxia:specify`: el delta va antes que el código, y un comportamiento pactado sólo en `decisions.json` es exactamente la conducta fuera de la especificación que Venoxia existe para impedir.\\n- **Sin progreso.** Se detiene cuando un intento **no cambia el estado de ningún requisito**, y también cuando el conjunto de estados repite uno ya visto en un intento anterior (poner `R1` en verde rompiendo `R2` y a la inversa es no avanzar). Entrega el rojo tal cual, con el diagnóstico.\\n- **El guardián deniega.** No se rodea: se entrega el mensaje del guardián y qué falta.\\n\\n## 4. La entrega\\n\\nTermina con un informe corto:\\n\\n- **Cada requisito del change con su estado** en la última ejecución del oráculo (`green`, `red`, `missing`, `timeout`), con su ID.\\n- **Los ficheros tocados**, con ruta, todos.\\n- Las decisiones que hubo que preguntar, con la respuesta literal y dónde quedó anotada.\\n- Cuál de las paradas aplicó: todo en verde, sin progreso, una respuesta que devuelve el change a `/venoxia:specify`, o una precondición que no se cumplía.\\n- **El siguiente paso**: con todo en verde, `/venoxia:verify`, que es quien graba el verde y escribe `verified`; con rojo, qué falta para que la próxima ejecución llegue al verde.\\n' : skills/implement/SKILL.md no se detiene ante un requisito en missing\n\n----------------------------------------------------------------------\nRan 21 tests in 0.002s\n\nFAILED (failures=6)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-IMP-004",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 37,
+          "output_tail": "@covers R-IMP-001\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_implement_skill.py\", line 127, in test_the_body_refuses_a_missing_test\n    self.assertIn(\n    ~~~~~~~~~~~~~^\n        \"algún requisito del change en `missing`\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        _body(_read_skill()),\n        ^^^^^^^^^^^^^^^^^^^^^\n        \"skills/implement/SKILL.md no se detiene ante un requisito en missing\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'algún requisito del change en `missing`' not found in '\\n# Venoxia · implementar\\n\\nChange a implementar: **$ARGUMENTS**\\n\\nEs el paso central del flujo y hasta ahora era el único sin dueño: la spec está validada, el test existe y está en rojo, y alguien tiene que escribir el código que lo pone en verde. Esa skill es ésta. Su contrato es corto y no tiene excepciones: lee todo antes de editar nada, escribe sólo código de producción, el criterio de parada lo dicta `oracle.py` y la grabación del verde no es suya.\\n\\n## Qué es tuyo y qué no\\n\\nTuyo: comprobar las precondiciones, leer el inventario completo, escribir y corregir código de producción, ejecutar el oráculo sin grabar, preguntar cuando una decisión no está escrita, y entregar el estado de cada requisito.\\n\\n**Nunca edita `.venoxia/`.** Ni el delta, ni `change.json`, ni `oracle.json`, ni el acta, ni los principios. La única excepción es el `decisions.json` del propio change, donde anota las respuestas del usuario a las preguntas de esta skill: es **el único fichero de `.venoxia/` que escribe**, y en él **añade sin borrar lo que ya hay** —las decisiones que `/venoxia:diverge` recogió son el único registro de por qué el change llegó a `validated`, y se conservan intactas—.\\n\\n**Nunca edita los oráculos.** Ni ningún fichero que un `verifies:` nombre, **ni ningún otro fichero del directorio que contiene a cada uno de ellos, subdirectorios incluidos**: un helper, un fixture o un `conftest` vaciado ponen el test en verde sin implementar nada, y ese verde es el que `/venoxia:verify` grabaría como prueba. La prohibición no se limita al delta de este change: alcanza a todo fichero que cualquier `verifies:` de `.venoxia/` nombre, porque el oráculo de otra capability es un comportamiento ya contratado. Dos límites conocidos: un módulo que el test importe desde fuera de esos directorios no se puede acotar sin analizar imports, y en un proyecto con los tests junto al código (`src/checkout/total.test.ts`) la regla se reduce a los ficheros de test de ese directorio —los que comparten patrón con el que `verifies:` nombra—, porque de otro modo cubriría el propio código que hay que escribir.\\n\\n**Nunca pasa `--record`** a `oracle.py`, ni `--dry-run`: `--record` es de `/venoxia:verify` —grabar el verde es afirmar que el ciclo rojo→verde ocurrió, y eso lo afirma quien lo audita, no quien escribe el código— y `--dry-run` no ejecuta nada, así que su `0` no dice nada del comportamiento.\\n\\n**El guardián sigue vigilando.** Los hooks `PreToolUse` interceptan todo `Edit` y `Write` de la sesión, dentro de una skill también: **el guardián intercepta también las ediciones hechas desde la skill**. Que el change esté en `validated` es justo lo que le hace abrir la puerta al código; si la deniega, algo de arriba no se cumple, y el remedio es el que el mensaje del guardián dice, no rodearlo.\\n\\n## 1. Precondiciones: sólo desde un change validado con un rojo grabado\\n\\nLee `.venoxia/changes/<id>/change.json`. Esta skill **sólo trabaja sobre un change en `validated`**: con `draft` o `specified` no hay contrato aceptado —remite a `/venoxia:validate` y `/venoxia:diverge`—; con `verified` no hay nada que implementar; con `archived`, menos.\\n\\nLee `.venoxia/changes/<id>/oracle.json` y mira su último run como lo mira `V17`: tiene que traer todos los requisitos del change, **ningún requisito del change en `missing`** y **algún requisito en `red`**. Si no existe, o el último run no cumple las tres cosas, se detiene sin editar nada y remite a `/venoxia:verify`: el rojo se graba **antes** de escribir código, y un test que todavía no existe (`missing`) no es un rojo, es un test que alguien tiene que escribir primero. Un run que no menciona a todos los requisitos tampoco vale: `missing` es una atribución del oráculo, y un requisito que el run no vio no está en ningún estado.\\n\\nCon las dos precondiciones, sigue. Sin ellas, la entrega dice cuál falla y qué skill la resuelve, y aquí termina.\\n\\n## 2. El inventario, antes de editar nada\\n\\nEn este orden, y **antes de editar nada**:\\n\\n1. `.venoxia/changes/<id>/delta/*.md` — el contrato: cada requisito con sus escenarios es lo que el código tiene que cumplir, ni más ni menos.\\n2. `.venoxia/changes/<id>/decisions.json` — las respuestas literales del usuario en la divergencia. Una decisión anotada ahí gobierna la implementación aunque el delta no la repita palabra por palabra.\\n3. `.venoxia/principles.md` — los tres del método y los principios de dominio; los de dominio deciden los desempates que ningún requisito recoge.\\n4. `.venoxia/capabilities/<slug>/spec.md` de cada capability que el change toca — el comportamiento vivo que el delta modifica o al que se suma, para no romper lo que ya está contratado.\\n5. Los ficheros que cada `verifies:` del delta nombra — el contrato ejecutable. Se leen enteros: dicen exactamente qué va a comprobar el oráculo, y se leen para implementar contra ellos, nunca para editarlos.\\n\\n## 3. Escribir el código, con el oráculo como único criterio\\n\\nEscribe el código de producción con `Edit` y `Write` (`Write` crea los directorios padre que falten; borrar o mover un fichero se pide al usuario, no se hace). Después de cada tanda de cambios, ejecuta el oráculo **sin grabar**:\\n\\n```bash\\npython3 \"${CLAUDE_PLUGIN_ROOT}/scripts/oracle.py\" --root \"<raíz>\" --change \"<id>\" --json --no-color\\n```\\n\\nLee `results` y `all_green` del JSON. La skill **termina en cuanto el oráculo queda todo en verde**: `all_green: true`, código `0`. Ahí se para de escribir código, aunque se te ocurra una mejora: lo que el oráculo no pide no es de este change.\\n\\nTres paradas más, porque un bucle sin salida es peor que un rojo entregado:\\n\\n- **Una decisión no escrita.** Si un requisito sigue en rojo y la causa es algo que ni el delta, ni `decisions.json`, ni los principios deciden —qué valor por defecto, qué ocurre en un caso que el escenario no cubre—, **no lo elijas en silencio**: se pregunta con `AskUserQuestion`, una pregunta por llamada, y la respuesta **se anota en `decisions.json`** con la misma forma que usa `/venoxia:diverge` (`at`, `scenario`, `question`, `options`, `chosen`, `answer`), añadiendo sin borrar. Si la respuesta **cambia el comportamiento observable** —hace falta un escenario o un requisito que el delta no tiene—, la skill se detiene y remite a `/venoxia:specify`: el delta va antes que el código, y un comportamiento pactado sólo en `decisions.json` es exactamente la conducta fuera de la especificación que Venoxia existe para impedir.\\n- **Sin progreso.** Se detiene cuando un intento **no cambia el estado de ningún requisito**, y también cuando el conjunto de estados repite uno ya visto en un intento anterior (poner `R1` en verde rompiendo `R2` y a la inversa es no avanzar). Entrega el rojo tal cual, con el diagnóstico.\\n- **El guardián deniega.** No se rodea: se entrega el mensaje del guardián y qué falta.\\n\\n## 4. La entrega\\n\\nTermina con un informe corto:\\n\\n- **Cada requisito del change con su estado** en la última ejecución del oráculo (`green`, `red`, `missing`, `timeout`), con su ID.\\n- **Los ficheros tocados**, con ruta, todos.\\n- Las decisiones que hubo que preguntar, con la respuesta literal y dónde quedó anotada.\\n- Cuál de las paradas aplicó: todo en verde, sin progreso, una respuesta que devuelve el change a `/venoxia:specify`, o una precondición que no se cumplía.\\n- **El siguiente paso**: con todo en verde, `/venoxia:verify`, que es quien graba el verde y escribe `verified`; con rojo, qué falta para que la próxima ejecución llegue al verde.\\n' : skills/implement/SKILL.md no se detiene ante un requisito en missing\n\n----------------------------------------------------------------------\nRan 21 tests in 0.002s\n\nFAILED (failures=6)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 4,
+        "missing": 0,
+        "timeout": 0,
+        "total": 4
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-11T15:18:20Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-IMP-001",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 35,
+          "output_tail": ".....................\n----------------------------------------------------------------------\nRan 21 tests in 0.001s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-IMP-002",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 37,
+          "output_tail": ".....................\n----------------------------------------------------------------------\nRan 21 tests in 0.001s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-IMP-003",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 36,
+          "output_tail": ".....................\n----------------------------------------------------------------------\nRan 21 tests in 0.001s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-IMP-004",
+          "verifies": [
+            "tests/test_implement_skill.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 37,
+          "output_tail": ".....................\n----------------------------------------------------------------------\nRan 21 tests in 0.001s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_implement_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 4,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 4
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

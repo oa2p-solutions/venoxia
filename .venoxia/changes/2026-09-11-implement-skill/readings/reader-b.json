@@ -1,0 +1,23 @@
+[
+  {"scenario": "The skill is named implement and takes a change id", "effect": "el frontmatter declara name implement y argument-hint del change id", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body requires the validated state", "effect": "el cuerpo declara que sólo actúa sobre un change validated", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body requires a recorded red run", "effect": "el cuerpo declara que exige un run con algún requisito en red", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body refuses a missing test", "effect": "el cuerpo declara que se detiene si algún requisito está missing", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The inventory precedes any edit", "effect": "el cuerpo declara que lee delta, decisions, principles y verifies antes de editar", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body forbids editing .venoxia", "effect": "el cuerpo declara que nunca edita ficheros bajo .venoxia/", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body forbids editing the oracle files", "effect": "el cuerpo declara que nunca edita ficheros nombrados por verifies", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body forbids editing the test directories", "effect": "el cuerpo declara que nunca edita otros ficheros del directorio contenedor", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "decisions.json is the one exception", "effect": "el cuerpo declara que decisions.json es el único fichero de .venoxia que escribe", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "decisions.json only grows", "effect": "el cuerpo declara que añade a decisions.json sin borrar lo existente", "status_code": null, "side_effects": ["se añaden entradas a decisions.json sin eliminar las previas"], "unclear": false, "unclear_why": null},
+  {"scenario": "The body says the guardian keeps watching", "effect": "el cuerpo declara que el guardián intercepta también sus ediciones", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The tools are exactly the seven declared", "effect": "allowed-tools lista exactamente Read, Glob, Grep, Edit, Write, AskUserQuestion y Bash acotado a oracle.py", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "No generic Bash", "effect": "ninguna entrada de allowed-tools es un Bash sin acotar", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body forbids recording", "effect": "el cuerpo declara que nunca pasa --record a oracle.py", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body stops on a green oracle", "effect": "el cuerpo declara que termina cuando el oráculo queda todo en verde", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "An unwritten decision is asked, not chosen", "effect": "el cuerpo declara que pregunta con AskUserQuestion y anota en decisions.json", "status_code": null, "side_effects": ["se anota la respuesta en decisions.json"], "unclear": false, "unclear_why": null},
+  {"scenario": "An answer that changes behaviour goes back to specify", "effect": "el cuerpo declara que se detiene y remite a /venoxia:specify", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "No progress stops the loop", "effect": "el cuerpo declara que se detiene si ningún requisito cambia de estado", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The delivery lists every requirement with its state", "effect": "el cuerpo declara que la entrega nombra cada requisito con su estado", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The delivery lists the files touched", "effect": "el cuerpo declara que la entrega nombra los ficheros tocados", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The next step is verify", "effect": "el cuerpo declara que el siguiente paso es /venoxia:verify", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null}
+]

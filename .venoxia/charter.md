@@ -26,6 +26,7 @@ en CI cuando miente.
 | 5 | `ci` | hacer que la especificación falle en CI cuando miente, en el plugin y en los proyectos que lo adoptan | quien empuja una spec con un `SHALL` ve el job `self-spec` en rojo con el hallazgo `V14` en el registro del run | medium |
 | 6 | `oracle` | traducir el resultado del `test_command` declarado en `venoxia.json` en verificado o no verificado | quien ejecuta `/venoxia:verify` sobre un change con oráculo ve el resultado del `test_command` convertido en verificado o no verificado, sin tener que leer la salida del test a mano | high |
 | 7 | `technical-contract` | someter las decisiones técnicas del propio repositorio —qué importa, qué no toca, cuánto cubre, cómo sale— al mismo contrato que su comportamiento: requisitos con oráculo, no prosa | quien añade `import requests` a un script y ejecuta `python3 -m unittest discover -s tests -q` ve la suite en rojo nombrando el fichero y el módulo, y quien ejecuta `python3 scripts/gate.py --root .` ve `tools/coverage.py` correr como runner de un requisito y el veredicto de la puerta en `0` | low |
+| 8 | `implementation` | escribir el código de producción de un change validado hasta que su oráculo salga en verde, sin tocar la especificación ni los tests que la verifican | quien ejecuta `/venoxia:implement <id>` sobre un change `validated` con un rojo grabado ve el código escrito y `python3 scripts/oracle.py --root . --change <id>` terminar con código 0, sin que ningún fichero de `.venoxia/` ni ningún fichero nombrado en `verifies:` haya cambiado | medium |
 
 ## Out of scope
 
@@ -90,4 +91,18 @@ un runner limpio: la puerta corre donde hay sesión.
 confidence: low
   why:      esta máquina ya tiene sesión autenticada, así que aquí no se puede comprobar
   revisit:  cuando alguien ejecute `tools/check.py` en una máquina sin sesión de Claude Code y cuente qué hizo el paso
+  fatal:    no
+
+### B-005 · El oráculo basta como criterio de parada de la implementación
+
+`/venoxia:implement` no tiene un `Bash` genérico: no puede lanzar la suite
+entera, un linter ni un build, sólo `oracle.py` sobre el change. Suponemos
+que «todos los requisitos del change en verde» es criterio suficiente para
+parar de escribir código, y que lo que el oráculo no ve —una regresión en
+otro change, un fichero sin formatear— lo atrapa la puerta local antes del
+push.
+
+confidence: medium
+  why:      ningún change real se ha implementado todavía con la skill; el criterio se eligió porque un comando a ojo es justo lo que el oráculo sustituye
+  revisit:  cuando el primer change de este repo se implemente con /venoxia:implement y se cuente cuántas veces hizo falta correr algo fuera del oráculo
   fatal:    no

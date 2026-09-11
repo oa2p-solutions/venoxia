@@ -1,0 +1,277 @@
+{
+  "version": 1,
+  "change": "2026-09-11-implement-skill",
+  "decisions": [
+    {
+      "at": "2026-09-11T17:40:00Z",
+      "scenario": "R-IMP-002 · devils-advocate (high)",
+      "field": "attack",
+      "question": "Editar tests/venoxia_fixtures.py o cualquier módulo que el test importe vacía las aserciones sin tocar .venoxia/ ni verifies:.",
+      "options": [
+        "Prohibir también el directorio que contiene a cada fichero de verifies:",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Prohibir también el directorio que contiene a cada fichero de verifies:",
+      "decided_by": "claude",
+      "note": "Narrativa de R-IMP-002 y escenario «The body forbids editing the test directories». Cerrado por Claude bajo la instrucción del usuario del 2026-09-11; no cubre un helper fuera de ese directorio (límite que el README documenta)."
+    },
+    {
+      "at": "2026-09-11T17:40:00Z",
+      "scenario": "R-IMP-002 · devils-advocate (medium, decisions.json)",
+      "field": "attack",
+      "question": "Prohibir todo .venoxia/ impide anotar en decisions.json la decisión que R-IMP-003 manda anotar.",
+      "options": [
+        "decisions.json del change como única excepción",
+        "Aceptar la contradicción"
+      ],
+      "chosen": 0,
+      "answer": "decisions.json del change como única excepción",
+      "decided_by": "claude",
+      "note": "Narrativa de R-IMP-002 y escenario «decisions.json is the one exception»."
+    },
+    {
+      "at": "2026-09-11T17:40:00Z",
+      "scenario": "R-IMP-001 · devils-advocate (medium, missing)",
+      "field": "attack",
+      "question": "«Al menos un requisito en red» deja arrancar con los demás en missing: código antes que test.",
+      "options": [
+        "Exigir además que ningún requisito esté en missing en el último run",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Exigir además que ningún requisito esté en missing en el último run",
+      "decided_by": "claude",
+      "note": "Narrativa de R-IMP-001 y escenario «The body refuses a missing test». Coherente con C4.5: missing no acredita nada."
+    },
+    {
+      "at": "2026-09-11T17:45:00Z",
+      "scenario": "The body stops on a green oracle",
+      "field": "status_code",
+      "question": "¿Qué código de estado debe devolver el sistema en «The body stops on a green oracle»?",
+      "options": [
+        "0",
+        "Ninguno, el escenario no devuelve código de estado"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno, el escenario no devuelve código de estado",
+      "decided_by": "claude",
+      "note": "Ronda 1. El escenario describe texto de la skill; el «código 0» del THEN era el criterio que la skill declara, no un código del escenario. Se reescribe el THEN sin la cifra («termina en cuanto el oráculo queda todo en verde») para que el motor no lo lea como status_code."
+    },
+    {
+      "at": "2026-09-11T18:05:00Z",
+      "scenario": "R-IMP-002 · devils-advocate ronda 2 (high, subdirectorios)",
+      "field": "attack",
+      "question": "Un helper en tests/support/ queda editable; un módulo importado desde fuera también.",
+      "options": [
+        "Subdirectorios incluidos; lo importado desde fuera es límite declarado",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Subdirectorios incluidos; lo importado desde fuera es límite declarado",
+      "decided_by": "claude",
+      "note": "Narrativa y escenario de R-IMP-002 dicen «subdirectorios incluidos». Un módulo que el test importe desde fuera de ese árbol no se puede acotar sin analizar imports: límite documentado en el README."
+    },
+    {
+      "at": "2026-09-11T18:05:00Z",
+      "scenario": "R-IMP-002 · devils-advocate ronda 2 (medium, decisions.json reescrito)",
+      "field": "attack",
+      "question": "Escribir decisions.json podría borrar las decisiones de diverge.",
+      "options": [
+        "Añade sin borrar lo que ya hay",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Añade sin borrar lo que ya hay",
+      "decided_by": "claude",
+      "note": "Narrativa de R-IMP-002 y escenario «decisions.json only grows»."
+    },
+    {
+      "at": "2026-09-11T18:05:00Z",
+      "scenario": "R-IMP-003 · devils-advocate ronda 2 (medium, conducta fuera de la spec)",
+      "field": "attack",
+      "question": "La decisión anotada se implementa sin que ningún requisito la describa.",
+      "options": [
+        "Si la respuesta cambia comportamiento observable, la skill se detiene y remite a /venoxia:specify",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Si la respuesta cambia comportamiento observable, la skill se detiene y remite a /venoxia:specify",
+      "decided_by": "claude",
+      "note": "Narrativa de R-IMP-003 y escenario «An answer that changes behaviour goes back to specify»: el delta va antes que el código."
+    },
+    {
+      "at": "2026-09-11T18:05:00Z",
+      "scenario": "R-IMP-003 · devils-advocate ronda 2 (medium, bucle sin fin)",
+      "field": "attack",
+      "question": "Nada acota los intentos si el rojo no se arregla.",
+      "options": [
+        "Se detiene cuando un intento no cambia el estado de ningún requisito",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Se detiene cuando un intento no cambia el estado de ningún requisito",
+      "decided_by": "claude",
+      "note": "Criterio sin cifra inventada (D10): sin progreso, parada y entrega con el rojo. Escenario «No progress stops the loop»."
+    },
+    {
+      "at": "2026-09-11T18:30:00Z",
+      "scenario": "decisions.json is the one exception",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «decisions.json is the one exception» es la correcta?",
+      "options": [
+        "«el cuerpo declara que decisions.json es la única excepción escribible»",
+        "«el cuerpo declara que decisions.json es el único fichero de .venoxia que escribe»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda: vocabulario entre lectores; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T18:30:00Z",
+      "scenario": "decisions.json only grows",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «decisions.json only grows»?",
+      "options": [
+        "«se añaden entradas a decisions.json sin eliminar las previas»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«se añaden entradas a decisions.json sin eliminar las previas»",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda: vocabulario entre lectores; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T18:30:00Z",
+      "scenario": "The tools are exactly the seven declared",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The tools are exactly the seven declared» es la correcta?",
+      "options": [
+        "«allowed-tools lista exactamente los siete herramientas indicadas»",
+        "«allowed-tools lista exactamente Read, Glob, Grep, Edit, Write, AskUserQuestion y Bash acotado a oracle.py»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda: vocabulario entre lectores; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T18:30:00Z",
+      "scenario": "The delivery lists every requirement with its state",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The delivery lists every requirement with its state» es la correcta?",
+      "options": [
+        "«la entrega nombra cada requisito con su estado del oráculo»",
+        "«el cuerpo declara que la entrega nombra cada requisito con su estado»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda: vocabulario entre lectores; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T18:30:00Z",
+      "scenario": "The delivery lists the files touched",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The delivery lists the files touched» es la correcta?",
+      "options": [
+        "«la entrega nombra los ficheros que la skill tocó»",
+        "«el cuerpo declara que la entrega nombra los ficheros tocados»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda: vocabulario entre lectores; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T18:30:00Z",
+      "scenario": "The next step is verify",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The next step is verify» es la correcta?",
+      "options": [
+        "«la entrega indica /venoxia:verify como siguiente paso»",
+        "«el cuerpo declara que el siguiente paso es /venoxia:verify»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda: vocabulario entre lectores; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T18:30:00Z",
+      "scenario": "R-IMP-003 · devils-advocate ronda 3 (high, --dry-run)",
+      "field": "attack",
+      "question": "oracle.py --dry-run sale 0 sin ejecutar nada: la skill podría darse por terminada.",
+      "options": [
+        "La skill lee all_green del --json y prohíbe --dry-run; el delta no cambia",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "La skill lee all_green del --json y prohíbe --dry-run; el delta no cambia",
+      "decided_by": "claude",
+      "note": "Cerrado en el texto de la skill (nunca --record ni --dry-run; el criterio es all_green: true del --json, no el código a solas). La narrativa «ejecutar oracle.py» ya excluye listar sin ejecutar; no se reabre el panel. Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+    },
+    {
+      "at": "2026-09-11T18:30:00Z",
+      "scenario": "R-IMP-002 · devils-advocate ronda 3 (high, tests de otras capabilities)",
+      "field": "attack",
+      "question": "Sólo se protegen los verifies: del delta; los tests de otras capabilities quedan editables.",
+      "options": [
+        "La skill extiende la prohibición a todo fichero que cualquier verifies: de .venoxia/ nombre, y su directorio",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "La skill extiende la prohibición a todo fichero que cualquier verifies: de .venoxia/ nombre, y su directorio",
+      "decided_by": "claude",
+      "note": "Cerrado en el texto de la skill; el delta fija el mínimo (los del delta) y el README documenta el alcance real."
+    },
+    {
+      "at": "2026-09-11T18:30:00Z",
+      "scenario": "R-IMP-002 · devils-advocate ronda 3 (medium, tests junto al código)",
+      "field": "attack",
+      "question": "Con tests junto al código el directorio protegido es el del código.",
+      "options": [
+        "Si el directorio del test es también el del código, la prohibición se reduce a los ficheros de test de ese directorio (mismo sufijo/patrón)",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Si el directorio del test es también el del código, la prohibición se reduce a los ficheros de test de ese directorio (mismo sufijo/patrón)",
+      "decided_by": "claude",
+      "note": "Texto de la skill; límite documentado."
+    },
+    {
+      "at": "2026-09-11T18:30:00Z",
+      "scenario": "R-IMP-003 · devils-advocate ronda 3 (medium, oscilación)",
+      "field": "attack",
+      "question": "Alternar R1/R2 rojo-verde siempre cambia algún estado y el bucle no para.",
+      "options": [
+        "También para cuando el conjunto de estados repite uno ya visto",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "También para cuando el conjunto de estados repite uno ya visto",
+      "decided_by": "claude",
+      "note": "Texto de la skill, sin cifra inventada (D10)."
+    },
+    {
+      "at": "2026-09-11T18:30:00Z",
+      "scenario": "R-IMP-001 · devils-advocate ronda 3 (medium, run incompleto)",
+      "field": "attack",
+      "question": "Un último run que no menciona a los demás requisitos no tiene missing y arranca igual.",
+      "options": [
+        "El último run debe traer todos los requisitos del change (criterio de V17)",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "El último run debe traer todos los requisitos del change (criterio de V17)",
+      "decided_by": "claude",
+      "note": "Texto de la skill: el run se lee como V17 lo lee."
+    }
+  ]
+}

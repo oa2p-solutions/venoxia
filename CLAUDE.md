@@ -106,12 +106,13 @@ Cinco estados, siempre en este orden; ninguna skill escribe uno que no le toca y
 /venoxia:diverge  → 2 lectores + abogado del diablo → readings/*.json → diff_readings.py
                     state: validated  SÓLO si validador Y divergencia salen 0
 guardian          → permite Edit/Write de código cuando hay change validated con delta/*.md no vacío
-   quien programa escribe el código hasta que el test pasa
+/venoxia:implement → escribe el código de producción hasta que oracle.py (sin --record) sale 0
+                    nunca .venoxia/ (salvo añadir a decisions.json), nunca los ficheros de verifies: ni su directorio
 /venoxia:verify   → oracle.py --record (rojo antes del código, verde después)
                     state: verified  SÓLO si el oráculo queda en verde y el rojo previo está en el historial
 ```
 
-Reglas duras del flujo: `specify` nunca escribe `validated` ni `verified`; `diverge` es la única que escribe `validated`; `verify` es la única que escribe `verified`; ninguna skill toca código de producción; `readings/` se guarda **crudo**, sin arreglar, y la skill no tiene voto sobre si dos lecturas «dicen lo mismo». `diverge` plantea las preguntas del informe como entrevista (`AskUserQuestion`, una por llamada, opciones literales del script) y anota cada respuesta tal cual en `changes/<id>/decisions.json`; el texto elegido va al delta sin reformular. Una divergencia dura de `side_effects` nombra la señal que la hizo dura (`signal`: `polarity`, `scope`, `numeric`, `empty-repertoire`), que es como se cuentan los falsos positivos del motor sobre prosa real. Los agentes `reader` y `devils-advocate` reciben **sólo la ruta del delta**, deliberadamente sin el contexto de la conversación. `guardian.py` sigue abriendo la puerta al código en `validated`, no en `verified`: escribir el código es justo lo que convierte el rojo del oráculo en verde.
+Reglas duras del flujo: `specify` nunca escribe `validated` ni `verified`; `diverge` es la única que escribe `validated`; `verify` es la única que escribe `verified`; ninguna skill toca código de producción salvo `implement`, que sólo escribe código (nunca `.venoxia/` ni los tests de `verifies:`) y nunca graba; `readings/` se guarda **crudo**, sin arreglar, y la skill no tiene voto sobre si dos lecturas «dicen lo mismo». `diverge` plantea las preguntas del informe como entrevista (`AskUserQuestion`, una por llamada, opciones literales del script) y anota cada respuesta tal cual en `changes/<id>/decisions.json`; el texto elegido va al delta sin reformular. Una divergencia dura de `side_effects` nombra la señal que la hizo dura (`signal`: `polarity`, `scope`, `numeric`, `empty-repertoire`), que es como se cuentan los falsos positivos del motor sobre prosa real. Los agentes `reader` y `devils-advocate` reciben **sólo la ruta del delta**, deliberadamente sin el contexto de la conversación. `guardian.py` sigue abriendo la puerta al código en `validated`, no en `verified`: escribir el código es justo lo que convierte el rojo del oráculo en verde.
 
 ### Tests
 

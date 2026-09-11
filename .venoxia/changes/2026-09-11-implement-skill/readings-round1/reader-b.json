@@ -1,0 +1,17 @@
+[
+  {"scenario": "The skill is named implement and takes a change id", "effect": "el frontmatter fija name implement y argument-hint el change id", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body requires the validated state", "effect": "el cuerpo declara que sólo actúa sobre change validated", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body requires a recorded red run", "effect": "el cuerpo declara que exige un run con algún requisito en red", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The inventory precedes any edit", "effect": "el cuerpo declara que lee delta, decisions, principles y capabilities antes de editar", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body forbids editing .venoxia", "effect": "el cuerpo declara que nunca edita ficheros bajo .venoxia", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body forbids editing the oracle files", "effect": "el cuerpo declara que nunca edita ficheros nombrados en verifies", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body says the guardian keeps watching", "effect": "el cuerpo declara que el guardián intercepta ediciones de la skill", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The tools are exactly the seven declared", "effect": "el frontmatter lista exactamente los siete allowed-tools indicados", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "No generic Bash", "effect": "el frontmatter no incluye ninguna entrada Bash sin acotar", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body forbids recording", "effect": "el cuerpo declara que nunca pasa --record a oracle.py", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The body stops on a green oracle", "effect": "el cuerpo declara que termina al salir oracle.py con código 0", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "An unwritten decision is asked, not chosen", "effect": "el cuerpo declara preguntar con AskUserQuestion y anotar en decisions.json", "status_code": null, "side_effects": ["se anota la decisión en decisions.json"], "unclear": false, "unclear_why": null},
+  {"scenario": "The delivery lists every requirement with its state", "effect": "el cuerpo declara que la entrega nombra cada requisito con su estado", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The delivery lists the files touched", "effect": "el cuerpo declara que la entrega nombra los ficheros tocados", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The next step is verify", "effect": "el cuerpo declara que el siguiente paso es /venoxia:verify", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null}
+]

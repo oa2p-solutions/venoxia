@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "R-IMP-002 sólo blinda el fichero que nombra `verifies:` y «los demás ficheros del directorio que lo contiene»: un helper o fixture que viva en un subdirectorio (`tests/support/`, `tests/fixtures/`) o cualquier módulo que el test importe desde fuera de esa carpeta queda editable, así que la skill puede pasar un requisito de rojo a verde debilitando el oráculo en vez de implementar nada, y `/venoxia:verify` graba ese verde como prueba del comportamiento.",
+    "requirement_id": "R-IMP-002",
+    "severity": "high"
+  },
+  {
+    "attack": "R-IMP-002 autoriza escribir el `decisions.json` del change sin exigir que conserve lo ya escrito: una implementación que lo reescribe entero al anotar su primera respuesta borra las decisiones literales que `/venoxia:diverge` recogió del usuario, que son el único registro de por qué el change llegó a `validated`.",
+    "requirement_id": "R-IMP-002",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-IMP-003 manda anotar en `decisions.json` la decisión no escrita que deja un requisito en rojo, y R-IMP-002 prohíbe tocar el delta: el comportamiento decidido se implementa en código y ningún requisito lo describe jamás, de modo que el change puede llegar a `verified` con conducta pactada fuera de la especificación, que es exactamente lo que Venoxia existe para impedir.",
+    "requirement_id": "R-IMP-003",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-IMP-003 sólo fija el fin del trabajo para el caso verde («DEBE terminar cuando el oráculo sale con código 0») y nada acota los intentos ni define rendirse: si el rojo no se puede arreglar, una implementación literal sigue editando y reescribiendo código de producción en bucle indefinidamente, sin salida ni entrega, dejando el árbol lleno de cambios a medias.",
+    "requirement_id": "R-IMP-003",
+    "severity": "medium"
+  }
+]
