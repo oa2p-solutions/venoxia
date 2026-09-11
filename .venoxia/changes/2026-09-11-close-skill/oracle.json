@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "change": "2026-09-11-close-skill",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-11T17:21:30Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CLS-001",
+          "verifies": [
+            "tests/test_close_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 44,
+          "output_tail": "AssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/close/SKILL.md»: falta la skill /venoxia:close que cierra un change verificado con la puerta, la autorización y el commit.\n\n======================================================================\nFAIL: test_the_tools_are_exactly_the_twelve_declared (tests.test_close_skill.CloseSkillToolsTest.test_the_tools_are_exactly_the_twelve_declared)\n@covers R-CLS-004\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_close_skill.py\", line 333, in test_the_tools_are_exactly_the_twelve_declared\n    tools = _allowed_tools(_frontmatter(_read_skill()))\n                                        ~~~~~~~~~~~^^\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_close_skill.py\", line 67, in _read_skill\n    raise AssertionError(\n    ...<2 lines>...\n    )\nAssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/close/SKILL.md»: falta la skill /venoxia:close que cierra un change verificado con la puerta, la autorización y el commit.\n\n----------------------------------------------------------------------\nRan 33 tests in 0.003s\n\nFAILED (failures=33)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_close_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-CLS-002",
+          "verifies": [
+            "tests/test_close_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 38,
+          "output_tail": "AssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/close/SKILL.md»: falta la skill /venoxia:close que cierra un change verificado con la puerta, la autorización y el commit.\n\n======================================================================\nFAIL: test_the_tools_are_exactly_the_twelve_declared (tests.test_close_skill.CloseSkillToolsTest.test_the_tools_are_exactly_the_twelve_declared)\n@covers R-CLS-004\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_close_skill.py\", line 333, in test_the_tools_are_exactly_the_twelve_declared\n    tools = _allowed_tools(_frontmatter(_read_skill()))\n                                        ~~~~~~~~~~~^^\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_close_skill.py\", line 67, in _read_skill\n    raise AssertionError(\n    ...<2 lines>...\n    )\nAssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/close/SKILL.md»: falta la skill /venoxia:close que cierra un change verificado con la puerta, la autorización y el commit.\n\n----------------------------------------------------------------------\nRan 33 tests in 0.003s\n\nFAILED (failures=33)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_close_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-CLS-003",
+          "verifies": [
+            "tests/test_close_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 41,
+          "output_tail": "AssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/close/SKILL.md»: falta la skill /venoxia:close que cierra un change verificado con la puerta, la autorización y el commit.\n\n======================================================================\nFAIL: test_the_tools_are_exactly_the_twelve_declared (tests.test_close_skill.CloseSkillToolsTest.test_the_tools_are_exactly_the_twelve_declared)\n@covers R-CLS-004\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_close_skill.py\", line 333, in test_the_tools_are_exactly_the_twelve_declared\n    tools = _allowed_tools(_frontmatter(_read_skill()))\n                                        ~~~~~~~~~~~^^\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_close_skill.py\", line 67, in _read_skill\n    raise AssertionError(\n    ...<2 lines>...\n    )\nAssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/close/SKILL.md»: falta la skill /venoxia:close que cierra un change verificado con la puerta, la autorización y el commit.\n\n----------------------------------------------------------------------\nRan 33 tests in 0.003s\n\nFAILED (failures=33)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_close_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-CLS-004",
+          "verifies": [
+            "tests/test_close_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 40,
+          "output_tail": "AssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/close/SKILL.md»: falta la skill /venoxia:close que cierra un change verificado con la puerta, la autorización y el commit.\n\n======================================================================\nFAIL: test_the_tools_are_exactly_the_twelve_declared (tests.test_close_skill.CloseSkillToolsTest.test_the_tools_are_exactly_the_twelve_declared)\n@covers R-CLS-004\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_close_skill.py\", line 333, in test_the_tools_are_exactly_the_twelve_declared\n    tools = _allowed_tools(_frontmatter(_read_skill()))\n                                        ~~~~~~~~~~~^^\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_close_skill.py\", line 67, in _read_skill\n    raise AssertionError(\n    ...<2 lines>...\n    )\nAssertionError: no existe «/Users/afroxstudio/Developments/ia/venoxia/skills/close/SKILL.md»: falta la skill /venoxia:close que cierra un change verificado con la puerta, la autorización y el commit.\n\n----------------------------------------------------------------------\nRan 33 tests in 0.003s\n\nFAILED (failures=33)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_close_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 4,
+        "missing": 0,
+        "timeout": 0,
+        "total": 4
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-11T17:23:26Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CLS-001",
+          "verifies": [
+            "tests/test_close_skill.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 41,
+          "output_tail": ".................................\n----------------------------------------------------------------------\nRan 33 tests in 0.001s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_close_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-CLS-002",
+          "verifies": [
+            "tests/test_close_skill.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 39,
+          "output_tail": ".................................\n----------------------------------------------------------------------\nRan 33 tests in 0.002s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_close_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-CLS-003",
+          "verifies": [
+            "tests/test_close_skill.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 38,
+          "output_tail": ".................................\n----------------------------------------------------------------------\nRan 33 tests in 0.002s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_close_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-CLS-004",
+          "verifies": [
+            "tests/test_close_skill.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 37,
+          "output_tail": ".................................\n----------------------------------------------------------------------\nRan 33 tests in 0.002s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_close_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 4,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 4
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

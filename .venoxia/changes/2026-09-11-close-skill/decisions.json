@@ -1,0 +1,469 @@
+{
+ "version": 1,
+ "change": "2026-09-11-close-skill",
+ "decisions": [
+  {
+   "at": "2026-09-11T17:30:00Z",
+   "scenario": "The body requires the verified state",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «The body requires the verified state» es la correcta?",
+   "options": [
+    "«el cuerpo declara que sólo trabaja en verified»",
+    "«cuerpo declara que sólo actúa sobre change verified»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Divergencia blanda de vocabulario («trabaja»/«actúa»). Cerrada por Claude bajo la instrucción del usuario del 2026-09-11 (ninguna pregunta salvo permisos)."
+  },
+  {
+   "at": "2026-09-11T17:30:00Z",
+   "scenario": "A red gate stops the skill",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «A red gate stops the skill» es la correcta?",
+   "options": [
+    "«el cuerpo declara detenerse sin commit si la puerta falla»",
+    "«cuerpo declara que puerta no-0 detiene sin commit»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Divergencia blanda de vocabulario («falla»/«no-0»). Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T17:30:00Z",
+   "scenario": "The files to commit are shown before asking",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «The files to commit are shown before asking» es la correcta?",
+   "options": [
+    "«el cuerpo declara mostrar los ficheros antes de pedir autorización»",
+    "«cuerpo declara mostrar ficheros a commitear antes de preguntar»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T17:30:00Z",
+   "scenario": "History is never rewritten nor hooks skipped",
+   "field": "missing_scenario",
+   "question": "¿Forma parte «History is never rewritten nor hooks skipped» de este delta?",
+   "options": [
+    "Sí, y su efecto es «cuerpo declara que nunca pasa --no-verify --force --amend» (lectura de B)",
+    "No, el delta no describe ese escenario y sobra en las lecturas que lo traen"
+   ],
+   "chosen": 0,
+   "answer": "Sí, y su efecto es «cuerpo declara que nunca pasa --no-verify --force --amend» (lectura de B)",
+   "decided_by": "claude",
+   "note": "El escenario está en el delta (R-CLS-002); el lector A lo omitió. No es ambigüedad del texto: se repite la ronda con lecturas nuevas en vez de dar el delta por validado con una dura abierta."
+  },
+  {
+   "at": "2026-09-11T17:30:00Z",
+   "scenario": "R-CLS-002 · devils-advocate (high)",
+   "field": "attack",
+   "question": "«Enseñar los ficheros que irían al commit» no acota cuáles: un `git add -A` empaqueta y empuja ficheros ajenos al change nunca examinados por gate.py, y sin --amend ni --force ya no se deshace.",
+   "options": [
+    "Acotar en el delta: nada en el índice antes del sí, git add por ruta de exactamente los ficheros enseñados, nunca -A ni «.», y los sin seguimiento ajenos al change se enumeran pero no se añaden salvo que el usuario los nombre",
+    "Aceptar como límite"
+   ],
+   "chosen": 0,
+   "answer": "Acotar en el delta: nada en el índice antes del sí, git add por ruta de exactamente los ficheros enseñados, nunca -A ni «.», y los sin seguimiento ajenos al change se enumeran pero no se añaden salvo que el usuario los nombre",
+   "decided_by": "claude",
+   "note": "Narrativa de R-CLS-002 y escenarios «Nothing is staged before the yes», «Only the listed files are staged» y «Untracked files outside the change need the user's word». Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T17:30:00Z",
+   "scenario": "R-CLS-002 · devils-advocate (high)",
+   "field": "attack",
+   "question": "Sólo se prohíben tres banderas: `git push -c core.hooksPath=/dev/null` o GIT_CONFIG cumple la letra y salta el pre-push, la única puerta que corre la matriz, la cobertura y plugin validate.",
+   "options": [
+    "Prohibir en el delta cualquier opción -c y cualquier cambio de variable de entorno de git",
+    "Aceptar como límite"
+   ],
+   "chosen": 0,
+   "answer": "Prohibir en el delta cualquier opción -c y cualquier cambio de variable de entorno de git",
+   "decided_by": "claude",
+   "note": "Narrativa de R-CLS-002 y escenario «No git configuration override». Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T17:30:00Z",
+   "scenario": "R-CLS-004 · devils-advocate (medium)",
+   "field": "attack",
+   "question": "allowed-tools trae git add pero ningún git reset/restore: si la skill añade para enseñar y el usuario dice no, el índice queda cargado y no hay herramienta para deshacerlo.",
+   "options": [
+    "Resolverlo sin herramienta nueva: no se añade nada antes del sí (git status y git diff bastan para enseñar)",
+    "Añadir git restore a allowed-tools"
+   ],
+   "chosen": 0,
+   "answer": "Resolverlo sin herramienta nueva: no se añade nada antes del sí (git status y git diff bastan para enseñar)",
+   "decided_by": "claude",
+   "note": "Lo cubre el escenario «Nothing is staged before the yes»; con un no, el índice queda como estaba. Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T17:30:00Z",
+   "scenario": "R-CLS-004 · devils-advocate (medium)",
+   "field": "attack",
+   "question": "La skill no escribe ningún estado, así que el change queda en verified para siempre; gate.py re-ejecuta todos los verified y un test antiguo roto bloquea cualquier cierre nuevo.",
+   "options": [
+    "Aceptar como límite: la consolidación y el archivado están fuera del alcance del acta y los hace quien consolida",
+    "Que la skill escriba archived"
+   ],
+   "chosen": 0,
+   "answer": "Aceptar como límite: la consolidación y el archivado están fuera del alcance del acta y los hace quien consolida",
+   "decided_by": "claude",
+   "note": "«Consolidación automática del delta sobre la capability viva» está en Out of scope del acta; archivar sin consolidar sacaría el requisito del gate sin que viviera en ningún spec.md. La entrega de la skill lo deja dicho. Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T17:55:00Z",
+   "scenario": "R-CLS-002 · devils-advocate ronda 2 (high)",
+   "field": "attack",
+   "question": "Excluir por defecto los ficheros sin seguimiento ajenos a .venoxia/changes/<id>/ y a verifies: deja fuera del commit el código de producción que /venoxia:implement acaba de escribir: se empuja un HEAD rojo con la puerta verde sobre el árbol de trabajo.",
+   "options": [
+    "Proponer todo lo que git status enumera, agrupado en tres grupos (bajo .venoxia/, en verifies:, y el resto), y que el usuario excluya nombrando",
+    "Mantener la exclusión por defecto"
+   ],
+   "chosen": 0,
+   "answer": "Proponer todo lo que git status enumera, agrupado en tres grupos (bajo .venoxia/, en verifies:, y el resto), y que el usuario excluya nombrando",
+   "decided_by": "claude",
+   "note": "Sustituye la decisión de la ronda 1 sobre los ficheros sin seguimiento. Escenarios «Every changed file is proposed, grouped» y «The user excludes a file by naming it». Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T17:55:00Z",
+   "scenario": "R-CLS-002 · devils-advocate ronda 2 (medium)",
+   "field": "attack",
+   "question": "Nada acota los ficheros ya seguidos: una modificación en curso ajena al change entra por ruta en el commit bajo un mensaje que sólo nombra este change.",
+   "options": [
+    "Cubierto por la lista agrupada: el grupo «el resto» la enseña con nombre y el usuario la excluye",
+    "Acotar por ruta los ficheros seguidos"
+   ],
+   "chosen": 0,
+   "answer": "Cubierto por la lista agrupada: el grupo «el resto» la enseña con nombre y el usuario la excluye",
+   "decided_by": "claude",
+   "note": "La skill no puede saber qué modificación seguida es del change y cuál no; enseñarla agrupada y dejar excluir es lo que sí puede hacer. Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T17:55:00Z",
+   "scenario": "R-CLS-002 · devils-advocate ronda 2 (medium)",
+   "field": "attack",
+   "question": "La autorización no enseña el destino del push; el usuario descubre rama y remoto en la entrega, cuando ya es irreversible.",
+   "options": [
+    "Enseñar rama y remoto antes de pedir la autorización",
+    "Aceptar como límite"
+   ],
+   "chosen": 0,
+   "answer": "Enseñar rama y remoto antes de pedir la autorización",
+   "decided_by": "claude",
+   "note": "Escenario «The branch and the remote are shown before asking». Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T17:55:00Z",
+   "scenario": "R-CLS-004 · devils-advocate ronda 2 (medium)",
+   "field": "attack",
+   "question": "El change queda en verified para siempre y gate.py re-ejecuta todos los verified en cada cierre.",
+   "options": [
+    "Aceptar como límite: ya decidido en la ronda 1",
+    "Que la skill escriba archived"
+   ],
+   "chosen": 0,
+   "answer": "Aceptar como límite: ya decidido en la ronda 1",
+   "decided_by": "claude",
+   "note": "Mismo ataque que en la ronda 1; misma decisión."
+  },
+  {
+   "at": "2026-09-11T18:20:00Z",
+   "scenario": "The body requires the verified state",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «The body requires the verified state» es la correcta?",
+   "options": [
+    "«el cuerpo declara que sólo actúa sobre un change en verified»",
+    "«cuerpo declara que sólo trabaja en estado verified»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 3, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:20:00Z",
+   "scenario": "Every changed file is proposed, grouped",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «Every changed file is proposed, grouped» es la correcta?",
+   "options": [
+    "«el cuerpo declara que propone todo git status agrupado en tres grupos»",
+    "«cuerpo declara lista completa agrupada en tres grupos»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 3, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:20:00Z",
+   "scenario": "The user excludes a file by naming it",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «The user excludes a file by naming it» es la correcta?",
+   "options": [
+    "«el cuerpo declara que un fichero sale del commit si el usuario lo nombra»",
+    "«cuerpo declara que el usuario excluye ficheros nombrándolos»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 3, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:20:00Z",
+   "scenario": "The tools are exactly the twelve declared",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «The tools are exactly the twelve declared» es la correcta?",
+   "options": [
+    "«el frontmatter declara exactamente las doce herramientas permitidas»",
+    "«allowed-tools lista exactamente las doce entradas descritas»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 3, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:20:00Z",
+   "scenario": "No generic Bash",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «No generic Bash» es la correcta?",
+   "options": [
+    "«el frontmatter no incluye ningún Bash sin acotar»",
+    "«ninguna entrada de allowed-tools es un Bash sin acotar»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 3, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:20:00Z",
+   "scenario": "No Write nor Edit",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «No Write nor Edit» es la correcta?",
+   "options": [
+    "«el frontmatter no incluye Write ni Edit»",
+    "«ninguna entrada de allowed-tools es Write ni Edit»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 3, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:20:00Z",
+   "scenario": "R-CLS-002 · devils-advocate ronda 3 (high)",
+   "field": "attack",
+   "question": "«todo lo que git status enumera» incluye ficheros sin seguimiento como .env o claves locales; con un solo sí se commitean y empujan.",
+   "options": [
+    "Aceptar como límite: el grupo «el resto» enseña cada fichero por su nombre, el sí es sobre esa lista exacta y .gitignore es la herramienta del proyecto para lo que nunca debe aparecer",
+    "Filtrar por patrones de secretos"
+   ],
+   "chosen": 0,
+   "answer": "Aceptar como límite: el grupo «el resto» enseña cada fichero por su nombre, el sí es sobre esa lista exacta y .gitignore es la herramienta del proyecto para lo que nunca debe aparecer",
+   "decided_by": "claude",
+   "note": "La skill no adivina qué es un secreto (un filtro por patrón sería una heurística inventada). Queda escrito en la propuesta. Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:20:00Z",
+   "scenario": "R-CLS-002 · devils-advocate ronda 3 (high)",
+   "field": "attack",
+   "question": "Un fichero ya en el índice antes de invocar la skill entra en el commit aunque el usuario lo excluya, y allowed-tools no tiene comando para desindexarlo.",
+   "options": [
+    "Exigir el índice vacío antes de empezar y detenerse sin commit si no lo está",
+    "Añadir git restore --staged a allowed-tools"
+   ],
+   "chosen": 0,
+   "answer": "Exigir el índice vacío antes de empezar y detenerse sin commit si no lo está",
+   "decided_by": "claude",
+   "note": "Escenario «A non-empty index stops the skill». Sin herramienta nueva. Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:20:00Z",
+   "scenario": "R-CLS-002 · devils-advocate ronda 3 (medium)",
+   "field": "attack",
+   "question": "El usuario puede excluir el test de verifies: o el delta y se empuja código sin su oráculo, con la puerta en verde sobre otro árbol.",
+   "options": [
+    "Los ficheros bajo .venoxia/changes/<id>/ o en un verifies: del delta no se pueden excluir; si el usuario los nombra, se detiene sin commit",
+    "Aceptar como límite"
+   ],
+   "chosen": 0,
+   "answer": "Los ficheros bajo .venoxia/changes/<id>/ o en un verifies: del delta no se pueden excluir; si el usuario los nombra, se detiene sin commit",
+   "decided_by": "claude",
+   "note": "Escenario «The change's own files cannot be excluded». Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:20:00Z",
+   "scenario": "R-CLS-004 · devils-advocate ronda 3 (medium)",
+   "field": "attack",
+   "question": "El change queda en verified para siempre; gate.py re-ejecuta todos los verified.",
+   "options": [
+    "Aceptar como límite: ya decidido en las rondas 1 y 2",
+    "Que la skill escriba archived"
+   ],
+   "chosen": 0,
+   "answer": "Aceptar como límite: ya decidido en las rondas 1 y 2",
+   "decided_by": "claude",
+   "note": "Mismo ataque; misma decisión."
+  },
+  {
+   "at": "2026-09-11T18:45:00Z",
+   "scenario": "A red gate stops the skill",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «A red gate stops the skill» es la correcta?",
+   "options": [
+    "«el cuerpo declara que con puerta distinta de 0 se detiene sin commit»",
+    "«el cuerpo declara que se detiene sin commit si la puerta falla»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 4, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:45:00Z",
+   "scenario": "A non-empty index stops the skill",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «A non-empty index stops the skill» es la correcta?",
+   "options": [
+    "«el cuerpo declara que un índice no vacío detiene la skill sin commit»",
+    "«el cuerpo declara que se detiene sin commit si el índice ya tiene cambios»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 4, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:45:00Z",
+   "scenario": "Only the listed files are staged",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «Only the listed files are staged» es la correcta?",
+   "options": [
+    "«el cuerpo declara que añade por ruta sólo lo enseñado, nunca -A ni .»",
+    "«el cuerpo declara que añade por ruta sólo los ficheros mostrados»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 4, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:45:00Z",
+   "scenario": "The user excludes a file by naming it",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «The user excludes a file by naming it» es la correcta?",
+   "options": [
+    "«el cuerpo declara que un fichero nombrado por el usuario queda excluido»",
+    "«el cuerpo declara que el usuario excluye un fichero al nombrarlo»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 4, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:45:00Z",
+   "scenario": "The tools are exactly the twelve declared",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «The tools are exactly the twelve declared» es la correcta?",
+   "options": [
+    "«el frontmatter lista exactamente los doce allowed-tools indicados»",
+    "«el frontmatter declara exactamente las doce herramientas permitidas»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 4, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:45:00Z",
+   "scenario": "No generic Bash",
+   "field": "effect",
+   "question": "¿Cuál de estas lecturas del efecto de «No generic Bash» es la correcta?",
+   "options": [
+    "«el frontmatter no incluye ningún Bash sin acotar»",
+    "«el frontmatter declara que ningún Bash queda sin acotar»",
+    "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+   ],
+   "chosen": 2,
+   "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+   "decided_by": "claude",
+   "note": "Ronda 4, divergencia blanda de vocabulario. Cerrada por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:45:00Z",
+   "scenario": "R-CLS-002 · devils-advocate ronda 4 (high)",
+   "field": "attack",
+   "question": "«todo lo que git status enumera» incluye ficheros sin seguimiento con secretos; un solo sí los empuja.",
+   "options": [
+    "Aceptar como límite: ya decidido en la ronda 3 (lista por nombre, .gitignore del proyecto)",
+    "Filtrar por patrones"
+   ],
+   "chosen": 0,
+   "answer": "Aceptar como límite: ya decidido en la ronda 3 (lista por nombre, .gitignore del proyecto)",
+   "decided_by": "claude",
+   "note": "Mismo ataque que en la ronda 3; misma decisión."
+  },
+  {
+   "at": "2026-09-11T18:45:00Z",
+   "scenario": "R-CLS-002 · devils-advocate ronda 4 (medium)",
+   "field": "attack",
+   "question": "Si git commit falla (un hook de pre-commit lo rechaza) el índice queda cargado y la siguiente invocación se detiene por índice no vacío sin herramienta para limpiarlo.",
+   "options": [
+    "Aceptar como límite y que la entrega nombre el estado del índice y el comando de remedio (git restore --staged) para que lo ejecute el usuario",
+    "Añadir git restore a allowed-tools"
+   ],
+   "chosen": 0,
+   "answer": "Aceptar como límite y que la entrega nombre el estado del índice y el comando de remedio (git restore --staged) para que lo ejecute el usuario",
+   "decided_by": "claude",
+   "note": "No se añade una herramienta que deshace por un caso que este repo no tiene (sólo hay hook de pre-push). La skill lo dice en su entrega. Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  },
+  {
+   "at": "2026-09-11T18:45:00Z",
+   "scenario": "R-CLS-004 · devils-advocate ronda 4 (medium)",
+   "field": "attack",
+   "question": "El change queda en verified para siempre; gate.py re-ejecuta todos los verified.",
+   "options": [
+    "Aceptar como límite: ya decidido en las rondas 1, 2 y 3",
+    "Que la skill escriba archived"
+   ],
+   "chosen": 0,
+   "answer": "Aceptar como límite: ya decidido en las rondas 1, 2 y 3",
+   "decided_by": "claude",
+   "note": "Mismo ataque; misma decisión."
+  },
+  {
+   "at": "2026-09-11T18:45:00Z",
+   "scenario": "R-CLS-003 · devils-advocate ronda 4 (low)",
+   "field": "attack",
+   "question": "Un id de change que contenga la palabra Claude obligaría a mutilar el asunto o a no cerrar.",
+   "options": [
+    "Aceptar: el id del change se copia tal cual; la prohibición es sobre referencias al modelo o a la herramienta como autor o colaborador, y la skill lo dice",
+    "Renombrar el change"
+   ],
+   "chosen": 0,
+   "answer": "Aceptar: el id del change se copia tal cual; la prohibición es sobre referencias al modelo o a la herramienta como autor o colaborador, y la skill lo dice",
+   "decided_by": "claude",
+   "note": "Se aclara en el cuerpo de la skill. Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+  }
+ ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "2026-09-11-close-skill",
+  "state": "verified",
+  "via": "spec",
+  "capabilities": [
+    "closing"
+  ],
+  "created": "2026-09-11T17:05:00Z"
+}

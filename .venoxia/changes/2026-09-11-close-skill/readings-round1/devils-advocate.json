@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "R-CLS-002 obliga a «enseñar los ficheros que irían al commit» pero no acota cuáles son ni los liga al change: una implementación que hace `git add -A`, lista el árbol entero sucio y pide el sí empaqueta y empuja ficheros ajenos al change y nunca examinados por `gate.py` (restos de otros changes, ficheros temporales, credenciales locales), y como R-CLS-002 prohíbe `--amend` y `--force`, lo publicado ya no se puede deshacer.",
+    "requirement_id": "R-CLS-002",
+    "severity": "high"
+  },
+  {
+    "attack": "R-CLS-002 sólo prohíbe tres banderas (`--no-verify`, `--force`, `--amend`); un `git push -c core.hooksPath=/dev/null` —o con `GIT_CONFIG` apuntando a otro lado— cumple la letra y salta el hook `pre-push`, que es la única puerta que corre la matriz de Python, la cobertura y `plugin validate`. El resultado es un push público que nadie verificó, con la spec prohibiendo además reescribir la historia para arreglarlo.",
+    "requirement_id": "R-CLS-002",
+    "severity": "high"
+  },
+  {
+    "attack": "R-CLS-004 fija `allowed-tools` a doce entradas que incluyen `git add` pero ningún `git reset`/`git restore`: si la skill hace el `add` para enseñar los ficheros y el usuario responde que no, cumple R-CLS-002 (no hay commit ni push) pero deja todo el árbol en el índice y literalmente no dispone de ninguna herramienta para deshacerlo, de modo que el siguiente commit del usuario se lleva por sorpresa todo lo que la skill preparó.",
+    "requirement_id": "R-CLS-004",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-CLS-004 prohíbe a la skill de cierre escribir «ningún estado del change», así que el change se queda en `verified` para siempre y nadie lo pasa nunca a `archived`; como `gate.py` ejecuta el oráculo de todos los changes en `verified`, cada cierre re-ejecuta la historia completa y un test antiguo que se rompa por causas ajenas deja la puerta en rojo y bloquea el cierre de cualquier change nuevo, sin que la propia skill pueda tocar nada para desatascarlo.",
+    "requirement_id": "R-CLS-004",
+    "severity": "medium"
+  }
+]

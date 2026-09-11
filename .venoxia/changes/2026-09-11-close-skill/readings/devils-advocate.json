@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "La lista propuesta es «todo lo que `git status` enumera», lo que incluye los ficheros sin seguimiento del árbol: un `.env`, un volcado de credenciales, un `oracle.json.corrupt-*` o un scratch local entran en el grupo «el resto» y, con un único sí en el `AskUserQuestion`, se añaden por ruta, se comitean y se empujan al remoto; la fuga al historial público es irreversible y el único modo de evitarla es que el usuario enumere uno a uno cada fichero a excluir.",
+    "requirement_id": "R-CLS-002",
+    "severity": "high"
+  },
+  {
+    "attack": "El texto sólo describe qué hacer si el índice está vacío al empezar y si el push sale en rojo: si el `git commit` falla (un hook de pre-commit lo rechaza, y `--no-verify` está prohibido), los ficheros quedan preparados en el índice y ninguna frase obliga a deshacerlo; en la siguiente invocación la skill se detiene por «índice no vacío» y, como su `allowed-tools` no incluye ningún `git reset` ni `git restore` (R-CLS-004), el flujo queda bloqueado hasta que alguien limpie el índice a mano.",
+    "requirement_id": "R-CLS-002",
+    "severity": "medium"
+  },
+  {
+    "attack": "La skill que cierra el change tiene prohibido escribir cualquier estado, así que ningún paso del ciclo lleva nunca un change a `archived`: todos se quedan en `verified` para siempre y `gate.py` —que valida el oráculo de cada change en `verified`— reejecuta el conjunto completo en cada cierre; en cuanto un requisito antiguo queda obsoleto y su test se pone en rojo, la puerta sale distinta de `0` y R-CLS-001 impide cerrar ningún change nuevo, sin ningún remedio dentro del flujo.",
+    "requirement_id": "R-CLS-004",
+    "severity": "medium"
+  },
+  {
+    "attack": "El asunto debe nombrar el change y a la vez ninguna línea del mensaje puede contener «Claude»: en un repositorio que es un plugin de Claude Code, un change cuyo id incluya esa palabra obliga a una implementación literal a mutilar el id en el asunto —dejando un commit que nombra un change inexistente— o a negarse a cerrar el change.",
+    "requirement_id": "R-CLS-003",
+    "severity": "low"
+  }
+]

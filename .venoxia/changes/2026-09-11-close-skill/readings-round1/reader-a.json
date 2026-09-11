@@ -1,0 +1,194 @@
+[
+  {
+    "scenario": "The skill is named close and takes a change id",
+    "effect": "el frontmatter declara name close y argument-hint del change",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The body requires the verified state",
+    "effect": "el cuerpo declara que sólo trabaja en verified",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The body runs the gate before proposing the commit",
+    "effect": "el cuerpo declara que ejecuta gate.py antes del commit",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A red gate stops the skill",
+    "effect": "el cuerpo declara detenerse sin commit si la puerta falla",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The gate output is shown literally",
+    "effect": "el cuerpo declara mostrar la salida literal de la puerta",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The files to commit are shown before asking",
+    "effect": "el cuerpo declara mostrar los ficheros antes de pedir autorización",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The proposed message is shown before asking",
+    "effect": "el cuerpo declara mostrar el mensaje propuesto antes de preguntar",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Authorization goes through AskUserQuestion",
+    "effect": "el cuerpo declara pedir autorización con AskUserQuestion",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No commit nor push without an explicit yes",
+    "effect": "el cuerpo declara no ejecutar commit ni push sin un sí explícito",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A failed push is delivered as it is",
+    "effect": "el cuerpo declara entregar un push en rojo sin rodearlo",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The subject names the change",
+    "effect": "el cuerpo declara que el asunto nombra el change",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The body lists the requirement IDs",
+    "effect": "el cuerpo declara que el cuerpo del mensaje lista los IDs",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No co-author trailer",
+    "effect": "el cuerpo declara que no hay línea Co-Authored-By",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No generated-with footer",
+    "effect": "el cuerpo declara que no hay pie Generated with",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No mention of the model nor the tool",
+    "effect": "el cuerpo declara que no menciona a Claude ni Claude Code",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The tools are exactly the twelve declared",
+    "effect": "el frontmatter declara allowed-tools exactamente esos doce",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No generic Bash",
+    "effect": "el frontmatter no tiene ninguna entrada Bash sin acotar",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No Write nor Edit",
+    "effect": "el frontmatter no incluye Write ni Edit",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The body says it writes no file",
+    "effect": "el cuerpo declara que no escribe ningún fichero",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The body says it writes no state",
+    "effect": "el cuerpo declara que no escribe ningún estado del change",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The delivery names the commit hash",
+    "effect": "el cuerpo declara que la entrega nombra el hash del commit",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The delivery names the branch and the remote",
+    "effect": "el cuerpo declara que la entrega nombra rama y remoto",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The delivery names the push result",
+    "effect": "el cuerpo declara que la entrega nombra el resultado del push",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The next step is specify",
+    "effect": "el cuerpo declara que el siguiente paso es venoxia:specify",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

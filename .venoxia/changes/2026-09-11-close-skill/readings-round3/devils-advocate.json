@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "«todo lo que `git status` enumera» incluye los ficheros sin seguimiento: la skill propone en el mismo bloque el `.env`, las claves locales, los `oracle.json.corrupt-*` y cualquier borrador que haya en el árbol, y con un único sí del usuario los añade por ruta, los commitea y los empuja al remoto público; nada en el requisito acota la lista al ámbito del change.",
+    "requirement_id": "R-CLS-002",
+    "severity": "high"
+  },
+  {
+    "attack": "La exclusión del usuario sólo impide el `git add` de ese fichero, pero si ya estaba en el índice antes de invocar la skill (el requisito sólo exige que la skill no haya puesto nada, no que el índice esté vacío) el `git commit` lo incluye igualmente, y con `allowed-tools` acotado a status/diff/log/rev-parse/branch/add/commit/push la skill no dispone de ningún comando para desindexarlo: el fichero que el usuario nombró para excluir acaba commiteado y empujado.",
+    "requirement_id": "R-CLS-002",
+    "severity": "high"
+  },
+  {
+    "attack": "El usuario puede excluir el fichero del grupo «nombrado en un `verifies:` del delta» y el requisito ordena commitear el resto sin volver a ejecutar `gate.py` sobre la selección: se empuja el código de producción sin el test que lo verifica, mientras la entrega presenta la puerta en verde de la pasada anterior sobre un árbol distinto al commiteado.",
+    "requirement_id": "R-CLS-002",
+    "severity": "medium"
+  },
+  {
+    "attack": "La prohibición de escribir «ningún estado del change» deja el change en `verified` para siempre, porque `close` es justamente quien lo cierra y ninguna otra skill escribe `archived`: los changes verificados se acumulan sin límite y, como `gate.py` corre el oráculo de cada change en `verified`, basta que un test antiguo desaparezca o cambie de ruta para que la puerta se ponga en rojo y bloquee el cierre de todo trabajo futuro.",
+    "requirement_id": "R-CLS-004",
+    "severity": "medium"
+  }
+]

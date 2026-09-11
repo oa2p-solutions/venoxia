@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "Un fichero nuevo sin seguimiento que no está bajo `.venoxia/changes/<id>/` ni nombrado en un `verifies:` sólo se enumera y no se añade salvo que el usuario lo nombre: el código de producción recién escrito por `/venoxia:implement` cae justo en esa categoría, así que el commit lleva el delta y los tests pero no la implementación, y se empuja un HEAD rojo mientras la puerta salió verde sobre el árbol de trabajo.",
+    "requirement_id": "R-CLS-002",
+    "severity": "high"
+  },
+  {
+    "attack": "La única exclusión que fija el requisito es para ficheros sin seguimiento fuera del change; nada acota los ficheros ya seguidos, así que cualquier modificación en curso ajena al change (un hack de depuración, una credencial en un fichero de configuración versionado) entra por ruta en el commit y se empuja bajo un mensaje que sólo nombra este change y sus requisitos.",
+    "requirement_id": "R-CLS-002",
+    "severity": "medium"
+  },
+  {
+    "attack": "La autorización con `AskUserQuestion` sólo enseña la lista de ficheros y el mensaje: el destino del `git push` se nombra después, en la entrega (R-CLS-004). Una implementación literal ejecuta `git push` a secas y publica en el remoto público configurado, y el usuario descubre a qué rama y a qué remoto fue su «sí» cuando ya es irreversible.",
+    "requirement_id": "R-CLS-002",
+    "severity": "medium"
+  },
+  {
+    "attack": "La skill tiene prohibido escribir cualquier estado del change, así que tras cerrarlo y empujarlo el change sigue en `verified` para siempre y `archived` queda inalcanzable: `gate.py` vuelve a ejecutar el oráculo de todos los changes ya cerrados en cada cierre futuro, y basta que un test antiguo se ponga en rojo para que ningún change nuevo pueda cerrarse nunca con la skill.",
+    "requirement_id": "R-CLS-004",
+    "severity": "medium"
+  }
+]

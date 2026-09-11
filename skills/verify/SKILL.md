@@ -109,4 +109,4 @@ Termina con un informe corto:
 - Si escribiste `verified`: qué requisitos lo acreditan y con qué run de `oracle.json` (fecha de `ran_at`).
 - Si no escribiste nada: qué falta exactamente para que la próxima ejecución sí pueda.
 - Si grabaste una confirmación: qué IDs lleva `confirmed_green` y en qué run.
-- El siguiente paso: escribir el código si el rojo era correcto, confirmar si el aviso pedía confirmación, o —con `verified` ya escrito— que el bucle corto sigue con `/venoxia:specify` de la siguiente capability.
+- El siguiente paso: escribir el código si el rojo era correcto, confirmar si el aviso pedía confirmación, o —con `verified` ya escrito— `/venoxia:close <id>`, que pasa la puerta del proyecto entero y, con la autorización del usuario, deja el commit y el push hechos; después el bucle corto sigue con `/venoxia:specify` de la siguiente capability.

@@ -27,6 +27,7 @@ en CI cuando miente.
 | 6 | `oracle` | traducir el resultado del `test_command` declarado en `venoxia.json` en verificado o no verificado | quien ejecuta `/venoxia:verify` sobre un change con oráculo ve el resultado del `test_command` convertido en verificado o no verificado, sin tener que leer la salida del test a mano | high |
 | 7 | `technical-contract` | someter las decisiones técnicas del propio repositorio —qué importa, qué no toca, cuánto cubre, cómo sale— al mismo contrato que su comportamiento: requisitos con oráculo, no prosa | quien añade `import requests` a un script y ejecuta `python3 -m unittest discover -s tests -q` ve la suite en rojo nombrando el fichero y el módulo, y quien ejecuta `python3 scripts/gate.py --root .` ve `tools/coverage.py` correr como runner de un requisito y el veredicto de la puerta en `0` | low |
 | 8 | `implementation` | escribir el código de producción de un change validado hasta que su oráculo salga en verde, sin tocar la especificación ni los tests que la verifican | quien ejecuta `/venoxia:implement <id>` sobre un change `validated` con un rojo grabado ve el código escrito y `python3 scripts/oracle.py --root . --change <id>` terminar con código 0, sin que ningún fichero de `.venoxia/` ni ningún fichero nombrado en `verifies:` haya cambiado | medium |
+| 9 | `closing` | cerrar un change verificado: pasar la puerta del proyecto entero, enseñar lo que iría al commit y, con la autorización del usuario, dejar el commit y el push hechos con un mensaje que no nombra al modelo ni a la herramienta, sin escribir ningún estado | quien ejecuta `/venoxia:close <id>` sobre un change `verified` ve la salida literal de `python3 scripts/gate.py --root .`, los ficheros que irían al commit, el mensaje propuesto y la pregunta de autorización, y tras su sí ve el hash del commit y el resultado del push, con un mensaje en el que no aparece ni `Co-Authored-By` ni la palabra Claude | medium |
 
 ## Out of scope
 
@@ -105,4 +106,18 @@ push.
 confidence: medium
   why:      ningún change real se ha implementado todavía con la skill; el criterio se eligió porque un comando a ojo es justo lo que el oráculo sustituye
   revisit:  cuando el primer change de este repo se implemente con /venoxia:implement y se cuente cuántas veces hizo falta correr algo fuera del oráculo
+  fatal:    no
+
+### B-006 · La puerta basta como verificación previa al commit
+
+`/venoxia:close` no tiene un `Bash` genérico: no puede lanzar la suite
+entera ni un build, sólo `gate.py` sobre el proyecto y los subcomandos de
+git que el cierre de `closing` necesita. Suponemos que el veredicto de la
+puerta —acta y validador en estricto, y el oráculo de cada change
+`verified`— es verificación suficiente para proponer el commit, y que lo que
+la puerta no ve lo atrapa el hook de pre-push del proyecto, si lo tiene.
+
+confidence: medium
+  why:      ningún change se ha cerrado todavía con la skill; la puerta se eligió porque es el contrato declarado del proyecto y un comando a ojo es justo lo que sustituye
+  revisit:  cuando el primer change de este repo se cierre con /venoxia:close y se compruebe si el pre-push atrapó algo que la puerta dejó pasar
   fatal:    no
