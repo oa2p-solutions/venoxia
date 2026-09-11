@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "change": "2026-09-09-verify-confirm-green",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-11T14:35:52Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-ORC-017",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 4654,
+          "output_tail": "@covers R-ORC-017\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_oracle.py\", line 1454, in test_the_output_keeps_its_eight_top_level_keys\n    self.assertEqual(run.returncode, 0, run.describe())\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 2 != 0 : comando: /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/afroxstudio/Developments/ia/venoxia/scripts/oracle.py --root /private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-xplfspzh/project --json --change c1 --record --confirm-green R-ORC-901\nreturncode: 2\nstdout:\n\nstderr:\nusage: oracle.py [-h] [--root DIR] --change ID [--timeout SECONDS] [--record]\n                 [--dry-run] [--json] [--no-color]\noracle.py: error: unrecognized arguments: --confirm-green R-ORC-901\n\n\n----------------------------------------------------------------------\nRan 84 tests in 4.584s\n\nFAILED (failures=3)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_oracle.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-ORC-010",
+          "verifies": [
+            "tests/test_verify_skill.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 39,
+          "output_tail": "R-ORC-010 · la confirmación del usuario se graba con --confirm-green, no sólo se dice.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_verify_skill.py\", line 182, in test_records_the_confirmation_with_confirm_green_before_verified\n    self.assertIn(\n    ~~~~~~~~~~~~~^\n        \"--confirm-green\",\n        ^^^^^^^^^^^^^^^^^^\n        text,\n        ^^^^^\n        \"skills/verify/SKILL.md no manda grabar la confirmación con «--confirm-green»\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: '--confirm-green' not found in '---\\nname: verify\\ndescription: \"Envuelve el oráculo de Venoxia: graba el rojo antes de escribir el código, graba el verde después, y es la única skill autorizada a escribir «state»: «verified» en un change. Debe usarse cuando el usuario pida «verifica el cambio», «graba el rojo», «pasa el oráculo», «¿está en verde?», «corre los tests de la spec», o justo después de que el guardián haya dejado escribir el código de un change validado.\"\\nargument-hint: \"el id del change a verificar (opcional)\"\\nallowed-tools:\\n  - Read\\n  - Glob\\n  - Bash(python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/oracle.py\" *)\\n  - Write\\n---\\n\\n# Venoxia · verificar\\n\\nChange a verificar: **$ARGUMENTS**\\n\\n`validate.py` comprueba que cada requisito **declare** su oráculo con `verifies:`; `oracle.py` sabe ejecutarlo y anotar `green`/`red`/`missing`/`timeout`. Lo que faltaba es quién decide, con esos dos datos, cuándo un change ha terminado de verdad — y quien lo decida tiene que ser el único que puede escribir `\"state\": \"verified\"`. Esa skill es ésta, con el mismo criterio que `/venoxia:diverge` aplica a `validated`: la aritmética la hace el script, tú lees el veredicto y lo presentas.\\n\\n## Qué es tuyo y qué no\\n\\nTuyo: localizar el change, preguntar y escribir `.venoxia/venoxia.json` si falta, ejecutar `oracle.py` en el orden que manda esta skill, leer su código de salida, decidir si `verified` procede según las reglas de más abajo, y escribir esa única clave cuando proceda.\\n\\n**Nunca editas tests ni código de producción.** Si el rojo dice que falta implementación, el siguiente paso es escribirla — en otra sesión de trabajo, no en ésta. Esta skill no toca ni un fichero bajo `src/`, ni el test que `verifies:` nombra: si lo hicieras, el rojo que acabas de grabar dejaría de ser honesto.\\n\\n**Nunca reinterpretas el JSON.** El estado de cada requisito (`green`, `red`, `missing`, `timeout`) y el código de salida de `oracle.py` son el veredicto; no hay «este rojo en realidad no cuenta» ni «el test seguro que es flaky». La misma regla que gobierna `/venoxia:diverge` frente a `diff_readings.py`: tú no tienes voto sobre lo que el script ya calculó.\\n\\n**No inventas nada que el proyecto no haya dicho.** El comando de test de `.venoxia/venoxia.json` lo escribe el usuario, nunca tú; si no existe, se pregunta, nunca se adivina.\\n\\n## 1. Localiza el change activo\\n\\nEl change a verificar es el que trae `$ARGUMENTS`, si lo trae. Si no, busca con `Glob` sobre `.venoxia/changes/*/change.json` el que tenga `state` distinto de `archived` y `change.json` con `mtime` más reciente, y di cuál has elegido.\\n\\nLee su `state`:\\n\\n- **`validated` o `verified`** — sigue al paso 2. Un change ya `verified` puede volver a pasar por aquí: es exactamente lo que ocurre cuando el segundo `--record` deja el run en verde tras el primero en rojo.\\n- **`draft` o `specified`** — no hay nada que verificar todavía: no hay divergencia comprobada, y verificar sin ella es construir sobre un contrato que ni el propio proyecto ha aceptado. Dilo, remite a `/venoxia:validate` y a `/venoxia:diverge`, y **para aquí**. No ejecutes `oracle.py` sobre un change que no ha llegado a `validated`.\\n\\n## 2. Asegura `.venoxia/venoxia.json`\\n\\nCon `Read`, comprueba si existe. Si existe, sigue al paso 3 sin tocarlo: el comando de test es del proyecto, no tuyo, y sobrescribirlo sin que nadie lo pida borraría una decisión que ya se tomó.\\n\\nSi **no** existe, pregunta al usuario el comando con el que se corren los tests de este proyecto — el mismo que usaría a mano, con el marcador `{files}` donde van las rutas de `verifies:` — y el directorio (`cwd`) desde el que se lanza si no es la raíz. Con la respuesta, muestra el contenido exacto que vas a escribir antes de escribirlo:\\n\\n```json\\n{\"version\": 1, \"test_command\": \"<lo que ha contestado>\", \"cwd\": \".\"}\\n```\\n\\nY escríbelo a partir de `${CLAUDE_PLUGIN_ROOT}/templates/venoxia.json` con `Write`. Sin respuesta del usuario, no lo inventes: dilo en la entrega y para aquí, porque `oracle.py` va a fallar con el error de uso que nombra este mismo fichero.\\n\\n## 3. `--dry-run` primero, y enséñalo\\n\\n```bash\\npython3 \"${CLAUDE_PLUGIN_ROOT}/scripts/oracle.py\" --root \"<raíz>\" --change \"<id>\" --dry-run --no-color\\n```\\n\\nMuestra la salida completa **antes** de ejecutar nada de verdad: es el comando exacto que se va a lanzar por requisito, y quien lee la entrega tiene que poder comprobarlo antes de que corra. Si aquí ya sale un error de uso (falta `venoxia.json`, o su `test_command` no trae `{files}`), repite el mensaje tal cual y para: no hay oráculo que ejecutar hasta que se arregle.\\n\\n## 4. Ejecuta de verdad y graba\\n\\n```bash\\npython3 \"${CLAUDE_PLUGIN_ROOT}/scripts/oracle.py\" --root \"<raíz>\" --change \"<id>\" --record --json --no-color\\n```\\n\\nSiempre con `--record`: sin historial no hay forma de comprobar, en el siguiente paso, que un verde estuvo antes en rojo. Siempre con `--json`: es lo que te permite leer `results`, `counts`, `all_green` y `all_red` sin adivinar nada de un informe de texto. Cada elemento de `results` trae además `runner` —`name` (`null` si fue el `test_command`), `command` ya sustituido y `cwd`—: cuando un requisito declara `runner:`, es ahí donde se ve qué comando produjo de verdad su veredicto, y conviene nombrarlo en la entrega.\\n\\n## 5. Lee el código de salida antes que nada\\n\\nIgual que hace `/venoxia:validate`:\\n\\n| Código | Significado | Qué haces |\\n|---|---|---|\\n| `0` | Todos los requisitos del change en `green` | Sigue al paso 6: puede que toque escribir `verified` |\\n| `1` | Al menos uno en `red`, `missing` o `timeout` | Sigue a «El rojo correcto», más abajo. No toques `change.json` |\\n| `2` | Error de uso: falta `venoxia.json`, el `test_command` no trae `{files}`, o el change no existe | No hay veredicto sobre el oráculo: reproduce el mensaje del script y corrige la invocación, no `change.json` |\\n\\nUn `2` nunca se presenta como un rojo ni como un verde: el oráculo no llegó a correr.\\n\\n### El rojo correcto (código `1`)\\n\\nCon todos los requisitos del change en `red` o `missing` —el caso normal antes de escribir una sola línea de código—, dilo así: **«rojo correcto»**. Es la prueba de que el oráculo funciona, no un problema. El siguiente paso es escribir el código de producción, y esta skill no lo hace: **no toca `change.json`**, se queda en `validated` (o en `verified`, si venía de ahí, sin que nada cambie).\\n\\nSi el rojo es parcial —unos requisitos en verde y otros en rojo—, el mismo criterio se aplica sin matices: mientras no estén todos en `green`, no hay nada que escribir en `change.json`, y lo dices con la lista exacta de qué falta.\\n\\n### El verde con rojo detrás (código `0`, con historial)\\n\\nAntes de escribir nada, lee `.venoxia/changes/<id>/oracle.json` con `Read` y mira su `runs`: una lista ordenada del más antiguo al más reciente. Para cada requisito que el último run trae en `green`, busca si **algún run anterior** (no el último) tiene ese mismo `requirement_id` en `red` o `missing`.\\n\\n- **Todos lo tienen** — el ciclo rojo→verde está documentado en el disco. Lee `change.json`, cambia **únicamente** la clave `state` a `\"verified\"` y deja el resto de claves intactas. Dilo con todas las letras: «`<id>` pasa a \"verified\": el oráculo está en verde y el historial acredita que cada requisito estuvo en rojo antes».\\n- **Alguno no lo tiene** — sigue al párrafo de abajo: es «verde sin rojo», y ahí no se escribe nada todavía.\\n\\n### Verde sin rojo (código `0`, sin historial que lo respalde)\\n\\nQue el primer run de un requisito ya salga en verde es ambiguo entre dos historias muy distintas: se te olvidó grabar el rojo antes de implementar, o el test nunca comprobó nada y pasaría igual sin la implementación. **No escribas `verified` en este caso.** Presenta el aviso con el requisito exacto que no tiene un rojo previo, y pregunta al usuario, en una frase: *¿has visto fallar este test antes de que la implementación existiera?*\\n\\nSólo con una confirmación explícita del usuario —no un silencio, no un «probablemente»— escribes `\"state\": \"verified\"`, y lo dejas dicho en la entrega tal cual: «`<id>` pasa a \"verified\" por confirmación explícita del usuario: el run no tenía un rojo previo grabado». Sin confirmación, `change.json` se queda como está y lo dices.\\n\\n## La entrega\\n\\nTermina con un informe corto:\\n\\n- El change verificado y su `state` antes y después de esta ejecución.\\n- El código de salida de `oracle.py` y el recuento (`green`/`red`/`missing`/`timeout`).\\n- Cuál de los tres casos de arriba aplicó, y por qué.\\n- Si escribiste `verified`: qué requisitos lo acreditan y con qué run de `oracle.json` (fecha de `ran_at`).\\n- Si no escribiste nada: qué falta exactamente para que la próxima ejecución sí pueda.\\n- El siguiente paso: escribir el código si el rojo era correcto, confirmar si el aviso pedía confirmación, o —con `verified` ya escrito— que el bucle corto sigue con `/venoxia:specify` de la siguiente capability.\\n' : skills/verify/SKILL.md no manda grabar la confirmación con «--confirm-green»\n\n----------------------------------------------------------------------\nRan 11 tests in 0.001s\n\nFAILED (failures=3)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_verify_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-VAL-007",
+          "verifies": [
+            "tests/test_rules_oracle.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 1167,
+          "output_tail": "      \"hint\": \"Antes de escribir el código, deja el test de «R-CHK-014» en rojo y grábalo con «python3 scripts/oracle.py --change c1 --record»; si ya se comprobó y esto es una reconstrucción del historial, no hay nada que arreglar.\"\n    }\n  ],\n  \"budget\": {\n    \"low\": 0,\n    \"total\": 2,\n    \"ratio\": 0.0,\n    \"limit\": 0.3,\n    \"ok\": true\n  },\n  \"adopted\": true\n}\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 26 tests in 1.128s\n\nFAILED (failures=3)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_rules_oracle.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 3,
+        "missing": 0,
+        "timeout": 0,
+        "total": 3
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-11T14:38:07Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-ORC-017",
+          "verifies": [
+            "tests/test_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4844,
+          "output_tail": ".............................venoxia: no se pudo leer «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-yz6fu6xe/project/.venoxia/changes/c1/oracle.json» (boom); se empieza un historial nuevo.\n.venoxia: «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-7c2m_zsd/project/.venoxia/changes/c1/oracle.json» no trae la lista «runs» del historial.\n.venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-4r8dysq2/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n.....................................................\n----------------------------------------------------------------------\nRan 84 tests in 4.791s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_oracle.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-ORC-010",
+          "verifies": [
+            "tests/test_verify_skill.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 36,
+          "output_tail": "...........\n----------------------------------------------------------------------\nRan 11 tests in 0.001s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_verify_skill.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-VAL-007",
+          "verifies": [
+            "tests/test_rules_oracle.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 1178,
+          "output_tail": "..........................\n----------------------------------------------------------------------\nRan 26 tests in 1.140s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_rules_oracle.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 3,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 3
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

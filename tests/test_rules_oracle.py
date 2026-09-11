@@ -244,6 +244,102 @@ class TestRuleV18RedBeforeGreen(unittest.TestCase):
             self.assertEqual(findings[0]["requirement_id"], SECOND_REQUIREMENT_ID)
 
 
+class TestRuleV18ConfirmedGreen(unittest.TestCase):
+    """V18 · un verde confirmado con «--confirm-green» en el historial no avisa."""
+
+    def _history(self, project: Project, runs: list[dict]) -> None:
+        """Escribe oracle.json a mano: `runs` ya trae results y, si toca, confirmed_green."""
+        document = {"version": 1, "change": CHANGE_ID, "runs": runs}
+        project.write(
+            f".venoxia/changes/{CHANGE_ID}/oracle.json",
+            json.dumps(document, ensure_ascii=False, indent=2) + "\n",
+        )
+
+    @staticmethod
+    def _run(statuses: dict[str, str], *, confirmed: list[str] | None = None, stamp: str = "2026-09-09T00:00:00Z") -> dict:
+        run = {
+            "version": 1,
+            "ran_at": stamp,
+            "runner": {"command": "python3 -m unittest {files}", "cwd": "."},
+            "results": [
+                {"requirement_id": rid, "verifies": [], "status": status, "exit_code": 0, "duration_ms": 1, "output_tail": ""}
+                for rid, status in statuses.items()
+            ],
+            "counts": {"green": sum(s == "green" for s in statuses.values()), "red": sum(s == "red" for s in statuses.values()), "missing": 0, "timeout": 0, "total": len(statuses)},
+            "all_green": all(s == "green" for s in statuses.values()),
+            "all_red": all(s == "red" for s in statuses.values()),
+        }
+        if confirmed is not None:
+            run["confirmed_green"] = confirmed
+        return run
+
+    def _two_requirements(self, project: Project) -> None:
+        project.delta(
+            CHANGE_ID,
+            CAPABILITY_NAME,
+            added=[
+                requirement(),
+                requirement(
+                    id=SECOND_REQUIREMENT_ID,
+                    title="Segundo requisito del change",
+                    verifies=project.oracle(SECOND_REQUIREMENT_ID),
+                ),
+            ],
+        )
+
+    def test_a_confirmed_green_is_silent(self):
+        """@covers R-VAL-007"""
+        with Project() as project:
+            self._history(
+                project,
+                [self._run({DEFAULT_REQUIREMENT_ID: "green"}, confirmed=[DEFAULT_REQUIREMENT_ID])],
+            )
+            run = project.validate_json("--strict")
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertNotIn("V18", run.rule_set(), run.describe())
+
+    def test_a_confirmation_covers_only_the_ids_it_names(self):
+        """@covers R-VAL-007"""
+        with Project() as project:
+            self._two_requirements(project)
+            self._history(
+                project,
+                [
+                    self._run(
+                        {DEFAULT_REQUIREMENT_ID: "green", SECOND_REQUIREMENT_ID: "green"},
+                        confirmed=[DEFAULT_REQUIREMENT_ID],
+                    )
+                ],
+            )
+            run = project.validate_json("--strict")
+            self.assertEqual(run.returncode, 1, run.describe())
+            findings = run.findings_for("V18")
+            self.assertEqual(len(findings), 1, run.describe())
+            self.assertEqual(findings[0]["requirement_id"], SECOND_REQUIREMENT_ID)
+
+    def test_the_confirmation_may_live_in_an_earlier_run(self):
+        """@covers R-VAL-007"""
+        with Project() as project:
+            self._history(
+                project,
+                [
+                    self._run({DEFAULT_REQUIREMENT_ID: "green"}, confirmed=[DEFAULT_REQUIREMENT_ID], stamp="2026-09-09T00:00:00Z"),
+                    self._run({DEFAULT_REQUIREMENT_ID: "green"}, stamp="2026-09-09T00:10:00Z"),
+                ],
+            )
+            run = project.validate_json("--strict")
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertNotIn("V18", run.rule_set(), run.describe())
+
+    def test_a_green_without_red_and_without_confirmation_still_warns(self):
+        """@covers R-VAL-007"""
+        with Project() as project:
+            self._history(project, [self._run({DEFAULT_REQUIREMENT_ID: "green"}, confirmed=[])])
+            run = project.validate_json("--strict")
+            self.assertEqual(run.returncode, 1, run.describe())
+            self.assertEqual(run.rule_set(), {"V18"}, run.describe())
+
+
 class TestRulesV17V18JsonSchema(unittest.TestCase):
     """Ambas reglas respetan el esquema v1: sólo se añaden claves, nunca se pisan."""
 

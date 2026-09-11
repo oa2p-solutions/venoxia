@@ -48,6 +48,7 @@ echo '{"tool_name":"Write","tool_input":{"file_path":"/x/src/a.ts"},"cwd":"/x"}'
 # El oráculo: ejecuta verifies: por requisito y atribuye green/red/missing/timeout
 python3 scripts/oracle.py --root . --change <id> --dry-run     # sólo lista los comandos, no ejecuta nada (excluyente con --record: los dos juntos son código 2)
 python3 scripts/oracle.py --root . --change <id> --record      # ejecuta y añade el run a changes/<id>/oracle.json; un oracle.json corrupto se copia antes a oracle.json.corrupt-<marca>
+python3 scripts/oracle.py --root . --change <id> --record --confirm-green R-XXX-001   # además anota confirmed_green en el run: exige --record, IDs del change y que salgan en green (si no, 2 y nada grabado)
 
 # Cobertura con la stdlib (trace), subprocesos incluidos; falla si algún fichero baja de su umbral
 python3 tools/coverage.py
@@ -92,7 +93,7 @@ Cinco estados, siempre en este orden; ninguna skill escribe uno que no le toca y
 | `draft` | quien crea el directorio del change | Antes de que exista `proposal.md` o `delta/`. |
 | `specified` | `/venoxia:specify` | Delta en EARS con `verifies:`/`confidence:`; `validate.py` puede estar en rojo por `V07`/`V08` (el test aún no existe) y es lo esperado. |
 | `validated` | `/venoxia:diverge` | Sólo cuando `validate.py` **y** `diff_readings.py` salen los dos con `0` en la misma pasada. |
-| `verified` | `/venoxia:verify` | Sólo cuando `scripts/oracle.py --record` deja el último run en verde cubriendo todos los requisitos del change; `V17` audita que el disco lo respalde. |
+| `verified` | `/venoxia:verify` | Sólo cuando `scripts/oracle.py --record` deja el último run en verde cubriendo todos los requisitos del change y cada requisito tiene un run anterior en `red` (`missing` no cuenta) o figura en `confirmed_green` (grabado con `--record --confirm-green <IDs>` tras preguntar al usuario); `V17` audita que el disco lo respalde y `V18` avisa del verde sin rojo ni confirmación. |
 | `archived` | quien cierra el change | El comportamiento ya vive en la capability y el change deja de ser el ámbito activo. |
 
 ```

@@ -1,0 +1,10 @@
+{
+  "id": "2026-09-09-verify-confirm-green",
+  "state": "verified",
+  "via": "spec",
+  "capabilities": [
+    "oracle",
+    "validator"
+  ],
+  "created": "2026-09-11T13:59:28Z"
+}

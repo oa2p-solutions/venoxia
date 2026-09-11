@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "La skill puede ejecutar `oracle.py --record --confirm-green <todos los IDs del delta>` como primera grabación y sólo después mirar el historial: entonces cada requisito «figura en `confirmed_green` de algún run anterior» y aplica el escenario «A confirmation already in the history is enough», que escribe `verified` sin volver a preguntar. Nada ata la grabación de la confirmación a una respuesta del usuario, así que el escenario de la pregunta no llega a activarse nunca y el change pasa a `verified` sin que nadie haya visto un solo rojo: la única salvaguarda que este delta introduce queda anulada cumpliendo sus siete escenarios.",
+    "requirement_id": "R-ORC-010",
+    "severity": "high"
+  },
+  {
+    "attack": "Con cinco requisitos verdes sin rojo previo, preguntar al usuario por uno solo y grabar `--confirm-green` con los cinco IDs cumple «la skill vuelve a grabar el oráculo con `--record --confirm-green` nombrando ese requisito» (lo nombra, junto a otros cuatro); los cuatro restantes quedan confirmados y desbloquean `verified` sin que nadie haya sido preguntado por ellos.",
+    "requirement_id": "R-ORC-010",
+    "severity": "medium"
+  },
+  {
+    "attack": "El único estado que el delta convierte en error de uso es `red` («An ID that is not green in this run is a usage error» habla de salir «en rojo»), así que `--record --confirm-green R-X` con `R-X` en `missing` o `timeout` graba la confirmación: se marca como verde confirmado un requisito cuyo test ni siquiera existe, y esa marca silencia V18 y desbloquea `verified` en cuanto aparezca un test que pase a la primera.",
+    "requirement_id": "R-ORC-017",
+    "severity": "medium"
+  },
+  {
+    "attack": "La confirmación se indexa sólo por ID de requisito y ningún enunciado la caduca ni la invalida: «The confirmation may live in an earlier run» la hace válida para siempre, de modo que si dentro del mismo change se reescribe el escenario y el test de un requisito ya confirmado, V18 sigue callado y R-ORC-010 escribe `verified` sin preguntar, aunque nadie haya visto fallar nunca el test nuevo.",
+    "requirement_id": "R-VAL-007",
+    "severity": "medium"
+  }
+]

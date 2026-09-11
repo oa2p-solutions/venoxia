@@ -1,0 +1,782 @@
+{
+  "version": 1,
+  "change": "2026-09-09-verify-confirm-green",
+  "decisions": [
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "The confirmation lands in the recorded run",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «The confirmation lands in the recorded run»?",
+      "options": [
+        "«oracle.json gana un run con confirmed_green: [\"R-ORC-901\"]»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«oracle.json gana un run con confirmed_green: [\"R-ORC-901\"]»",
+      "decided_by": "claude",
+      "note": "Dura por señal numeric: el lector B copió el ID de ejemplo del WHEN y el lector A dijo «ese ID». Vocabulario; el delta no cambia (regla 3 del plan)."
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "The confirmation lands in the recorded run",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The confirmation lands in the recorded run» es la correcta?",
+      "options": [
+        "«el último run añade confirmed_green con ese ID»",
+        "«el run grabado incluye confirmed_green con R-ORC-901»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Vocabulario entre lectores; el delta no cambia (regla 3 del plan)."
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "Several IDs separated by commas",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Several IDs separated by commas» es la correcta?",
+      "options": [
+        "«el último run trae los dos IDs en confirmed_green»",
+        "«el run grabado incluye ambos IDs en confirmed_green»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Vocabulario entre lectores; el delta no cambia (regla 3 del plan)."
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "An ID that is not green in this run is a usage error",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An ID that is not green in this run is a usage error» es la correcta?",
+      "options": [
+        "«el proceso termina por error de uso»",
+        "«el proceso termina con error de uso y no graba el run»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Vocabulario entre lectores; el delta no cambia (regla 3 del plan)."
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "A green run backed by a documented red run",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A green run backed by a documented red run» es la correcta?",
+      "options": [
+        "«change.json pasa a state verified»",
+        "«el change pasa al estado verified»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Vocabulario entre lectores; el delta no cambia (regla 3 del plan)."
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "The recorded confirmation unlocks verified",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The recorded confirmation unlocks verified» es la correcta?",
+      "options": [
+        "«change.json pasa a state verified»",
+        "«el change pasa al estado verified»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Vocabulario entre lectores; el delta no cambia (regla 3 del plan)."
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "A confirmation already in the history is enough",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A confirmation already in the history is enough» es la correcta?",
+      "options": [
+        "«change.json pasa a verified sin volver a preguntar»",
+        "«el change pasa a verified sin preguntar de nuevo»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Vocabulario entre lectores; el delta no cambia (regla 3 del plan)."
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "The user confirms and the confirmation is recorded",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «The user confirms and the confirmation is recorded»?",
+      "options": [
+        "«oracle.json gana un run con --record --confirm-green nombrando ese requisito»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«oracle.json gana un run con --record --confirm-green nombrando ese requisito»",
+      "decided_by": "claude",
+      "note": "Blanda; es lo que el THEN dice. El delta no cambia."
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "The output keeps its eight top-level keys",
+      "field": "gap",
+      "question": "¿Qué debe ocurrir en «The output keeps its eight top-level keys»?",
+      "options": [
+        "«el JSON de salida conserva las ocho claves de primer nivel» (lectura de A)",
+        "«el JSON de salida trae exactamente ocho claves de primer nivel» (lectura de B)",
+        "Ninguna de las anteriores, el delta debe decir explícitamente qué ocurre"
+      ],
+      "chosen": 2,
+      "answer": "El THEN lista las ocho claves: version, change, ran_at, runner, results, counts, all_green y all_red.",
+      "decided_by": "claude"
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "An ID outside the change records nothing",
+      "field": "gap",
+      "question": "¿Qué debe ocurrir en «An ID outside the change records nothing»?",
+      "options": [
+        "«el directorio del change no gana ningún fichero» (lectura de A)",
+        "«el directorio del change no gana ningún fichero nuevo» (lectura de B)",
+        "Ninguna de las anteriores, el delta debe decir explícitamente qué ocurre"
+      ],
+      "chosen": 2,
+      "answer": "El THEN dice «termina con código `2` y el directorio del change no gana ningún fichero».",
+      "decided_by": "claude"
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "Every run has always been green",
+      "field": "gap",
+      "question": "¿Qué debe ocurrir en «Every run has always been green»?",
+      "options": [
+        "«V18 se dispara para ese requisito» (lectura de A y B)",
+        "Ninguna de las anteriores, el delta debe decir explícitamente qué ocurre"
+      ],
+      "chosen": 1,
+      "answer": "El THEN dice «V18 se dispara para ese requisito con severidad `warning`».",
+      "decided_by": "claude"
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "R-ORC-010 · devils-advocate (high)",
+      "field": "attack",
+      "question": "Nada ata la grabación de --confirm-green a una respuesta del usuario: la confirmación podría ser la primera grabación y «ya figurar en el historial»; preguntar por un ID y grabar cinco también «nombra ese requisito».",
+      "options": [
+        "Atar la confirmación a la pregunta",
+        "Aceptar como límite declarado",
+        "Que oracle.py exija --record previo"
+      ],
+      "chosen": 0,
+      "answer": "Atar la confirmación a la pregunta",
+      "decided_by": "user",
+      "note": "La narrativa de R-ORC-010 dice que la skill graba --confirm-green sólo después de haber preguntado, únicamente con los IDs confirmados uno a uno y nunca como primera grabación; dos escenarios nuevos lo fijan y tests/test_verify_skill.py exige esas frases. Cierra también el ataque medium de los cinco IDs."
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "R-ORC-017 · devils-advocate (medium)",
+      "field": "attack",
+      "question": "Sólo `red` es error de uso: --confirm-green sobre un ID en missing o timeout grabaría la confirmación.",
+      "options": [
+        "Cualquier estado distinto de green es error de uso 2",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Cualquier estado distinto de green es error de uso 2",
+      "decided_by": "claude",
+      "note": "Narrativa de R-ORC-017 y WHEN del escenario «An ID that is not green in this run is a usage error» nombran red, missing y timeout."
+    },
+    {
+      "at": "2026-09-11T11:10:00Z",
+      "scenario": "R-VAL-007 · devils-advocate (medium)",
+      "field": "attack",
+      "question": "La confirmación indexada por ID no caduca: si dentro del mismo change se reescribe el test de un requisito confirmado, V18 sigue callado.",
+      "options": [
+        "Aceptar como límite declarado",
+        "Caducar la confirmación por hash del test"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado",
+      "decided_by": "claude",
+      "note": "Una confirmación es una decisión del usuario sobre un ID del change; reescribir el test tras confirmarlo es el mismo caso que reescribirlo tras un rojo grabado, que V18 tampoco detecta. Se documenta como límite en el README."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "The confirmation lands in the recorded run",
+      "field": "status_code",
+      "question": "¿Qué código de estado debe devolver el sistema en «The confirmation lands in the recorded run»?",
+      "options": [
+        "0",
+        "Ninguno, el escenario no devuelve código de estado"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno, el escenario no devuelve código de estado",
+      "decided_by": "claude",
+      "note": "Ronda 2. El THEN no nombra ningún código: el lector A infirió el 0 de R-ORC-001. Un hecho por escenario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "Several IDs separated by commas",
+      "field": "status_code",
+      "question": "¿Qué código de estado debe devolver el sistema en «Several IDs separated by commas»?",
+      "options": [
+        "0",
+        "Ninguno, el escenario no devuelve código de estado"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno, el escenario no devuelve código de estado",
+      "decided_by": "claude",
+      "note": "Ronda 2. El THEN no nombra ningún código: el lector A infirió el 0 de R-ORC-001. Un hecho por escenario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "The output keeps its eight top-level keys",
+      "field": "status_code",
+      "question": "¿Qué código de estado debe devolver el sistema en «The output keeps its eight top-level keys»?",
+      "options": [
+        "0",
+        "Ninguno, el escenario no devuelve código de estado"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno, el escenario no devuelve código de estado",
+      "decided_by": "claude",
+      "note": "Ronda 2. El THEN no nombra ningún código: el lector A infirió el 0 de R-ORC-001. Un hecho por escenario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "A run without the flag carries no confirmation",
+      "field": "status_code",
+      "question": "¿Qué código de estado debe devolver el sistema en «A run without the flag carries no confirmation»?",
+      "options": [
+        "0",
+        "Ninguno, el escenario no devuelve código de estado"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno, el escenario no devuelve código de estado",
+      "decided_by": "claude",
+      "note": "Ronda 2. El THEN no nombra ningún código: el lector A infirió el 0 de R-ORC-001. Un hecho por escenario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "A green run backed by a documented red run",
+      "field": "missing_scenario",
+      "question": "¿Forma parte «A green run backed by a documented red run» de este delta?",
+      "options": [
+        "Sí, y su efecto es «change.json pasa a estado verified» (lectura de B)",
+        "No, el delta no describe ese escenario y sobra en las lecturas que lo traen"
+      ],
+      "chosen": 0,
+      "answer": "Sí, y su efecto es «change.json pasa a estado verified» (lectura de B)",
+      "decided_by": "claude",
+      "note": "Ronda 2. El lector A devolvió 15 escenarios: se saltó el bloque MODIFIED de R-ORC-010 en delta/oracle.md. Fallo de lectura, no del delta; se repite el panel."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "A green run with no red run in the history",
+      "field": "missing_scenario",
+      "question": "¿Forma parte «A green run with no red run in the history» de este delta?",
+      "options": [
+        "Sí, y su efecto es «la skill pregunta al usuario sin escribir nada» (lectura de B)",
+        "No, el delta no describe ese escenario y sobra en las lecturas que lo traen"
+      ],
+      "chosen": 0,
+      "answer": "Sí, y su efecto es «la skill pregunta al usuario sin escribir nada» (lectura de B)",
+      "decided_by": "claude",
+      "note": "Ronda 2. El lector A devolvió 15 escenarios: se saltó el bloque MODIFIED de R-ORC-010 en delta/oracle.md. Fallo de lectura, no del delta; se repite el panel."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "The user confirms and the confirmation is recorded",
+      "field": "missing_scenario",
+      "question": "¿Forma parte «The user confirms and the confirmation is recorded» de este delta?",
+      "options": [
+        "Sí, y su efecto es «la skill vuelve a grabar el oráculo confirmando ese requisito» (lectura de B)",
+        "No, el delta no describe ese escenario y sobra en las lecturas que lo traen"
+      ],
+      "chosen": 0,
+      "answer": "Sí, y su efecto es «la skill vuelve a grabar el oráculo confirmando ese requisito» (lectura de B)",
+      "decided_by": "claude",
+      "note": "Ronda 2. El lector A devolvió 15 escenarios: se saltó el bloque MODIFIED de R-ORC-010 en delta/oracle.md. Fallo de lectura, no del delta; se repite el panel."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "The confirmation names only the IDs the user confirmed",
+      "field": "missing_scenario",
+      "question": "¿Forma parte «The confirmation names only the IDs the user confirmed» de este delta?",
+      "options": [
+        "Sí, y su efecto es «confirm-green nombra sólo el requisito que el usuario confirmó» (lectura de B)",
+        "No, el delta no describe ese escenario y sobra en las lecturas que lo traen"
+      ],
+      "chosen": 0,
+      "answer": "Sí, y su efecto es «confirm-green nombra sólo el requisito que el usuario confirmó» (lectura de B)",
+      "decided_by": "claude",
+      "note": "Ronda 2. El lector A devolvió 15 escenarios: se saltó el bloque MODIFIED de R-ORC-010 en delta/oracle.md. Fallo de lectura, no del delta; se repite el panel."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "No confirmation is recorded before asking",
+      "field": "missing_scenario",
+      "question": "¿Forma parte «No confirmation is recorded before asking» de este delta?",
+      "options": [
+        "Sí, y su efecto es «ninguna grabación lleva todavía confirm-green» (lectura de B)",
+        "No, el delta no describe ese escenario y sobra en las lecturas que lo traen"
+      ],
+      "chosen": 0,
+      "answer": "Sí, y su efecto es «ninguna grabación lleva todavía confirm-green» (lectura de B)",
+      "decided_by": "claude",
+      "note": "Ronda 2. El lector A devolvió 15 escenarios: se saltó el bloque MODIFIED de R-ORC-010 en delta/oracle.md. Fallo de lectura, no del delta; se repite el panel."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "The recorded confirmation unlocks verified",
+      "field": "missing_scenario",
+      "question": "¿Forma parte «The recorded confirmation unlocks verified» de este delta?",
+      "options": [
+        "Sí, y su efecto es «change.json pasa a estado verified» (lectura de B)",
+        "No, el delta no describe ese escenario y sobra en las lecturas que lo traen"
+      ],
+      "chosen": 0,
+      "answer": "Sí, y su efecto es «change.json pasa a estado verified» (lectura de B)",
+      "decided_by": "claude",
+      "note": "Ronda 2. El lector A devolvió 15 escenarios: se saltó el bloque MODIFIED de R-ORC-010 en delta/oracle.md. Fallo de lectura, no del delta; se repite el panel."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "A confirmation already in the history is enough",
+      "field": "missing_scenario",
+      "question": "¿Forma parte «A confirmation already in the history is enough» de este delta?",
+      "options": [
+        "Sí, y su efecto es «change.json pasa a verified sin volver a preguntar» (lectura de B)",
+        "No, el delta no describe ese escenario y sobra en las lecturas que lo traen"
+      ],
+      "chosen": 0,
+      "answer": "Sí, y su efecto es «change.json pasa a verified sin volver a preguntar» (lectura de B)",
+      "decided_by": "claude",
+      "note": "Ronda 2. El lector A devolvió 15 escenarios: se saltó el bloque MODIFIED de R-ORC-010 en delta/oracle.md. Fallo de lectura, no del delta; se repite el panel."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "The user does not confirm",
+      "field": "missing_scenario",
+      "question": "¿Forma parte «The user does not confirm» de este delta?",
+      "options": [
+        "Sí, y su efecto es «change.json no cambia» (lectura de B)",
+        "No, el delta no describe ese escenario y sobra en las lecturas que lo traen"
+      ],
+      "chosen": 0,
+      "answer": "Sí, y su efecto es «change.json no cambia» (lectura de B)",
+      "decided_by": "claude",
+      "note": "Ronda 2. El lector A devolvió 15 escenarios: se saltó el bloque MODIFIED de R-ORC-010 en delta/oracle.md. Fallo de lectura, no del delta; se repite el panel."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "A red run never writes verified",
+      "field": "missing_scenario",
+      "question": "¿Forma parte «A red run never writes verified» de este delta?",
+      "options": [
+        "Sí, y su efecto es «change.json no cambia sea cual sea su estado» (lectura de B)",
+        "No, el delta no describe ese escenario y sobra en las lecturas que lo traen"
+      ],
+      "chosen": 0,
+      "answer": "Sí, y su efecto es «change.json no cambia sea cual sea su estado» (lectura de B)",
+      "decided_by": "claude",
+      "note": "Ronda 2. El lector A devolvió 15 escenarios: se saltó el bloque MODIFIED de R-ORC-010 en delta/oracle.md. Fallo de lectura, no del delta; se repite el panel."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "The confirmation lands in the recorded run",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The confirmation lands in the recorded run» es la correcta?",
+      "options": [
+        "«confirmed_green queda con ese ID en el run»",
+        "«el último run de oracle.json trae confirmed_green con ese ID»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 2. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "A run without the flag carries no confirmation",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A run without the flag carries no confirmation» es la correcta?",
+      "options": [
+        "«el run grabado no trae la clave confirmed_green»",
+        "«el último run no tiene la clave confirmed_green»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 2. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "An ID outside the change is a usage error",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An ID outside the change is a usage error» es la correcta?",
+      "options": [
+        "«termina en error de uso, no confirma nada»",
+        "«el proceso termina con error de uso»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 2. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "An ID that is not green in this run is a usage error",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An ID that is not green in this run is a usage error» es la correcta?",
+      "options": [
+        "«termina en error, oracle.json no gana ningún run»",
+        "«termina en error y no añade ningún run»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 2. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "The output keeps its eight top-level keys",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «The output keeps its eight top-level keys»?",
+      "options": [
+        "«se graba el run con confirmed_green en oracle.json»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«se graba el run con confirmed_green en oracle.json»",
+      "decided_by": "claude",
+      "note": "Ronda 2. Blanda: es lo que --record hace en ese WHEN. El delta no cambia."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "A run without the flag carries no confirmation",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «A run without the flag carries no confirmation»?",
+      "options": [
+        "«se graba el run en oracle.json sin confirmed_green»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«se graba el run en oracle.json sin confirmed_green»",
+      "decided_by": "claude",
+      "note": "Ronda 2. Blanda: es lo que --record hace en ese WHEN. El delta no cambia."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "R-ORC-017 · devils-advocate ronda 2 (high)",
+      "field": "attack",
+      "question": "oracle.py acepta --confirm-green de cualquier invocador sin prueba de que se preguntó ni rastro que distinga una confirmación legítima.",
+      "options": [
+        "Atar la confirmación a la pregunta (decisión previa del usuario)",
+        "Que oracle.py exija prueba de la pregunta"
+      ],
+      "chosen": 0,
+      "answer": "Cubierto por la decisión del usuario en la ronda 1: la confirmación se ata a la pregunta en la skill; ningún script puede comprobar que un humano contestó, y el usuario descartó la opción de que oracle.py lo exigiera.",
+      "decided_by": "user",
+      "note": "Se documenta como límite en el README: confirmed_green es una declaración del usuario a través de la skill, tan falsificable como un run entero de oracle.json."
+    },
+    {
+      "at": "2026-09-11T11:35:00Z",
+      "scenario": "R-VAL-007 · devils-advocate ronda 2 (medium, caducidad)",
+      "field": "attack",
+      "question": "Una confirmación no caduca aunque el test se vacíe a assert True.",
+      "options": [
+        "Aceptar como límite declarado",
+        "Caducar la confirmación por hash del test"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado",
+      "decided_by": "claude",
+      "note": "Misma respuesta que en la ronda 1: reescribir el test tras confirmarlo es el mismo caso que reescribirlo tras un rojo grabado."
+    },
+    {
+      "at": "2026-09-11T11:40:00Z",
+      "scenario": "R-ORC-010 · devils-advocate ronda 2 (high, missing)",
+      "field": "attack",
+      "question": "¿Qué acredita el rojo previo? La skill aceptaba «red o missing»; V18 sólo red.",
+      "options": [
+        "Sólo `red` acredita, como V18",
+        "`red` o `missing` acreditan, y V18 acepta `missing`",
+        "Aceptar como límite declarado"
+      ],
+      "chosen": 0,
+      "answer": "Sólo `red` acredita, como V18",
+      "decided_by": "user",
+      "note": "R-ORC-010: la narrativa dice que missing y timeout no acreditan nada; escenario nuevo «A prior missing run is not a prior red run». Cierra también el ataque medium sobre el V18 imposible de limpiar."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "The confirmation lands in the recorded run",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The confirmation lands in the recorded run» es la correcta?",
+      "options": [
+        "«graba confirmed_green con ese ID en el run»",
+        "«el último run guarda confirmed_green con ese ID»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "Several IDs separated by commas",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Several IDs separated by commas» es la correcta?",
+      "options": [
+        "«graba ambos IDs en confirmed_green del run»",
+        "«el último run guarda confirmed_green con los dos IDs»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "The output keeps its eight top-level keys",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The output keeps its eight top-level keys» es la correcta?",
+      "options": [
+        "«el JSON conserva exactamente las ocho claves de siempre»",
+        "«el documento JSON conserva sus ocho claves de primer nivel»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "An ID outside the change is a usage error",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An ID outside the change is a usage error» es la correcta?",
+      "options": [
+        "«termina en error de uso sin grabar nada»",
+        "«el proceso termina en error de uso»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "An ID that is not green in this run is a usage error",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An ID that is not green in this run is a usage error» es la correcta?",
+      "options": [
+        "«termina en error y oracle.json no gana ningún run»",
+        "«termina en error de uso sin grabar ningún run»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "Confirming without recording is a usage error",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Confirming without recording is a usage error» es la correcta?",
+      "options": [
+        "«termina en error sin ejecutar ningún comando»",
+        "«termina en error de uso sin ejecutar nada»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "The user confirms and the confirmation is recorded",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The user confirms and the confirmation is recorded» es la correcta?",
+      "options": [
+        "«la skill regraba el oráculo con confirm-green»",
+        "«la skill graba de nuevo el oráculo con confirm-green»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "No confirmation is recorded before asking",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «No confirmation is recorded before asking» es la correcta?",
+      "options": [
+        "«la skill no pasa confirm-green en ninguna grabación»",
+        "«la skill no usa confirm-green antes de preguntar»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "One warning per requirement, never one per change",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «One warning per requirement, never one per change» es la correcta?",
+      "options": [
+        "«V18 se dispara una vez, nombrando el sin rojo previo»",
+        "«V18 se dispara una sola vez nombrando ese requisito»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3. Vocabulario; el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "An ID outside the change records nothing",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «An ID outside the change records nothing»?",
+      "options": [
+        "«el directorio del change no gana ningún fichero»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«el directorio del change no gana ningún fichero»",
+      "decided_by": "claude",
+      "note": "Ronda 3. Blanda: el lector B repite en side_effects lo que el THEN ya dice. El delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "A prior missing run is not a prior red run",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «A prior missing run is not a prior red run»?",
+      "options": [
+        "«no escribe nada en change.json»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«no escribe nada en change.json»",
+      "decided_by": "claude",
+      "note": "Ronda 3. Blanda: el lector B repite en side_effects lo que el THEN ya dice. El delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "A green run with no red run in the history",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «A green run with no red run in the history»?",
+      "options": [
+        "«no escribe nada en change.json»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«no escribe nada en change.json»",
+      "decided_by": "claude",
+      "note": "Ronda 3. Blanda: el lector B repite en side_effects lo que el THEN ya dice. El delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "The user confirms and the confirmation is recorded",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «The user confirms and the confirmation is recorded»?",
+      "options": [
+        "«se ejecuta --record --confirm-green nombrando ese requisito»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«se ejecuta --record --confirm-green nombrando ese requisito»",
+      "decided_by": "claude",
+      "note": "Ronda 3. Blanda: el lector B repite en side_effects lo que el THEN ya dice. El delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "The confirmation names only the IDs the user confirmed",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «The confirmation names only the IDs the user confirmed»?",
+      "options": [
+        "«se graba confirm-green con un único ID»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«se graba confirm-green con un único ID»",
+      "decided_by": "claude",
+      "note": "Ronda 3. Blanda: el lector B repite en side_effects lo que el THEN ya dice. El delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "A confirmation already in the history is enough",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «A confirmation already in the history is enough»?",
+      "options": [
+        "«no se pregunta al usuario»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 0,
+      "answer": "«no se pregunta al usuario»",
+      "decided_by": "claude",
+      "note": "Ronda 3. Blanda: el lector B repite en side_effects lo que el THEN ya dice. El delta no cambia."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "R-ORC-017 · devils-advocate ronda 3 (high, primera grabación)",
+      "field": "attack",
+      "question": "oracle.py acepta --record --confirm-green como primerísima ejecución del change; la prohibición ata a la skill, no al script.",
+      "options": [
+        "Aceptar como límite declarado (decisión previa del usuario)",
+        "Que oracle.py rechace --confirm-green sin run previo"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado",
+      "decided_by": "user",
+      "note": "El usuario eligió en la ronda 1 atar la confirmación a la pregunta en la skill y descartó la opción de que oracle.py exigiera un run previo; no se reabre. Límite documentado en el README: confirmed_green vale lo que vale quien lo invoca, igual que cualquier run de oracle.json."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "R-ORC-010 · devils-advocate ronda 3 (high, caducidad)",
+      "field": "attack",
+      "question": "La confirmación no caduca ni queda atada al test; vaciado el test, «A confirmation already in the history is enough» obliga a verified sin preguntar.",
+      "options": [
+        "Aceptar como límite declarado",
+        "Caducar la confirmación por hash del test o del verifies:"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado",
+      "decided_by": "claude",
+      "note": "Tercera vez que aparece (medium en rondas 1 y 2, high ahora). Misma respuesta, bajo la instrucción del usuario del 2026-09-11 de cerrar con la recomendación de Claude: reescribir el test tras confirmarlo es el mismo agujero que reescribirlo tras un rojo grabado, que ningún run detecta; atar la confirmación a un hash del test convertiría cada refactor del test en una pregunta nueva. Límite documentado en el README."
+    },
+    {
+      "at": "2026-09-11T12:05:00Z",
+      "scenario": "R-ORC-017 · devils-advocate ronda 3 (medium, run perdido)",
+      "field": "attack",
+      "question": "Si al regrabar con --confirm-green R-A otro requisito sale en red o timeout, el 2 tira el run entero y se pierde ese rojo.",
+      "options": [
+        "La comprobación de --confirm-green afecta sólo a los IDs nombrados",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "La comprobación de --confirm-green afecta sólo a los IDs nombrados",
+      "decided_by": "claude",
+      "note": "Es lo que R-ORC-017 ya dice («sólo si cada uno de esos IDs … sale en green»): un ID no nombrado en red no es error de uso; el run se graba con confirmed_green y el proceso sale con 1 como cualquier run en rojo. Se implementa así y se documenta en el README."
+    }
+  ]
+}

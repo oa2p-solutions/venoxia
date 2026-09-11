@@ -173,6 +173,62 @@ class VerifySkillBodyTest(unittest.TestCase):
             "skills/verify/SKILL.md no nombra el caso «verde sin rojo»",
         )
 
+    def test_records_the_confirmation_with_confirm_green_before_verified(self):
+        """R-ORC-010 · la confirmación del usuario se graba con --confirm-green, no sólo se dice.
+
+        @covers R-ORC-010
+        """
+        text = _read_skill()
+        self.assertIn(
+            "--confirm-green",
+            text,
+            "skills/verify/SKILL.md no manda grabar la confirmación con «--confirm-green»",
+        )
+        self.assertIn(
+            "confirmed_green",
+            text,
+            "skills/verify/SKILL.md no nombra la lista «confirmed_green» que V18 lee",
+        )
+
+    def test_records_the_confirmation_only_after_asking_and_only_for_confirmed_ids(self):
+        """R-ORC-010 · --confirm-green nunca precede a la pregunta ni nombra IDs sin confirmar.
+
+        @covers R-ORC-010
+        """
+        text = _read_skill()
+        self.assertIn(
+            "sólo después de haber preguntado",
+            text,
+            "skills/verify/SKILL.md no dice que --confirm-green va sólo después de preguntar",
+        )
+        self.assertIn(
+            "únicamente con los IDs que el usuario confirmó",
+            text,
+            "skills/verify/SKILL.md no acota --confirm-green a los IDs confirmados",
+        )
+        self.assertIn(
+            "nunca como primera grabación",
+            text,
+            "skills/verify/SKILL.md no prohíbe que la confirmación sea la primera grabación",
+        )
+
+    def test_only_a_prior_red_run_counts_as_red(self):
+        """R-ORC-010 · un run anterior en «missing» no acredita el rojo previo.
+
+        @covers R-ORC-010
+        """
+        text = _read_skill()
+        self.assertNotIn(
+            "`requirement_id` en `red` o `missing`",
+            text,
+            "skills/verify/SKILL.md sigue tratando «missing» como rojo previo",
+        )
+        self.assertIn(
+            "`missing` y `timeout` no acreditan",
+            text,
+            "skills/verify/SKILL.md no dice que missing y timeout no acreditan el rojo",
+        )
+
     def test_declares_it_never_edits_tests_or_production_code(self):
         text = _read_skill()
         self.assertRegex(

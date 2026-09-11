@@ -1399,5 +1399,114 @@ class OracleResultRunnerTest(unittest.TestCase):
             )
 
 
+class OracleConfirmGreenTest(unittest.TestCase):
+    """R-ORC-017 · «--confirm-green» graba junto al run qué verdes confirmó el usuario."""
+
+    def _project(self, project: Project, *, red: bool = False) -> Path:
+        project.oracle_config(FAKE_RUNNER_COMMAND)
+        reqs = [
+            requirement(
+                id="R-ORC-901",
+                title="Uno",
+                verifies=project.oracle("R-ORC-901", result="red" if red else None),
+            ),
+            requirement(id="R-ORC-902", title="Dos", verifies=project.oracle("R-ORC-902")),
+        ]
+        project.delta(CHANGE_ID, project.capability_name, added=reqs, declare=("ADDED",))
+        return project.path(f".venoxia/changes/{CHANGE_ID}/oracle.json")
+
+    def _last_run(self, history_path: Path) -> dict:
+        return json.loads(history_path.read_text(encoding="utf-8"))["runs"][-1]
+
+    def test_the_confirmation_lands_in_the_recorded_run(self):
+        """@covers R-ORC-017"""
+        with Project() as project:
+            history_path = self._project(project)
+
+            run = project.run_oracle("--change", CHANGE_ID, "--record", "--confirm-green", "R-ORC-901")
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertEqual(self._last_run(history_path)["confirmed_green"], ["R-ORC-901"])
+
+    def test_several_ids_separated_by_commas(self):
+        """@covers R-ORC-017"""
+        with Project() as project:
+            history_path = self._project(project)
+
+            run = project.run_oracle(
+                "--change", CHANGE_ID, "--record", "--confirm-green", "R-ORC-901,R-ORC-902"
+            )
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertEqual(
+                sorted(self._last_run(history_path)["confirmed_green"]), ["R-ORC-901", "R-ORC-902"]
+            )
+
+    def test_the_output_keeps_its_eight_top_level_keys(self):
+        """@covers R-ORC-017"""
+        with Project() as project:
+            self._project(project)
+
+            run = project.run_oracle_json(
+                "--change", CHANGE_ID, "--record", "--confirm-green", "R-ORC-901"
+            )
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertEqual(
+                set(run.json.keys()),
+                {"version", "change", "ran_at", "runner", "results", "counts", "all_green", "all_red"},
+            )
+
+    def test_a_run_without_the_flag_carries_no_confirmation(self):
+        """@covers R-ORC-017"""
+        with Project() as project:
+            history_path = self._project(project)
+
+            run = project.run_oracle("--change", CHANGE_ID, "--record")
+
+            self.assertEqual(run.returncode, 0, run.describe())
+            self.assertNotIn("confirmed_green", self._last_run(history_path))
+
+    def test_an_id_outside_the_change_is_a_usage_error(self):
+        """@covers R-ORC-017"""
+        with Project() as project:
+            history_path = self._project(project)
+            before = sorted(path.name for path in history_path.parent.iterdir())
+
+            run = project.run_oracle("--change", CHANGE_ID, "--record", "--confirm-green", "R-ORC-999")
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("R-ORC-999", run.stderr)
+            self.assertNotIn("Traceback", run.stderr)
+            self.assertEqual(sorted(path.name for path in history_path.parent.iterdir()), before)
+            self.assertFalse(history_path.exists())
+
+    def test_an_id_that_is_not_green_in_this_run_is_a_usage_error(self):
+        """@covers R-ORC-017"""
+        with Project() as project:
+            history_path = self._project(project, red=True)
+
+            run = project.run_oracle("--change", CHANGE_ID, "--record", "--confirm-green", "R-ORC-901")
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("R-ORC-901", run.stderr)
+            self.assertFalse(history_path.exists(), "un run con una confirmación imposible no se graba")
+
+    def test_confirming_without_recording_is_a_usage_error(self):
+        """@covers R-ORC-017"""
+        with Project() as project:
+            self._project(project)
+            log_path = project.path("runner.log")
+
+            run = project.run_oracle(
+                "--change", CHANGE_ID, "--confirm-green", "R-ORC-901",
+                env={"FAKE_RUNNER_LOG": str(log_path)},
+            )
+
+            self.assertEqual(run.returncode, 2, run.describe())
+            self.assertIn("--record", run.stderr)
+            self.assertEqual(_log_lines(log_path), [])
+
+
 if __name__ == "__main__":
     unittest.main()

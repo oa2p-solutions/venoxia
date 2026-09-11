@@ -85,6 +85,9 @@ CHANGES_DIR = "changes"
 DELTA_DIR = "delta"
 CONFIG_FILENAME = "venoxia.json"
 RECORD_FILENAME = "oracle.json"
+#: La lista de IDs cuyo verde sin rojo previo confirmó el usuario (R-ORC-017);
+#: va en la entrada del historial, no en el documento de salida.
+CONFIRMED_GREEN_KEY = "confirmed_green"
 
 # La clave de `venoxia.json` con los runners con nombre, y la del bloque de
 # metadatos con la que un requisito elige uno de ellos.
@@ -704,7 +707,13 @@ def _corrupt_copy_path(path: Path, ran_at: object) -> Path:
     return candidate
 
 
-def record(path: Path, change: str, payload: dict, keep: int = MAX_RUNS) -> bool:
+def record(
+    path: Path,
+    change: str,
+    payload: dict,
+    keep: int = MAX_RUNS,
+    confirmed_green: list[str] | None = None,
+) -> bool:
     """Añade `payload` (sin «change») al historial y conserva como mucho `keep` runs.
 
     Devuelve `True` si el run quedó en disco. Con un historial corrupto, los
@@ -712,8 +721,14 @@ def record(path: Path, change: str, payload: dict, keep: int = MAX_RUNS) -> bool
     copia no se puede escribir el historial original se queda como está y el
     run no se graba: quedarse sin el rojo que `V18` busca es peor que quedarse
     sin grabar un run (`R-ORC-012`).
+
+    `confirmed_green` (`R-ORC-017`) se anota sólo en la entrada del historial,
+    nunca en el documento que sale por stdout: el esquema de salida conserva
+    sus ocho claves y la confirmación vive donde `V18` la lee, en `oracle.json`.
     """
     entry = {key: value for key, value in payload.items() if key != "change"}
+    if confirmed_green:
+        entry[CONFIRMED_GREEN_KEY] = list(confirmed_green)
     runs, corrupt_text = _read_history(path)
     if corrupt_text is not None:
         copy_path = _corrupt_copy_path(path, payload.get("ran_at"))
@@ -805,6 +820,33 @@ def render_text(payload: dict, no_color: bool = False) -> str:
 # ---------------------------------------------------------------------------
 
 
+def parse_confirmed_green(raw: str | None) -> list[str]:
+    """Los IDs de `--confirm-green`, separados por comas, sin vacíos ni repetidos."""
+    if not raw:
+        return []
+    seen: list[str] = []
+    for piece in raw.split(","):
+        rid = piece.strip()
+        if rid and rid not in seen:
+            seen.append(rid)
+    return seen
+
+
+def check_confirmed_ids(
+    confirmed_green: list[str], requirements: list[Requirement], change: str
+) -> None:
+    """`UsageError` si algún ID confirmado no es un requisito del change (R-ORC-017)."""
+    known = {requirement.id for requirement in requirements if requirement.id}
+    unknown = [rid for rid in confirmed_green if rid not in known]
+    if unknown:
+        listed = ", ".join(f"«{rid}»" for rid in unknown)
+        raise UsageError(
+            f"«--confirm-green» nombra {listed}, que no es ningún requisito del change "
+            f"«{change}»: sólo se confirma lo que el delta declara. No se ha ejecutado "
+            "ni grabado nada."
+        )
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Define la interfaz de línea de comandos."""
     cli = argparse.ArgumentParser(
@@ -816,9 +858,11 @@ def build_parser() -> argparse.ArgumentParser:
         ),
         epilog=(
             "Códigos de salida: 0 todos en green (o --dry-run) · 1 alguno en red, "
-            "missing o timeout · 2 error de uso, --dry-run junto a --record, o un "
-            "--record que no pudo dejar el run en disco. Un oracle.json corrupto se "
-            "copia a oracle.json.corrupt-<marca> antes de sustituirlo."
+            "missing o timeout · 2 error de uso, --dry-run junto a --record, un "
+            "--record que no pudo dejar el run en disco, o un --confirm-green sin "
+            "--record, con un ID ajeno al change o con un ID que no salió en green. "
+            "Un oracle.json corrupto se copia a oracle.json.corrupt-<marca> antes de "
+            "sustituirlo."
         ),
     )
     cli.add_argument(
@@ -850,6 +894,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="imprime el comando de cada requisito y no ejecuta nada",
     )
     cli.add_argument(
+        "--confirm-green",
+        metavar="IDS",
+        help=(
+            "IDs del change (separados por comas) cuyo verde el usuario confirmó sin "
+            "rojo previo; se anotan como «confirmed_green» en el run grabado. Exige "
+            "--record y que cada ID salga en green en este mismo run"
+        ),
+    )
+    cli.add_argument(
         "--json",
         action="store_true",
         help="emite el JSON del esquema estable en vez del informe de texto",
@@ -869,6 +922,16 @@ def main(argv: list[str] | None = None) -> int:
         print(
             "venoxia: «--dry-run» y «--record» se excluyen: no se graba un run que no se "
             "ha ejecutado. Quita uno de los dos.",
+            file=sys.stderr,
+        )
+        return EXIT_USAGE
+
+    # R-ORC-017: una confirmación sólo tiene sentido junto al run que la graba.
+    confirmed_green = parse_confirmed_green(args.confirm_green)
+    if confirmed_green and not args.record:
+        print(
+            "venoxia: «--confirm-green» exige «--record»: la confirmación se anota en el "
+            "run grabado en oracle.json y sin grabar no hay dónde dejarla.",
             file=sys.stderr,
         )
         return EXIT_USAGE
@@ -894,6 +957,9 @@ def main(argv: list[str] | None = None) -> int:
         # antes de ejecutar o listar nada, para que ningún comando corra ni
         # ningún fichero se escriba.
         check_runners(requirements, cfg)
+        # R-ORC-017: un ID ajeno al change se descubre antes de ejecutar nada,
+        # para que no corra ningún comando ni se escriba ningún fichero.
+        check_confirmed_ids(confirmed_green, requirements, args.change)
     except UsageError as error:
         print(f"venoxia: {error}", file=sys.stderr)
         return EXIT_USAGE
@@ -906,10 +972,26 @@ def main(argv: list[str] | None = None) -> int:
     results = run_all(requirements, root, cfg, args.timeout)
     payload = build_payload(args.change, cfg, results)
 
+    # R-ORC-017: confirmar un verde que este run no produjo sería grabar una
+    # confirmación de nada; el run entero se descarta y no se graba.
+    not_green = [
+        result.requirement_id
+        for result in results
+        if result.requirement_id in confirmed_green and result.status != STATUS_GREEN
+    ]
+    if not_green:
+        print(
+            f"venoxia: «--confirm-green» nombra {', '.join(f'«{rid}»' for rid in not_green)}, "
+            "que no ha salido en green en este run: sólo se confirma un verde que existe. "
+            "No se ha grabado nada.",
+            file=sys.stderr,
+        )
+        return EXIT_USAGE
+
     recorded = True
     if args.record:
         record_path = root / VENOXIA_DIR / CHANGES_DIR / args.change / RECORD_FILENAME
-        recorded = record(record_path, args.change, payload)
+        recorded = record(record_path, args.change, payload, confirmed_green=confirmed_green)
 
     if args.json:
         print(render_json(payload))

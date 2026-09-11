@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "R-ORC-017 sólo rechaza IDs que no pertenecen al change o que no salen en `green`: un `oracle.py --record --confirm-green R-A,R-B,R-C` como primerísima ejecución del change es legal y graba un historial de un único run, todo verde y todo confirmado. Con eso V18 calla y R-ORC-010 escribe `verified` sin que nadie haya visto fallar jamás un test; la prohibición «nunca como primera grabación del change» ata a la skill, no al script, y el script es justo lo que un agente puede invocar directamente.",
+    "requirement_id": "R-ORC-017",
+    "severity": "high"
+  },
+  {
+    "attack": "La confirmación grabada no caduca ni queda atada al test que se ejecutó (sólo es un ID en una lista de un run pasado): confirmado R-X una vez, se puede después vaciar su test o apuntar su `verifies:` a otro fichero, y el escenario «A confirmation already in the history is enough» obliga a escribir `verified` sin volver a preguntar, con V18 callado para siempre. El change queda verificado sobre un test que nunca se demostró capaz de fallar.",
+    "requirement_id": "R-ORC-010",
+    "severity": "high"
+  },
+  {
+    "attack": "«cualquier otro estado es un error de uso, código 2, que no graba nada» permite tirar el run entero: si al re-grabar con `--confirm-green R-A` otro requisito del change sale en `red` o `timeout`, el proceso sale con 2 y `oracle.json` no gana ningún run, perdiendo precisamente el rojo que habría acreditado a ese otro requisito por la vía legítima, además de la confirmación recién obtenida del usuario.",
+    "requirement_id": "R-ORC-017",
+    "severity": "medium"
+  }
+]

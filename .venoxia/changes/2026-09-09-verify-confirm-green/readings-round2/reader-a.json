@@ -1,0 +1,122 @@
+[
+  {
+    "scenario": "The confirmation lands in the recorded run",
+    "effect": "confirmed_green queda con ese ID en el run",
+    "status_code": "0",
+    "side_effects": ["se escribe confirmed_green en el run grabado de oracle.json"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Several IDs separated by commas",
+    "effect": "confirmed_green trae los dos IDs en el run",
+    "status_code": "0",
+    "side_effects": ["se escribe confirmed_green con ambos IDs en oracle.json"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The output keeps its eight top-level keys",
+    "effect": "el JSON de salida conserva las ocho claves de primer nivel",
+    "status_code": "0",
+    "side_effects": ["se graba el run con confirmed_green en oracle.json"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A run without the flag carries no confirmation",
+    "effect": "el run grabado no trae la clave confirmed_green",
+    "status_code": "0",
+    "side_effects": ["se graba el run en oracle.json sin confirmed_green"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An ID outside the change is a usage error",
+    "effect": "termina en error de uso, no confirma nada",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An ID outside the change records nothing",
+    "effect": "termina en error, el change no gana ningún fichero",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An ID that is not green in this run is a usage error",
+    "effect": "termina en error, oracle.json no gana ningún run",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Confirming without recording is a usage error",
+    "effect": "termina en error sin ejecutar ningún comando",
+    "status_code": "2",
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Red preceded the green",
+    "effect": "V18 no se dispara para ese requisito",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The only run is already green",
+    "effect": "V18 se dispara con severidad warning",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Every run has always been green",
+    "effect": "V18 se dispara con severidad warning",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "One warning per requirement, never one per change",
+    "effect": "V18 se dispara una sola vez, nombrando el sin rojo previo",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A confirmed green is silent",
+    "effect": "V18 no se dispara para ese requisito",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A confirmation covers only the IDs it names",
+    "effect": "V18 se dispara una vez, nombrando el no confirmado",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The confirmation may live in an earlier run",
+    "effect": "V18 no se dispara para ese requisito",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

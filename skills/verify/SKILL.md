@@ -70,28 +70,34 @@ Igual que hace `/venoxia:validate`:
 |---|---|---|
 | `0` | Todos los requisitos del change en `green` | Sigue al paso 6: puede que toque escribir `verified` |
 | `1` | Al menos uno en `red`, `missing` o `timeout` | Sigue a «El rojo correcto», más abajo. No toques `change.json` |
-| `2` | Error de uso: falta `venoxia.json`, el `test_command` no trae `{files}`, o el change no existe | No hay veredicto sobre el oráculo: reproduce el mensaje del script y corrige la invocación, no `change.json` |
+| `2` | Error de uso: falta `venoxia.json`, el `test_command` no trae `{files}`, el change no existe, o `--confirm-green` va sin `--record`, nombra un ID ajeno al change o un ID que no salió en verde | No hay veredicto sobre el oráculo: reproduce el mensaje del script y corrige la invocación, no `change.json` |
 
 Un `2` nunca se presenta como un rojo ni como un verde: el oráculo no llegó a correr.
 
 ### El rojo correcto (código `1`)
 
-Con todos los requisitos del change en `red` o `missing` —el caso normal antes de escribir una sola línea de código—, dilo así: **«rojo correcto»**. Es la prueba de que el oráculo funciona, no un problema. El siguiente paso es escribir el código de producción, y esta skill no lo hace: **no toca `change.json`**, se queda en `validated` (o en `verified`, si venía de ahí, sin que nada cambie).
+Con todos los requisitos del change en `red` —el caso normal antes de escribir una sola línea de código—, dilo así: **«rojo correcto»**. Es la prueba de que el oráculo funciona, no un problema. Si alguno sale en `missing`, el fichero que su `verifies:` nombra todavía no existe: dilo con su ID, porque ese run no le acreditará el rojo previo y, cuando llegue el verde, tocará preguntar. El siguiente paso es escribir el código de producción, y esta skill no lo hace: **no toca `change.json`**, se queda en `validated` (o en `verified`, si venía de ahí, sin que nada cambie).
 
 Si el rojo es parcial —unos requisitos en verde y otros en rojo—, el mismo criterio se aplica sin matices: mientras no estén todos en `green`, no hay nada que escribir en `change.json`, y lo dices con la lista exacta de qué falta.
 
 ### El verde con rojo detrás (código `0`, con historial)
 
-Antes de escribir nada, lee `.venoxia/changes/<id>/oracle.json` con `Read` y mira su `runs`: una lista ordenada del más antiguo al más reciente. Para cada requisito que el último run trae en `green`, busca si **algún run anterior** (no el último) tiene ese mismo `requirement_id` en `red` o `missing`.
+Antes de escribir nada, lee `.venoxia/changes/<id>/oracle.json` con `Read` y mira su `runs`: una lista ordenada del más antiguo al más reciente. Para cada requisito que el último run trae en `green`, busca si **algún run anterior** (no el último) tiene ese mismo `requirement_id` en `red`, o si algún run del historial —el último incluido— lo trae en su lista `confirmed_green`. Sólo `red` acredita el rojo previo: `missing` y `timeout` no acreditan nada, porque un fichero que no existe o un test que no termina no demuestran que el test detecte la ausencia del comportamiento.
 
-- **Todos lo tienen** — el ciclo rojo→verde está documentado en el disco. Lee `change.json`, cambia **únicamente** la clave `state` a `"verified"` y deja el resto de claves intactas. Dilo con todas las letras: «`<id>` pasa a "verified": el oráculo está en verde y el historial acredita que cada requisito estuvo en rojo antes».
+- **Todos lo tienen** — el ciclo rojo→verde está documentado en el disco, o el usuario ya lo confirmó y la confirmación quedó grabada. Lee `change.json`, cambia **únicamente** la clave `state` a `"verified"` y deja el resto de claves intactas. Dilo con todas las letras: «`<id>` pasa a "verified": el oráculo está en verde y el historial acredita que cada requisito estuvo en rojo antes» (o «…figura en `confirmed_green`», si es el caso, sin volver a preguntar).
 - **Alguno no lo tiene** — sigue al párrafo de abajo: es «verde sin rojo», y ahí no se escribe nada todavía.
 
 ### Verde sin rojo (código `0`, sin historial que lo respalde)
 
-Que el primer run de un requisito ya salga en verde es ambiguo entre dos historias muy distintas: se te olvidó grabar el rojo antes de implementar, o el test nunca comprobó nada y pasaría igual sin la implementación. **No escribas `verified` en este caso.** Presenta el aviso con el requisito exacto que no tiene un rojo previo, y pregunta al usuario, en una frase: *¿has visto fallar este test antes de que la implementación existiera?*
+Que el primer run de un requisito ya salga en verde es ambiguo entre dos historias muy distintas: se te olvidó grabar el rojo antes de implementar, o el test nunca comprobó nada y pasaría igual sin la implementación. Un run anterior en `missing` es el mismo caso: el test aún no existía, así que nunca falló. **No escribas `verified` en este caso.** Presenta el aviso con el requisito exacto que no tiene un rojo previo, y pregunta al usuario, en una frase por requisito: *¿has visto fallar este test antes de que la implementación existiera?*
 
-Sólo con una confirmación explícita del usuario —no un silencio, no un «probablemente»— escribes `"state": "verified"`, y lo dejas dicho en la entrega tal cual: «`<id>` pasa a "verified" por confirmación explícita del usuario: el run no tenía un rojo previo grabado». Sin confirmación, `change.json` se queda como está y lo dices.
+Sólo con una confirmación explícita del usuario —no un silencio, no un «probablemente»— la confirmación se **graba**, no sólo se dice: vuelve a ejecutar el oráculo con `--record --confirm-green <IDs>`, y `oracle.py` anota esos IDs en la lista `confirmed_green` del run que graba, que es lo que `V18` lee para dejar de avisar. Tres reglas sin excepción, porque son la única salvaguarda que tiene este camino: `--confirm-green` se pasa sólo después de haber preguntado, únicamente con los IDs que el usuario confirmó uno a uno —cinco requisitos sin rojo previo y una sola confirmación son un solo ID en la lista—, y nunca como primera grabación del change: si todavía no has preguntado por ningún requisito, ninguna grabación lleva `--confirm-green`.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/oracle.py" --root "<raíz>" --change "<id>" --record --confirm-green "R-XXX-001,R-XXX-004" --json --no-color
+```
+
+Si ese run vuelve a salir con `0` y trae los IDs en `confirmed_green`, escribes `"state": "verified"` y lo dejas dicho en la entrega tal cual: «`<id>` pasa a "verified" por confirmación explícita del usuario, grabada en `confirmed_green` del run de `<ran_at>`: el run no tenía un rojo previo grabado». Si sale con `2` —un ID que no está en el change o que no salió en verde—, reproduce el mensaje y no toques `change.json`. Sin confirmación, `change.json` se queda como está y lo dices.
 
 ## La entrega
 
@@ -102,4 +108,5 @@ Termina con un informe corto:
 - Cuál de los tres casos de arriba aplicó, y por qué.
 - Si escribiste `verified`: qué requisitos lo acreditan y con qué run de `oracle.json` (fecha de `ran_at`).
 - Si no escribiste nada: qué falta exactamente para que la próxima ejecución sí pueda.
+- Si grabaste una confirmación: qué IDs lleva `confirmed_green` y en qué run.
 - El siguiente paso: escribir el código si el rojo era correcto, confirmar si el aviso pedía confirmación, o —con `verified` ya escrito— que el bucle corto sigue con `/venoxia:specify` de la siguiente capability.

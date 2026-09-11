@@ -1506,6 +1506,26 @@ def rule_v17(ctx: Context) -> list[Finding]:
     return findings
 
 
+ORACLE_CONFIRMED_GREEN_KEY = "confirmed_green"
+
+
+def _confirmed_green_ids(runs: list[dict]) -> set[str]:
+    """Los IDs que algún run del historial trae en `confirmed_green` (R-VAL-007).
+
+    Vale cualquier run, no sólo el último: la confirmación se grabó una vez y
+    los runs posteriores en verde no la repiten. Una lista mal formada se
+    ignora: no confirma nada y V18 avisa como si no estuviera.
+    """
+    confirmed: set[str] = set()
+    for run in runs:
+        if not isinstance(run, dict):
+            continue
+        ids = run.get(ORACLE_CONFIRMED_GREEN_KEY)
+        if isinstance(ids, list):
+            confirmed.update(rid for rid in ids if isinstance(rid, str) and rid)
+    return confirmed
+
+
 def rule_v18(ctx: Context) -> list[Finding]:
     """V18 · Aviso: un requisito llegó a verde sin haber pasado por rojo antes.
 
@@ -1514,8 +1534,10 @@ def rule_v18(ctx: Context) -> list[Finding]:
     test falla antes de que exista la implementación— no depende de en qué
     fase del ciclo de vida esté el change. Para cada requisito en verde en el
     último run, hace falta un run **anterior** donde ese mismo requisito
-    estuviera en rojo; si no lo hay, un aviso por requisito, nunca uno solo
-    por change.
+    estuviera en rojo, o que algún run del historial lo traiga en su lista
+    `confirmed_green` (el usuario confirmó, vía `oracle.py --confirm-green`,
+    que vio fallar el test; `R-VAL-007`); si no hay ni lo uno ni lo otro, un
+    aviso por requisito, nunca uno solo por change.
     """
     findings: list[Finding] = []
     for change_id in _requirements_by_change(ctx):
@@ -1540,8 +1562,10 @@ def rule_v18(ctx: Context) -> list[Finding]:
                 if status == ORACLE_STATUS_RED:
                     ever_red.add(rid)
 
+        confirmed = _confirmed_green_ids(runs)
+
         for requirement_id in green_ids:
-            if requirement_id in ever_red:
+            if requirement_id in ever_red or requirement_id in confirmed:
                 continue
             findings.append(
                 Finding(
@@ -1556,8 +1580,9 @@ def rule_v18(ctx: Context) -> list[Finding]:
                     hint=(
                         f"Antes de escribir el código, deja el test de «{requirement_id}» "
                         "en rojo y grábalo con «python3 scripts/oracle.py --change "
-                        f"{change_id} --record»; si ya se comprobó y esto es una "
-                        "reconstrucción del historial, no hay nada que arreglar."
+                        f"{change_id} --record»; si el usuario ya vio fallar el test, "
+                        "graba su confirmación con «--record --confirm-green "
+                        f"{requirement_id}» y V18 deja de avisar."
                     ),
                 )
             )
