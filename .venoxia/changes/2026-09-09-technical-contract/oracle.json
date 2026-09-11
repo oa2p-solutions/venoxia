@@ -1,0 +1,256 @@
+{
+  "version": 1,
+  "change": "2026-09-09-technical-contract",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-09T21:01:19Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-019",
+          "verifies": [
+            "tests/test_check.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 1306,
+          "output_tail": "................F.\n======================================================================\nFAIL: test_list_names_the_three_steps_with_their_commands_and_runs_nothing (tests.test_check.TestTheThreeSteps.test_list_names_the_three_steps_with_their_commands_and_runs_nothing)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/afroxstudio/Developments/ia/venoxia/tests/test_check.py\", line 110, in test_list_names_the_three_steps_with_their_commands_and_runs_nothing\n    self.assertNotRegex(\n    ~~~~~~~~~~~~~~~~~~~^\n        run.stdout, r\"(?m)^coverage\\b\", \"coverage ya no es un paso propio: corre dentro del gate\"\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: Regex matched: 'coverage' matches '(?m)^coverage\\\\b' in 'matrix[3.12]: docker run --rm --user 501:20 -e HOME=/tmp -v /Users/afroxstudio/Developments/ia/venoxia:/w -w /w python:3.12-slim python3 -m unittest discover -s tests -q\\nmatrix[3.13]: docker run --rm --user 501:20 -e HOME=/tmp -v /Users/afroxstudio/Developments/ia/venoxia:/w -w /w python:3.13-slim python3 -m unittest discover -s tests -q\\nmatrix[3.14]: docker run --rm --user 501:20 -e HOME=/tmp -v /Users/afroxstudio/Developments/ia/venoxia:/w -w /w python:3.14-slim python3 -m unittest discover -s tests -q\\ncoverage: /opt/homebrew/opt/python@3.14/bin/python3.14 tools/coverage.py\\ngate: /opt/homebrew/opt/python@3.14/bin/python3.14 scripts/gate.py --root .\\nplugin-validate: claude plugin validate . --strict\\n' : coverage ya no es un paso propio: corre dentro del gate\n\n----------------------------------------------------------------------\nRan 18 tests in 1.266s\n\nFAILED (failures=1)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_check.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-001",
+          "verifies": [
+            "tests/test_technical_contract.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 824,
+          "output_tail": "............\n----------------------------------------------------------------------\nRan 12 tests in 0.787s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_technical_contract.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-002",
+          "verifies": [
+            "tests/test_technical_contract.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 826,
+          "output_tail": "............\n----------------------------------------------------------------------\nRan 12 tests in 0.789s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_technical_contract.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-003",
+          "verifies": [
+            "tests/test_guardian.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4223,
+          "output_tail": ".................................s.................................................................\n----------------------------------------------------------------------\nRan 99 tests in 4.185s\n\nOK (skipped=1)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_guardian.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-004",
+          "verifies": [
+            "tools/coverage.py",
+            "tests/test_coverage.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 88741,
+          "output_tail": "\n----------------------------------------------------------------------\nRan 905 tests in 88.380s\n\nFAILED (failures=1, errors=3, skipped=1)\n\nLa suite no terminó en OK bajo medición (código 1): esto ya no es un artefacto de la instrumentación — con tools/trace_run.py el código de salida es el real de unittest. Corrige la suite antes de fiarte de la tabla de abajo.\n\nfichero                          ejecutables ejecutadas      % umbral  estado\n-----------------------------------------------------------------------------\nscripts/charter_lint.py                 1380       1316   95.4     93  ok\nscripts/diff_readings.py                1156       1086   93.9     91  ok\nscripts/gate.py                          175        168   96.0     93  ok\nscripts/guardian.py                      534        463   86.7     85  ok\nscripts/oracle.py                        529        513   97.0     95  ok\nscripts/validate.py                     1159       1086   93.7     91  ok\nscripts/venoxia/__init__.py                3          3  100.0     98  ok\nscripts/venoxia/model.py                 121        120   99.2     97  ok\nscripts/venoxia/parser.py                539        450   83.5     81  ok\nscripts/venoxia/report.py                153        143   93.5     91  ok",
+          "runner": {
+            "name": "coverage",
+            "command": "python3 tools/coverage.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-005",
+          "verifies": [
+            "tests/test_technical_contract.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 853,
+          "output_tail": "............\n----------------------------------------------------------------------\nRan 12 tests in 0.817s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_technical_contract.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-006",
+          "verifies": [
+            "tests/test_report.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 82,
+          "output_tail": ".....................................................\n----------------------------------------------------------------------\nRan 53 tests in 0.026s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_report.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 5,
+        "red": 2,
+        "missing": 0,
+        "timeout": 0,
+        "total": 7
+      },
+      "all_green": false,
+      "all_red": false
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-09T21:05:55Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CI-019",
+          "verifies": [
+            "tests/test_check.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 1245,
+          "output_tail": "..................\n----------------------------------------------------------------------\nRan 18 tests in 1.208s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_check.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-001",
+          "verifies": [
+            "tests/test_technical_contract.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 838,
+          "output_tail": "............\n----------------------------------------------------------------------\nRan 12 tests in 0.800s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_technical_contract.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-002",
+          "verifies": [
+            "tests/test_technical_contract.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 821,
+          "output_tail": "............\n----------------------------------------------------------------------\nRan 12 tests in 0.785s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_technical_contract.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-003",
+          "verifies": [
+            "tests/test_guardian.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 4188,
+          "output_tail": ".................................s.................................................................\n----------------------------------------------------------------------\nRan 99 tests in 4.152s\n\nOK (skipped=1)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_guardian.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-004",
+          "verifies": [
+            "tools/coverage.py",
+            "tests/test_coverage.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 85134,
+          "output_tail": "venoxia: no se pudo escribir «/private/var/folders/fc/bv91k_zs2tg576k066lxf86r0000gn/T/venoxia-test-lh8nxufz/project/.venoxia/changes/c1/oracle.json»: disco lleno; este run no se ha grabado.\n----------------------------------------------------------------------\nRan 906 tests in 84.791s\n\nOK (skipped=1)\n\nLa suite terminó en OK bajo medición.\n\nfichero                          ejecutables ejecutadas      % umbral  estado\n-----------------------------------------------------------------------------\nscripts/charter_lint.py                 1380       1316   95.4     93  ok\nscripts/diff_readings.py                1156       1086   93.9     91  ok\nscripts/gate.py                          175        168   96.0     93  ok\nscripts/guardian.py                      534        463   86.7     85  ok\nscripts/oracle.py                        529        513   97.0     95  ok\nscripts/validate.py                     1159       1086   93.7     91  ok\nscripts/venoxia/__init__.py                3          3  100.0     98  ok\nscripts/venoxia/model.py                 121        120   99.2     97  ok\nscripts/venoxia/parser.py                539        450   83.5     81  ok\nscripts/venoxia/report.py                153        143   93.5     91  ok",
+          "runner": {
+            "name": "coverage",
+            "command": "python3 tools/coverage.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-005",
+          "verifies": [
+            "tests/test_technical_contract.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 821,
+          "output_tail": "............\n----------------------------------------------------------------------\nRan 12 tests in 0.782s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_technical_contract.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        },
+        {
+          "requirement_id": "R-TEC-006",
+          "verifies": [
+            "tests/test_report.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 84,
+          "output_tail": "......................................................\n----------------------------------------------------------------------\nRan 54 tests in 0.027s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_report.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 7,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 7
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

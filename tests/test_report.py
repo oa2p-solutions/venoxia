@@ -190,6 +190,7 @@ class TestJsonSchemaKeys(unittest.TestCase):
         """El primer nivel trae las siete claves del esquema, ni una más ni una menos."""
         self.assertEqual(set(self.payload), set(SCHEMA_TOP_LEVEL_KEYS))
 
+    # @covers R-TEC-006
     def test_payload_version_is_one(self):
         """La versión del esquema publicado es 1, el entero, no la cadena."""
         self.assertEqual(self.payload["version"], 1)
@@ -210,6 +211,7 @@ class TestJsonSchemaKeys(unittest.TestCase):
             with self.subTest(rule=entry.get("rule")):
                 self.assertEqual(set(entry), set(SCHEMA_FINDING_KEYS))
 
+    # @covers R-TEC-006
     def test_render_json_keys_survive_the_serialisation(self):
         """Las claves del esquema siguen intactas después de serializar y reparsear."""
         reparsed = json.loads(report.render_json(self.result))
@@ -220,6 +222,16 @@ class TestJsonSchemaKeys(unittest.TestCase):
             with self.subTest(rule=entry.get("rule")):
                 self.assertEqual(set(entry), set(SCHEMA_FINDING_KEYS))
 
+    # @covers R-TEC-006
+    def test_an_extra_key_named_like_a_schema_key_does_not_override_it(self):
+        """Una clave extra homónima no cambia el valor del esquema: el esquema sólo crece."""
+        payload = report.build_payload(self.result, extra={"ok": "sí", "version": "2", "adopted": True})
+        self.assertEqual(payload["ok"], self.payload["ok"])
+        self.assertIsInstance(payload["ok"], bool)
+        self.assertEqual(payload["version"], 1)
+        self.assertIs(payload["adopted"], True)
+
+    # @covers R-TEC-006
     def test_extra_adds_keys_without_removing_the_schema_ones(self):
         """El «extra» del contrato añade contexto propio sin borrar el esquema."""
         payload = report.build_payload(self.result, {"change": "c1"})

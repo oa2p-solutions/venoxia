@@ -12,13 +12,14 @@ El plan nace de `2026-09-08-vision-conversacion.md` (la corrección de la visió
 
 Venoxia es un **plugin de Claude Code** (no una librería ni una app) que convierte la especificación en un contrato verificable: cada requisito nace con `verifies:` (ruta del test que lo resuelve) y `confidence:`, y un validador determinista lo rechaza si falta cualquiera de los dos. El plugin se compone de skills (`skills/*/SKILL.md`), agentes (`agents/*.md`), un hook `PreToolUse` (`hooks/hooks.json` → `scripts/guardian.py`) y scripts Python que son la única lógica ejecutable.
 
-Convenciones fijas de todo el repo:
+Convenciones fijas de todo el repo. Las verificables son requisitos de la capability `technical-contract` (`.venoxia/capabilities/technical-contract/`, `R-TEC-001`…`006`, con `tests/test_technical_contract.py` como oráculo): si cambian, cambia primero la spec.
 
-- **Python 3 stdlib, cero dependencias.** Ni pip, ni venv, ni pytest (aunque pytest ejecuta la suite igual). Probado con 3.14.
-- **Tags, claves e identificadores en inglés; prosa, valores y mensajes en español.** Aplica a código, docs, skills, plantillas y mensajes de error.
-- **Ningún script consulta a un modelo.** La aritmética de todos los veredictos está en código; las skills sólo envuelven y presentan.
+- **Python 3 stdlib, cero dependencias** (`R-TEC-001`). Ni pip, ni venv, ni pytest (aunque pytest ejecuta la suite igual); ningún import dinámico en `scripts/` ni `tools/`. Matriz 3.12–3.14 en la puerta local.
+- **Tags, claves e identificadores en inglés; prosa, valores y mensajes en español.** Aplica a código, docs, skills, plantillas y mensajes de error. Es convención de lectura (`principles.md`), no requisito.
+- **Ningún script consulta a un modelo ni toca la red** (`R-TEC-002`): sin módulos de red ni clientes de modelo en `scripts/`, y sólo `oracle.py` y `gate.py` lanzan procesos. La aritmética de todos los veredictos está en código; las skills sólo envuelven y presentan.
+- **El guardián importa sólo la biblioteca estándar** (`R-TEC-003`); **cada script supera su umbral de cobertura** (`R-TEC-004`, `tools/coverage.py` como runner `coverage`); **los cinco CLI comparten los códigos `0`/`1`/`2`** (`R-TEC-005`); **el esquema JSON versión 1 sólo crece** (`R-TEC-006`).
 - **Ningún campo puede pedir un valor que el modelo tenga que inventar.** Por eso `revisit:` es «el hecho que resuelve la apuesta», nunca una fecha (V10/C12 rechazan fechas).
-- El plugin se carga desde `~/.claude-b2bcarts/skills/venoxia` como symlink a este repo: se edita aquí sin reinstalar.
+- El plugin que corre en sesión es el **instalado desde GitHub** (`claude plugin list` dice desde qué commit), no este árbol: tras cambiar scripts o skills hay que empujar y reinstalar (comando en `PLAN.md`, punto 1).
 
 ## Comandos
 
@@ -51,7 +52,7 @@ python3 scripts/oracle.py --root . --change <id> --record      # ejecuta y añad
 # Cobertura con la stdlib (trace), subprocesos incluidos; falla si algún fichero baja de su umbral
 python3 tools/coverage.py
 
-# La puerta local, antes de cada push: matriz 3.12/3.13/3.14 en Docker (sin root), coverage, gate.py y plugin validate.
+# La puerta local, antes de cada push: matriz 3.12/3.13/3.14 en Docker (sin root), gate.py (que corre la cobertura como runner de R-TEC-004) y plugin validate.
 # Exige docker y claude en el PATH (sin ellos sale con 2). El hook .githooks/pre-push la invoca; se activa por clon con:
 python3 tools/check.py            # --list imprime los comandos sin ejecutar; --no-docker omite la matriz a la vista
 git config core.hooksPath .githooks

@@ -45,7 +45,9 @@ HOOK = REPO_ROOT / ".githooks" / "pre-push"
 WORKFLOW = REPO_ROOT / ".forgejo" / "workflows" / "ci.yml"
 README = REPO_ROOT / "README.md"
 
-STEP_NAMES = ("matrix", "coverage", "gate", "plugin-validate")
+# Tres pasos desde 2026-09-09-technical-contract: la cobertura corre dentro del
+# gate como runner de R-TEC-004, no como paso propio (R-CI-019).
+STEP_NAMES = ("matrix", "gate", "plugin-validate")
 
 
 def run_check(*args: str, env: dict[str, str] | None = None) -> subprocess.CompletedProcess:
@@ -97,15 +99,17 @@ def path_with_only(*executables: str) -> str:
     return tmp
 
 
-class TestTheFourSteps(unittest.TestCase):
-    """R-CI-019 · Cuatro pasos con nombre, un veredicto único."""
+class TestTheThreeSteps(unittest.TestCase):
+    """R-CI-019 · Tres pasos con nombre, un veredicto único."""
 
-    def test_list_names_the_four_steps_with_their_commands_and_runs_nothing(self):
+    def test_list_names_the_three_steps_with_their_commands_and_runs_nothing(self):
         run = run_check("--list")
         self.assertEqual(run.returncode, 0, run.stderr)
         for name in STEP_NAMES:
             self.assertRegex(run.stdout, rf"(?m)^{re.escape(name)}\b", f"falta el paso «{name}»")
-        self.assertIn("tools/coverage.py", run.stdout)
+        self.assertNotRegex(
+            run.stdout, r"(?m)^coverage\b", "coverage ya no es un paso propio: corre dentro del gate"
+        )
         self.assertIn("scripts/gate.py --root", run.stdout)
         self.assertIn("claude plugin validate", run.stdout)
         # No se ha ejecutado nada: ni un resumen de resultados ni tiempos.

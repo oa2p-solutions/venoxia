@@ -793,7 +793,10 @@ class GuardianLatencyTest(GuardianTestCase):
         )
 
     def test_guardian_imports_no_venoxia_module_and_never_runs_the_validator(self):
-        """El presupuesto de latencia como test: ni módulos de Venoxia ni subprocesos."""
+        """El presupuesto de latencia como test: ni módulos de Venoxia ni subprocesos.
+
+        @covers R-TEC-003
+        """
         source = Path(GUARDIAN_PY).read_text(encoding="utf-8")
         imported: set[str] = set()
         for node in ast.walk(ast.parse(source)):
@@ -810,6 +813,27 @@ class GuardianLatencyTest(GuardianTestCase):
                     if name == forbidden or name.startswith(f"{forbidden}.")
                 ]
                 self.assertEqual([], offenders, f"guardian.py importa «{forbidden}»")
+
+    def test_guardian_imports_only_the_standard_library(self):
+        """Ni una lista de nombres prohibidos: todo lo que importa es stdlib.
+
+        Una lista cerrada se esquiva con un `sys.path.insert` y un `import
+        parser`; exigir que cada módulo esté en `sys.stdlib_module_names`
+        no deja hueco.
+
+        @covers R-TEC-003
+        """
+        source = Path(GUARDIAN_PY).read_text(encoding="utf-8")
+        imported: set[str] = set()
+        for node in ast.walk(ast.parse(source)):
+            if isinstance(node, ast.Import):
+                imported.update(alias.name for alias in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
+                imported.add(node.module)
+        outsiders = sorted(
+            name for name in imported if name.split(".", 1)[0] not in sys.stdlib_module_names
+        )
+        self.assertEqual([], outsiders, f"guardian.py importa fuera de la stdlib: {outsiders}")
 
         self.assertNotIn("validate.py", source, "guardian.py no debe ejecutar el validador")
 

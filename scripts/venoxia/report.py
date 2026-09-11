@@ -153,7 +153,9 @@ def build_payload(result: ValidationResult, extra: dict | None = None) -> dict:
     """Construye el documento del esquema estable versión 1.
 
     `extra` añade claves al primer nivel para quien necesite llevar contexto
-    propio; las claves del esquema se calculan siempre desde el resultado.
+    propio; las claves del esquema se calculan siempre desde el resultado y
+    una clave extra con el mismo nombre no las sobrescribe (R-TEC-006): el
+    esquema versión 1 sólo crece, nunca cambia de valor por la puerta de atrás.
     """
     payload = {
         "version": SCHEMA_VERSION,
@@ -165,7 +167,7 @@ def build_payload(result: ValidationResult, extra: dict | None = None) -> dict:
         "budget": uncertainty_budget(requirements_of(result)),
     }
     if extra:
-        payload.update(extra)
+        payload.update({key: value for key, value in extra.items() if key not in payload})
     return payload
 
 

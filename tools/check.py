@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 """La puerta local: los jobs del CI, en un solo comando, antes de cada `push`.
 
-Cuatro pasos, con el nombre del job del CI al que corresponden:
+Tres pasos, con el nombre del job del CI al que corresponden:
 
     matrix           la suite en cada versión de Python que declara la matriz
                      del workflow, dentro de `python:<versión>-slim`, como
                      usuario sin privilegios y en paralelo
-    coverage         python3 tools/coverage.py
     gate             python3 scripts/gate.py --root .   (acta, validador y
-                     oráculo de cada change en «verified», sobre este repo)
+                     oráculo de cada change en «verified», sobre este repo;
+                     ahí corre `tools/coverage.py` como runner de R-TEC-004)
     plugin-validate  claude plugin validate . --strict
 
-`evals` se queda fuera a propósito: cuesta tokens y se lanza a mano.
+La cobertura dejó de ser un paso propio en `2026-09-09-technical-contract`:
+el gate ya la ejecuta como oráculo de un requisito, y medir dos veces lo
+mismo eran dos minutos por push. `evals` se queda fuera a propósito: cuesta
+tokens y se lanza a mano.
 
 Códigos de salida, los del resto del núcleo:
 
-    0   los cuatro pasos en verde
+    0   los tres pasos en verde
     1   algún paso en rojo
     2   no se pudo comprobar: falta un ejecutable, la matriz del workflow no
         se puede leer, o la invocación es incorrecta
@@ -137,7 +140,6 @@ def build_steps(no_docker: bool) -> list[Step]:
         matrix = Step("matrix", [docker_command(v) for v in matrix_versions()])
     return [
         matrix,
-        Step("coverage", [[sys.executable, "tools/coverage.py"]]),
         Step("gate", [[sys.executable, "scripts/gate.py", "--root", "."]]),
         Step("plugin-validate", [["claude", "plugin", "validate", ".", "--strict"]]),
     ]

@@ -1,0 +1,10 @@
+{
+  "id": "2026-09-09-technical-contract",
+  "state": "verified",
+  "via": "spec",
+  "capabilities": [
+    "technical-contract",
+    "ci"
+  ],
+  "created": "2026-09-09T20:29:51Z"
+}

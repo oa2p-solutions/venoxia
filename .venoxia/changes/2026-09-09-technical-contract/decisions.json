@@ -1,0 +1,779 @@
+{
+  "version": 1,
+  "change": "2026-09-09-technical-contract",
+  "decisions": [
+    {
+      "at": "2026-09-09T20:35:36Z",
+      "scenario": "Every import resolves to the standard library or to the repository",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Every import resolves to the standard library or to the repository» es la correcta?",
+      "options": [
+        "«analiza los imports y no señala ninguno ajeno»",
+        "«el análisis no encuentra imports fuera de la stdlib o el repo»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 1 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:35:36Z",
+      "scenario": "A network import is named by the test",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A network import is named by the test» es la correcta?",
+      "options": [
+        "«el análisis señala el fichero que importa urllib.request»",
+        "«el análisis señala fichero y módulo de red importado»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 1 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:35:36Z",
+      "scenario": "An unknown option is 2 in all five",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An unknown option is 2 in all five» es la correcta?",
+      "options": [
+        "«cada uno de los cinco CLI termina con error de uso»",
+        "«los cinco scripts terminan por opción desconocida»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 1 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:35:36Z",
+      "scenario": "A root that does not exist is 2 in all five",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A root that does not exist is 2 in all five» es la correcta?",
+      "options": [
+        "«cada uno de los cinco CLI termina sin veredicto»",
+        "«los cinco scripts terminan sin poder ejecutarse»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 1 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:35:36Z",
+      "scenario": "Extra keys never remove the schema ones",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Extra keys never remove the schema ones» es la correcta?",
+      "options": [
+        "«build_payload conserva las siete claves del esquema»",
+        "«las siete claves del esquema siguen junto a las añadidas»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 1 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:35:36Z",
+      "scenario": "The version is the integer one",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The version is the integer one» es la correcta?",
+      "options": [
+        "«el informe lleva version igual al entero 1»",
+        "«el campo version vale el entero 1»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 1 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:35:36Z",
+      "scenario": "The three steps by name",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The three steps by name» es la correcta?",
+      "options": [
+        "«lista los tres pasos con su comando, sin ejecutar nada»",
+        "«lista los pasos y sus comandos sin ejecutarlos»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 1 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:35:36Z",
+      "scenario": "Coverage is not a step of its own",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Coverage is not a step of its own» es la correcta?",
+      "options": [
+        "«ningún paso listado se llama coverage»",
+        "«el listado de pasos no incluye uno llamado coverage»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 1 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:35:36Z",
+      "scenario": "Every step passes",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Every step passes» es la correcta?",
+      "options": [
+        "«los tres pasos terminan en verde»",
+        "«la comprobación termina con éxito»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 1 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:35:36Z",
+      "scenario": "A required executable is missing",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A required executable is missing» es la correcta?",
+      "options": [
+        "«falla nombrando el ejecutable ausente en el PATH»",
+        "«el mensaje nombra el ejecutable que falta en el PATH»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 1 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:35:36Z",
+      "scenario": "An unknown option",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An unknown option» es la correcta?",
+      "options": [
+        "«falla con el mensaje de uso»",
+        "«muestra el mensaje de uso por opción desconocida»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 1 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:50:56Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-002",
+      "question": "Ataque high sobre R-TEC-002: la prohibición es una lista de módulos importados; un script que haga subprocess.run([\"curl\", …]) o invoque el CLI `claude` para pedirle un veredicto no importa ninguno y pasa. Hoy sólo oracle.py y gate.py importan subprocess. ¿Cómo se cierra?",
+      "options": [
+        "Sólo oracle.py y gate.py pueden importar subprocess",
+        "Aceptar como límite declarado",
+        "Prohibir subprocess en todo scripts/"
+      ],
+      "chosen": 0,
+      "answer": "Sólo oracle.py y gate.py pueden importar subprocess",
+      "decided_by": "user"
+    },
+    {
+      "at": "2026-09-09T20:50:56Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-003",
+      "question": "Ataque high sobre R-TEC-003: el aislamiento del guardián es una lista de cinco nombres prohibidos; un guardian.py que haga sys.path.insert(…/scripts/venoxia) y luego `import parser, model, report` no nombra ninguno y pasa. ¿Qué exige R-TEC-003?",
+      "options": [
+        "El guardián importa sólo la biblioteca estándar",
+        "Aceptar como límite declarado"
+      ],
+      "chosen": 0,
+      "answer": "El guardián importa sólo la biblioteca estándar",
+      "decided_by": "user"
+    },
+    {
+      "at": "2026-09-09T20:50:56Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-001",
+      "question": "Ataque medium: importlib.import_module o __import__ no producen nodos Import y esquivan el análisis.",
+      "options": [
+        "Escenario nuevo: en scripts/ y tools/ una llamada a importlib.import_module o __import__ se señala como import",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Escenario nuevo: en scripts/ y tools/ una llamada a importlib.import_module o __import__ se señala como import",
+      "decided_by": "claude",
+      "note": "tests/ queda fuera: carga módulos del propio repo por ruta (tools/check.py) y eso es legítimo"
+    },
+    {
+      "at": "2026-09-09T20:50:56Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-004",
+      "question": "Ataque medium: un fichero sin entrada en coverage-threshold.json recibe hoy un umbral igual a su medida menos dos, así que un script nuevo con 0 % pasa.",
+      "options": [
+        "Escenario nuevo: un fichero sin entrada se exige al suelo del núcleo (85), la constante que ya existe",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Escenario nuevo: un fichero sin entrada se exige al suelo del núcleo (85), la constante que ya existe",
+      "decided_by": "claude",
+      "note": "no inventa ninguna constante: CORE_FLOOR ya vale 85 en tools/coverage.py; las entradas existentes no cambian"
+    },
+    {
+      "at": "2026-09-09T20:50:56Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-CI-019",
+      "question": "Ataque medium: al archivar este change, la cobertura dejaría de correr en cada push porque el gate sólo ejecuta changes verified.",
+      "options": [
+        "Límite D8 ya declarado: este change no se archiva hasta que exista consolidación que conserve el oráculo",
+        "Reponer el paso coverage"
+      ],
+      "chosen": 0,
+      "answer": "Límite D8 ya declarado: este change no se archiva hasta que exista consolidación que conserve el oráculo",
+      "decided_by": "claude",
+      "note": "escrito en la propuesta y en PLAN.md; reabrir D8 no procede"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": "No network module in any script",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «No network module in any script» es la correcta?",
+      "options": [
+        "«confirma que ningún script importa módulos de red»",
+        "«confirma ausencia de módulos de red en scripts»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": "No model client in any script",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «No model client in any script» es la correcta?",
+      "options": [
+        "«confirma que ningún script importa anthropic ni openai»",
+        "«confirma ausencia de anthropic u openai en scripts»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": "Every file at or above its threshold",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Every file at or above its threshold» es la correcta?",
+      "options": [
+        "«el proceso termina en éxito»",
+        "«el proceso termina en verde, todos los ficheros cumplen su umbral»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": "One file below its threshold",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «One file below its threshold» es la correcta?",
+      "options": [
+        "«el proceso termina en fallo»",
+        "«el proceso falla porque un fichero no alcanza su umbral»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": "A file without an entry is held to the core floor",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A file without an entry is held to the core floor» es la correcta?",
+      "options": [
+        "«aplica el umbral del suelo del núcleo, 85, a ese fichero»",
+        "«el fichero sin entrada usa el umbral por defecto, 85»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": "An unknown option is 2 in all five",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An unknown option is 2 in all five» es la correcta?",
+      "options": [
+        "«cada uno de los cinco scripts termina sin veredicto»",
+        "«cada uno de los cinco scripts termina en error de uso»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": "A root that does not exist is 2 in all five",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A root that does not exist is 2 in all five» es la correcta?",
+      "options": [
+        "«cada uno de los cinco scripts termina sin veredicto»",
+        "«cada uno de los cinco scripts termina en error de uso»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": "In the gate, 2 means it could not look",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «In the gate, 2 means it could not look» es la correcta?",
+      "options": [
+        "«gate.py termina sin poder evaluar el proyecto»",
+        "«el gate no puede evaluar el proyecto sin venoxia.json»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": "The version is the integer one",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The version is the integer one» es la correcta?",
+      "options": [
+        "«el campo version vale el entero 1»",
+        "«el informe trae version igual al entero 1»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": "Every step passes",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Every step passes» es la correcta?",
+      "options": [
+        "«la comprobación termina en éxito»",
+        "«la comprobación termina en verde tras los tres pasos»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": "An unknown option",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An unknown option» es la correcta?",
+      "options": [
+        "«el mensaje muestra el uso correcto»",
+        "«muestra el mensaje de uso ante una opción desconocida»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 2 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-002",
+      "question": "Ronda 2, ataque high: os.system, os.popen u os.exec* esquivan la prohibición de importar subprocess.",
+      "options": [
+        "Ningún script de scripts/ llama a os.system, os.popen, os.exec*, os.spawn* ni os.posix_spawn*",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Ningún script de scripts/ llama a os.system, os.popen, os.exec*, os.spawn* ni os.posix_spawn*",
+      "decided_by": "claude",
+      "note": "misma brecha que el usuario mandó cerrar en la ronda 1 (sólo oracle y gate lanzan procesos, y lo hacen con subprocess); ningún script usa estas llamadas hoy. Señalado en la entrega para que el usuario lo vete si no lo comparte"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-001",
+      "question": "Ronda 2, ataque medium: «el análisis lo señala» lo cumple un test que imprime y pasa.",
+      "options": [
+        "Los tres escenarios de señalar pasan a decir «el test falla nombrando…»",
+        "Dejar el texto"
+      ],
+      "chosen": 0,
+      "answer": "Los tres escenarios de señalar pasan a decir «el test falla nombrando…»",
+      "decided_by": "claude"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-001",
+      "question": "Ronda 2, ataque medium: «los ficheros .py de scripts/» admite un recorrido no recursivo que nunca mira scripts/venoxia/.",
+      "options": [
+        "El ámbito se escribe recursivo: todos los .py bajo scripts/, tools/ y tests/, a cualquier profundidad",
+        "Dejar el texto"
+      ],
+      "chosen": 0,
+      "answer": "El ámbito se escribe recursivo: todos los .py bajo scripts/, tools/ y tests/, a cualquier profundidad",
+      "decided_by": "claude"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-004",
+      "question": "Ronda 2, ataque medium: «cada fichero medido» deja fuera un script que la suite nunca ejecuta.",
+      "options": [
+        "El informe lista cada fichero de scripts/**/*.py, tenga datos o no; uno sin datos cuenta como por debajo de su umbral",
+        "Dejar el texto"
+      ],
+      "chosen": 0,
+      "answer": "El informe lista cada fichero de scripts/**/*.py, tenga datos o no; uno sin datos cuenta como por debajo de su umbral",
+      "decided_by": "claude",
+      "note": "tools/coverage.py ya enumera scripts/**/*.py desde el disco y marca SIN DATOS (FALLA) al que no tiene .cover; el texto pasa a decirlo"
+    },
+    {
+      "at": "2026-09-09T20:55:36Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-CI-019",
+      "question": "Ronda 2, ataque medium: check.py sale con 0 sin medir cobertura si ningún change verified la reclama.",
+      "options": [
+        "Límite D8 ya aceptado en la ronda 1: este change no se archiva",
+        "Reponer el paso"
+      ],
+      "chosen": 0,
+      "answer": "Límite D8 ya aceptado en la ronda 1: este change no se archiva",
+      "decided_by": "claude"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "Every import resolves to the standard library or to the repository",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Every import resolves to the standard library or to the repository» es la correcta?",
+      "options": [
+        "«el test pasa: todos los imports son stdlib o del repo»",
+        "«el test pasa: todos los imports son válidos»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "No script shells out through os",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «No script shells out through os» es la correcta?",
+      "options": [
+        "«el test pasa: ningún script llama a funciones os shell»",
+        "«el test pasa: ninguna llamada usa os.system/popen/exec/spawn»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "Every file at or above its threshold",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Every file at or above its threshold» es la correcta?",
+      "options": [
+        "«coverage.py termina con código 0»",
+        "«el proceso termina en verde, todos los ficheros cumplen su umbral»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "One file below its threshold",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «One file below its threshold» es la correcta?",
+      "options": [
+        "«coverage.py termina con código 1»",
+        "«el proceso termina en rojo por un fichero bajo umbral»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "A script the suite never runs is below its threshold",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A script the suite never runs is below its threshold» es la correcta?",
+      "options": [
+        "«cuenta como por debajo del umbral, código 1»",
+        "«cuenta como por debajo de umbral y falla el proceso»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "A file without an entry is held to the core floor",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A file without an entry is held to the core floor» es la correcta?",
+      "options": [
+        "«se le aplica el umbral suelo del núcleo, 85»",
+        "«el fichero se mide contra el suelo del núcleo, 85»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "An unknown option is 2 in all five",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An unknown option is 2 in all five» es la correcta?",
+      "options": [
+        "«los cinco scripts terminan con código 2»",
+        "«los cinco scripts terminan con código de error de uso»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "A root that does not exist is 2 in all five",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A root that does not exist is 2 in all five» es la correcta?",
+      "options": [
+        "«los cinco scripts terminan con código 2»",
+        "«los cinco scripts terminan con código de error de uso»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "In the gate, 2 means it could not look",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «In the gate, 2 means it could not look» es la correcta?",
+      "options": [
+        "«gate.py termina con código 2 si falta venoxia.json»",
+        "«gate.py termina sin veredicto al faltar venoxia.json»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "Extra keys never remove the schema ones",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Extra keys never remove the schema ones» es la correcta?",
+      "options": [
+        "«build_payload conserva las siete claves del esquema»",
+        "«el informe conserva las siete claves junto a las añadidas»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "The three steps by name",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The three steps by name» es la correcta?",
+      "options": [
+        "«lista matrix, gate y plugin-validate con su comando, sin ejecutar»",
+        "«la salida nombra matrix, gate y plugin-validate sin ejecutarlos»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "Every step passes",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Every step passes» es la correcta?",
+      "options": [
+        "«la comprobación termina con código 0»",
+        "«la comprobación termina en verde»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "A required executable is missing",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A required executable is missing» es la correcta?",
+      "options": [
+        "«termina con código 2 y nombra el ejecutable que falta»",
+        "«termina sin veredicto y el mensaje nombra el ejecutable ausente»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": "An unknown option",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An unknown option» es la correcta?",
+      "options": [
+        "«termina con código 2 y muestra el mensaje de uso»",
+        "«termina sin veredicto con un mensaje de uso»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "ronda 3 · decidida por Claude: vocabulario (mismo status_code en los dos lectores), el delta no cambia"
+    },
+    {
+      "at": "2026-09-11T13:56:46Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-002",
+      "question": "Ronda 3, ataque high: las listas son cerradas; asyncio.open_connection, selectors, pty.spawn, multiprocessing u os.fork pasan.",
+      "options": [
+        "Aceptar como límite declarado: una lista de módulos es un suelo, no una prueba; el residuo se escribe",
+        "Ampliar las listas (y repetir el panel)"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado: una lista de módulos es un suelo, no una prueba; el residuo se escribe",
+      "decided_by": "user",
+      "note": "resuelta por el usuario en /venoxia:verify: aceptar como límite declarado"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-004",
+      "question": "Ronda 3, ataque medium: una entrada con umbral 0 en coverage-threshold.json desactiva la puerta sin tocar código.",
+      "options": [
+        "Límite declarado: el fichero de umbrales es parte del repo y se revisa como código; bajar un umbral es visible en el diff",
+        "Exigir el suelo también a las entradas existentes (rompería parser.py, hoy en 81)"
+      ],
+      "chosen": 0,
+      "answer": "Límite declarado: el fichero de umbrales es parte del repo y se revisa como código; bajar un umbral es visible en el diff",
+      "decided_by": "claude"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-006",
+      "question": "Ronda 3, ataque medium: build_payload hace payload.update(extra), así que una clave extra homónima sobrescribe una del esquema.",
+      "options": [
+        "Las claves del esquema ganan: extra no puede sobrescribirlas; se implementa y se prueba en tests/test_report.py sin cambiar el texto del delta",
+        "Dejarlo"
+      ],
+      "chosen": 0,
+      "answer": "Las claves del esquema ganan: extra no puede sobrescribirlas; se implementa y se prueba en tests/test_report.py sin cambiar el texto del delta",
+      "decided_by": "claude",
+      "note": "el escenario «Extra keys never remove the schema ones» se lee literalmente sobre presencia; el valor se protege en código y se dirá en la consolidación"
+    },
+    {
+      "at": "2026-09-09T20:59:41Z",
+      "scenario": null,
+      "field": "attack",
+      "requirement_id": "R-TEC-001",
+      "question": "Ronda 3, ataque medium: copiar un paquete de terceros dentro de scripts/ (vendoring) pasa como módulo del repo.",
+      "options": [
+        "Límite declarado: «cero dependencias» significa nada que instalar; un fichero copiado se ve en el diff y se revisa",
+        "Prohibir subdirectorios nuevos en scripts/"
+      ],
+      "chosen": 0,
+      "answer": "Límite declarado: «cero dependencias» significa nada que instalar; un fichero copiado se ve en el diff y se revisa",
+      "decided_by": "claude"
+    },
+    {
+      "at": "2026-09-11T13:56:46Z",
+      "scenario": null,
+      "field": "verify",
+      "requirement_id": "R-TEC-001, R-TEC-002, R-TEC-003, R-TEC-005, R-TEC-006",
+      "question": "El oráculo está todo en verde pero estos cinco no tienen rojo previo. ¿Confirmas que pasan a verified sin rojo previo?",
+      "options": [
+        "Sí, adopción retroactiva confirmada",
+        "No, quiero ver un rojo"
+      ],
+      "chosen": 0,
+      "answer": "Sí, adopción retroactiva confirmada",
+      "decided_by": "user"
+    },
+    {
+      "at": "2026-09-11T13:56:46Z",
+      "scenario": null,
+      "field": "finding",
+      "requirement_id": "R-VAL-007",
+      "question": "Cinco avisos V18 hacen fallar validate.py --strict sobre el árbol y con él el gate: no hay dónde grabar la aceptación retroactiva. ¿Cómo lo resolvemos?",
+      "options": [
+        "Change nuevo: la confirmación se graba en oracle.json y V18 la respeta",
+        "Anotar la aceptación a mano en oracle.json",
+        "Que V18 no cuente bajo --strict"
+      ],
+      "chosen": 0,
+      "answer": "Change nuevo: la confirmación se graba en oracle.json y V18 la respeta",
+      "decided_by": "user"
+    }
+  ]
+}

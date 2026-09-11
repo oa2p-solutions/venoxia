@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "Las dos listas de R-TEC-002 son cerradas: un script puede abrir conexiones TCP con `asyncio.open_connection` o `selectors` (ninguno figura entre `urllib`/`http`/`socket`/`ssl`/`smtplib`/`ftplib`/`xmlrpc`) y lanzar procesos con `pty.spawn`, `multiprocessing` u `os.fork` (ninguno figura entre `os.system`/`os.popen`/`os.exec*`/`os.spawn*`/`os.posix_spawn*`), pasando los cinco escenarios en verde mientras consulta a un modelo para decidir un veredicto; se pierde la garantía central de que la aritmética de los veredictos está en código y es determinista.",
+    "requirement_id": "R-TEC-002",
+    "severity": "high"
+  },
+  {
+    "attack": "El suelo de 85 sólo protege a los ficheros sin entrada en `tools/coverage-threshold.json`; añadir a `guardian.py` una entrada con umbral `0` deja `tools/coverage.py` en código `0` con cero líneas cubiertas y cumple los cinco escenarios, de modo que la puerta de cobertura se desactiva editando un fichero de datos y sin tocar una línea de código ni de test.",
+    "requirement_id": "R-TEC-004",
+    "severity": "medium"
+  },
+  {
+    "attack": "Un `build_payload` implementado como `{**esquema, **extra}` deja que una clave añadida con el nombre de una del esquema (`compliant`, `findings`, `adopted`) sobrescriba su valor: las siete claves siguen presentes y los tres escenarios pasan, pero el JSON versión 1 publica un veredicto falso que los graders de evals y cualquier consumidor leen como bueno.",
+    "requirement_id": "R-TEC-006",
+    "severity": "medium"
+  },
+  {
+    "attack": "El escenario acepta como válido todo módulo que sea «un fichero o paquete del propio repositorio»: copiar un paquete de terceros dentro de `scripts/` o `tools/` (un `vendor/requests.py`) hace que su import pase el test, con lo que el repositorio incorpora código ajeno sin versión ni auditoría mientras el contrato de cero dependencias sigue en verde.",
+    "requirement_id": "R-TEC-001",
+    "severity": "medium"
+  }
+]

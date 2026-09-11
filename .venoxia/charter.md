@@ -25,6 +25,7 @@ en CI cuando miente.
 | 4 | `divergence` | cotejar dos lecturas aisladas del mismo delta y convertir cada desacuerdo en una pregunta cerrada | quien ejecuta `python3 scripts/diff_readings.py` sobre dos lecturas con `status_code` distintos ve el proceso terminar con código 1 y la divergencia marcada como dura | medium |
 | 5 | `ci` | hacer que la especificación falle en CI cuando miente, en el plugin y en los proyectos que lo adoptan | quien empuja una spec con un `SHALL` ve el job `self-spec` en rojo con el hallazgo `V14` en el registro del run | medium |
 | 6 | `oracle` | traducir el resultado del `test_command` declarado en `venoxia.json` en verificado o no verificado | quien ejecuta `/venoxia:verify` sobre un change con oráculo ve el resultado del `test_command` convertido en verificado o no verificado, sin tener que leer la salida del test a mano | high |
+| 7 | `technical-contract` | someter las decisiones técnicas del propio repositorio —qué importa, qué no toca, cuánto cubre, cómo sale— al mismo contrato que su comportamiento: requisitos con oráculo, no prosa | quien añade `import requests` a un script y ejecuta `python3 -m unittest discover -s tests -q` ve la suite en rojo nombrando el fichero y el módulo, y quien ejecuta `python3 scripts/gate.py --root .` ve `tools/coverage.py` correr como runner de un requisito y el veredicto de la puerta en `0` | low |
 
 ## Out of scope
 
@@ -64,31 +65,29 @@ Suponemos que el módulo `trace` de la stdlib basta para medir qué líneas
 ejecuta el `test_command` de la capability `oracle` cuando corre por
 subproceso, sin tener que instrumentar código con dependencias externas.
 
-confidence: low
-  why:      no se ha probado todavía con el volumen real de tests que trae DEF-010
-  revisit:  cuando DEF-010 produzca su primer informe
+confidence: high
+  why:      resuelta el 2026-09-09: `tools/coverage.py` mide la suite entera bajo `trace`, subprocesos incluidos, y `R-TEC-004` la ejecuta como runner del oráculo; el umbral por fichero lleva desde `2026-09-07-local-gate` cerrando la puerta
   fatal:    no
 
 ### B-003 · La matriz de Python pasa en los runners reales
 
-La capability `ci` declara en `.forgejo/workflows/ci.yml` una matriz con
-Python 3.12, 3.13 y 3.14, cada entrada dentro de su imagen
-`python:<versión>-slim`. Suponemos que la suite pasa en las tres sobre el
-`el runner interno` interno: aquí sólo se ha comprobado con 3.13 y 3.14.
+La capability `ci` corre la suite en una matriz con Python 3.12, 3.13 y
+3.14, cada versión dentro de su imagen `python:<versión>-slim`, desde la
+puerta local `tools/check.py` (`R-CI-020`). Suponíamos que la suite pasaba
+en las tres cuando aquí sólo se había comprobado con 3.13 y 3.14.
 
-confidence: low
-  why:      no hay Python 3.12 en esta máquina y no se ha leído ningún run de la matriz entero en verde
-  revisit:  cuando un run de la forja interna deje los tres jobs de la matriz en verde
+confidence: high
+  why:      resuelta el 2026-09-09: la puerta local dejó los tres contenedores de la matriz en verde antes del push de `5681d14`, y lo hace en cada push desde `2026-09-07-local-gate`
   fatal:    no
 
 ### B-004 · El CLI valida el plugin sin credenciales en un runner limpio
 
-El job `plugin-validate` de la capability `ci` da por hecho que
-`claude plugin validate . --strict` funciona en un runner sin sesión de
-Claude Code autenticada. Mientras no se sepa, el job lleva
-`continue-on-error: true` para no bloquear el resto del workflow.
+El paso `plugin-validate` de la puerta local (`tools/check.py`) da por
+hecho que `claude plugin validate . --strict` funciona en una máquina sin
+sesión de Claude Code autenticada. Ya no hay un job de CI que lo pruebe en
+un runner limpio: la puerta corre donde hay sesión.
 
 confidence: low
   why:      esta máquina ya tiene sesión autenticada, así que aquí no se puede comprobar
-  revisit:  cuando exista el primer run real del job plugin-validate en un runner limpio
+  revisit:  cuando alguien ejecute `tools/check.py` en una máquina sin sesión de Claude Code y cuente qué hizo el paso
   fatal:    no

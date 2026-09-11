@@ -1,1 +1,10 @@
-{"version": 1, "test_command": "python3 -m unittest {files}", "cwd": "."}
+{
+  "version": 1,
+  "test_command": "python3 -m unittest {files}",
+  "cwd": ".",
+  "runners": {
+    "coverage": {
+      "command": "python3 tools/coverage.py"
+    }
+  }
+}

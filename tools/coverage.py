@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Cobertura de `scripts/**/*.py` con la stdlib, subprocesos incluidos.
 
+@covers R-TEC-004 — este script es el runner con nombre «coverage» de
+`.venoxia/venoxia.json`: el oráculo lo ejecuta tal cual, sin `{files}`, y su
+código de salida es el veredicto del requisito (0 si cada fichero alcanza su
+umbral, 1 si alguno baja).
+
 `tests/venoxia_fixtures.py` (`Project.run`) ejecuta `validate.py`,
 `charter_lint.py`, `guardian.py`, `diff_readings.py` y `oracle.py` **por
 subprocess**, nunca importados. Una medida de cobertura ingenua —correr
@@ -54,7 +59,10 @@ fichero en el valor medido menos 2 puntos, redondeado hacia abajo — y nunca
 por debajo de 85 para los cinco scripts del núcleo determinista
 (`validate.py`, `charter_lint.py`, `guardian.py`, `diff_readings.py`,
 `oracle.py`). Las siguientes ejecuciones comparan contra ese fichero y fallan
-(código 1) si algún fichero baja de su umbral.
+(código 1) si algún fichero baja de su umbral. Un fichero que aparece después
+sin entrada recibe la suya al vuelo, y nunca por debajo de ese mismo suelo de
+85 (R-TEC-004): si naciera con «lo medido menos 2», un script nuevo sin tests
+pasaría con un 0 %.
 
 Con el envoltorio de `tools/trace_run.py`, `scripts/guardian.py` ya deja
 `.cover` como cualquier otro script: el hueco que documentaba esta sección
@@ -260,6 +268,16 @@ def compute_threshold(key: str, measured: float | None) -> int:
     return floor_value
 
 
+def threshold_for_new_file(key: str, measured: float | None) -> int:
+    """El umbral de un fichero que aparece sin entrada en el fichero de umbrales.
+
+    Nunca por debajo del suelo del núcleo (R-TEC-004): fijarlo en «lo medido
+    menos 2» dejaría pasar con un 0 % a un script nuevo sin un solo test. Las
+    entradas que ya existen no cambian; esto sólo decide cómo nace una.
+    """
+    return max(compute_threshold(key, measured), CORE_FLOOR)
+
+
 def build_thresholds(coverage: dict[str, FileCoverage]) -> dict[str, int]:
     return {key: compute_threshold(key, fc.percentage) for key, fc in coverage.items()}
 
@@ -395,11 +413,12 @@ def main(argv: list[str] | None = None) -> int:
         missing_keys = sorted(set(coverage) - set(thresholds))
         if missing_keys:
             for key in missing_keys:
-                thresholds[key] = compute_threshold(key, coverage[key].percentage)
+                thresholds[key] = threshold_for_new_file(key, coverage[key].percentage)
             write_thresholds(threshold_file, thresholds)
             print(
                 f"\nFicheros nuevos sin umbral: {', '.join(missing_keys)}. "
-                f"Añadidos a {threshold_file} con lo medido ahora."
+                f"Añadidos a {threshold_file} con lo medido ahora, y nunca por "
+                f"debajo del suelo del núcleo ({CORE_FLOOR})."
             )
 
     if args.fail_under is not None:
