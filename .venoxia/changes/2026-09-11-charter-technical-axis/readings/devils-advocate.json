@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "Los seis escenarios sólo observan que el cuerpo de `skills/charter/SKILL.md` «declara» cosas y que no aparece el literal `## Convenciones técnicas`: una skill que añade un párrafo declarativo al final y mantiene en su procedimiento el paso de volcar las convenciones a `principles.md` bajo otro encabezado (`## Convenciones del proyecto`) pasa las seis y deja las decisiones técnicas exactamente donde el change pretendía sacarlas, con instrucciones contradictorias dentro de la misma skill.",
+    "requirement_id": "R-CHL-006",
+    "severity": "medium"
+  },
+  {
+    "attack": "«DEBE escribir `principles.md` sólo con los tres principios del método y los de dominio» y la cláusula de no perder nada cubre únicamente las convenciones técnicas: una implementación reescribe el fichero entero descartando cualquier otro contenido que el usuario tuviera allí (notas, glosario, principios no clasificados como de dominio) y el escenario de migración sigue en verde porque las convenciones técnicas sí se repartieron.",
+    "requirement_id": "R-CHL-006",
+    "severity": "high"
+  },
+  {
+    "attack": "«Repartiendo igual… sin perder ninguna» no exige conservar el estado de decisión: la skill puede mandar todas las convenciones técnicas preexistentes de `principles.md` a `## Bets` (ninguna fue «aprobada» en esta entrevista), con lo que decisiones que ya gobernaban el proyecto pierden fuerza normativa, no llegan nunca a `technical-contract` y quedan como apuestas abiertas que nadie tiene que cerrar.",
+    "requirement_id": "R-CHL-006",
+    "severity": "medium"
+  },
+  {
+    "attack": "«Llevarlo a un requisito de `technical-contract` con `verifies:`» no dice a través de qué change ni en qué estado: `/venoxia:specify` puede escribir el requisito directamente en `.venoxia/capabilities/technical-contract/spec.md`, saltándose el ciclo draft→specified→validated→verified; como el test declarado en `verifies:` aún no existe, la capability queda en rojo permanente por V07/V08 sin ningún change activo que pueda arreglarlo y `gate.py`, que es fail-closed, bloquea el proyecto entero.",
+    "requirement_id": "R-CHL-007",
+    "severity": "medium"
+  }
+]

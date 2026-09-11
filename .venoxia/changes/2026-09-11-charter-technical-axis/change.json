@@ -1,0 +1,9 @@
+{
+  "id": "2026-09-11-charter-technical-axis",
+  "state": "verified",
+  "via": "spec",
+  "capabilities": [
+    "charter-lint"
+  ],
+  "created": "2026-09-11T15:20:00Z"
+}

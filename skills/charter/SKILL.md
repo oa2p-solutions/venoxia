@@ -185,7 +185,7 @@ Una apuesta con `fatal: yes` y `confidence: low` es la línea más importante de
 
 ### Tanda F · Confirmar los principios
 
-Los que fuiste anotando durante la entrevista, más las convenciones técnicas. Va en el Paso 4, porque no se pregunta igual que lo demás.
+Los que fuiste anotando durante la entrevista, más las convenciones técnicas. Va en el Paso 4, porque no se pregunta igual que lo demás; y las convenciones técnicas no acaban en los principios, sino en el contrato técnico o en las apuestas (Paso 4, «Dónde va cada convención»).
 
 Aprovecha la misma tanda para una pregunta más, corta y de una sola vez: **«¿con qué comando corren los tests de este proyecto?»** («`npm test`», «`pytest`», «`npx vitest run`»…). No es un principio ni una convención: es lo que necesita `oracle.py` para ejecutar de verdad el oráculo de cada requisito, y preguntarlo aquí evita una segunda entrevista sólo para eso. Si el proyecto todavía no tiene tests —o el usuario no lo sabe todavía porque el esqueleto ni siquiera está montado—, no insistas ni lo inventes: se deja para más adelante y se dice en la entrega. Ver Paso 8.
 
@@ -212,6 +212,10 @@ Cuatro casos, y los cuatro se arreglan con la pregunta siguiente, no señalando 
 | Dinero | enteros en la unidad mínima, nunca coma flotante |
 | Identificadores | opacos y estables; no se reutilizan ni se renumeran |
 | Borrado | se marca, no se borra, mientras algo pueda referenciarlo |
+
+**Dónde va cada convención.** Una convención técnica es una decisión sobre el sistema, y en Venoxia una decisión sobre el sistema o tiene oráculo o es una apuesta; prosa no hay. Así que la tanda produce dos salidas y ninguna más: **una convención aprobada es un requisito de `technical-contract`** —la capability cuyo sujeto es el propio repositorio, prefijo `R-TEC-`— con su `verifies:` (el test que fallaría si se incumpliera: un escaneo de imports, un umbral de cobertura, un código de salida), y **una convención sin decidir es una apuesta en `## Bets`**, con el hecho que la cierra en `revisit:`. Sólo es apuesta cuando ningún test podría comprobarla aunque se escribiera; si un test que todavía no existe bastaría, es requisito, y el test se escribe cuando toque. Con al menos una convención aprobada, la tabla del acta gana la fila `technical-contract` —«Qué podrá hacer»: someter las decisiones técnicas del propio repositorio al mismo contrato que su comportamiento; `Done when` observable, como todas— y la entrega termina con su `/venoxia:specify` tecleado (ver «La entrega»): esta skill no escribe requisitos, ni los de esa capability. `principles.md` no lleva convenciones técnicas, ni aprobadas ni abiertas: lleva los tres principios del método y los de dominio.
+
+Si el proyecto ya tiene un `principles.md` de una entrevista anterior con una sección de convenciones técnicas, **las convenciones técnicas que ya estén en `principles.md` se reparten igual** antes de quitar la sección, sin perder ninguna: fueron aprobadas en su día, así que van a `technical-contract` como aprobadas —a `## Bets` sólo si ningún test podría comprobarlas—, y el resto del fichero (principios de dominio, cualquier otro contenido) se conserva tal cual: lo único que se retira es esa sección.
 
 **De dominio.** Salen del usuario, siempre, y no se preguntan: se cazan mientras habla. El detector es una frase con dos cosas buenas y una elegida —«prefiero X, aunque…», «mejor perder Y que Z», «si tengo que elegir…»—. Anótala **literal** en el momento, con sus palabras, y al final de la entrevista devuélvesela en la forma canónica para que la confirme:
 
@@ -313,7 +317,7 @@ confidence: low
 
 ## Paso 8 · Escribir los principios
 
-`.venoxia/principles.md`, en este orden: los tres principios del método, las convenciones técnicas que el usuario aprobó y los principios de dominio que dijo él.
+`.venoxia/principles.md`, en este orden: los tres principios del método y los principios de dominio que dijo el usuario. Las convenciones técnicas no van aquí (Paso 4): las aprobadas son requisitos de `technical-contract` y las abiertas, apuestas del acta.
 
 Los tres del método se escriben sin preguntar, y no es una excepción a la regla 4: **no son del proyecto, son del plugin**, y quien instala Venoxia los acepta con él. Dilo así en el fichero.
 
@@ -332,9 +336,9 @@ Este proyecto especifica antes de construir. Tres principios gobiernan cada requ
 El presupuesto de incertidumbre del proyecto es del 30 %: como mucho tres de cada diez
 requisitos pueden nacer con `confidence: low`.
 
-## Convenciones técnicas
-
-- **<Tensión>.** <La convención, en una frase.>
+Las decisiones técnicas verificables de este proyecto no viven aquí: son requisitos con
+oráculo de la capability `technical-contract`. Lo que aquí queda es lo que por naturaleza
+no se verifica con un test: cómo se desempata.
 
 ## Principios de dominio
 
@@ -343,7 +347,7 @@ requisitos pueden nacer con `confidence: low`.
 
 De este fichero el linter lee una sola cosa —si hay principios de dominio, para `C17`—; todo lo demás lo leen las personas y `/venoxia:specify` antes de redactar nada. Por eso sus encabezados van en español, a diferencia de los del acta, y por eso el de dominio se escribe **exactamente** así: `## Principios de dominio`.
 
-Si una de las dos secciones quedó vacía, bórrala en vez de dejar el hueco con un ejemplo dentro. El hueco de la plantilla —el que trae `<la tensión>` entre ángulos— no cuenta como principio ni para el linter ni para nadie: dejarlo puesto es peor que borrar la sección, porque aparenta un acuerdo que no existe.
+Si la sección de dominio quedó vacía, bórrala en vez de dejar el hueco con un ejemplo dentro. El hueco de la plantilla —el que trae `<la tensión>` entre ángulos— no cuenta como principio ni para el linter ni para nadie: dejarlo puesto es peor que borrar la sección, porque aparenta un acuerdo que no existe.
 
 Con una excepción, y es la que `C17` va a señalar: **si alguna fila de la tabla arbitra, la sección de dominio no se borra por vacía.** O lleva el desempate, o la entrevista todavía no ha terminado. Vuelve al Paso 4 y haz la pregunta con la tensión concreta delante.
 
@@ -402,10 +406,17 @@ Termina con un informe corto, sin adornos:
 - El veredicto literal del linter.
 - Lo que quedó sin cerrar y qué haría falta para cerrarlo. Una casilla vacía se dice; no se disimula. Si `.venoxia/venoxia.json` no se escribió porque nadie dio el comando de test todavía, dilo aquí explícitamente: sin él, `oracle.py` no puede correr el oráculo de ningún requisito.
 - Toda decisión que tomaste tú porque la entrevista no la cubría, marcada como tal. Una asunción tuya que el usuario no ve es una asunción que nadie revisa.
+- **Las convenciones técnicas, repartidas:** cuáles quedaron aprobadas (y por tanto van a `technical-contract`) y cuáles quedaron como apuestas en `## Bets`, cada una con su hecho de cierre.
 - **El siguiente paso, tecleado.** Literalmente la celda «Qué podrá hacer» de la fila 1, entre comillas:
 
   ```
   /venoxia:specify "reservar una mesa para una fecha y hora"
+  ```
+
+  Y cuando hay convenciones aprobadas, la entrega termina con el `/venoxia:specify` de `technical-contract`, con las convenciones aprobadas en la frase para que ese change las escriba como requisitos con `verifies:`:
+
+  ```
+  /venoxia:specify "technical-contract: dinero en enteros en la unidad mínima; tiempo en UTC e ISO 8601"
   ```
 
 - Y el recordatorio del andamiaje si aún no está montado: `.venoxia/` ya existe, así que el guardián está en pie y el esqueleto del proyecto necesita un change con `"via": "direct"` para pasar.

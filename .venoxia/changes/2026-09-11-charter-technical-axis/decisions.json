@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "change": "2026-09-11-charter-technical-axis",
+  "decisions": [
+    {
+      "at": "2026-09-11T15:45:00Z",
+      "scenario": "The technical conventions heading is gone",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The technical conventions heading is gone» es la correcta?",
+      "options": [
+        "«el encabezado Convenciones técnicas ya no aparece»",
+        "«el cuerpo no contiene el encabezado indicado»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 1. Vocabulario; el delta no cambia. Cerrado por Claude bajo la instrucción del usuario del 2026-09-11."
+    },
+    {
+      "at": "2026-09-11T15:45:00Z",
+      "scenario": "R-CHL-007 · devils-advocate (medium)",
+      "field": "attack",
+      "question": "La disyunción se resuelve siempre por el lado barato: todo juicio técnico acaba como apuesta y nada llega al contrato con test.",
+      "options": [
+        "Sólo es apuesta cuando ningún test puede comprobarlo hoy (D6)",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Sólo es apuesta cuando ningún test puede comprobarlo hoy",
+      "decided_by": "claude",
+      "note": "Narrativa de R-CHL-007 y escenario nuevo «A bet only when no test can check it today»; es la decisión D6 del plan llevada a la skill."
+    },
+    {
+      "at": "2026-09-11T15:45:00Z",
+      "scenario": "R-CHL-006 · devils-advocate (medium, specify tecleado)",
+      "field": "attack",
+      "question": "La entrega sólo imprime el /venoxia:specify; si el usuario no lo teclea, la fila technical-contract queda sin requisitos.",
+      "options": [
+        "Aceptar como límite declarado",
+        "Que la skill charter escriba el change"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado",
+      "decided_by": "claude",
+      "note": "La skill charter nunca escribe requisitos (su Paso 10): adelantarlos es una spec sin oráculo por la puerta de atrás. Una fila sin spec.md es una capability pendiente, que es lo que el acta ya sabe representar; el siguiente paso tecleado es el mismo mecanismo con el que la entrega entrega la capability 1."
+    },
+    {
+      "at": "2026-09-11T15:45:00Z",
+      "scenario": "R-CHL-006 · devils-advocate (medium, principles.md preexistente)",
+      "field": "attack",
+      "question": "En un proyecto ya adoptado la skill borra las convenciones técnicas preexistentes de principles.md sin llevarlas a ningún sitio.",
+      "options": [
+        "Repartirlas igual antes de quitar la sección",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Repartirlas igual antes de quitar la sección",
+      "decided_by": "claude",
+      "note": "Narrativa de R-CHL-006 y escenario nuevo «Existing conventions are moved, not dropped»."
+    },
+    {
+      "at": "2026-09-11T15:45:00Z",
+      "scenario": "R-CHL-006 · devils-advocate (low, encabezado renombrado)",
+      "field": "attack",
+      "question": "Renombrar el encabezado y seguir volcando prosa pasa el escenario negativo.",
+      "options": [
+        "Aceptar: el escenario «principles.md no lleva convenciones técnicas» expresa la intención",
+        "Prohibir cualquier sección de convenciones por regex"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado",
+      "decided_by": "claude",
+      "note": "El test de texto no puede cerrar todas las paráfrasis; la intención está en el escenario positivo y la skill la interpreta un modelo."
+    },
+    {
+      "at": "2026-09-11T16:05:00Z",
+      "scenario": "R-CHL-007 · devils-advocate ronda 2 (high)",
+      "field": "attack",
+      "question": "«sólo es apuesta cuando hoy no existe ningún test que pueda comprobarlo» se lee como «no existe todavía el test», y en Venoxia el test siempre nace después de specify: todo acabaría en ## Bets.",
+      "options": [
+        "Reescribir: apuesta sólo cuando ningún test podría comprobarlo aunque se escribiera",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "Reescribir: apuesta sólo cuando ningún test podría comprobarlo aunque se escribiera",
+      "decided_by": "claude",
+      "note": "Ambigüedad real de redacción (existe/podría). Narrativa de R-CHL-007 y escenario renombrado «A bet only when no test could check it». Cerrado por Claude bajo la instrucción del usuario del 2026-09-11; se repite el panel."
+    },
+    {
+      "at": "2026-09-11T16:05:00Z",
+      "scenario": "R-CHL-006 · devils-advocate ronda 2 (medium, principles.md amputado)",
+      "field": "attack",
+      "question": "Reescribir principles.md «sólo con» método y dominio borra lo que no encaje, p. ej. convenciones de lectura.",
+      "options": [
+        "Aceptar como límite: la skill conserva los principios de dominio existentes y las convenciones de lectura son principios de dominio",
+        "Añadir una tercera sección"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado",
+      "decided_by": "claude",
+      "note": "La convención de lectura de este repo ya vive bajo ## Principios de dominio (es «cómo se lee», no comportamiento). La skill dirá que los principios de dominio existentes se conservan; una tercera sección reabriría la prosa sin oráculo que D5 cerró."
+    },
+    {
+      "at": "2026-09-11T16:05:00Z",
+      "scenario": "R-CHL-006 · devils-advocate ronda 2 (medium, specify tecleado)",
+      "field": "attack",
+      "question": "La entrega imprime el comando y nada comprueba que los requisitos lleguen a existir.",
+      "options": [
+        "Aceptar como límite declarado (misma respuesta que en la ronda 1)",
+        "Que charter escriba el change"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado",
+      "decided_by": "claude",
+      "note": "Misma respuesta que en la ronda 1: charter nunca escribe requisitos; la fila sin spec.md es una capability pendiente que el acta ya sabe representar."
+    },
+    {
+      "at": "2026-09-11T16:25:00Z",
+      "scenario": "R-CHL-006 · devils-advocate ronda 3 (medium, párrafo declarativo)",
+      "field": "attack",
+      "question": "Un párrafo declarativo al final y otro encabezado para la misma prosa pasan los seis escenarios.",
+      "options": [
+        "Aceptar como límite de los tests de texto",
+        "Regex sobre cualquier encabezado de convenciones"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado",
+      "decided_by": "claude",
+      "note": "Misma clase que el ataque low de la ronda 1: un test estructural no cierra las paráfrasis; la skill la interpreta un modelo y se revisa como texto."
+    },
+    {
+      "at": "2026-09-11T16:25:00Z",
+      "scenario": "R-CHL-006 · devils-advocate ronda 3 (high, principles.md reescrito)",
+      "field": "attack",
+      "question": "«sólo con los tres del método y los de dominio» autoriza a descartar cualquier otro contenido de un principles.md existente.",
+      "options": [
+        "Aceptar como límite: la skill dirá que conserva lo que ya haya y sólo retira la sección de convenciones",
+        "Reescribir la narrativa y repetir el panel"
+      ],
+      "chosen": 0,
+      "answer": "Aceptar como límite declarado; la skill conserva el contenido existente",
+      "decided_by": "claude",
+      "note": "Cerrado por Claude bajo la instrucción del usuario del 2026-09-11. La narrativa es D5 literal (principles.md = método + dominio). El caso —charter sobre un proyecto ya adoptado con contenido extra en principles.md— se cubre en el texto de la skill: se conserva todo lo que no sea la sección de convenciones técnicas."
+    },
+    {
+      "at": "2026-09-11T16:25:00Z",
+      "scenario": "R-CHL-006 · devils-advocate ronda 3 (medium, preexistentes a Bets)",
+      "field": "attack",
+      "question": "Las convenciones preexistentes podrían ir todas a ## Bets porque ninguna fue aprobada en esta entrevista.",
+      "options": [
+        "La skill las trata como aprobadas (lo fueron en su entrevista)",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "La skill las trata como aprobadas",
+      "decided_by": "claude",
+      "note": "Texto de la skill: una convención que ya estaba en principles.md fue aprobada en su día y va a technical-contract; sólo es apuesta si ningún test podría comprobarla."
+    },
+    {
+      "at": "2026-09-11T16:25:00Z",
+      "scenario": "R-CHL-007 · devils-advocate ronda 3 (medium, saltarse el ciclo)",
+      "field": "attack",
+      "question": "specify podría escribir el requisito directamente en capabilities/technical-contract/spec.md.",
+      "options": [
+        "La skill dice que va al delta del change en curso (delta/technical-contract.md)",
+        "Aceptar como límite"
+      ],
+      "chosen": 0,
+      "answer": "La skill dice que va al delta del change en curso",
+      "decided_by": "claude",
+      "note": "specify sólo escribe change.json, proposal.md y delta/*.md; el texto nuevo nombra delta/technical-contract.md del mismo change."
+    },
+    {
+      "at": "2026-09-11T16:30:00Z",
+      "scenario": "An approved convention is a requirement of technical-contract",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An approved convention is a requirement of technical-contract» es la correcta?",
+      "options": [
+        "«el texto de la skill declara la regla, no ejecuta nada»",
+        "«el cuerpo de SKILL.md declara la convención aprobada como requisito»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda. El lector A describió casi todos los efectos como «el texto de la skill declara la regla, no ejecuta nada»; vocabulario, el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T16:30:00Z",
+      "scenario": "An undecided convention is a bet",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An undecided convention is a bet» es la correcta?",
+      "options": [
+        "«el texto de la skill declara la regla, no ejecuta nada»",
+        "«el cuerpo de SKILL.md declara la convención sin decidir como apuesta»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda. El lector A describió casi todos los efectos como «el texto de la skill declara la regla, no ejecuta nada»; vocabulario, el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T16:30:00Z",
+      "scenario": "The principles file carries no technical conventions",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The principles file carries no technical conventions» es la correcta?",
+      "options": [
+        "«el texto de la skill declara la regla, no ejecuta nada»",
+        "«el cuerpo de SKILL.md declara que principles.md no lleva convenciones técnicas»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda. El lector A describió casi todos los efectos como «el texto de la skill declara la regla, no ejecuta nada»; vocabulario, el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T16:30:00Z",
+      "scenario": "Existing conventions are moved, not dropped",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Existing conventions are moved, not dropped» es la correcta?",
+      "options": [
+        "«el texto de la skill declara la regla, no ejecuta nada»",
+        "«el cuerpo declara que las convenciones se reparten antes de quitar la sección»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda. El lector A describió casi todos los efectos como «el texto de la skill declara la regla, no ejecuta nada»; vocabulario, el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T16:30:00Z",
+      "scenario": "The delivery hands the approved conventions to specify",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The delivery hands the approved conventions to specify» es la correcta?",
+      "options": [
+        "«el texto de la skill declara que la entrega llama a specify»",
+        "«el cuerpo declara que la entrega termina invocando specify de technical-contract»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda. El lector A describió casi todos los efectos como «el texto de la skill declara la regla, no ejecuta nada»; vocabulario, el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T16:30:00Z",
+      "scenario": "The body names the two destinations",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The body names the two destinations» es la correcta?",
+      "options": [
+        "«el texto de la skill declara los dos destinos posibles»",
+        "«el cuerpo declara que el juicio sin principio va al contrato o a Bets»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda. El lector A describió casi todos los efectos como «el texto de la skill declara la regla, no ejecuta nada»; vocabulario, el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T16:30:00Z",
+      "scenario": "The body forbids prose",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The body forbids prose» es la correcta?",
+      "options": [
+        "«el texto de la skill prohíbe escribirlo como prosa»",
+        "«el cuerpo declara que ese juicio técnico nunca va a prosa»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda. El lector A describió casi todos los efectos como «el texto de la skill declara la regla, no ejecuta nada»; vocabulario, el delta no cambia."
+    },
+    {
+      "at": "2026-09-11T16:30:00Z",
+      "scenario": "A bet only when no test could check it",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A bet only when no test could check it» es la correcta?",
+      "options": [
+        "«el texto de la skill declara ese criterio de apuesta»",
+        "«el cuerpo declara que sólo es apuesta si ningún test lo comprobaría»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Ronda 3, blanda. El lector A describió casi todos los efectos como «el texto de la skill declara la regla, no ejecuta nada»; vocabulario, el delta no cambia."
+    }
+  ]
+}

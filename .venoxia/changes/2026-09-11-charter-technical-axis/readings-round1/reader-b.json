@@ -1,0 +1,8 @@
+[{"scenario": "An approved convention is a requirement of technical-contract", "effect": "el texto declara que la convención aprobada es requisito", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "An undecided convention is a bet", "effect": "el texto declara que la convención sin decidir es una apuesta", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The principles file carries no technical conventions", "effect": "el texto declara que principles.md no lleva convenciones técnicas", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The technical conventions heading is gone", "effect": "el cuerpo no contiene el encabezado indicado", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The delivery hands the approved conventions to specify", "effect": "el texto declara que la entrega termina invocando specify", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The body names the two destinations", "effect": "el texto declara los dos destinos posibles del juicio técnico", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The body forbids prose", "effect": "el texto declara que el juicio técnico nunca va a prosa", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The inventory includes the technical contract", "effect": "el texto manda leer el spec de technical-contract antes de proponer", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null}]

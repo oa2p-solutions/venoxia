@@ -1,0 +1,10 @@
+[{"scenario": "An approved convention is a requirement of technical-contract", "effect": "el texto de la skill declara la regla, no ejecuta nada", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "An undecided convention is a bet", "effect": "el texto de la skill declara la regla, no ejecuta nada", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The principles file carries no technical conventions", "effect": "el texto de la skill declara la regla, no ejecuta nada", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The technical conventions heading is gone", "effect": "el cuerpo de la skill no contiene ese encabezado", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "Existing conventions are moved, not dropped", "effect": "el texto de la skill declara el reparto antes de quitar la sección", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The delivery hands the approved conventions to specify", "effect": "el texto de la skill declara que termina llamando a specify", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The body names the two destinations", "effect": "el texto de la skill declara los dos destinos posibles", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The body forbids prose", "effect": "el texto de la skill prohíbe escribirlo como prosa", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "A bet only when no test can check it today", "effect": "el texto de la skill declara la condición de apuesta", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+{"scenario": "The inventory includes the technical contract", "effect": "el texto de la skill manda leer ese spec antes de proponer", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null}]

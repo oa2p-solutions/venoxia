@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "La disyunción «requisito de technical-contract con verifies: o apuesta en ## Bets» se puede resolver siempre por el lado barato: una skill que clasifica todo juicio técnico sin principio como apuesta cumple la frase al pie de la letra y pasa los tres escenarios (que sólo exigen que el cuerpo nombre los dos destinos y prohíba la prosa), y el resultado es que ningún juicio técnico llega nunca al contrato con test, que es justo lo que el change existe para evitar.",
+    "requirement_id": "R-CHL-007",
+    "severity": "medium"
+  },
+  {
+    "attack": "«el /venoxia:specify tecleado de la entrega» y el escenario que sólo pide declarar que la entrega termina con ese comando se cumplen imprimiendo la línea del comando al usuario; nada obliga a comprobar que los requisitos se escribieron. Si el usuario no lo teclea, las convenciones técnicas aprobadas quedan como filas de una tabla del acta sin ningún requisito con verifies: detrás, es decir, exactamente la prosa no verificable que el requisito dice erradicar.",
+    "requirement_id": "R-CHL-006",
+    "severity": "medium"
+  },
+  {
+    "attack": "«DEBE escribir principles.md sólo con los tres principios del método y los de dominio» autoriza a reescribir el fichero descartando todo lo que no encaje en esas dos categorías, y la obligación de trasladar sólo alcanza a las convenciones de la tanda en curso; en un proyecto ya adoptado, la skill borra de principles.md convenciones técnicas preexistentes sin llevarlas a technical-contract ni a ## Bets, perdiendo decisiones que eran su único registro.",
+    "requirement_id": "R-CHL-006",
+    "severity": "medium"
+  },
+  {
+    "attack": "El único escenario negativo prohíbe la cadena literal «## Convenciones técnicas»; una skill que renombra el encabezado (por ejemplo «## Acuerdos del eje técnico») y sigue volcando ahí la prosa de cada convención, además de llevarla a technical-contract, pasa los cinco escenarios y deja dos fuentes de verdad para la misma decisión técnica, que divergirán en cuanto una de las dos se edite.",
+    "requirement_id": "R-CHL-006",
+    "severity": "low"
+  }
+]
