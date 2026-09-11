@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "venoxia",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Convierte la especificación en un contrato que falla en CI cuando miente. Cada requisito nace con su oráculo de verificación y su nivel de confianza declarado; sin oráculo, no compila. Incluye validador determinista, guardián PreToolUse y motor de divergencia con lectores aislados.",
   "author": {
     "name": "Oscar Arocha",
