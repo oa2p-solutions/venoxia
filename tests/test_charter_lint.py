@@ -1386,15 +1386,16 @@ class TestRuleC15RiskWithoutBets(CharterCase):
         self.assert_conforms(charter())
 
     def test_c15_stays_quiet_without_high_risk_capabilities(self) -> None:
-        """Sin riesgo alto, un acta sin apuestas es perfectamente legítima."""
-        self.assert_conforms(
+        """Sin riesgo alto, C15 calla: de un acta sin apuestas avisa C20 y sólo él."""
+        self.assert_only_warning(
+            "C20",
             charter(
                 capabilities=[
                     Cap(risk="medium"),
                     Cap(priority=2, slug="availability", risk="low"),
                 ],
                 bets="",
-            )
+            ),
         )
 
     def test_c15_warns_on_high_risk_with_no_bets_declared(self) -> None:
@@ -1402,6 +1403,35 @@ class TestRuleC15RiskWithoutBets(CharterCase):
         findings = self.assert_only_warning("C15", charter(bets=""))
         self.assertIn("«booking»", findings[0]["message"])
         self.assertIn("ninguna apuesta", findings[0]["message"])
+
+
+# ---------------------------------------------------------------------------
+# C20 · un acta que no declara ninguna apuesta (aviso)
+# ---------------------------------------------------------------------------
+
+
+class TestRuleC20CharterWithoutBets(CharterCase):
+    """C20 · la sección de apuestas declarada y vacía."""
+
+    NO_HIGH_RISK = (Cap(risk="medium"), Cap(priority=2, slug="availability", risk="low"))
+
+    # @covers R-CHL-008
+    def test_c20_warns_when_the_charter_declares_no_bet(self) -> None:
+        """Ninguna apuesta y ningún riesgo alto: nadie ha separado lo visto de lo supuesto."""
+        findings = self.assert_only_warning(
+            "C20", charter(capabilities=list(self.NO_HIGH_RISK), bets="")
+        )
+        self.assertIn("ninguna apuesta", findings[0]["message"])
+
+    # @covers R-CHL-008
+    def test_c20_defers_to_c15_when_a_capability_is_high_risk(self) -> None:
+        """Con riesgo alto el aviso ya lo da C15: dos por la misma sección son ruido."""
+        self.assert_only_warning("C15", charter(bets=""))
+
+    # @covers R-CHL-008
+    def test_c20_stays_quiet_with_a_single_bet(self) -> None:
+        """Una apuesta basta: el acta ya distingue lo observado de lo supuesto."""
+        self.assert_conforms(charter(capabilities=list(self.NO_HIGH_RISK)))
 
 
 # ---------------------------------------------------------------------------
@@ -1918,12 +1948,14 @@ class TestRuleRegistry(unittest.TestCase):
         "C17": "warning",
         "C18": "warning",
         "C19": "warning",
+        "C20": "warning",
     }
 
-    def test_the_nineteen_rules_are_registered_in_order(self) -> None:
-        """Los códigos son C01…C19, sin saltos ni repetidos."""
+    # @covers R-CHL-008
+    def test_the_twenty_rules_are_registered_in_order(self) -> None:
+        """Los códigos son C01…C20, sin saltos ni repetidos."""
         codes = [rule.code for rule in charter_lint.RULES]
-        self.assertEqual(codes, [f"C{number:02d}" for number in range(1, 20)])
+        self.assertEqual(codes, [f"C{number:02d}" for number in range(1, 21)])
 
     def test_every_rule_declares_its_severity_and_its_function(self) -> None:
         """Cada regla trae la severidad del contrato, un resumen y una función."""

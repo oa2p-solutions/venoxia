@@ -136,7 +136,7 @@ Son las dos casillas que la entrevista no deja en blanco, y las dos por el mismo
 
 **`Out of scope` es la frontera.** Un proyecto sin fronteras escritas las tiene igualmente: las descubre tarde, de una en una y en mitad de una entrega. Y cada viñeta lleva el porqué, no sólo el qué, porque un «pagos, no» a secas se vuelve a discutir la semana que viene, mientras que un «pagos no, porque el riesgo regulatorio no compensa hasta que haya reservas de verdad» se puede revisar el día en que esa condición cambie. Una frontera sin razón no es una decisión, es un capricho, y los caprichos no sobreviven a la primera reunión.
 
-### Las 19 reglas del linter del acta
+### Las 20 reglas del linter del acta
 
 Todas deterministas, igual que las del validador: ninguna consulta a un modelo. `scripts/charter_lint.py` sale con `0` si el acta cumple, `1` si no y `2` ante un error de uso. Con `--strict`, los avisos también hacen fallar.
 
@@ -161,6 +161,7 @@ Todas deterministas, igual que las del validador: ninguna consulta a un modelo. 
 | `C17` | Alguna capability promete un **juicio** —comparar, puntuar, recomendar, ordenar por varios criterios— y `.venoxia/principles.md` no declara ningún principio de dominio que diga cómo se desempata. El criterio existe igual: si no está escrito, lo toma quien implemente. Un aviso por acta, no uno por fila. | warning |
 | `C18` | Un `Done when` **absoluto** —«sin corregir ninguno», «nunca falla», «el 100 %»— que ninguna apuesta respalda. O se baja el listón a algo alcanzable, o se declara la apuesta. | warning |
 | `C19` | Un `Done when` que sólo se cumple si **alguien vuelve más tarde** —«pasada la entrega, marca si cumplió»— y ninguna apuesta lo reconoce. Es la dependencia que más veces se incumple y la que menos veces está escrita. | warning |
+| `C20` | El acta declara `## Bets` y no escribe ninguna apuesta dentro. Un acta que no supone nada es casi siempre un acta a la que nadie preguntó qué estaba suponiendo. Calla cuando alguna capability declara riesgo alto, porque ese caso ya lo avisa `C15`. | warning |
 
 Y como en el validador, el parseo tiene su propio código: `P01` (error) es un acta que no se ha podido leer, y es un fallo de Venoxia, no del acta.
 

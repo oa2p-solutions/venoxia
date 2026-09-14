@@ -2031,6 +2031,43 @@ def rule_c15(ctx: Context) -> list[Finding]:
     ]
 
 
+def rule_c20(ctx: Context) -> list[Finding]:
+    """C20 · Un acta que declara la sección de apuestas y no escribe ninguna."""
+    if not ctx.charter.has(SECTION_BETS):
+        # La sección ausente ya la dice C01, y con severidad de error.
+        return []
+    if ctx.charter.bets:
+        return []
+    if not ctx.charter.capabilities:
+        # Sin tabla legible no hay nada detrás de lo que suponer: lo dicen C03 y C04.
+        return []
+    if any(row.risk == "high" for row in ctx.charter.capabilities):
+        # Ese acta ya recibe C15, que dice lo mismo con el riesgo delante.
+        return []
+
+    return [
+        _finding(
+            ctx,
+            "C20",
+            SEVERITY_WARNING,
+            (
+                "El acta no declara ninguna apuesta: escrita así afirma que nada de lo "
+                "que dice se está dando por supuesto, y eso en un proyecto que todavía "
+                "no existe casi nunca es cierto."
+            ),
+            (
+                "Recorre el propósito y la capability de prioridad 1 preguntando qué has "
+                "visto y cuántas veces. Lo que salga supuesto va a «## Bets» como "
+                "«### B-001 · <título>» con «confidence», «why», «revisit» y «fatal». Si "
+                "de verdad has observado todo lo que el acta afirma, dilo en la prosa y "
+                "deja este aviso: es lo que distingue un acta comprobada de una a la que "
+                "nadie hizo la pregunta."
+            ),
+            line=ctx.charter.line_of(SECTION_BETS),
+        )
+    ]
+
+
 def rule_c16(ctx: Context) -> list[Finding]:
     """C16 · El orden del acta y el orden en que se ha construido no coinciden.
 
@@ -2343,6 +2380,7 @@ RULES: list[Rule] = [
     Rule("C17", SEVERITY_WARNING, "Lo que el acta arbitra tiene principio que lo desempate", rule_c17),
     Rule("C18", SEVERITY_WARNING, "Un «Done when» absoluto declara que es una apuesta", rule_c18),
     Rule("C19", SEVERITY_WARNING, "Lo que depende de un paso diferido lo dice", rule_c19),
+    Rule("C20", SEVERITY_WARNING, "El acta declara al menos una apuesta", rule_c20),
 ]
 
 

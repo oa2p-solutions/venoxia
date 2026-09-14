@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "change": "2026-09-14-charter-bets-warning",
+  "runs": [
+    {
+      "version": 1,
+      "ran_at": "2026-09-14T19:19:18Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CHL-008",
+          "verifies": [
+            "tests/test_charter_lint.py"
+          ],
+          "status": "red",
+          "exit_code": 1,
+          "duration_ms": 8439,
+          "output_tail": "        \"priority\": 1,\n        \"slug\": \"booking\",\n        \"risk\": \"medium\"\n      },\n      {\n        \"priority\": 2,\n        \"slug\": \"availability\",\n        \"risk\": \"low\"\n      }\n    ]\n  }\n}\n\nstderr:\n\n\n----------------------------------------------------------------------\nRan 130 tests in 8.375s\n\nFAILED (failures=2)",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_charter_lint.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 0,
+        "red": 1,
+        "missing": 0,
+        "timeout": 0,
+        "total": 1
+      },
+      "all_green": false,
+      "all_red": true
+    },
+    {
+      "version": 1,
+      "ran_at": "2026-09-14T19:24:48Z",
+      "runner": {
+        "command": "python3 -m unittest {files}",
+        "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+      },
+      "results": [
+        {
+          "requirement_id": "R-CHL-008",
+          "verifies": [
+            "tests/test_charter_lint.py"
+          ],
+          "status": "green",
+          "exit_code": 0,
+          "duration_ms": 8735,
+          "output_tail": "..................................................................................................................................\n----------------------------------------------------------------------\nRan 130 tests in 8.691s\n\nOK",
+          "runner": {
+            "name": null,
+            "command": "python3 -m unittest tests/test_charter_lint.py",
+            "cwd": "/Users/afroxstudio/Developments/ia/venoxia"
+          }
+        }
+      ],
+      "counts": {
+        "green": 1,
+        "red": 0,
+        "missing": 0,
+        "timeout": 0,
+        "total": 1
+      },
+      "all_green": true,
+      "all_red": false
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "change": "2026-09-14-charter-bets-warning",
+  "decisions": [
+    {
+      "at": "2026-09-14T19:17:22Z",
+      "scenario": "A charter without a single bet",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «A charter without a single bet»?",
+      "options": [
+        "«añade un Finding C20 apuntando a la línea de la sección de apuestas»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. El efecto único del escenario es el hallazgo; el lector A lo repitió como efecto colateral y no hay ningún otro estado que cambie: un hecho por escenario."
+    },
+    {
+      "at": "2026-09-14T19:17:22Z",
+      "scenario": "A charter without a single bet",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A charter without a single bet» es la correcta?",
+      "options": [
+        "«el linter reporta el hallazgo C20 sobre la sección»",
+        "«el hallazgo C20 se marca sobre la línea de la sección de apuestas»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. «sobre la sección» y «sobre la línea de la sección» nombran el mismo ancla; el delta no cambia."
+    },
+    {
+      "at": "2026-09-14T19:17:22Z",
+      "scenario": "A high risk row keeps its own warning",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «A high risk row keeps its own warning»?",
+      "options": [
+        "«C20 se suprime cuando hay riesgo alto declarado»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. La supresión de C20 es el efecto mismo del escenario, no un efecto colateral aparte."
+    },
+    {
+      "at": "2026-09-14T19:17:22Z",
+      "scenario": "One bet is enough",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «One bet is enough» es la correcta?",
+      "options": [
+        "«no aparece ningún aviso sobre apuestas»",
+        "«no se emite ningún hallazgo C20»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 1,
+      "answer": "«no se emite ningún hallazgo C20»",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. No son equivalentes: el lector A generalizó a «ningún aviso sobre apuestas», y el delta sólo dice que no salta C20. La lectura literal del lector B es la que manda; el delta ya lo dice así y no cambia."
+    },
+    {
+      "at": "2026-09-14T19:17:22Z",
+      "scenario": "A high risk row keeps its own warning",
+      "field": "devils-advocate",
+      "question": "Ataque medium: una implementación literal de «el único aviso sobre la sección de apuestas es C15» filtraría cualquier hallazgo anclado en esa línea cuando hay riesgo alto, y dejaría pasar defectos reales de otras reglas.",
+      "options": [
+        "Reescribir el THEN para que hable sólo de C20",
+        "Aceptarlo como límite declarado"
+      ],
+      "chosen": 0,
+      "answer": "Reescribir el THEN para que hable sólo de C20",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. El ataque es correcto: «el único aviso» concede permiso para silenciar reglas que este requisito no gobierna. El THEN pasa a «no salta C20», que dice lo mismo sin conceder nada."
+    },
+    {
+      "at": "2026-09-14T19:17:22Z",
+      "scenario": "A charter without a single bet",
+      "field": "devils-advocate",
+      "question": "Ataque low: borrar el encabezado «## Bets» entero silencia C20 para siempre, premiando al acta con menos información.",
+      "options": [
+        "Extender C20 a la sección ausente",
+        "Aceptarlo: la sección ausente ya la cubre C01 como error"
+      ],
+      "chosen": 1,
+      "answer": "Aceptarlo: la sección ausente ya la cubre C01 como error",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Un acta sin «## Bets» dispara C01, que es error y no aviso: el caso está cubierto con más severidad, no menos. Duplicarlo en C20 daría dos hallazgos por el mismo defecto, que es justo lo que la otra decisión de este change evita."
+    },
+    {
+      "at": "2026-09-14T19:18:50Z",
+      "scenario": "A charter without a single bet",
+      "field": "effect",
+      "round": 2,
+      "question": "¿Cuál de estas lecturas del efecto de «A charter without a single bet» es la correcta?",
+      "options": [
+        "«marca hallazgo C20 sobre la línea de la sección»",
+        "«el linter reporta el hallazgo C20 sobre la sección de apuestas»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran el mismo hallazgo sobre el mismo ancla; sólo difieren en el sujeto de la frase. El delta no cambia."
+    },
+    {
+      "at": "2026-09-14T19:18:50Z",
+      "scenario": "A high risk row keeps its own warning",
+      "field": "effect",
+      "round": 2,
+      "question": "¿Cuál de estas lecturas del efecto de «A high risk row keeps its own warning» es la correcta?",
+      "options": [
+        "«no marca C20 en esa sección»",
+        "«el linter no reporta C20 pese a la sección vacía»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran el mismo hallazgo sobre el mismo ancla; sólo difieren en el sujeto de la frase. El delta no cambia."
+    },
+    {
+      "at": "2026-09-14T19:18:50Z",
+      "scenario": "One bet is enough",
+      "field": "effect",
+      "round": 2,
+      "question": "¿Cuál de estas lecturas del efecto de «One bet is enough» es la correcta?",
+      "options": [
+        "«no marca C20 en esa sección»",
+        "«el linter no reporta C20 con una apuesta declarada»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran el mismo hallazgo sobre el mismo ancla; sólo difieren en el sujeto de la frase. El delta no cambia."
+    },
+    {
+      "at": "2026-09-14T19:18:50Z",
+      "scenario": "A high risk row keeps its own warning",
+      "field": "devils-advocate",
+      "round": 2,
+      "question": "Ataque medium: la excepción por riesgo alto es global, así que una sola fila «high» apaga C20 en toda el acta y sirve de interruptor para silenciar el aviso.",
+      "options": [
+        "Acotar la excepción",
+        "Aceptarlo: el acta con riesgo alto y sin apuestas ya recibe C15"
+      ],
+      "chosen": 1,
+      "answer": "Aceptarlo: el acta con riesgo alto y sin apuestas ya recibe C15",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. La premisa del ataque es falsa: ese acta no se queda sin aviso, recibe C15, que dice lo mismo con más contexto. Marcar una fila como «high» no silencia nada, cambia qué regla avisa."
+    },
+    {
+      "at": "2026-09-14T19:18:50Z",
+      "scenario": "A charter without a single bet",
+      "field": "devils-advocate",
+      "round": 2,
+      "question": "Ataque medium: borrar el encabezado «## Bets» cumple los tres escenarios y deja el acta en verde con --strict, que es peor que la sección vacía.",
+      "options": [
+        "Extender C20 a la sección ausente",
+        "Aceptarlo: la sección ausente dispara C01, que es error y no aviso"
+      ],
+      "chosen": 1,
+      "answer": "Aceptarlo: la sección ausente dispara C01, que es error y no aviso",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Repetido de la ronda 1 con más severidad, y la respuesta no cambia: un acta sin «## Bets» no pasa --strict en verde, falla por C01 con severidad de error. El atajo que el ataque describe no existe."
+    }
+  ]
+}

@@ -390,7 +390,7 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/charter_lint.py" --root "<raíz>" --stric
 
 **Con `--strict` desde la primera ejecución**, y aquí no hay excusa posible para el rojo. La spec tiene una: `V07` y `V08` se quedan rojas esperando un test que todavía no está escrito, y ese rojo es correcto. El acta no depende de nada externo —todo lo que necesita está en el mismo fichero—, así que **todo hallazgo, error o aviso, se resuelve aquí**, a veces con una pregunta más de por medio. Devolver el control con uno pendiente es dejar el acta a medio acordar.
 
-Itera: lee cada hallazgo, corrige el acta, vuelve a ejecutar. Las reglas se llaman `C01`–`C19`, como las `V01`–`V16` del validador, y cada hallazgo trae su remedio: preséntalo como lo hace `/venoxia:validate`, con el error delante y el remedio pegado. No reclasifiques la severidad, no descartes un hallazgo por parecerte menor y no matices el veredicto: si el script sale con `1`, el acta no cumple.
+Itera: lee cada hallazgo, corrige el acta, vuelve a ejecutar. Las reglas se llaman `C01`–`C20`, como las `V01`–`V16` del validador, y cada hallazgo trae su remedio: preséntalo como lo hace `/venoxia:validate`, con el error delante y el remedio pegado. No reclasifiques la severidad, no descartes un hallazgo por parecerte menor y no matices el veredicto: si el script sale con `1`, el acta no cumple.
 
 Tres casos que se paran a preguntar en vez de corregirse solos, y los tres por el mismo motivo: el remedio pasaría por **inventar contenido**.
 
@@ -398,11 +398,12 @@ Tres casos que se paran a preguntar en vez de corregirse solos, y los tres por e
 - Una viñeta `**hoy:**` o `**con esto:**` que falta tampoco se completa con lo que ese papel suele hacer. O se pregunta, o se borra el usuario entero: un acta con un solo usuario de verdad es mejor que una con dos, uno de ellos con dos frases que nadie ha dicho, porque la segunda aparenta que se ha hablado con dos personas.
 - Un riesgo alto sin apuestas **no se arregla bajando el riesgo a `medium`**. Eso apaga el aviso sin tocar el problema, que es el peor arreglo posible en una herramienta que existe para señalar lo que no se sabe. Se arregla preguntando qué se está dando por hecho en esa capability.
 
-Y tres más, que son los avisos de fondo: `C17`, `C18` y `C19` no señalan la forma del acta, señalan algo que no se ha decidido todavía. Ninguno se calla escribiendo lo que suene bien.
+Y cuatro más, que son los avisos de fondo: `C17`, `C18`, `C19` y `C20` no señalan la forma del acta, señalan algo que no se ha decidido todavía. Ninguno se calla escribiendo lo que suene bien.
 
 - **`C17` · una capability arbitra y no hay principio de dominio.** El remedio es la pregunta del Paso 4, con la tensión concreta de su tabla delante. Escribir un principio que el usuario no ha dicho es exactamente lo que el Paso 4 prohíbe, y de propina apaga el aviso: quedaría un criterio inventado gobernando todas las specs del proyecto.
 - **`C18` · un «Done when» absoluto sin apuesta que lo respalde.** Dos salidas y las dos son del usuario: bajar el listón a algo alcanzable, o dejarlo y declarar la apuesta. No elijas tú. «Sin corregir ninguno» puede ser una exigencia deliberada del negocio o una frase que sonaba bien, y sólo quien la escribió sabe cuál de las dos.
 - **`C19` · un «Done when» que espera a que alguien vuelva.** Es la tanda E.2 sin hacer. Vuelve a ella con esa fila: cuánto tarda, qué gana quien lo hace, y qué otra fila se queda en blanco si no lo hace. Y **no lo arregles quitando el paso diferido de la celda**: la frase se queda limpia y la dependencia sigue ahí, sólo que ya no la ve nadie.
+- **`C20` · el acta no declara ninguna apuesta.** Es la tanda E entera sin hacer, y el remedio es hacerla: el propósito y la fila 1, preguntando qué se ha visto y cuántas veces. Lo que salga supuesto baja a `## Bets`. Y **no lo arregles escribiendo una apuesta plausible** —«suponemos que los usuarios lo adoptarán»—: una apuesta que el usuario no ha dicho apaga el aviso y deja el acta peor que vacía, porque ahora afirma saber qué se está suponiendo. Si de verdad todo lo que el acta afirma está observado, el aviso se deja puesto y se dice en la entrega.
 
 Los tres se callan también con el arreglo bueno cuando el arreglo bueno es rediseñar la fila —que el sistema recoja el dato en vez de esperar a alguien, que la celda no prometa un juicio que la capability no hace—. Eso no es apagar un aviso: es lo que el aviso pedía.
 
