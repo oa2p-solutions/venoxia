@@ -23,7 +23,7 @@ Produces dos ficheros, y un tercer grupo sólo si el usuario lo pide, todo bajo 
 
 ---
 
-## Las cuatro reglas que gobiernan la entrevista
+## Las cinco reglas que gobiernan la entrevista
 
 > ### 1. Esto es una entrevista, no un formulario.
 >
@@ -57,6 +57,12 @@ Produces dos ficheros, y un tercer grupo sólo si el usuario lo pide, todo bajo 
 > Todo lo que propongas va marcado como propuesta tuya, y el usuario lo aprueba, lo tacha o lo corrige. El silencio no aprueba nada.
 >
 > Y si al escribir el acta te falta una casilla, hay dos caminos y ninguno es rellenarla con lo que suele ponerse ahí. Si el acta puede vivir sin ella —un segundo usuario, una fila más de la tabla—, se queda vacía y lo dices en la entrega. Si es de las que el linter exige —el `Done when` de una capability, un no-alcance—, no se puede dejar vacía **ni** inventar: es exactamente el motivo de una pregunta más.
+
+> ### 5. Ninguna pregunta se hace si no puedes nombrar la casilla que va a escribir.
+>
+> Antes de lanzar cada una, dite qué parte del acta rellena su respuesta: una fila de la tabla, un `Done when`, una viñeta de `## Out of scope`, el `confidence` de una apuesta. **Si no hay casilla, no hay pregunta**, por interesante que sea la conversación que abriría. Éste es el filtro que separa una entrevista de definición de una charla sobre el futuro: «¿y si el mercado cambia?», «¿podría alguien usarlo para otra cosa?», «¿qué pasaría si esto sale mal dentro de dos años?» no escriben nada en `charter.md`, y gastan el único recurso que la entrevista no puede reponer, que es la paciencia de quien contesta. Un hipotético no se pregunta: si de verdad importa, es una apuesta, y una apuesta se escribe con lo que el usuario ya ha dicho.
+>
+> El mismo filtro corta la redundancia, que es la otra forma de perder una entrevista. **Antes de preguntar, mira si la casilla ya está escrita**: la respuesta suele haberla dado dos tandas antes, con otras palabras, contestando a otra cosa. Cuando sea así no se vuelve a preguntar desde cero —se le enseña lo que entendiste y se le pide que lo corrija, que cuesta diez segundos y además verifica—. Una pregunta que el usuario ya ha contestado no se lee como rigor: se lee como que no le estabas escuchando.
 
 ---
 
@@ -143,27 +149,28 @@ Obligatoria, y como mínimo sobre el propósito y sobre la capability de priorid
 
 #### E.1 · Lo que ya pasó
 
-Primera pregunta, con estas cuatro opciones tal cual:
+Se pregunta por **la evidencia, no por la etiqueta**: «¿qué has visto, y cuántas veces?». «¿Lo has visto o lo supones?» pide una confesión y se contesta con una impresión; «¿qué has visto?» se contesta con un hecho, y la etiqueta la pones tú a partir de él. Tres opciones, y cada una da un resultado distinto —ésa es la prueba de que la pregunta merece hacerse—:
 
 | Respuesta | Qué se hace con ella |
 |---|---|
-| «Lo he visto: me lo ha contado alguien que lo sufre, más de una vez» | No es apuesta. Va a la prosa del acta |
-| «Lo he visto una vez, en un caso» | Apuesta con `confidence: medium` |
-| «Lo supongo, pero me parece razonable» | Apuesta con `confidence: medium` |
-| «Es una corazonada» | Apuesta con `confidence: low` |
+| «Me lo han contado más de una vez, o lo he visto pasar» | No es apuesta. Va a la prosa del acta |
+| «Hay un caso concreto ahí fuera al que puedo ir a mirar» | Apuesta con `confidence: medium`, y lo que la resuelve es ir a mirarlo |
+| «Sale de mi cabeza; hoy no hay nada que mirar» | Apuesta con `confidence: low` |
 
-Y para cada apuesta, dos preguntas más, y la primera va **partida en dos** porque juntas se contesta sólo la mitad:
+Y **sólo para las apuestas en `low`**, dos preguntas más —la primera partida en dos, porque juntas se contesta sólo la mitad—:
 
 - **«¿Qué verías que te haría cambiar de opinión?»** → `why`.
 - **«¿Y qué tendría que pasar para que pudieras verlo?»** → `revisit`.
 
+Sólo en `low`, y no es una concesión: `C12` exige el `revisit` a una apuesta en `low` y a ninguna otra. En una apuesta `medium` la respuesta ya la acabas de oír —el caso concreto al que se puede ir a mirar— y volver a preguntarla es la redundancia que hace abandonar una entrevista.
+
 La segunda pide un **hecho**, no una fecha: «cuando hayamos cerrado las diez primeras compras», «cuando el primer proveedor conteste por el hilo». **Tú no lo inventas nunca**, y no es una regla de estilo: no sabes a qué ritmo pasan las cosas en este negocio, así que cualquier plazo que escribas es un número al aire con aspecto de compromiso. Si la respuesta no llega, no la rellenes: pregunta por el ritmo real —«¿cuántos presupuestos os llegan a la semana?»— y deja que el hecho salga de ahí. `C12` rechaza tanto las fechas como los «ya veremos», y con razón: las dos cosas son la misma, una casilla ocupada sin nada dentro.
 
-Y la tercera: **«si esto sale mal, ¿el proyecto sigue teniendo sentido?»**, que es `fatal`.
+Y la tercera, **sólo sobre la apuesta que sostiene el propósito o la fila 1**: **«si esto sale mal, ¿el proyecto sigue teniendo sentido?»**, que es `fatal`. Ahí decide si conviene resolverla antes de construir nada encima; preguntada sobre la séptima apuesta del acta es un hipotético, `C14` no la exige, y se anota sin preguntar o se deja vacía.
 
 #### E.2 · Lo que hará falta que alguien haga
 
-Sobre **cada fila de la tabla**, no sólo sobre la primera, una pregunta que la mitad de arriba no puede hacer:
+Sobre la fila 1 siempre, y sobre las demás **sólo cuando su `Done when` dependa de que una persona haga algo que hoy no hace**. Esa condición la juzgas tú leyendo la fila, sin preguntar: una fila que se cumple sola en cuanto el código funciona no tiene nada que destapar aquí, y recorrer la tabla entera con la misma pregunta es exactamente cómo una entrevista se vuelve un formulario. Donde sí aplica, es una pregunta que la mitad de arriba no puede hacer:
 
 > **«Para que esta fila valga, ¿alguien tiene que hacer algo que hoy no hace?»**
 
