@@ -37,10 +37,12 @@ Produces dos ficheros, y un tercer grupo sólo si el usuario lo pide, todo bajo 
 > |---|---|
 > | «¿Cuál es tu propuesta de valor?» | «Cuando esto funcione, ¿qué podrá hacer alguien que hoy no puede?» |
 > | «¿Quién es tu usuario objetivo?» | «¿Quién tiene hoy este problema, y cómo se apaña sin ti?» |
-> | «¿Qué funcionalidades quieres?» | «Si sólo pudieras entregar una cosa el mes que viene, ¿cuál dolería no tener?» |
-> | «¿Cuál es el alcance?» | «¿Qué te van a pedir que hagas y vas a decir que no? Di el porqué.» |
+> | «¿Qué funcionalidades quieres?» | «Si sólo pudieras entregar una cosa el mes que viene, ¿cuál eliges, y qué podría hacer tu usuario ese día?» |
+> | «¿Cuál es el alcance?» | «Cuando esto funcione, ¿qué va a seguir haciendo tu usuario en otro sitio, igual que hoy? ¿Quién se lo resuelve?» |
 >
 > La prueba antes de lanzar cualquier pregunta: *¿la respuesta va a nombrar a alguien haciendo algo?* Si sólo puede producir un adjetivo —ágil, escalable, intuitivo—, la pregunta está mal hecha y la culpa no es de quien la contesta.
+>
+> Y se pregunta **siempre en positivo, por lo que sí va a ocurrir**. Una pregunta formulada en negación —«¿qué no va a hacer?», «¿a qué vas a decir que no?», «¿cuál dolería no tener?»— obliga a contestar imaginando un sistema que no existe, y lo que devuelve no es una frontera: es una duda sobre lo que el sistema sí hace. La frontera se obtiene igual de bien, y sin esa niebla, preguntando por el comportamiento que se queda fuera **porque sigue ocurriendo en otro sitio**: lo que el usuario seguirá haciendo como hoy, y quién se lo resuelve. La respuesta nombra a alguien haciendo algo —pasa la prueba de arriba— y trae su propia razón pegada, que es justo lo que `## Out of scope` necesita en cada viñeta. El acta guarda un no; la entrevista nunca lo pregunta como un no.
 
 > ### 3. Lo que se supone no se escribe como si se supiera.
 >
@@ -121,17 +123,19 @@ Qué escuchas:
 
 Sale de aquí: la fila 1 de la tabla con su `Done when`.
 
-**«Si sólo pudieras entregar una cosa el mes que viene, ¿cuál dolería no tener?»** Las opciones son las capabilities que ya han aparecido en las tandas anteriores, cada una con el apaño que quita. Y en la llamada siguiente —no en la misma, porque depende de ésta—: **«¿Qué tendría que pasar para que dijeras que eso ya funciona? ¿Quién lo ve y qué ve?»**
+**«Si sólo pudieras entregar una cosa el mes que viene, ¿cuál eliges, y qué podría hacer tu usuario ese día?»** Las opciones son las capabilities que ya han aparecido en las tandas anteriores, cada una con el apaño que quita. Y en la llamada siguiente —no en la misma, porque depende de ésta—: **«¿Qué tendría que pasar para que dijeras que eso ya funciona? ¿Quién lo ve y qué ve?»**
 
 **Regla de no avanzar.** Si el `Done when` no nombra a alguien y algo que esa persona ve, la tanda no termina: se reformula la pregunta, no se apunta la respuesta. «Que sea rápido» no tiene sujeto, «que funcione bien» no tiene verbo comprobable y «desplegado en producción» describe un hito nuestro, no algo que le pase a nadie. Un `Done when` que no se puede observar lo da por cumplido quien tenga prisa, que es justo el escenario contra el que se escribe.
 
-### Tanda D · El no
+### Tanda D · La frontera
 
 Sale de aquí: `## Out of scope`, y de paso el orden del resto de la tabla.
 
-**«¿Qué te van a pedir que hagas y vas a decir que no? Di el porqué.»** Opciones: las cosas que en un proyecto así se piden siempre, cada una con la razón por la que sería un no aquí.
+**«Cuando esto funcione, ¿qué va a seguir haciendo tu usuario en otro sitio, igual que hoy? ¿Quién se lo resuelve?»** Opciones: las cosas que en un proyecto así se dan por supuestas, cada una con la herramienta o el hábito que se las queda. Si la primera se queda corta, la segunda de la tanda: **«¿Con qué otra herramienta van a confundir esto la primera vez que lo vean, y qué hace aquélla que aquí se resuelve de otra manera?»**
 
-Distingue las dos cosas que se confunden en esta tanda, porque el acta las guarda en sitios distintos: **«más adelante» no es un no-alcance**, es una fila con un número alto en la tabla. Aquí abajo va lo que no se va a hacer y por qué no compensa. Si todo lo que sale es «más adelante», el proyecto todavía no ha dicho que no a nada, y eso hay que decirlo tal cual.
+La tanda pregunta en positivo a propósito, y es la aplicación más visible de la regla 2. «¿A qué vas a decir que no?» se contesta con una lista de cosas ausentes, y una ausencia no describe nada: quien lo lea después sigue sin saber qué hace el sistema, y quien lo contesta tiene que adivinar qué se le va a pedir. «¿Qué sigue ocurriendo en otro sitio?» se contesta con comportamiento real y observable —alguien abriendo su hoja de cálculo, alguien llamando por teléfono— y **cada respuesta ya trae su porqué**: eso se queda fuera porque hay algo que lo resuelve mejor, o porque no compensa moverlo aquí. Eso es exactamente una viñeta de `## Out of scope`, con su razón, sin haber preguntado nunca por un no.
+
+Distingue las dos cosas que se confunden en esta tanda, porque el acta las guarda en sitios distintos: **«más adelante» no es un no-alcance**, es una fila con un número alto en la tabla. Abajo va lo que se sigue resolviendo fuera y por qué compensa dejarlo ahí. Si todo lo que sale es «más adelante», el proyecto todavía no ha puesto ninguna frontera, y eso hay que decirlo tal cual.
 
 ### Tanda E · ¿Lo has visto o lo supones?
 
@@ -286,7 +290,7 @@ La forma es vinculante porque la comprueba un script:
 
 **Antes de dar el acta por escrita, un repaso que ningún script puede hacer por ti: cada dolor que nombraste en un `**hoy:**` tiene que acabar en algún sitio.** O en una fila de la tabla, o en `## Out of scope`. Las viñetas de `**hoy:**` son la parte del acta que se escribe con las palabras del usuario y sin filtrar, así que casi siempre nombran más problemas de los que el proyecto va a resolver —«y además somos tres comprando, cada uno con su hoja, sin ver lo que ha pedido el otro»—. Ese «además» es un dolor real que alguien ha dicho en voz alta, y si no aparece en ninguna de las dos secciones, el acta lo deja colgado: no está prometido, pero tampoco está descartado. Alguien lo leerá dentro de dos meses y dará por hecho que entra.
 
-Recórrelas una por una y decide con el usuario, en una sola pregunta por cabo suelto: **entra** —y se le busca fila y prioridad—, o **no entra** —y se escribe como no-alcance, con su porqué—. La respuesta suele ser la segunda, y tarda diez segundos. Un no escrito vale más que un silencio.
+Recórrelas una por una y decide con el usuario, en una sola pregunta por cabo suelto y también en positivo —«¿esto lo va a resolver el sistema, o se va a seguir resolviendo como hoy?»—: **lo resuelve el sistema** —y se le busca fila y prioridad— o **se sigue resolviendo como hoy** —y eso, con quién se lo queda, es la viñeta de no-alcance con su porqué—. La respuesta suele ser la segunda, y tarda diez segundos. Un no escrito vale más que un silencio.
 
 Ese mismo repaso destapa la otra cosa que se escapa: **un dolor que no es del usuario que tienes en la lista**. Si la tabla promete algo que mira alguien por encima —un responsable que ve el histórico, un jefe de equipo que compara— y en `## Users` sólo está quien hace el trabajo del día, falta un papel. O se añade con sus dos viñetas, o la fila es del usuario que ya está; lo que no puede es que la capability sirva a alguien que el acta no nombra.
 
