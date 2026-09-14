@@ -86,6 +86,8 @@ Preguntar por el stack teniendo un `package.json` delante es una entrevista que 
 
 Con eso, **di en voz alta lo que has deducido y sigue**, en una línea, sin convertirlo en pregunta: «veo un `package.json` con Next.js y Prisma: doy por hecho el stack y no pregunto por él; corrígeme si va a cambiar». Lo que el disco ya contesta no se pregunta, se confirma de pasada.
 
+Y hay una segunda lectura de la sala, que no está en el disco sino en lo que el usuario acaba de escribir: **si llega con el producto claro** —te ha dicho qué herramienta quiere y para qué—, la entrevista no es un descubrimiento, es una transcripción. Entonces **se redacta primero y se pregunta después**: montas el acta entera con lo que ya ha dicho, se la enseñas marcada como propuesta tuya y le pides que tache y corrija. Preguntar de cero lo que alguien te acaba de contar es la forma más rápida de que abandone, y la regla 4 se respeta igual: lo que propones va marcado como propuesta y el silencio no aprueba nada. Sólo se pregunta lo que de ahí no se pueda derivar —casi siempre el `Done when` de la fila 1 y el no-alcance—.
+
 Y una lectura que cambia toda la entrevista: **si ya hay código, el acta se escribe a posteriori.** Entonces el propósito hay que reconstruirlo de lo que el código ya hace, la mitad de las capabilities existen aunque nadie las haya nombrado, y la de prioridad 1 casi nunca es la primera del proyecto sino la siguiente. Dilo y adapta las tandas: preguntar «¿qué vas a construir?» a quien lleva seis meses construyéndolo es empezar por ofender.
 
 Con código delante hay que decidir además una cosa que la tabla no tiene columna para decir, así que se dice aquí: **la prioridad `#` de un proyecto ya empezado es el orden en que las capabilities se van a poner bajo especificación, no el orden en que se van a programar.** Lo que ya funciona ocupa fila igual —un acta que sólo lista lo que falta describe medio sistema—, y su `Done when` se escribe como el hecho que tiene que **seguir** siendo cierto: es el criterio de no romperlo, y es exactamente lo que su primer delta tendrá que preservar. Ojo al número que le pones: si le das uno alto y luego resulta que hay que especificarla primero —porque el cambio que quieres hacer la toca—, `C16` avisará de que el orden que se sigue no es el que el acta declara, y con `--strict` eso es rojo. Cuando lo primero que vas a especificar es comportamiento que ya existe, ésa es la fila 1, aunque su código lleve seis meses escrito.
@@ -99,6 +101,8 @@ Trae también, delante de todo, **todas las apuestas vivas con su `revisit`**, y
 Luego pregunta, con opciones y sin dar por hecho ninguna: **continuar por donde se quedó**, **revisar una sección concreta** (y cuál) o **empezar de cero**. Si es lo último, avisa antes de escribir: el acta nueva pisa la anterior y esta skill no guarda copias —escribe tres cosas y no una cuarta—, así que si quiere conservarla, que la aparte antes.
 
 ## Paso 3 · La entrevista, tanda a tanda
+
+**Antes de la primera pregunta, di en dos líneas qué va a salir de aquí y qué no.** El acta decide qué se construye, para quién, en qué orden y sobre qué se está apostando; **no define la herramienta ni la hace construible**: eso es `/venoxia:specify`, y desde el acta se llega en un solo prompt. Quien no lo sabe contesta veinte preguntas esperando un producto definido, recibe dos ficheros de marco y con razón siente que no tiene nada. Cuesta dos líneas decirlo y evita la única decepción que esta skill puede provocar.
 
 Seis cosas hay que sacar, y ninguna se saca preguntándola por su nombre. Lo que sigue es el material de la entrevista, **no su guion**: el orden lo fija lo que el usuario acaba de decir.
 
@@ -250,7 +254,9 @@ Y si de verdad no apareció ninguno y la tabla tampoco arbitra, `principles.md` 
 
 ## Paso 5 · Cuándo se para
 
-**Una entrevista que no termina es peor que una corta.** Hay un mínimo y es corto: cuando estén
+**Una entrevista que no termina es peor que una corta.** Por eso este paso no va al final: **se comprueba después de cada tanda**, y en cuanto el mínimo esté, se ofrece cerrar antes de la pregunta siguiente. No «al terminar las tandas»: las tandas no son un recorrido que haya que completar. Si el mínimo se cumple en la segunda, la tercera ya no se hace sin haber ofrecido cerrar primero.
+
+Hay un mínimo y es corto: cuando estén
 
 1. el propósito,
 2. **un** usuario con su `**hoy:**` y su `**con esto:**`,
@@ -260,6 +266,8 @@ Y si de verdad no apareció ninguno y la tabla tampoco arbitra, `principles.md` 
 6. y, **sólo si alguna fila de la tabla arbitra**, el desempate resuelto: o un principio de dominio, o una apuesta que diga que aún no se ha decidido.
 
 el acta ya vale para escribir la primera spec. Todo lo demás —el segundo usuario, la fila 4, la apuesta que se le acaba de ocurrir— se completa después, y se completa mejor cuando haya algo funcionando. Cuando tengas esas cosas, **ofrece cerrar**; no sigas preguntando porque queden casillas.
+
+Y ofrecer cerrar es una pregunta de verdad, con sus dos opciones —**cerrar ya** o **seguir con una sección concreta**, nombrándola—, no una frase de cortesía antes de la tanda siguiente. La segunda fila de la tabla, la tercera apuesta y el segundo usuario son casillas que el acta **puede** tener, no que necesite: cada una cuesta preguntas al usuario y ninguna cambia lo que se puede especificar mañana. Un acta de cinco filas contestada de mala gana vale menos que una de una fila contestada en serio.
 
 Las dos últimas entran en el mínimo y no en «todo lo demás», y no es un capricho: son las únicas de la lista que no se pueden añadir más tarde en las mismas condiciones. Las otras cuatro siguen ahí mañana esperando a que alguien las escriba. La diferencia entre lo que el usuario vio y lo que supuso, en cambio, se borra sola en cuanto pasan unas semanas, y entonces el acta entera se lee como si todo estuviera comprobado. Y un desempate que no está escrito cuando se redacta la primera spec no se queda pendiente: **se toma solo**, en una línea de un requisito, y a partir de ahí es «como funciona el sistema» sin que nadie recuerde haberlo acordado. Dos preguntas cuestan dos minutos hoy y no se recuperan después.
 
