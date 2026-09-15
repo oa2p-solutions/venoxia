@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "change": "2026-09-15-charter-evidence",
+  "decisions": [
+    {
+      "at": "2026-09-15T19:55:00Z",
+      "round": 1,
+      "kind": "soft-batch",
+      "count": 10,
+      "scenarios": [
+        "Dependent questions never share a call",
+        "No row the user has not seen",
+        "Own decisions go to the log, not only to the delivery",
+        "The drafted row is confirmed in one call",
+        "The evidence file and its shape are named",
+        "The log survives the session",
+        "The three kinds and the three outcomes are named",
+        "The version is announced first",
+        "The version travels with the evidence"
+      ],
+      "answer": "Las 10 blandas de la ronda 1 son vocabulario: el lector A anota «modifica skills/charter/SKILL.md» como efecto colateral de todos los escenarios y el B sólo los dos que el texto del requisito nombra; y «tipos/desenlaces» frente a «kinds/outcomes» es la misma lectura. Ningún hecho distinto, status_code nulo en los 9 escenarios.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T19:55:00Z",
+      "round": 1,
+      "kind": "attack",
+      "requirement_id": "R-CHL-018",
+      "attack": "Presentar la fila y escribirla igualmente aunque el usuario la rechace o cambie la prioridad cumple la letra.",
+      "answer": "Aceptado: R-CHL-018 dice que la fila se escribe sólo con el sí del usuario, que una corrección se vuelve a confirmar y que una fila rechazada no se escribe y se anota `dropped` (escenario «A rejected row is never written»). Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T19:55:00Z",
+      "round": 1,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "Una casilla inferida y escrita sin presentarse nunca no dispara la obligación de registrar, y la entrega puede anunciar «0 inferencias» con el acta llena de inferencias sin marca.",
+      "answer": "Aceptado: la entrada `inference` se escribe al rellenar la casilla, con desenlace `pending` hasta que se confirme, corrija o descarte (escenario «An inference is logged when it is written, not when it is confirmed»); una casilla inferida sin presentar conserva la marca `<!-- inferred -->` y C21 la rechaza. Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T19:55:00Z",
+      "round": 1,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "Con un charter-log.json ilegible o de otra versión, reescribirlo desde cero cumple «añadir una entrada» y borra la evidencia anterior.",
+      "answer": "Aceptado: un registro ilegible o de otra versión se renombra a `charter-log.json.corrupt-<marca>` antes de crear uno nuevo y nunca se sobrescribe, igual que hace oracle.py con oracle.json (escenario «An unreadable log is kept, not overwritten»). Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T19:55:00Z",
+      "round": 1,
+      "kind": "attack",
+      "requirement_id": "R-CHL-019",
+      "attack": "Sin CLAUDE_PLUGIN_ROOT o sin manifiesto legible, seguir sin anunciar nada y con plugin_version vacío cumple.",
+      "answer": "Aceptado: la versión anunciada y anotada es `unknown`, dicha igual de claro, como en R-TEC-007 (escenario «A missing manifest is announced as unknown»). Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T20:40:00Z",
+      "round": 2,
+      "kind": "soft-batch",
+      "count": 10,
+      "scenarios": [
+        "A rejected row is never written",
+        "An inference is logged when it is written, not when it is confirmed",
+        "An unreadable log is kept, not overwritten",
+        "Dependent questions never share a call",
+        "No row the user has not seen",
+        "Own decisions go to the log, not only to the delivery",
+        "The evidence file and its shape are named",
+        "The log survives the session",
+        "The three kinds and the three outcomes are named",
+        "The version is announced first"
+      ],
+      "answer": "Las blandas de la ronda 2 son vocabulario: el lector B antepone «el test confirma que SKILL.md…» a la misma lectura que el A escribe directa; ningún hecho distinto, status_code nulo en los 13 escenarios, sin lagunas.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T20:40:00Z",
+      "round": 2,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "Nada obliga a presentar nunca una inferencia `pending`; un acta entera inferida, con todas las entradas en pending y una entrega que cuenta por kind, cumple.",
+      "answer": "Aceptado: una casilla cuya entrada sigue `pending` conserva la marca `<!-- inferred -->`, así que C21 la rechaza hasta que se resuelva, y la entrega dice cuántas inferencias quedan `pending` (escenario «Pending inferences are counted and keep the mark»). Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T20:40:00Z",
+      "round": 2,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "`<marca>` no tiene que ser única: renombrar siempre a .corrupt-1 destruye la copia anterior.",
+      "answer": "Aceptado: `<marca>` es la fecha y hora UTC hasta el segundo, con sufijo numérico si el nombre ya existe (escenario «The corrupt copy never replaces an earlier one»). Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T20:40:00Z",
+      "round": 2,
+      "kind": "attack",
+      "requirement_id": "R-CHL-018",
+      "attack": "`dropped` sólo se ata al rechazo; una llamada sin respuesta deja la fila fuera del acta sin rastro.",
+      "answer": "Aceptado: una fila presentada y no contestada tampoco se escribe y se anota `dropped` con «sin respuesta» (escenario «An unanswered row leaves a trace»). Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:05:00Z",
+      "round": 3,
+      "kind": "soft-batch",
+      "count": 15,
+      "scenarios": [
+        "A missing manifest is announced as unknown",
+        "A rejected row is never written",
+        "An inference is logged when it is written, not when it is confirmed",
+        "An unanswered row leaves a trace",
+        "An unreadable log is kept, not overwritten",
+        "Dependent questions never share a call",
+        "No row the user has not seen",
+        "Own decisions go to the log, not only to the delivery",
+        "Pending inferences are counted and keep the mark",
+        "The corrupt copy never replaces an earlier one",
+        "The drafted row is confirmed in one call",
+        "The log survives the session",
+        "The three kinds and the three outcomes are named",
+        "The version is announced first",
+        "The version travels with the evidence"
+      ],
+      "answer": "Las blandas de la ronda 3 son vocabulario («el test confirma que SKILL.md declara…» frente a «el cuerpo declara…»); 16 escenarios, status_code nulo, sin lagunas.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:05:00Z",
+      "round": 3,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "Confirmar añadiendo una entrada nueva `confirmed` en vez de resolver la `pending` cumple «sin borrar las anteriores» y deja la marca para siempre: C21 rojo indefinido.",
+      "answer": "Aceptado: la confirmación, corrección o descarte cambia el desenlace de la misma entrada `pending` y le añade `resolved_at`; «sin borrar las anteriores» habla de entradas, no de desenlaces (escenario «Resolving an inference updates its own entry»). Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:05:00Z",
+      "round": 3,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "Nada obliga a retomar las inferencias pending en una sesión posterior; el acta queda en rojo por C21 y el registro crece.",
+      "answer": "Aceptado: al retomar un acta, las inferencias `pending` del registro se presentan antes de cualquier pregunta nueva (escenario «Pending inferences are resumed first»). Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:05:00Z",
+      "round": 3,
+      "kind": "attack",
+      "requirement_id": "R-CHL-018",
+      "attack": "Tratar cualquier respuesta no afirmativa como «sin respuesta» descarta filas que el usuario describió sin que la entrega lo mencione en ninguna cifra.",
+      "answer": "Aceptado: la entrega nombra cada fila `dropped` con su motivo (escenario «Dropped rows are named in the delivery»). Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:25:00Z",
+      "round": 4,
+      "kind": "soft-batch",
+      "count": 17,
+      "scenarios": [
+        "A missing manifest is announced as unknown",
+        "A rejected row is never written",
+        "An inference is logged when it is written, not when it is confirmed",
+        "An unanswered row leaves a trace",
+        "An unreadable log is kept, not overwritten",
+        "Dependent questions never share a call",
+        "Dropped rows are named in the delivery",
+        "No row the user has not seen",
+        "Own decisions go to the log, not only to the delivery",
+        "Pending inferences are counted and keep the mark",
+        "Pending inferences are resumed first",
+        "Resolving an inference updates its own entry",
+        "The corrupt copy never replaces an earlier one",
+        "The log survives the session",
+        "The three kinds and the three outcomes are named",
+        "The version is announced first",
+        "The version travels with the evidence"
+      ],
+      "answer": "Las blandas de la ronda 4 son vocabulario («el SKILL.md declara…» frente a «el texto declara…»); 19 escenarios, status_code nulo, sin lagunas.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:25:00Z",
+      "round": 4,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "Imprimir la inferencia y marcarla confirmed sin pregunta, con las palabras del usuario «opcionales», cumple la letra.",
+      "answer": "Límite aceptado, sin cambio de delta: la regla ya vigente de la skill (R-CHL-013 y siguientes, y las cinco reglas de la entrevista) dice que el silencio no aprueba nada y que una casilla inferred sólo pasa a known cuando el usuario la confirma; el desenlace confirmed exige una respuesta del usuario en la misma llamada de confirmación y la skill lo dice al describir el registro.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:25:00Z",
+      "round": 4,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "Nada obliga a borrar del acta el texto de una inferencia descartada: dropped quita la marca y deja la frase rechazada como si fuera acordada.",
+      "answer": "Aceptado: descartar una inferencia quita además del acta la línea inferida (escenario «A dropped inference leaves the charter»). Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:25:00Z",
+      "round": 4,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "Al apartar un registro ilegible, las inferencias pending desaparecen del registro mientras sus marcas siguen en el acta, sin aviso.",
+      "answer": "Aceptado en parte: la entrega nombra la copia apartada (añadido al escenario «An unreadable log is kept, not overwritten»); las marcas huérfanas las sigue señalando C21 y la skill las trata como inferencias por confirmar, que es el remedio de C21 ya escrito.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:25:00Z",
+      "round": 4,
+      "kind": "attack",
+      "requirement_id": "R-CHL-018",
+      "attack": "Una entrevista interrumpida anota todas las filas como dropped «sin respuesta» y, como dropped es desenlace resuelto, no se vuelven a presentar nunca.",
+      "answer": "Aceptado: al retomar un acta se presentan también las filas dropped por «sin respuesta», junto a las inferencias pending, antes de cualquier pregunta nueva (escenario «An unanswered row is offered again when resuming»). Test en rojo añadido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:50:00Z",
+      "round": 5,
+      "kind": "soft-batch",
+      "count": 24,
+      "scenarios": [
+        "A missing manifest is announced as unknown",
+        "A rejected row is never written",
+        "An inference is logged when it is written, not when it is confirmed",
+        "An unanswered row is offered again when resuming",
+        "An unanswered row leaves a trace",
+        "An unreadable log is kept, not overwritten",
+        "Dependent questions never share a call",
+        "Dropped rows are named in the delivery",
+        "No row the user has not seen",
+        "Own decisions go to the log, not only to the delivery",
+        "Pending inferences are counted and keep the mark",
+        "Pending inferences are resumed first",
+        "Resolving an inference updates its own entry",
+        "The corrupt copy never replaces an earlier one",
+        "The drafted row is confirmed in one call",
+        "The evidence file and its shape are named",
+        "The log survives the session",
+        "The three kinds and the three outcomes are named",
+        "The version is announced first",
+        "The version travels with the evidence"
+      ],
+      "answer": "Las blandas de la ronda 5 son vocabulario: el lector A anota como side_effects «se documenta X» en cada escenario y el B sólo los efectos que el requisito describe; el mismo hecho en cada uno de los 21 escenarios, status_code nulo, sin lagunas.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:50:00Z",
+      "round": 5,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "Tras apartar un registro ilegible, las marcas inferred huérfanas del acta no se vuelven a ofrecer y C21 bloquea indefinidamente.",
+      "answer": "Límite aceptado, sin cambio de delta: C21 señala cada línea marcada y el remedio de C21 ya escrito en la skill es preguntar por esa línea; la skill lo dice al describir el registro apartado.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:50:00Z",
+      "round": 5,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "Descartar una inferencia deja la casilla vacía para siempre; nadie vuelve a preguntarla.",
+      "answer": "Límite aceptado, sin cambio de delta: una casilla cuya inferencia se descarta vuelve a `missing` en el mapa de cobertura, y la regla vigente de la entrevista pregunta toda casilla en `missing`; la skill lo dice al describir `dropped`.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T21:50:00Z",
+      "round": 5,
+      "kind": "attack",
+      "requirement_id": "R-CHL-017",
+      "attack": "El registro conserva verbatim el texto que el usuario mandó corregir o descartar y acaba en el commit.",
+      "answer": "Límite aceptado, sin cambio de delta: el registro es evidencia auditable por diseño (objetivo 5 del origen); un dato confidencial retractado se retira a mano del registro y la skill lo advierte en la entrega.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    }
+  ]
+}

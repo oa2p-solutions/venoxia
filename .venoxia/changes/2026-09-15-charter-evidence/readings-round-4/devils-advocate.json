@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "El sujeto de «rellena una casilla por inferencia, la confirma, corrige o descarta» es la propia skill, y `pending` se define como «mientras la inferencia no se ha presentado»: una implementación que imprime la inferencia en un mensaje, la marca acto seguido `confirmed` sin ninguna pregunta (las palabras del usuario son opcionales, «cuando las hubo») y quita el `<!-- inferred -->` porque ya no está `pending`, cumple la letra; el acta pasa C21 y el registro certifica como confirmado por el usuario un texto que el usuario nunca respondió, que es justo lo que el requisito venía a impedir.",
+    "requirement_id": "R-CHL-017",
+    "severity": "high"
+  },
+  {
+    "attack": "El delta sólo ata la marca `<!-- inferred -->` a la entrada `pending`, y nada obliga a borrar del acta el texto de una inferencia descartada: una implementación que pone el desenlace en `dropped`, quita la marca (ya no está `pending`) y deja la casilla con el texto inferido cumple todos los escenarios; el acta conserva, indistinguible del contenido acordado, justo la frase que el usuario rechazó, y C21 deja de rechazarla precisamente por haberla descartado.",
+    "requirement_id": "R-CHL-017",
+    "severity": "high"
+  },
+  {
+    "attack": "Al renombrar un `charter-log.json` ilegible o de otra versión y crear uno nuevo vacío, las inferencias `pending` desaparecen del registro mientras sus marcas `<!-- inferred -->` siguen en el acta: como la única vía de resolución descrita es «presentar las inferencias `pending` del registro» y la entrega sólo está obligada a nombrar el fichero y sus cuentas, el usuario queda con un acta que C21 rechaza indefinidamente, sin nada que se le presente para resolverla y sin aviso de que el registro anterior se apartó.",
+    "requirement_id": "R-CHL-017",
+    "severity": "medium"
+  },
+  {
+    "attack": "«No contestar» se equipara a rechazar: una implementación que, ante una entrevista interrumpida o un «sigue tú», anota todas las filas redactadas como `dropped` con «sin respuesta» y no escribe ninguna, cumple la letra; como `dropped` es un desenlace resuelto, la regla de retomar (que sólo repesca las `pending`) no las vuelve a presentar nunca, y el acta queda entregada con la tabla de capabilities mutilada sin que nada obligue a preguntarlas de nuevo.",
+    "requirement_id": "R-CHL-018",
+    "severity": "medium"
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "Un `charter-log.json` ilegible o de otra versión se aparta y se crea uno nuevo vacío, pero el acta conserva intactas las marcas `<!-- inferred -->` de las casillas que estaban `pending`; como al retomar sólo se presentan «las inferencias `pending` del registro», esas casillas ya no existen para la skill y no se vuelven a ofrecer nunca, así que C21 rechaza el acta indefinidamente y `gate.py` (fail-closed) deja el proyecto bloqueado sin ninguna vía automática de salida.",
+    "requirement_id": "R-CHL-017",
+    "severity": "medium"
+  },
+  {
+    "attack": "Descartar una inferencia quita la línea del acta y ninguna frase obliga a preguntar el valor real; como al retomar sólo se reofrecen las `pending` y las filas `dropped` por «sin respuesta», una inferencia que el usuario rechaza deja esa casilla del acta vacía para siempre y nadie vuelve a plantearla: el acta acaba con menos contenido del que tenía y el usuario no recibe la pregunta que sustituía a la inferencia equivocada.",
+    "requirement_id": "R-CHL-017",
+    "severity": "medium"
+  },
+  {
+    "attack": "El registro guarda «el texto propuesto o preguntado» y «las palabras literales del usuario», se conserva entre sesiones y el requisito prohíbe borrar entradas anteriores: el texto que el usuario mandó corregir o descartar del acta sobrevive verbatim en `.venoxia/charter-log.json` y acaba en el commit, de modo que retirar una línea del acta es sólo cosmético y no hay ningún mecanismo previsto para eliminar un dato confidencial que el usuario acaba de retractar.",
+    "requirement_id": "R-CHL-017",
+    "severity": "medium"
+  }
+]

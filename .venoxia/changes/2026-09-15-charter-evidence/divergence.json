@@ -1,0 +1,1701 @@
+{
+  "version": 1,
+  "converged": false,
+  "verdict": "soft_only",
+  "strict": false,
+  "exit_code": 0,
+  "counts": {
+    "hard": 0,
+    "soft": 24,
+    "gaps": 0,
+    "scenarios": 21,
+    "readers": 2
+  },
+  "divergences": [
+    {
+      "scenario": "The evidence file and its shape are named",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta el fichero .venoxia/charter-log.json y su forma en SKILL.md"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The evidence file and its shape are named»?",
+      "options": [
+        "«se documenta el fichero .venoxia/charter-log.json y su forma en SKILL.md»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The evidence file and its shape are named",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "SKILL.md nombra charter-log.json, entries y sus claves",
+        "reader-b": "SKILL.md nombra el fichero, entries y sus claves"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The evidence file and its shape are named» es la correcta?",
+      "options": [
+        "«SKILL.md nombra charter-log.json, entries y sus claves»",
+        "«SKILL.md nombra el fichero, entries y sus claves»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The three kinds and the three outcomes are named",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documentan inference, question, own-decision, confirmed, corrected, dropped"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The three kinds and the three outcomes are named»?",
+      "options": [
+        "«se documentan inference, question, own-decision, confirmed, corrected, dropped»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Own decisions go to the log, not only to the delivery",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta que toda decisión propia se anota en charter-log.json además de en la entrega"
+        ],
+        "reader-b": [
+          "se escribe una entrada own-decision en charter-log.json"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «Own decisions go to the log, not only to the delivery»?",
+      "options": [
+        "«se documenta que toda decisión propia se anota en charter-log.json además de en la entrega»",
+        "«se escribe una entrada own-decision en charter-log.json»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The log survives the session",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta que las entradas nuevas se añaden sin borrar las anteriores"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The log survives the session»?",
+      "options": [
+        "«se documenta que las entradas nuevas se añaden sin borrar las anteriores»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The log survives the session",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "SKILL.md declara que el registro persiste entre sesiones",
+        "reader-b": "SKILL.md declara que el registro persiste y no borra entradas"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The log survives the session» es la correcta?",
+      "options": [
+        "«SKILL.md declara que el registro persiste entre sesiones»",
+        "«SKILL.md declara que el registro persiste y no borra entradas»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An inference is logged when it is written, not when it is confirmed",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta el desenlace pending hasta confirmar, corregir o descartar"
+        ],
+        "reader-b": [
+          "se crea entrada inference con desenlace pending"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «An inference is logged when it is written, not when it is confirmed»?",
+      "options": [
+        "«se documenta el desenlace pending hasta confirmar, corregir o descartar»",
+        "«se crea entrada inference con desenlace pending»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An inference is logged when it is written, not when it is confirmed",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "SKILL.md declara que la inferencia se registra al escribirla",
+        "reader-b": "SKILL.md declara que la entrada se escribe al rellenar la casilla"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «An inference is logged when it is written, not when it is confirmed» es la correcta?",
+      "options": [
+        "«SKILL.md declara que la inferencia se registra al escribirla»",
+        "«SKILL.md declara que la entrada se escribe al rellenar la casilla»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An unreadable log is kept, not overwritten",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-b": [
+          "se crea un registro nuevo"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «An unreadable log is kept, not overwritten»?",
+      "options": [
+        "«se crea un registro nuevo»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Pending inferences are counted and keep the mark",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta que la casilla conserva <!-- inferred --> mientras esté pending",
+          "se documenta que la entrega cuenta las pending"
+        ],
+        "reader-b": [
+          "la entrega dice cuántas inferencias quedan pending"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «Pending inferences are counted and keep the mark»?",
+      "options": [
+        "«se documenta que la casilla conserva <!-- inferred --> mientras esté pending» y «se documenta que la entrega cuenta las pending»",
+        "«la entrega dice cuántas inferencias quedan pending»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The corrupt copy never replaces an earlier one",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta que <marca> es fecha y hora UTC hasta el segundo con sufijo numérico si colisiona"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The corrupt copy never replaces an earlier one»?",
+      "options": [
+        "«se documenta que <marca> es fecha y hora UTC hasta el segundo con sufijo numérico si colisiona»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Resolving an inference updates its own entry",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta que se añade resolved_at sin crear otra entrada"
+        ],
+        "reader-b": [
+          "no se crea una entrada nueva"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «Resolving an inference updates its own entry»?",
+      "options": [
+        "«se documenta que se añade resolved_at sin crear otra entrada»",
+        "«no se crea una entrada nueva»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Pending inferences are resumed first",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta el orden de presentación al retomar un acta"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «Pending inferences are resumed first»?",
+      "options": [
+        "«se documenta el orden de presentación al retomar un acta»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An unanswered row is offered again when resuming",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta que se presentan junto a las inferencias pending al retomar"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «An unanswered row is offered again when resuming»?",
+      "options": [
+        "«se documenta que se presentan junto a las inferencias pending al retomar»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Dropped rows are named in the delivery",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta la mención de cada fila descartada y su motivo en la entrega"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «Dropped rows are named in the delivery»?",
+      "options": [
+        "«se documenta la mención de cada fila descartada y su motivo en la entrega»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The drafted row is confirmed in one call",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta que contenido y prioridad se confirman juntos antes de escribir la fila"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The drafted row is confirmed in one call»?",
+      "options": [
+        "«se documenta que contenido y prioridad se confirman juntos antes de escribir la fila»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The drafted row is confirmed in one call",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "SKILL.md declara confirmación en una sola llamada antes de escribir",
+        "reader-b": "SKILL.md declara que la fila se confirma en una sola llamada"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The drafted row is confirmed in one call» es la correcta?",
+      "options": [
+        "«SKILL.md declara confirmación en una sola llamada antes de escribir»",
+        "«SKILL.md declara que la fila se confirma en una sola llamada»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "No row the user has not seen",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta la prohibición de escribir filas no vistas"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «No row the user has not seen»?",
+      "options": [
+        "«se documenta la prohibición de escribir filas no vistas»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A rejected row is never written",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta que corregir vuelve a pedir confirmación"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «A rejected row is never written»?",
+      "options": [
+        "«se documenta que corregir vuelve a pedir confirmación»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An unanswered row leaves a trace",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "SKILL.md declara que la fila sin respuesta tampoco se escribe",
+        "reader-b": "SKILL.md declara que la fila no contestada se anota dropped sin respuesta"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «An unanswered row leaves a trace» es la correcta?",
+      "options": [
+        "«SKILL.md declara que la fila sin respuesta tampoco se escribe»",
+        "«SKILL.md declara que la fila no contestada se anota dropped sin respuesta»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Dependent questions never share a call",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta el ejemplo del reparto de convenciones y la prioridad de la fila"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «Dependent questions never share a call»?",
+      "options": [
+        "«se documenta el ejemplo del reparto de convenciones y la prioridad de la fila»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The version is announced first",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta la lectura de la versión desde plugin.json"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The version is announced first»?",
+      "options": [
+        "«se documenta la lectura de la versión desde plugin.json»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The version travels with the evidence",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta que plugin_version viaja en cada entrada de charter-log.json"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The version travels with the evidence»?",
+      "options": [
+        "«se documenta que plugin_version viaja en cada entrada de charter-log.json»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A missing manifest is announced as unknown",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se documenta que unknown se anuncia y se anota igual sin CLAUDE_PLUGIN_ROOT o manifiesto legible"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «A missing manifest is announced as unknown»?",
+      "options": [
+        "«se documenta que unknown se anuncia y se anota igual sin CLAUDE_PLUGIN_ROOT o manifiesto legible»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    }
+  ],
+  "gaps": [],
+  "attacks": [
+    {
+      "attack": "Un `charter-log.json` ilegible o de otra versión se aparta y se crea uno nuevo vacío, pero el acta conserva intactas las marcas `<!-- inferred -->` de las casillas que estaban `pending`; como al retomar sólo se presentan «las inferencias `pending` del registro», esas casillas ya no existen para la skill y no se vuelven a ofrecer nunca, así que C21 rechaza el acta indefinidamente y `gate.py` (fail-closed) deja el proyecto bloqueado sin ninguna vía automática de salida.",
+      "requirement_id": "R-CHL-017",
+      "severity": "medium"
+    },
+    {
+      "attack": "Descartar una inferencia quita la línea del acta y ninguna frase obliga a preguntar el valor real; como al retomar sólo se reofrecen las `pending` y las filas `dropped` por «sin respuesta», una inferencia que el usuario rechaza deja esa casilla del acta vacía para siempre y nadie vuelve a plantearla: el acta acaba con menos contenido del que tenía y el usuario no recibe la pregunta que sustituía a la inferencia equivocada.",
+      "requirement_id": "R-CHL-017",
+      "severity": "medium"
+    },
+    {
+      "attack": "El registro guarda «el texto propuesto o preguntado» y «las palabras literales del usuario», se conserva entre sesiones y el requisito prohíbe borrar entradas anteriores: el texto que el usuario mandó corregir o descartar del acta sobrevive verbatim en `.venoxia/charter-log.json` y acaba en el commit, de modo que retirar una línea del acta es sólo cosmético y no hay ningún mecanismo previsto para eliminar un dato confidencial que el usuario acaba de retractar.",
+      "requirement_id": "R-CHL-017",
+      "severity": "medium"
+    }
+  ],
+  "advocate": "listed",
+  "decisions": [
+    {
+      "id": "D-001",
+      "scenarios": [
+        "The evidence file and its shape are named"
+      ],
+      "fields": [
+        "side_effects",
+        "effect"
+      ],
+      "divergences": [
+        0,
+        1
+      ],
+      "hardness": "soft",
+      "reason": "same-reading-two-fields",
+      "question": "¿Cuál de estas lecturas de «The evidence file and its shape are named» es la correcta, para el efecto y para los efectos observables a la vez?",
+      "options": [
+        "«SKILL.md nombra charter-log.json, entries y sus claves», con «se documenta el fichero .venoxia/charter-log.json y su forma en SKILL.md» (A)",
+        "«SKILL.md nombra el fichero, entries y sus claves» (B)",
+        "Las lecturas dicen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "members": [
+        {
+          "divergence": 0,
+          "scenario": "The evidence file and its shape are named",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta el fichero .venoxia/charter-log.json y su forma en SKILL.md"
+            ]
+          }
+        },
+        {
+          "divergence": 1,
+          "scenario": "The evidence file and its shape are named",
+          "field": "effect",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": "SKILL.md nombra charter-log.json, entries y sus claves",
+            "reader-b": "SKILL.md nombra el fichero, entries y sus claves"
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«SKILL.md nombra charter-log.json, entries y sus claves», con «se documenta el fichero .venoxia/charter-log.json y su forma en SKILL.md» (A)",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta el fichero .venoxia/charter-log.json y su forma en SKILL.md",
+            "SKILL.md nombra charter-log.json, entries y sus claves"
+          ]
+        },
+        {
+          "option": "«SKILL.md nombra el fichero, entries y sus claves» (B)",
+          "reader": "reader-b",
+          "answers": [
+            "",
+            "SKILL.md nombra el fichero, entries y sus claves"
+          ]
+        },
+        {
+          "option": "Las lecturas dicen lo mismo con otras palabras, no hay divergencia real",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "255cc9f3a6d3abb75d81edfeaf7fbbf0",
+      "stale_reason": null
+    },
+    {
+      "id": "D-002",
+      "scenarios": [
+        "The three kinds and the three outcomes are named"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        2
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «The three kinds and the three outcomes are named»?",
+      "options": [
+        "«se documentan inference, question, own-decision, confirmed, corrected, dropped»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 2,
+          "scenario": "The three kinds and the three outcomes are named",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documentan inference, question, own-decision, confirmed, corrected, dropped"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documentan inference, question, own-decision, confirmed, corrected, dropped»",
+          "reader": "reader-a",
+          "answers": [
+            "se documentan inference, question, own-decision, confirmed, corrected, dropped"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "65e1a54ff82d1a716f6bad6d579d9da5",
+      "stale_reason": null
+    },
+    {
+      "id": "D-003",
+      "scenarios": [
+        "Own decisions go to the log, not only to the delivery"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        3
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «Own decisions go to the log, not only to the delivery»?",
+      "options": [
+        "«se documenta que toda decisión propia se anota en charter-log.json además de en la entrega»",
+        "«se escribe una entrada own-decision en charter-log.json»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 3,
+          "scenario": "Own decisions go to the log, not only to the delivery",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta que toda decisión propia se anota en charter-log.json además de en la entrega"
+            ],
+            "reader-b": [
+              "se escribe una entrada own-decision en charter-log.json"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta que toda decisión propia se anota en charter-log.json además de en la entrega»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta que toda decisión propia se anota en charter-log.json además de en la entrega"
+          ]
+        },
+        {
+          "option": "«se escribe una entrada own-decision en charter-log.json»",
+          "reader": "reader-b",
+          "answers": [
+            "se escribe una entrada own-decision en charter-log.json"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "63150266a32127a62e45d67bc5ce2779",
+      "stale_reason": null
+    },
+    {
+      "id": "D-004",
+      "scenarios": [
+        "The log survives the session"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        4
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «The log survives the session»?",
+      "options": [
+        "«se documenta que las entradas nuevas se añaden sin borrar las anteriores»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 4,
+          "scenario": "The log survives the session",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta que las entradas nuevas se añaden sin borrar las anteriores"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta que las entradas nuevas se añaden sin borrar las anteriores»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta que las entradas nuevas se añaden sin borrar las anteriores"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "22cb5ce45cd25bae6a96bd6423b7285f",
+      "stale_reason": null
+    },
+    {
+      "id": "D-005",
+      "scenarios": [
+        "The log survives the session"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        5
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «The log survives the session» es la correcta?",
+      "options": [
+        "«SKILL.md declara que el registro persiste entre sesiones»",
+        "«SKILL.md declara que el registro persiste y no borra entradas»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "members": [
+        {
+          "divergence": 5,
+          "scenario": "The log survives the session",
+          "field": "effect",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": "SKILL.md declara que el registro persiste entre sesiones",
+            "reader-b": "SKILL.md declara que el registro persiste y no borra entradas"
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«SKILL.md declara que el registro persiste entre sesiones»",
+          "reader": "reader-a",
+          "answers": [
+            "SKILL.md declara que el registro persiste entre sesiones"
+          ]
+        },
+        {
+          "option": "«SKILL.md declara que el registro persiste y no borra entradas»",
+          "reader": "reader-b",
+          "answers": [
+            "SKILL.md declara que el registro persiste y no borra entradas"
+          ]
+        },
+        {
+          "option": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "168584d2a1b25ac59e2e3a8e25dd6ed0",
+      "stale_reason": null
+    },
+    {
+      "id": "D-006",
+      "scenarios": [
+        "An inference is logged when it is written, not when it is confirmed"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        6
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «An inference is logged when it is written, not when it is confirmed»?",
+      "options": [
+        "«se documenta el desenlace pending hasta confirmar, corregir o descartar»",
+        "«se crea entrada inference con desenlace pending»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 6,
+          "scenario": "An inference is logged when it is written, not when it is confirmed",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta el desenlace pending hasta confirmar, corregir o descartar"
+            ],
+            "reader-b": [
+              "se crea entrada inference con desenlace pending"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta el desenlace pending hasta confirmar, corregir o descartar»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta el desenlace pending hasta confirmar, corregir o descartar"
+          ]
+        },
+        {
+          "option": "«se crea entrada inference con desenlace pending»",
+          "reader": "reader-b",
+          "answers": [
+            "se crea entrada inference con desenlace pending"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "175cf94f883baa14266654e9e0d1044b",
+      "stale_reason": null
+    },
+    {
+      "id": "D-007",
+      "scenarios": [
+        "An inference is logged when it is written, not when it is confirmed"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        7
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «An inference is logged when it is written, not when it is confirmed» es la correcta?",
+      "options": [
+        "«SKILL.md declara que la inferencia se registra al escribirla»",
+        "«SKILL.md declara que la entrada se escribe al rellenar la casilla»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "members": [
+        {
+          "divergence": 7,
+          "scenario": "An inference is logged when it is written, not when it is confirmed",
+          "field": "effect",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": "SKILL.md declara que la inferencia se registra al escribirla",
+            "reader-b": "SKILL.md declara que la entrada se escribe al rellenar la casilla"
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«SKILL.md declara que la inferencia se registra al escribirla»",
+          "reader": "reader-a",
+          "answers": [
+            "SKILL.md declara que la inferencia se registra al escribirla"
+          ]
+        },
+        {
+          "option": "«SKILL.md declara que la entrada se escribe al rellenar la casilla»",
+          "reader": "reader-b",
+          "answers": [
+            "SKILL.md declara que la entrada se escribe al rellenar la casilla"
+          ]
+        },
+        {
+          "option": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "7473bafc3eca7461b04bed13cb3c574f",
+      "stale_reason": null
+    },
+    {
+      "id": "D-008",
+      "scenarios": [
+        "An unreadable log is kept, not overwritten"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        8
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «An unreadable log is kept, not overwritten»?",
+      "options": [
+        "«se crea un registro nuevo»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 8,
+          "scenario": "An unreadable log is kept, not overwritten",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-b": [
+              "se crea un registro nuevo"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se crea un registro nuevo»",
+          "reader": "reader-b",
+          "answers": [
+            "se crea un registro nuevo"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "bdb53724e72147fbe03cd2255c1dc4a8",
+      "stale_reason": null
+    },
+    {
+      "id": "D-009",
+      "scenarios": [
+        "Pending inferences are counted and keep the mark"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        9
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «Pending inferences are counted and keep the mark»?",
+      "options": [
+        "«se documenta que la casilla conserva <!-- inferred --> mientras esté pending» y «se documenta que la entrega cuenta las pending»",
+        "«la entrega dice cuántas inferencias quedan pending»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 9,
+          "scenario": "Pending inferences are counted and keep the mark",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta que la casilla conserva <!-- inferred --> mientras esté pending",
+              "se documenta que la entrega cuenta las pending"
+            ],
+            "reader-b": [
+              "la entrega dice cuántas inferencias quedan pending"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta que la casilla conserva <!-- inferred --> mientras esté pending» y «se documenta que la entrega cuenta las pending»",
+          "reader": null,
+          "answers": []
+        },
+        {
+          "option": "«la entrega dice cuántas inferencias quedan pending»",
+          "reader": "reader-b",
+          "answers": [
+            "la entrega dice cuántas inferencias quedan pending"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "69df9c0cee96baf6c385ebc175190b0e",
+      "stale_reason": null
+    },
+    {
+      "id": "D-010",
+      "scenarios": [
+        "The corrupt copy never replaces an earlier one"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        10
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «The corrupt copy never replaces an earlier one»?",
+      "options": [
+        "«se documenta que <marca> es fecha y hora UTC hasta el segundo con sufijo numérico si colisiona»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 10,
+          "scenario": "The corrupt copy never replaces an earlier one",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta que <marca> es fecha y hora UTC hasta el segundo con sufijo numérico si colisiona"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta que <marca> es fecha y hora UTC hasta el segundo con sufijo numérico si colisiona»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta que <marca> es fecha y hora UTC hasta el segundo con sufijo numérico si colisiona"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "16bbefa52593cccaa7a1d4c49f2b7239",
+      "stale_reason": null
+    },
+    {
+      "id": "D-011",
+      "scenarios": [
+        "Resolving an inference updates its own entry"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        11
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «Resolving an inference updates its own entry»?",
+      "options": [
+        "«se documenta que se añade resolved_at sin crear otra entrada»",
+        "«no se crea una entrada nueva»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 11,
+          "scenario": "Resolving an inference updates its own entry",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta que se añade resolved_at sin crear otra entrada"
+            ],
+            "reader-b": [
+              "no se crea una entrada nueva"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta que se añade resolved_at sin crear otra entrada»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta que se añade resolved_at sin crear otra entrada"
+          ]
+        },
+        {
+          "option": "«no se crea una entrada nueva»",
+          "reader": "reader-b",
+          "answers": [
+            "no se crea una entrada nueva"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "080a90f0e27b82430b0ecfe30310c21f",
+      "stale_reason": null
+    },
+    {
+      "id": "D-012",
+      "scenarios": [
+        "Pending inferences are resumed first"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        12
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «Pending inferences are resumed first»?",
+      "options": [
+        "«se documenta el orden de presentación al retomar un acta»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 12,
+          "scenario": "Pending inferences are resumed first",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta el orden de presentación al retomar un acta"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta el orden de presentación al retomar un acta»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta el orden de presentación al retomar un acta"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "abfac438aaccb0b95eeab19049602cc0",
+      "stale_reason": null
+    },
+    {
+      "id": "D-013",
+      "scenarios": [
+        "An unanswered row is offered again when resuming"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        13
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «An unanswered row is offered again when resuming»?",
+      "options": [
+        "«se documenta que se presentan junto a las inferencias pending al retomar»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 13,
+          "scenario": "An unanswered row is offered again when resuming",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta que se presentan junto a las inferencias pending al retomar"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta que se presentan junto a las inferencias pending al retomar»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta que se presentan junto a las inferencias pending al retomar"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "8c51ad27f4946a8e982548ae756b1a8b",
+      "stale_reason": null
+    },
+    {
+      "id": "D-014",
+      "scenarios": [
+        "Dropped rows are named in the delivery"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        14
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «Dropped rows are named in the delivery»?",
+      "options": [
+        "«se documenta la mención de cada fila descartada y su motivo en la entrega»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 14,
+          "scenario": "Dropped rows are named in the delivery",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta la mención de cada fila descartada y su motivo en la entrega"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta la mención de cada fila descartada y su motivo en la entrega»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta la mención de cada fila descartada y su motivo en la entrega"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "289e2cc125e7eeacb0dfa9d9650b5506",
+      "stale_reason": null
+    },
+    {
+      "id": "D-015",
+      "scenarios": [
+        "The drafted row is confirmed in one call"
+      ],
+      "fields": [
+        "side_effects",
+        "effect"
+      ],
+      "divergences": [
+        15,
+        16
+      ],
+      "hardness": "soft",
+      "reason": "same-reading-two-fields",
+      "question": "¿Cuál de estas lecturas de «The drafted row is confirmed in one call» es la correcta, para el efecto y para los efectos observables a la vez?",
+      "options": [
+        "«SKILL.md declara confirmación en una sola llamada antes de escribir», con «se documenta que contenido y prioridad se confirman juntos antes de escribir la fila» (A)",
+        "«SKILL.md declara que la fila se confirma en una sola llamada» (B)",
+        "Las lecturas dicen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "members": [
+        {
+          "divergence": 15,
+          "scenario": "The drafted row is confirmed in one call",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta que contenido y prioridad se confirman juntos antes de escribir la fila"
+            ]
+          }
+        },
+        {
+          "divergence": 16,
+          "scenario": "The drafted row is confirmed in one call",
+          "field": "effect",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": "SKILL.md declara confirmación en una sola llamada antes de escribir",
+            "reader-b": "SKILL.md declara que la fila se confirma en una sola llamada"
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«SKILL.md declara confirmación en una sola llamada antes de escribir», con «se documenta que contenido y prioridad se confirman juntos antes de escribir la fila» (A)",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta que contenido y prioridad se confirman juntos antes de escribir la fila",
+            "SKILL.md declara confirmación en una sola llamada antes de escribir"
+          ]
+        },
+        {
+          "option": "«SKILL.md declara que la fila se confirma en una sola llamada» (B)",
+          "reader": "reader-b",
+          "answers": [
+            "",
+            "SKILL.md declara que la fila se confirma en una sola llamada"
+          ]
+        },
+        {
+          "option": "Las lecturas dicen lo mismo con otras palabras, no hay divergencia real",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "052b2d87b7a2b4cbd01d6ed0d5f725c1",
+      "stale_reason": null
+    },
+    {
+      "id": "D-016",
+      "scenarios": [
+        "No row the user has not seen"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        17
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «No row the user has not seen»?",
+      "options": [
+        "«se documenta la prohibición de escribir filas no vistas»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 17,
+          "scenario": "No row the user has not seen",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta la prohibición de escribir filas no vistas"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta la prohibición de escribir filas no vistas»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta la prohibición de escribir filas no vistas"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "6335acdc24a096b3e747377551995531",
+      "stale_reason": null
+    },
+    {
+      "id": "D-017",
+      "scenarios": [
+        "A rejected row is never written"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        18
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «A rejected row is never written»?",
+      "options": [
+        "«se documenta que corregir vuelve a pedir confirmación»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 18,
+          "scenario": "A rejected row is never written",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta que corregir vuelve a pedir confirmación"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta que corregir vuelve a pedir confirmación»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta que corregir vuelve a pedir confirmación"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "e6c75346f178fccb25473fed1f8470af",
+      "stale_reason": null
+    },
+    {
+      "id": "D-018",
+      "scenarios": [
+        "An unanswered row leaves a trace"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        19
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «An unanswered row leaves a trace» es la correcta?",
+      "options": [
+        "«SKILL.md declara que la fila sin respuesta tampoco se escribe»",
+        "«SKILL.md declara que la fila no contestada se anota dropped sin respuesta»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "members": [
+        {
+          "divergence": 19,
+          "scenario": "An unanswered row leaves a trace",
+          "field": "effect",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": "SKILL.md declara que la fila sin respuesta tampoco se escribe",
+            "reader-b": "SKILL.md declara que la fila no contestada se anota dropped sin respuesta"
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«SKILL.md declara que la fila sin respuesta tampoco se escribe»",
+          "reader": "reader-a",
+          "answers": [
+            "SKILL.md declara que la fila sin respuesta tampoco se escribe"
+          ]
+        },
+        {
+          "option": "«SKILL.md declara que la fila no contestada se anota dropped sin respuesta»",
+          "reader": "reader-b",
+          "answers": [
+            "SKILL.md declara que la fila no contestada se anota dropped sin respuesta"
+          ]
+        },
+        {
+          "option": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "6edb415396b6d24c378e531e6e747c63",
+      "stale_reason": null
+    },
+    {
+      "id": "D-019",
+      "scenarios": [
+        "Dependent questions never share a call"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        20
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «Dependent questions never share a call»?",
+      "options": [
+        "«se documenta el ejemplo del reparto de convenciones y la prioridad de la fila»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 20,
+          "scenario": "Dependent questions never share a call",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta el ejemplo del reparto de convenciones y la prioridad de la fila"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta el ejemplo del reparto de convenciones y la prioridad de la fila»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta el ejemplo del reparto de convenciones y la prioridad de la fila"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "20a3795140c8a7f4245c20ffa6c5df73",
+      "stale_reason": null
+    },
+    {
+      "id": "D-020",
+      "scenarios": [
+        "The version is announced first"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        21
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «The version is announced first»?",
+      "options": [
+        "«se documenta la lectura de la versión desde plugin.json»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 21,
+          "scenario": "The version is announced first",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta la lectura de la versión desde plugin.json"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta la lectura de la versión desde plugin.json»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta la lectura de la versión desde plugin.json"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "709baa7b9691cc2704f6610a357112fd",
+      "stale_reason": null
+    },
+    {
+      "id": "D-021",
+      "scenarios": [
+        "The version travels with the evidence"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        22
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «The version travels with the evidence»?",
+      "options": [
+        "«se documenta que plugin_version viaja en cada entrada de charter-log.json»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 22,
+          "scenario": "The version travels with the evidence",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta que plugin_version viaja en cada entrada de charter-log.json"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta que plugin_version viaja en cada entrada de charter-log.json»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta que plugin_version viaja en cada entrada de charter-log.json"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "3714ca0398873690c73a7d2b72371816",
+      "stale_reason": null
+    },
+    {
+      "id": "D-022",
+      "scenarios": [
+        "A missing manifest is announced as unknown"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        23
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «A missing manifest is announced as unknown»?",
+      "options": [
+        "«se documenta que unknown se anuncia y se anota igual sin CLAUDE_PLUGIN_ROOT o manifiesto legible»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "members": [
+        {
+          "divergence": 23,
+          "scenario": "A missing manifest is announced as unknown",
+          "field": "side_effects",
+          "requirement_id": null,
+          "input": null,
+          "hardness": "soft",
+          "readings": {
+            "reader-a": [
+              "se documenta que unknown se anuncia y se anota igual sin CLAUDE_PLUGIN_ROOT o manifiesto legible"
+            ]
+          }
+        }
+      ],
+      "resolutions": [
+        {
+          "option": "«se documenta que unknown se anuncia y se anota igual sin CLAUDE_PLUGIN_ROOT o manifiesto legible»",
+          "reader": "reader-a",
+          "answers": [
+            "se documenta que unknown se anuncia y se anota igual sin CLAUDE_PLUGIN_ROOT o manifiesto legible"
+          ]
+        },
+        {
+          "option": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+          "reader": null,
+          "answers": []
+        }
+      ],
+      "status": "pending",
+      "previous": null,
+      "fingerprint": "e0c2d1b8c72ff16e320b0720256c584e",
+      "stale_reason": null
+    }
+  ],
+  "decisions_source": "/Users/afroxstudio/Developments/ia/venoxia/.venoxia/changes/2026-09-15-charter-evidence/decisions.json",
+  "decisions_pending": 22,
+  "tool": {
+    "name": "venoxia",
+    "version": "0.5.0",
+    "script": "diff_readings.py"
+  }
+}

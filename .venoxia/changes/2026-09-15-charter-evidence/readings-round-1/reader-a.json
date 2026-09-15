@@ -1,0 +1,74 @@
+[
+  {
+    "scenario": "The evidence file and its shape are named",
+    "effect": "SKILL.md nombra el fichero de registro y sus claves",
+    "status_code": null,
+    "side_effects": ["modifica skills/charter/SKILL.md"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The three kinds and the three outcomes are named",
+    "effect": "SKILL.md nombra los tres tipos y los tres desenlaces",
+    "status_code": null,
+    "side_effects": ["modifica skills/charter/SKILL.md"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Own decisions go to the log, not only to the delivery",
+    "effect": "SKILL.md declara que las decisiones propias se registran también",
+    "status_code": null,
+    "side_effects": ["modifica skills/charter/SKILL.md"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The log survives the session",
+    "effect": "SKILL.md declara que el registro persiste entre sesiones",
+    "status_code": null,
+    "side_effects": ["modifica skills/charter/SKILL.md"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The drafted row is confirmed in one call",
+    "effect": "SKILL.md declara que la fila se confirma en una llamada",
+    "status_code": null,
+    "side_effects": ["modifica skills/charter/SKILL.md"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No row the user has not seen",
+    "effect": "SKILL.md declara que no se escribe fila sin ver",
+    "status_code": null,
+    "side_effects": ["modifica skills/charter/SKILL.md"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Dependent questions never share a call",
+    "effect": "SKILL.md declara que preguntas dependientes van en llamadas separadas",
+    "status_code": null,
+    "side_effects": ["modifica skills/charter/SKILL.md"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The version is announced first",
+    "effect": "SKILL.md declara que se anuncia la versión al iniciar",
+    "status_code": null,
+    "side_effects": ["modifica skills/charter/SKILL.md"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The version travels with the evidence",
+    "effect": "SKILL.md declara que cada entrada del registro lleva la versión",
+    "status_code": null,
+    "side_effects": ["modifica skills/charter/SKILL.md"],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

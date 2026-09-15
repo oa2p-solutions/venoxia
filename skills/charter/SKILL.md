@@ -109,6 +109,29 @@ Reglas del mapa:
 - Y **una corrección invalida sólo las casillas que dependen de la corregida.** Las dependencias son éstas: `primary_user` → `current_workaround` → `first_capability` → `done_when`; `first_capability` → `out_of_scope` y `domain_decisions`; `evidence` cuelga de cada casilla por separado. Corregir el `Done when` no toca el propósito; corregir el usuario devuelve apaño y capability a `inferred` —no a `missing`— si siguen siendo plausibles con el usuario nuevo.
 - El mapa no se guarda en ningún fichero: se enseña en la conversación, y su oráculo en disco es el linter, cuyas reglas cubren las casillas bloqueantes (`C02` el propósito, `C03` el usuario con su hoy y su con esto, `C04`/`C07`/`C08` la capability y su `Done when`, `C10` el no-alcance, `C17` el desempate, `C20` las apuestas, `C21` las inferencias sin confirmar).
 
+## El registro de evidencia: `.venoxia/charter-log.json`
+
+Una inferencia confirmada de palabra no deja rastro: dentro de tres meses nadie sabe si esa fila la dijo el usuario o la dedujo el modelo y el usuario asintió sin leerla. Por eso todo lo que la skill infiere, pregunta o decide sola se anota en `.venoxia/charter-log.json`, un fichero de versión `1` con la lista `entries`. Cada entrada lleva `at`, `plugin_version`, `kind`, `slot` (la casilla del mapa, o el slug de la fila), el texto propuesto o preguntado (`text`), el desenlace (`outcome`) y las palabras literales del usuario cuando las hubo (`user_words`). Los tres `kind`: `inference` (una casilla que se rellenó por deducción), `question` (una pregunta hecha, con su casilla) y `own-decision` (algo que la skill decidió sin preguntar). Los desenlaces de una inferencia: `pending` mientras no se ha presentado, y `confirmed`, `corrected` o `dropped` cuando se resuelve.
+
+```json
+{"version": 1,
+ "entries": [
+   {"at": "2026-09-15T10:12:00Z", "plugin_version": "0.6.0", "kind": "inference",
+    "slot": "done_when", "text": "el presupuesto entra en la comparación en menos de un minuto",
+    "outcome": "pending", "resolved_at": null, "user_words": null}
+ ]}
+```
+
+Las reglas, que son las que hacen que el registro valga como evidencia:
+
+- **La entrada `inference` se escribe al rellenar la casilla, con desenlace `pending` hasta que se confirme, corrija o descarte**; no se escribe al confirmarla, porque entonces una inferencia que nunca se presentó no dejaría rastro. Y **confirmar, corregir o descartar una inferencia cambia el desenlace de esa misma entrada y le añade `resolved_at`**, sin añadir otra: «sin borrar las anteriores» habla de entradas, no de desenlaces. El desenlace `confirmed` exige una respuesta del usuario en la llamada de confirmación (regla 4: el silencio no aprueba nada); sus palabras van en `user_words`.
+- **Una casilla cuya entrada sigue `pending` conserva la marca** `<!-- inferred -->` en el acta, así que `C21` la rechaza hasta que se resuelva; y **la entrega dice cuántas inferencias quedan `pending`**. **Descartar una inferencia quita además del acta la línea inferida**: no basta con quitar la marca, porque el texto rechazado quedaría indistinguible del acordado. La casilla vuelve a `missing` en el mapa, y la regla 5 hace el resto: se pregunta.
+- **Al retomar un acta las inferencias `pending` del registro se presentan antes de cualquier pregunta nueva**, y **las filas `dropped` por «sin respuesta» se presentan de nuevo, junto a las inferencias `pending`**: una sesión interrumpida no convierte en decisiones lo que nadie contestó.
+- Y **toda decisión que la skill toma sola se anota en el registro como `own-decision`**, además de decirse en la entrega: cambiar un principio, elegir una prioridad por descarte, dejar una casilla vacía.
+- Y **cada entrada del registro lleva `plugin_version`**, la misma que se anunció al empezar.
+- Y **el registro se conserva entre sesiones**: si el fichero existe, se lee y **las entradas nuevas se añaden sin borrar las anteriores**. **Un registro ilegible o de otra versión se renombra a `charter-log.json.corrupt-<marca>` antes de crear uno nuevo** y **nunca se sobrescribe**: **`<marca>` es la fecha y hora UTC hasta el segundo**, y lleva **un sufijo numérico si ese nombre ya existe**; **la entrega nombra la copia apartada**. Las marcas `<!-- inferred -->` que queden en el acta sin entrada en el registro nuevo las sigue señalando `C21`, y se tratan como lo que son: inferencias por confirmar. Y el registro guarda palabras literales a propósito —es evidencia—; un dato que el usuario quiera retirar del todo se quita a mano del registro, y se dice.
+- **La entrega nombra cada fila `dropped` con su motivo**, junto al recuento de entradas de cada clase.
+
 ## Paso 1 · Leer la sala y clasificar el modo
 
 Preguntar por el stack teniendo un `package.json` delante es una entrevista que no ha leído la sala, y el usuario lo nota en la primera pregunta.
@@ -127,6 +150,8 @@ Con eso, y con lo que el usuario acaba de escribir, clasificas la conversación 
 | **retomar un acta** | existe `.venoxia/charter.md` | el resumen de su estado y una pregunta: qué quiere hacer |
 
 El orden de los modos importa en un caso: **con `.venoxia/charter.md` en el disco el modo es retomar un acta aunque haya código**. Un repositorio con código y con acta no es un proyecto existente al que reconstruirle el acta desde el disco: eso pisaría las apuestas ya acordadas, con su `revisit` y su `fatal`, que nadie puede reconstruir.
+
+**Y la primera línea de todas es la versión: al empezar se anuncia la versión del plugin** que está corriendo, leída de `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` (`Venoxia 0.6.0 · charter`); sin `CLAUDE_PLUGIN_ROOT` o sin manifiesto legible la versión anunciada y anotada es `unknown`, dicho con la misma claridad. Es lo que permite demostrar después, con el registro de evidencia delante, qué versión hizo cada inferencia.
 
 **Antes de la primera pregunta, di en dos líneas qué va a salir de aquí y qué no.** El acta decide qué se construye, para quién, en qué orden y sobre qué se está apostando; **no define la herramienta ni la hace construible**: eso es `/venoxia:specify`, y desde el acta se llega en un solo prompt. Cuesta dos líneas decirlo y evita la única decepción que esta skill puede provocar.
 
@@ -242,6 +267,8 @@ La forma es vinculante porque la comprueba un script:
 | `## Capabilities` | Tabla con las cinco columnas exactas del bloque de abajo | Es de donde sale el `/venoxia:specify` de cada una y el nombre de su directorio |
 | `## Out of scope` | Una o más viñetas `- **<Qué>.** <por qué no>` | Un «no» sin razón se vuelve a abrir en la primera reunión en la que alguien insista |
 | `## Bets` | Cero o más `### B-NNN · <título>`, con prosa y el bloque de metadatos | Separa lo observado de lo supuesto antes de que pase el tiempo |
+
+**Una fila que redactas tú no se escribe sin que el usuario la haya visto entera.** Cuando la fila de la tabla la redacta la skill —incluida `technical-contract` al repartir convenciones—, **una fila redactada por la skill se confirma con su contenido y su prioridad en una sola llamada antes de escribirse**: se presentan su «Qué podrá hacer», su `Done when`, su `Risk` y su prioridad, marcados como inferidos, y la llamada pregunta por la fila entera. Así **no se escribe ninguna fila que el usuario no haya visto**; **la fila se escribe sólo con el sí del usuario**; **una corrección se vuelve a confirmar** con el texto corregido; **una fila rechazada no se escribe y se anota como `dropped`** con sus palabras; y **una fila presentada y no contestada tampoco se escribe y se anota como `dropped` con «sin respuesta»**, para volver a ofrecerla al retomar. Y las dos preguntas que esa fila arrastra van en llamadas distintas: primero **qué convenciones aprobar y qué prioridad dar a la fila** son dos cosas, y la segunda depende de la primera (regla de las llamadas, arriba).
 
 **Un repaso que ningún script puede hacer por ti: cada dolor que nombraste en un `**hoy:**` tiene que acabar en algún sitio.** O en una fila de la tabla, o en `## Out of scope`. Ese «y además somos tres comprando, cada uno con su hoja» es un dolor real, y si no aparece en ninguna de las dos secciones el acta lo deja colgado. El sitio para resolverlo es el borrador: cada cabo suelto va como viñeta de no-alcance `inferred` («se sigue resolviendo como hoy, con su hoja») y el usuario lo corrige en la confirmación general si en realidad lo tiene que resolver el sistema. Lo mismo con **un dolor que no es del usuario que tienes en la lista**: si la tabla promete algo que mira alguien por encima y en `## Users` sólo está quien hace el trabajo del día, falta un papel, y va marcado.
 
@@ -359,7 +386,8 @@ Termina con un informe corto, sin adornos:
 - **El desempate, si alguna fila arbitra**: el principio de dominio tal como quedó escrito, o la apuesta en la que se aparcó.
 - El veredicto literal del linter. Si `C20` se quedó puesto porque el usuario afirmó que todo está observado, se dice aquí.
 - El mapa final: qué casillas quedaron `known`, cuáles se confirmaron desde `inferred` y cuáles quedaron `optional` para después. Una casilla vacía se dice; no se disimula.
-- Toda decisión que tomaste tú porque la entrevista no la cubría, marcada como tal.
+- Toda decisión que tomaste tú porque la entrevista no la cubría, marcada como tal, y anotada en el registro como `own-decision`.
+- **El registro de evidencia:** `.venoxia/charter-log.json`, con cuántas entradas de cada clase escribiste (`inference`, `question`, `own-decision`), cuántas inferencias quedan `pending`, cada fila `dropped` con su motivo y, si hubo que apartar un registro ilegible, el nombre de la copia.
 - **La preparación:** el comando de pruebas detectado y si `venoxia.json` quedó escrito —y si no, que sin él `oracle.py` no puede correr el oráculo de ningún requisito—; las convenciones técnicas repartidas, aprobadas a `technical-contract` y abiertas a `## Bets`, o que ninguna era relevante; el estado del guardián.
 - **El siguiente paso, tecleado.** Literalmente la celda «Qué podrá hacer» de la fila 1, entre comillas:
 

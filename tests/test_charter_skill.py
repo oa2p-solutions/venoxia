@@ -491,5 +491,92 @@ class CharterSkillResumeTest(unittest.TestCase):
         )
 
 
+class CharterSkillEvidenceTest(unittest.TestCase):
+    """R-CHL-017 · toda inferencia confirmada, pregunta y decisión propia deja rastro."""
+
+    def test_the_evidence_file_and_its_shape_are_named(self):
+        """@covers R-CHL-017"""
+        body = _body()
+        self.assertIn(".venoxia/charter-log.json", body)
+        self.assertIn("`entries`", body)
+        for key in ("`at`", "`plugin_version`", "`kind`", "`slot`"):
+            self.assertIn(key, body, f"skills/charter/SKILL.md no nombra la clave {key}")
+
+    def test_the_three_kinds_and_the_three_outcomes_are_named(self):
+        """@covers R-CHL-017"""
+        body = _body()
+        for value in ("`inference`", "`question`", "`own-decision`", "`confirmed`", "`corrected`", "`dropped`"):
+            self.assertIn(value, body, f"skills/charter/SKILL.md no nombra {value}")
+
+    def test_own_decisions_go_to_the_log(self):
+        """@covers R-CHL-017"""
+        self.assertIn(
+            "toda decisión que la skill toma sola se anota en el registro como `own-decision`",
+            _body(),
+        )
+
+    def test_the_log_survives_the_session(self):
+        """@covers R-CHL-017"""
+        body = _body()
+        self.assertIn("el registro se conserva entre sesiones", body)
+        self.assertIn("las entradas nuevas se añaden sin borrar las anteriores", body)
+        "la entrada `inference` se escribe al rellenar la casilla, con desenlace `pending` hasta que se confirme, corrija o descarte",
+        "un registro ilegible o de otra versión se renombra a `charter-log.json.corrupt-<marca>` antes de crear uno nuevo",
+        "nunca se sobrescribe",
+        "una casilla cuya entrada sigue `pending` conserva la marca",
+        "cuántas inferencias quedan `pending`",
+        "`<marca>` es la fecha y hora UTC hasta el segundo",
+        "un sufijo numérico si ese nombre ya existe",
+        "confirmar, corregir o descartar una inferencia cambia el desenlace de esa misma entrada y le añade `resolved_at`",
+        "al retomar un acta las inferencias `pending` del registro se presentan antes de cualquier pregunta nueva",
+        "la entrega nombra cada fila `dropped` con su motivo",
+        "descartar una inferencia quita además del acta la línea inferida",
+        "la entrega nombra la copia apartada",
+        "las filas `dropped` por «sin respuesta» se presentan de nuevo, junto a las inferencias `pending`",
+
+
+class CharterSkillDraftedRowTest(unittest.TestCase):
+    """R-CHL-018 · una fila redactada por la skill se confirma antes de escribirse."""
+
+    def test_the_drafted_row_is_confirmed_in_one_call(self):
+        """@covers R-CHL-018"""
+        self.assertIn(
+            "una fila redactada por la skill se confirma con su contenido y su prioridad en una sola llamada antes de escribirse",
+            _body(),
+        )
+
+    def test_no_row_the_user_has_not_seen(self):
+        """@covers R-CHL-018"""
+        self.assertIn("no se escribe ninguna fila que el usuario no haya visto", _body())
+        "la fila se escribe sólo con el sí del usuario",
+        "una corrección se vuelve a confirmar",
+        "una fila rechazada no se escribe y se anota como `dropped`",
+        "una fila presentada y no contestada tampoco se escribe y se anota como `dropped` con «sin respuesta»",
+
+    def test_dependent_questions_never_share_a_call(self):
+        """@covers R-CHL-018"""
+        body = _body()
+        self.assertIn(
+            "Dos preguntas donde la redacción de la segunda depende de lo que conteste la primera son una llamada mal montada",
+            body,
+        )
+        self.assertIn("qué convenciones aprobar y qué prioridad dar a la fila", body)
+
+
+class CharterSkillVersionTest(unittest.TestCase):
+    """R-CHL-019 · la skill anuncia la versión que corre y la escribe en la evidencia."""
+
+    def test_the_version_is_announced_first(self):
+        """@covers R-CHL-019"""
+        body = _body()
+        self.assertIn("al empezar se anuncia la versión del plugin", body)
+        self.assertIn("${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json", body)
+
+    def test_the_version_travels_with_the_evidence(self):
+        """@covers R-CHL-019"""
+        self.assertIn("cada entrada del registro lleva `plugin_version`", _body())
+        "sin `CLAUDE_PLUGIN_ROOT` o sin manifiesto legible la versión anunciada y anotada es `unknown`",
+
+
 if __name__ == "__main__":
     unittest.main()

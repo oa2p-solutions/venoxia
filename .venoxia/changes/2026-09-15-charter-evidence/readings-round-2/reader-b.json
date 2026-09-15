@@ -1,0 +1,106 @@
+[
+  {
+    "scenario": "The evidence file and its shape are named",
+    "effect": "el test lee SKILL.md y encuentra el nombre del fichero y claves",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The three kinds and the three outcomes are named",
+    "effect": "el test confirma que SKILL.md nombra los tres kinds y los tres outcomes",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Own decisions go to the log, not only to the delivery",
+    "effect": "el test confirma que SKILL.md declara el doble registro de own-decision",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The log survives the session",
+    "effect": "el test confirma que SKILL.md declara persistencia entre sesiones",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An inference is logged when it is written, not when it is confirmed",
+    "effect": "el test confirma que SKILL.md fija el momento de escritura y el pending",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unreadable log is kept, not overwritten",
+    "effect": "el test confirma que SKILL.md declara el renombrado a corrupt-<marca>",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The drafted row is confirmed in one call",
+    "effect": "el test confirma que SKILL.md declara confirmación en una sola llamada",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No row the user has not seen",
+    "effect": "el test confirma que SKILL.md prohíbe escribir filas no vistas",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A rejected row is never written",
+    "effect": "el test confirma que SKILL.md declara el flujo sí/corrección/dropped",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Dependent questions never share a call",
+    "effect": "el test confirma que SKILL.md separa preguntas dependientes con ejemplo",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The version is announced first",
+    "effect": "el test confirma que SKILL.md declara anuncio inicial de la versión",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The version travels with the evidence",
+    "effect": "el test confirma que SKILL.md declara plugin_version en cada entrada",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A missing manifest is announced as unknown",
+    "effect": "el test confirma que SKILL.md declara unknown sin manifiesto legible",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

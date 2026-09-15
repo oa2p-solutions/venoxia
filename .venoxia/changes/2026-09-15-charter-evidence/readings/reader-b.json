@@ -1,0 +1,170 @@
+[
+  {
+    "scenario": "The evidence file and its shape are named",
+    "effect": "SKILL.md nombra el fichero, entries y sus claves",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The three kinds and the three outcomes are named",
+    "effect": "SKILL.md nombra los tres tipos y los tres desenlaces",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Own decisions go to the log, not only to the delivery",
+    "effect": "SKILL.md declara que las decisiones propias se anotan también en el registro",
+    "status_code": null,
+    "side_effects": ["se escribe una entrada own-decision en charter-log.json"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The log survives the session",
+    "effect": "SKILL.md declara que el registro persiste y no borra entradas",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An inference is logged when it is written, not when it is confirmed",
+    "effect": "SKILL.md declara que la entrada se escribe al rellenar la casilla",
+    "status_code": null,
+    "side_effects": ["se crea entrada inference con desenlace pending"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unreadable log is kept, not overwritten",
+    "effect": "SKILL.md declara que el registro ilegible se aparta, no se sobrescribe",
+    "status_code": null,
+    "side_effects": ["se renombra a charter-log.json.corrupt-<marca>", "se crea un registro nuevo", "la entrega nombra la copia apartada"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Pending inferences are counted and keep the mark",
+    "effect": "SKILL.md declara que la casilla pending conserva la marca y se cuenta",
+    "status_code": null,
+    "side_effects": ["la entrega dice cuántas inferencias quedan pending"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The corrupt copy never replaces an earlier one",
+    "effect": "SKILL.md declara el formato de marca y el sufijo numérico",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Resolving an inference updates its own entry",
+    "effect": "SKILL.md declara que resolver actualiza la misma entrada",
+    "status_code": null,
+    "side_effects": ["se añade resolved_at a la entrada existente", "no se crea una entrada nueva"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A dropped inference leaves the charter",
+    "effect": "SKILL.md declara que descartar quita la línea inferida del acta",
+    "status_code": null,
+    "side_effects": ["se elimina la línea inferida del acta"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Pending inferences are resumed first",
+    "effect": "SKILL.md declara que las inferencias pending se presentan primero",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unanswered row is offered again when resuming",
+    "effect": "SKILL.md declara que las filas dropped por sin respuesta se repiten",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Dropped rows are named in the delivery",
+    "effect": "SKILL.md declara que la entrega nombra cada fila dropped y su motivo",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The drafted row is confirmed in one call",
+    "effect": "SKILL.md declara que la fila se confirma en una sola llamada",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No row the user has not seen",
+    "effect": "SKILL.md declara que no se escribe fila no vista por el usuario",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A rejected row is never written",
+    "effect": "SKILL.md declara que la fila rechazada no se escribe y se anota dropped",
+    "status_code": null,
+    "side_effects": ["se anota dropped en el registro"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unanswered row leaves a trace",
+    "effect": "SKILL.md declara que la fila no contestada se anota dropped sin respuesta",
+    "status_code": null,
+    "side_effects": ["se anota dropped con motivo sin respuesta"],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Dependent questions never share a call",
+    "effect": "SKILL.md declara que preguntas dependientes van en llamadas separadas",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The version is announced first",
+    "effect": "SKILL.md declara que la primera línea anuncia la versión del plugin",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The version travels with the evidence",
+    "effect": "SKILL.md declara que cada entrada lleva plugin_version",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A missing manifest is announced as unknown",
+    "effect": "SKILL.md declara que sin manifiesto legible la versión es unknown",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

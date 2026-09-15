@@ -1,0 +1,154 @@
+[
+  {
+    "scenario": "The evidence file and its shape are named",
+    "effect": "el texto de SKILL.md nombra el fichero y sus claves",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The three kinds and the three outcomes are named",
+    "effect": "el texto nombra los tres tipos y los tres desenlaces",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Own decisions go to the log, not only to the delivery",
+    "effect": "el texto declara que las decisiones propias se registran",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The log survives the session",
+    "effect": "el texto declara que el registro persiste entre sesiones",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An inference is logged when it is written, not when it is confirmed",
+    "effect": "el texto declara que la inferencia se registra al escribirse",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unreadable log is kept, not overwritten",
+    "effect": "el texto declara el renombrado del registro corrupto",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Pending inferences are counted and keep the mark",
+    "effect": "el texto declara marca conservada y conteo de pendientes",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The corrupt copy never replaces an earlier one",
+    "effect": "el texto declara el sufijo numérico si el nombre existe",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Resolving an inference updates its own entry",
+    "effect": "el texto declara que resolver actualiza la misma entrada",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Pending inferences are resumed first",
+    "effect": "el texto declara que lo pendiente se presenta primero",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Dropped rows are named in the delivery",
+    "effect": "el texto declara que la entrega nombra las filas descartadas",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The drafted row is confirmed in one call",
+    "effect": "el texto declara confirmación en una sola llamada antes de escribir",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No row the user has not seen",
+    "effect": "el texto declara que no se escribe fila no vista",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A rejected row is never written",
+    "effect": "el texto declara que la fila rechazada no se escribe",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unanswered row leaves a trace",
+    "effect": "el texto declara que la fila sin respuesta se anota descartada",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Dependent questions never share a call",
+    "effect": "el texto declara que preguntas dependientes van en llamadas separadas",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The version is announced first",
+    "effect": "el texto declara el anuncio de la versión al empezar",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The version travels with the evidence",
+    "effect": "el texto declara que cada entrada lleva la versión",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A missing manifest is announced as unknown",
+    "effect": "el texto declara que sin manifiesto la versión es unknown",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

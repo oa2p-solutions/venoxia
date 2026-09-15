@@ -1,0 +1,397 @@
+{
+  "version": 1,
+  "converged": false,
+  "verdict": "soft_only",
+  "strict": false,
+  "exit_code": 0,
+  "counts": {
+    "hard": 0,
+    "soft": 10,
+    "gaps": 0,
+    "scenarios": 13,
+    "readers": 2
+  },
+  "divergences": [
+    {
+      "scenario": "The evidence file and its shape are named",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md nombra el fichero, la lista y las claves",
+        "reader-b": "el test lee SKILL.md y encuentra el nombre del fichero y claves"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The evidence file and its shape are named» es la correcta?",
+      "options": [
+        "«el SKILL.md nombra el fichero, la lista y las claves»",
+        "«el test lee SKILL.md y encuentra el nombre del fichero y claves»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The three kinds and the three outcomes are named",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md nombra los tres tipos y los tres desenlaces",
+        "reader-b": "el test confirma que SKILL.md nombra los tres kinds y los tres outcomes"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The three kinds and the three outcomes are named» es la correcta?",
+      "options": [
+        "«el SKILL.md nombra los tres tipos y los tres desenlaces»",
+        "«el test confirma que SKILL.md nombra los tres kinds y los tres outcomes»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Own decisions go to the log, not only to the delivery",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara que las decisiones propias también se registran",
+        "reader-b": "el test confirma que SKILL.md declara el doble registro de own-decision"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Own decisions go to the log, not only to the delivery» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que las decisiones propias también se registran»",
+        "«el test confirma que SKILL.md declara el doble registro de own-decision»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The log survives the session",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara que el registro persiste y sólo se añade",
+        "reader-b": "el test confirma que SKILL.md declara persistencia entre sesiones"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The log survives the session» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que el registro persiste y sólo se añade»",
+        "«el test confirma que SKILL.md declara persistencia entre sesiones»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An inference is logged when it is written, not when it is confirmed",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara que se registra al rellenar, no al confirmar",
+        "reader-b": "el test confirma que SKILL.md fija el momento de escritura y el pending"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «An inference is logged when it is written, not when it is confirmed» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que se registra al rellenar, no al confirmar»",
+        "«el test confirma que SKILL.md fija el momento de escritura y el pending»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An unreadable log is kept, not overwritten",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara que un registro ilegible se renombra, no se sobrescribe",
+        "reader-b": "el test confirma que SKILL.md declara el renombrado a corrupt-<marca>"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «An unreadable log is kept, not overwritten» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que un registro ilegible se renombra, no se sobrescribe»",
+        "«el test confirma que SKILL.md declara el renombrado a corrupt-<marca>»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "No row the user has not seen",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara que nunca se escribe una fila no vista",
+        "reader-b": "el test confirma que SKILL.md prohíbe escribir filas no vistas"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «No row the user has not seen» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que nunca se escribe una fila no vista»",
+        "«el test confirma que SKILL.md prohíbe escribir filas no vistas»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A rejected row is never written",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara que lo rechazado no se escribe y queda dropped",
+        "reader-b": "el test confirma que SKILL.md declara el flujo sí/corrección/dropped"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A rejected row is never written» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que lo rechazado no se escribe y queda dropped»",
+        "«el test confirma que SKILL.md declara el flujo sí/corrección/dropped»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Dependent questions never share a call",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara que preguntas dependientes van en llamadas separadas",
+        "reader-b": "el test confirma que SKILL.md separa preguntas dependientes con ejemplo"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Dependent questions never share a call» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que preguntas dependientes van en llamadas separadas»",
+        "«el test confirma que SKILL.md separa preguntas dependientes con ejemplo»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The version is announced first",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara que la versión se anuncia en la primera línea",
+        "reader-b": "el test confirma que SKILL.md declara anuncio inicial de la versión"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The version is announced first» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que la versión se anuncia en la primera línea»",
+        "«el test confirma que SKILL.md declara anuncio inicial de la versión»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    }
+  ],
+  "gaps": [],
+  "attacks": [
+    {
+      "attack": "El requisito obliga a registrar la inferencia al rellenar la casilla con desenlace `pending` «mientras no se ha presentado», pero ninguna frase obliga a presentarla nunca; una implementación que infiere todas las casillas, las escribe en el acta, deja todas las entradas en `pending` y en la entrega dice sólo «5 entradas inference» (el recuento es por `kind`, no por desenlace) cumple al pie de la letra y entrega un acta inventada indistinguible de una confirmada.",
+      "requirement_id": "R-CHL-017",
+      "severity": "high"
+    },
+    {
+      "attack": "Nada exige que `<marca>` sea única: renombrar siempre a `charter-log.json.corrupt-1` cumple la frase «renombrarse antes de crear uno nuevo y nunca sobrescribirse», y en la segunda ejecución el renombrado destruye la copia anterior; con un registro de versión superior (que el requisito manda apartar igual que uno ilegible) se pierde evidencia válida y no recuperable.",
+      "requirement_id": "R-CHL-017",
+      "severity": "medium"
+    },
+    {
+      "attack": "El requisito ata el `dropped` sólo al rechazo: si el usuario no contesta la llamada de confirmación (la cierra o responde algo que no es sí, corrección ni rechazo), una implementación literal no escribe la fila y tampoco anota nada, con lo que una capability que el usuario había descrito desaparece del acta sin dejar rastro en el registro de evidencia.",
+      "requirement_id": "R-CHL-018",
+      "severity": "medium"
+    }
+  ],
+  "advocate": "listed",
+  "decisions": [
+    {
+      "id": "D-001",
+      "scenarios": [
+        "The evidence file and its shape are named"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        0
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «The evidence file and its shape are named» es la correcta?",
+      "options": [
+        "«el SKILL.md nombra el fichero, la lista y las claves»",
+        "«el test lee SKILL.md y encuentra el nombre del fichero y claves»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-002",
+      "scenarios": [
+        "The three kinds and the three outcomes are named"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        1
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «The three kinds and the three outcomes are named» es la correcta?",
+      "options": [
+        "«el SKILL.md nombra los tres tipos y los tres desenlaces»",
+        "«el test confirma que SKILL.md nombra los tres kinds y los tres outcomes»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-003",
+      "scenarios": [
+        "Own decisions go to the log, not only to the delivery"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        2
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «Own decisions go to the log, not only to the delivery» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que las decisiones propias también se registran»",
+        "«el test confirma que SKILL.md declara el doble registro de own-decision»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-004",
+      "scenarios": [
+        "The log survives the session"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        3
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «The log survives the session» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que el registro persiste y sólo se añade»",
+        "«el test confirma que SKILL.md declara persistencia entre sesiones»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-005",
+      "scenarios": [
+        "An inference is logged when it is written, not when it is confirmed"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        4
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «An inference is logged when it is written, not when it is confirmed» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que se registra al rellenar, no al confirmar»",
+        "«el test confirma que SKILL.md fija el momento de escritura y el pending»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-006",
+      "scenarios": [
+        "An unreadable log is kept, not overwritten"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        5
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «An unreadable log is kept, not overwritten» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que un registro ilegible se renombra, no se sobrescribe»",
+        "«el test confirma que SKILL.md declara el renombrado a corrupt-<marca>»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-007",
+      "scenarios": [
+        "No row the user has not seen"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        6
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «No row the user has not seen» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que nunca se escribe una fila no vista»",
+        "«el test confirma que SKILL.md prohíbe escribir filas no vistas»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-008",
+      "scenarios": [
+        "A rejected row is never written"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        7
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «A rejected row is never written» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que lo rechazado no se escribe y queda dropped»",
+        "«el test confirma que SKILL.md declara el flujo sí/corrección/dropped»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-009",
+      "scenarios": [
+        "Dependent questions never share a call"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        8
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «Dependent questions never share a call» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que preguntas dependientes van en llamadas separadas»",
+        "«el test confirma que SKILL.md separa preguntas dependientes con ejemplo»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-010",
+      "scenarios": [
+        "The version is announced first"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        9
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «The version is announced first» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que la versión se anuncia en la primera línea»",
+        "«el test confirma que SKILL.md declara anuncio inicial de la versión»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    }
+  ]
+}

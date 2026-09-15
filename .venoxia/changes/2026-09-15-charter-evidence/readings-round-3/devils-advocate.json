@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "R-CHL-017 exige que «las entradas nuevas se añaden sin borrar las anteriores» y que «una casilla cuya entrada sigue pending conserva la marca <!-- inferred -->»; una implementación que al confirmar añade una entrada nueva con desenlace `confirmed` en lugar de resolver la entrada `pending` cumple ambas frases al pie de la letra, y entonces toda casilla confirmada conserva la marca, C21 rechaza el acta indefinidamente (charter_lint rojo y gate.py fail-closed) y la entrega sigue anunciando inferencias `pending` que el usuario ya confirmó.",
+    "requirement_id": "R-CHL-017",
+    "severity": "high"
+  },
+  {
+    "attack": "R-CHL-017 obliga a escribir la entrada `inference` y la marca <!-- inferred --> al rellenar la casilla, pero ninguna frase obliga a retomar las inferencias `pending` en una sesión posterior; una skill que infiere, marca el acta y termina la sesión sin presentar la inferencia deja en disco un charter.md que C21 rechaza y un registro que crece con `pending` nuevos en cada ejecución, sin ninguna vía prevista para desbloquearlo salvo editar el acta a mano.",
+    "requirement_id": "R-CHL-017",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-CHL-018 manda no escribir la fila si el usuario la rechaza o no la contesta, y R-CHL-017 sólo obliga a que la entrega diga cuántas entradas de cada clase (`inference`, `question`, `own-decision`) escribió y cuántas inferencias quedan `pending`: una implementación que trata cualquier respuesta no afirmativa como «sin respuesta», descarta la fila, la anota como `dropped` y no vuelve a proponerla cumple ambos requisitos, y el usuario recibe un acta a la que le falta una capability que él mismo describió —incluida `technical-contract`— sin que la entrega lo mencione en ninguna cifra.",
+    "requirement_id": "R-CHL-018",
+    "severity": "medium"
+  }
+]

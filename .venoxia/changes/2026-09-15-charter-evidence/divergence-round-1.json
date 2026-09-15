@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "converged": false,
+  "verdict": "soft_only",
+  "strict": false,
+  "exit_code": 0,
+  "counts": {
+    "hard": 0,
+    "soft": 10,
+    "gaps": 0,
+    "scenarios": 9,
+    "readers": 2
+  },
+  "divergences": [
+    {
+      "scenario": "The evidence file and its shape are named",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "modifica skills/charter/SKILL.md"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The evidence file and its shape are named»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The three kinds and the three outcomes are named",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "modifica skills/charter/SKILL.md"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The three kinds and the three outcomes are named»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The three kinds and the three outcomes are named",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "SKILL.md nombra los tres tipos y los tres desenlaces",
+        "reader-b": "el SKILL.md nombra los tres kinds y los tres outcomes"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The three kinds and the three outcomes are named» es la correcta?",
+      "options": [
+        "«SKILL.md nombra los tres tipos y los tres desenlaces»",
+        "«el SKILL.md nombra los tres kinds y los tres outcomes»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Own decisions go to the log, not only to the delivery",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "modifica skills/charter/SKILL.md"
+        ],
+        "reader-b": [
+          "se registra la decisión propia en el log ademas de en la entrega"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «Own decisions go to the log, not only to the delivery»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "«se registra la decisión propia en el log ademas de en la entrega»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The log survives the session",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "modifica skills/charter/SKILL.md"
+        ],
+        "reader-b": [
+          "las entradas nuevas se añaden sin borrar las anteriores"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The log survives the session»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "«las entradas nuevas se añaden sin borrar las anteriores»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The drafted row is confirmed in one call",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "modifica skills/charter/SKILL.md"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The drafted row is confirmed in one call»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "No row the user has not seen",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "modifica skills/charter/SKILL.md"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «No row the user has not seen»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Dependent questions never share a call",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "modifica skills/charter/SKILL.md"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «Dependent questions never share a call»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The version is announced first",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "modifica skills/charter/SKILL.md"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The version is announced first»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The version travels with the evidence",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "modifica skills/charter/SKILL.md"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The version travels with the evidence»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    }
+  ],
+  "gaps": [],
+  "attacks": [
+    {
+      "attack": "R-CHL-018 obliga a presentar la fila marcada como inferida y confirmarla en una sola llamada antes de escribirla, pero no condiciona la escritura al sí del usuario: una implementación que presenta la fila, recibe «no, esa capability sobra» o una prioridad distinta, y escribe igualmente la fila redactada cumple al pie de la letra («se confirmó antes de escribir», «el usuario la vio»), y el acta queda con una capability y una prioridad que el usuario rechazó, registradas además en charter-log.json como parte del proceso de confirmación.",
+      "requirement_id": "R-CHL-018",
+      "severity": "high"
+    },
+    {
+      "attack": "R-CHL-017 sólo obliga a registrar la casilla inferida que la skill «confirma, corrige o descarta»; una implementación que infiere una casilla y la escribe directamente en el acta sin presentarla nunca dispara la obligación y no deja ninguna entrada, de modo que la entrega puede anunciar «0 inferencias» con un acta llena de contenido inventado y C21 en verde por no llevar la marca `<!-- inferred -->` (R-CHL-018 sólo cubre las filas de la tabla de capabilities).",
+      "requirement_id": "R-CHL-017",
+      "severity": "medium"
+    },
+    {
+      "attack": "R-CHL-017 describe charter-log.json como fichero de versión `1` con la lista `entries` y sólo exige «añadir una entrada»; nada dice qué hacer con un fichero preexistente ilegible o de otra versión, así que una implementación que en ese caso lo reescribe desde cero como {\"version\":1,\"entries\":[<la nueva>]} cumple la frase y borra sin aviso toda la evidencia de las sesiones anteriores —la única prueba de qué se infirió y qué dijo el usuario—, mientras la entrega informa tranquilamente de «1 entrada escrita».",
+      "requirement_id": "R-CHL-017",
+      "severity": "medium"
+    },
+    {
+      "attack": "R-CHL-019 exige anunciar la versión leída de ${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json y escribirla en cada entrada, pero no dice nada del caso en que la variable no esté definida o el fichero no se pueda leer: una implementación que entonces sigue adelante sin anunciar nada y con `plugin_version` vacío cumple, y el registro queda sin atribución de versión justo cuando el plugin corre desde un sitio inesperado, que es el único escenario en el que el hallazgo 6 pedía poder demostrar qué versión corre.",
+      "requirement_id": "R-CHL-019",
+      "severity": "low"
+    }
+  ],
+  "advocate": "listed",
+  "decisions": [
+    {
+      "id": "D-001",
+      "scenarios": [
+        "The evidence file and its shape are named",
+        "The three kinds and the three outcomes are named",
+        "The drafted row is confirmed in one call",
+        "No row the user has not seen",
+        "Dependent questions never share a call",
+        "The version is announced first",
+        "The version travels with the evidence"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        0,
+        1,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "hardness": "soft",
+      "reason": "same-readings-across-scenarios",
+      "question": "¿Qué efectos observables debe producir «The evidence file and its shape are named», «The three kinds and the three outcomes are named», «The drafted row is confirmed in one call», «No row the user has not seen», «Dependent questions never share a call», «The version is announced first» y «The version travels with the evidence»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+        "Las lecturas dicen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-002",
+      "scenarios": [
+        "The three kinds and the three outcomes are named"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        2
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «The three kinds and the three outcomes are named» es la correcta?",
+      "options": [
+        "«SKILL.md nombra los tres tipos y los tres desenlaces»",
+        "«el SKILL.md nombra los tres kinds y los tres outcomes»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-003",
+      "scenarios": [
+        "Own decisions go to the log, not only to the delivery"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        3
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «Own decisions go to the log, not only to the delivery»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "«se registra la decisión propia en el log ademas de en la entrega»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ]
+    },
+    {
+      "id": "D-004",
+      "scenarios": [
+        "The log survives the session"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        4
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «The log survives the session»?",
+      "options": [
+        "«modifica skills/charter/SKILL.md»",
+        "«las entradas nuevas se añaden sin borrar las anteriores»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ]
+    }
+  ]
+}

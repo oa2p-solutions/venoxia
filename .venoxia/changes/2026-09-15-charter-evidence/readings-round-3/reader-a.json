@@ -1,0 +1,130 @@
+[
+  {
+    "scenario": "The evidence file and its shape are named",
+    "effect": "el test confirma que SKILL.md nombra el fichero y sus claves",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The three kinds and the three outcomes are named",
+    "effect": "el test confirma que SKILL.md nombra tipos y desenlaces",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Own decisions go to the log, not only to the delivery",
+    "effect": "el test confirma que SKILL.md declara registrar own-decision",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The log survives the session",
+    "effect": "el test confirma que SKILL.md declara persistencia entre sesiones",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An inference is logged when it is written, not when it is confirmed",
+    "effect": "el test confirma que SKILL.md declara el momento de registro",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unreadable log is kept, not overwritten",
+    "effect": "el test confirma que SKILL.md declara renombrar el registro corrupto",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Pending inferences are counted and keep the mark",
+    "effect": "el test confirma que SKILL.md declara marca y conteo de pendientes",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The corrupt copy never replaces an earlier one",
+    "effect": "el test confirma que SKILL.md declara el formato de la marca temporal",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The drafted row is confirmed in one call",
+    "effect": "el test confirma que SKILL.md declara confirmación en una sola llamada",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No row the user has not seen",
+    "effect": "el test confirma que SKILL.md declara no escribir filas no vistas",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A rejected row is never written",
+    "effect": "el test confirma que SKILL.md declara el flujo de confirmación y rechazo",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "An unanswered row leaves a trace",
+    "effect": "el test confirma que SKILL.md declara anotar dropped sin respuesta",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Dependent questions never share a call",
+    "effect": "el test confirma que SKILL.md declara separar preguntas dependientes",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The version is announced first",
+    "effect": "el test confirma que SKILL.md declara anunciar versión al iniciar",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The version travels with the evidence",
+    "effect": "el test confirma que SKILL.md declara plugin_version en cada entrada",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A missing manifest is announced as unknown",
+    "effect": "el test confirma que SKILL.md declara unknown sin manifiesto",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

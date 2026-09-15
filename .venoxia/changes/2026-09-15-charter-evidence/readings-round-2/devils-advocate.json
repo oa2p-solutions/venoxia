@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "El requisito obliga a registrar la inferencia al rellenar la casilla con desenlace `pending` «mientras no se ha presentado», pero ninguna frase obliga a presentarla nunca; una implementación que infiere todas las casillas, las escribe en el acta, deja todas las entradas en `pending` y en la entrega dice sólo «5 entradas inference» (el recuento es por `kind`, no por desenlace) cumple al pie de la letra y entrega un acta inventada indistinguible de una confirmada.",
+    "requirement_id": "R-CHL-017",
+    "severity": "high"
+  },
+  {
+    "attack": "Nada exige que `<marca>` sea única: renombrar siempre a `charter-log.json.corrupt-1` cumple la frase «renombrarse antes de crear uno nuevo y nunca sobrescribirse», y en la segunda ejecución el renombrado destruye la copia anterior; con un registro de versión superior (que el requisito manda apartar igual que uno ilegible) se pierde evidencia válida y no recuperable.",
+    "requirement_id": "R-CHL-017",
+    "severity": "medium"
+  },
+  {
+    "attack": "El requisito ata el `dropped` sólo al rechazo: si el usuario no contesta la llamada de confirmación (la cierra o responde algo que no es sí, corrección ni rechazo), una implementación literal no escribe la fila y tampoco anota nada, con lo que una capability que el usuario había descrito desaparece del acta sin dejar rastro en el registro de evidencia.",
+    "requirement_id": "R-CHL-018",
+    "severity": "medium"
+  }
+]
