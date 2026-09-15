@@ -1,0 +1,12 @@
+[
+  {
+    "attack": "R-DIV-016 y R-DIV-023 obligan a escribir una entrada por divergencia miembro y todas llevan la misma `fingerprint` de la decisión, mientras R-DIV-022 decide el `status` con «la entrada más reciente con esa huella —la última de la lista—»: si tras un `needs-clarification` se pregunta por miembro y uno se cierra con `custom-resolved` mientras otro queda en `changes-contract`, basta con que la entrada cerrada quede después en el fichero para que toda la decisión salga `answered`; la skill no vuelve a preguntar (R-DIV-023) y el miembro que contradecía el acta o el delta desaparece de la entrevista para siempre, sin que nadie lo remita a /venoxia:specify.",
+    "requirement_id": "R-DIV-022",
+    "severity": "high"
+  },
+  {
+    "attack": "R-DIV-023 sólo prohíbe preguntar las decisiones `answered` y para las `stale` exige «enseñar `previous`», sin exigir volver a preguntarlas: una skill que imprime la respuesta anterior y sigue adelante cumple la frase, de modo que una decisión que el propio script marcó obsoleta —porque la pregunta o las opciones cambiaron, o porque el `equivalent` anterior dejó viva una divergencia dura— nunca se re-plantea; con divergencias blandas el cambio se sella como `validated` arrastrando en el delta una respuesta a una pregunta que ya no existe, y sólo se arregla editando `decisions.json` a mano.",
+    "requirement_id": "R-DIV-023",
+    "severity": "medium"
+  }
+]

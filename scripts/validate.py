@@ -37,6 +37,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from venoxia import model, parser, report  # noqa: E402
+
+SCRIPT_NAME = Path(__file__).name
 from venoxia.model import (  # noqa: E402
     CONFIDENCE_LEVELS,
     FILLER_REVISIT_RE,
@@ -2094,10 +2096,11 @@ def main(argv: list[str] | None = None) -> int:
             # una especificación conforme. Sin esta clave, una verja de CI o el panel
             # de salud leerían «verde» donde no hay nada que validar.
             empty = ValidationResult(strict=args.strict, root=str(root))
-            print(report.render_json(empty, extra={"adopted": False}))
+            print(report.render_json(empty, extra={"adopted": False, "tool": report.tool_info(SCRIPT_NAME)}))
             print(message, file=sys.stderr)
         else:
             print(message)
+            print(report.tool_line(SCRIPT_NAME))
         return EXIT_OK
 
     if targets.note:
@@ -2111,11 +2114,13 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     if args.json:
-        print(report.render_json(result, extra={"adopted": True}))
+        print(report.render_json(result, extra={"adopted": True, "tool": report.tool_info(SCRIPT_NAME)}))
     elif args.quiet:
         print(report.render_summary(result, no_color=args.no_color))
+        print(report.tool_line(SCRIPT_NAME))
     else:
         print(report.render_text(result, no_color=args.no_color))
+        print(report.tool_line(SCRIPT_NAME))
 
     return EXIT_OK if result.ok else EXIT_FAILED
 

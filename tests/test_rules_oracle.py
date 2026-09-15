@@ -370,7 +370,7 @@ class TestRulesV17V18JsonSchema(unittest.TestCase):
             run = project.validate_json("--strict")
             self.assertEqual(
                 set(run.json.keys()),
-                {"version", "ok", "strict", "root", "counts", "findings", "budget", "adopted"},
+                {"version", "ok", "strict", "root", "counts", "findings", "budget", "adopted", "tool"},
                 run.describe(),
             )
             rules = {finding["rule"] for finding in run.findings}
@@ -517,10 +517,10 @@ class TestRuleV19RunnerMustBeDeclared(unittest.TestCase):
         with Project() as project:
             self._delta_with_runner(project, "alt")
             run = project.validate_json("--strict")
-            # Las siete del esquema más «adopted», que el CLI añade por contrato.
+            # Las siete del esquema más «adopted» y «tool», que el CLI añade por contrato.
             self.assertEqual(
                 set(run.json.keys()),
-                {"version", "ok", "strict", "root", "counts", "findings", "budget", "adopted"},
+                {"version", "ok", "strict", "root", "counts", "findings", "budget", "adopted", "tool"},
             )
 
 

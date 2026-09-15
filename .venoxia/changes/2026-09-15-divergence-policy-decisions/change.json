@@ -1,0 +1,10 @@
+{
+  "id": "2026-09-15-divergence-policy-decisions",
+  "state": "verified",
+  "via": "spec",
+  "capabilities": [
+    "divergence",
+    "technical-contract"
+  ],
+  "created": "2026-09-15T19:30:00Z"
+}

@@ -34,10 +34,11 @@ from __future__ import annotations
 
 import argparse
 import fnmatch
+import hashlib
 import json
 import sys
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 SCHEMA_VERSION = 1
@@ -63,6 +64,39 @@ MINIMUM_READERS = 2
 EXIT_OK = 0
 EXIT_DIVERGENCE = 1
 EXIT_USAGE = 2
+
+#: Quién produjo el informe (`R-TEC-007`): la versión sale del manifiesto del
+#: plugin que acompaña a los scripts, y si no se puede leer se dice `unknown`
+#: en vez de inventarla o de romper el informe.
+TOOL_NAME = "venoxia"
+TOOL_UNKNOWN_VERSION = "unknown"
+MANIFEST_PATH = Path(__file__).resolve().parent.parent / ".claude-plugin" / "plugin.json"
+
+#: El historial de decisiones (`R-DIV-022`): por defecto el `decisions.json`
+#: que la skill escribe junto al directorio de lecturas.
+DECISIONS_FILENAME = "decisions.json"
+STATUS_PENDING = "pending"
+STATUS_ANSWERED = "answered"
+STATUS_STALE = "stale"
+STATUS_UNCLASSIFIED = "unclassified"
+RESOLUTIONS_CLOSING = frozenset({"selected", "equivalent", "custom-resolved"})
+RESOLUTIONS_OPEN = frozenset({"needs-clarification", "changes-contract"})
+RESOLUTION_EQUIVALENT = "equivalent"
+
+
+def tool_version() -> str:
+    """La versión del manifiesto del plugin, o `unknown` si no se puede leer."""
+    try:
+        manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return TOOL_UNKNOWN_VERSION
+    version = manifest.get("version") if isinstance(manifest, dict) else None
+    return version.strip() if isinstance(version, str) and version.strip() else TOOL_UNKNOWN_VERSION
+
+
+def tool_info() -> dict:
+    """La clave `tool` del JSON: nombre, versión y script."""
+    return {"name": TOOL_NAME, "version": tool_version(), "script": Path(__file__).name}
 
 HARDNESS_HARD = "hard"
 HARDNESS_SOFT = "soft"
@@ -649,6 +683,11 @@ class Reading:
     side_effects: list[str]
     unclear: bool
     unclear_why: str | None
+    #: Opcionales (`R-DIV-018`): el requisito bajo el que está el escenario y el
+    #: valor literal que su `WHEN` pone a prueba. Las lecturas antiguas no los
+    #: traen y siguen valiendo.
+    requirement_id: str | None = None
+    input: str | None = None
 
 
 @dataclass
@@ -676,6 +715,14 @@ class Divergence:
     #: no la usan. Es la clave que permite contar, sobre deltas reales, cuántas
     #: duras de polaridad fueron desacuerdos de verdad.
     signal: str | None = None
+    #: Del escenario, no de la divergencia: el requisito y la entrada que los
+    #: lectores declararon (`R-DIV-018`) y, por lector, el código de estado y los
+    #: efectos colaterales normalizados, que es lo que la agrupación por política
+    #: compara cuando ningún lector trae `requirement_id` (`R-DIV-019`). No
+    #: salen en `to_dict`: el esquema de `divergences` no cambia.
+    requirement_id: str | None = None
+    input: str | None = None
+    context: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         # Ninguna pregunta sale con dos opciones iguales, la construya quien la construya.
@@ -743,6 +790,12 @@ class Analysis:
     attacks: list[dict]
     advocate_status: str
     errors: list[str]
+    #: El id del change (el directorio padre de `readings/`), que entra en la huella.
+    change_id: str = ""
+    #: Las decisiones se calculan una vez en `analyse` y el historial las anota.
+    decision_list: list = field(default_factory=list)
+    #: De dónde salió el historial de decisiones, o `None` si no había ninguno.
+    decisions_source: str | None = None
 
     @property
     def hard(self) -> list[Divergence]:
@@ -750,8 +803,19 @@ class Analysis:
 
     @property
     def decisions(self) -> list["Decision"]:
-        """Las divergencias repartidas por decisión raíz (`R-DIV-013`…`015`)."""
-        return group_decisions(self.divergences)
+        """Las divergencias repartidas por decisión raíz (`R-DIV-013`…`015`, `R-DIV-019`)."""
+        if not self.decision_list and self.divergences:
+            self.decision_list = group_decisions(self.divergences, self.change_id)
+        return self.decision_list
+
+    @property
+    def pending_decisions(self) -> list["Decision"]:
+        """Las que todavía hay que preguntar: todo lo que no está `answered`."""
+        return [decision for decision in self.decisions if decision.status != STATUS_ANSWERED]
+
+    @property
+    def answered_decisions(self) -> list["Decision"]:
+        return [decision for decision in self.decisions if decision.status == STATUS_ANSWERED]
 
     @property
     def grouped_decisions(self) -> list["Decision"]:
@@ -1000,6 +1064,7 @@ def parse_reading(entry: object, path: Path, position: int) -> tuple[Reading | N
             "escenario; sin él no se puede emparejar con las demás lecturas."
         )
     unclear_why = coerce_text(entry.get("unclear_why")) or None
+    raw_input = entry.get("input")
     reading = Reading(
         scenario=scenario.strip(),
         effect=coerce_text(entry.get("effect")),
@@ -1007,6 +1072,8 @@ def parse_reading(entry: object, path: Path, position: int) -> tuple[Reading | N
         side_effects=coerce_side_effects(entry.get("side_effects")),
         unclear=coerce_flag(entry.get("unclear")),
         unclear_why=unclear_why,
+        requirement_id=coerce_text(entry.get("requirement_id")) or None,
+        input=None if raw_input is None else (coerce_text(raw_input) or None),
     )
     return reading, None
 
@@ -1748,6 +1815,7 @@ def collect_gaps(group: ScenarioGroup, reader_names: list[str]) -> tuple[list[Ga
 REASON_SINGLE = "single"
 REASON_TWO_FIELDS = "same-reading-two-fields"
 REASON_ACROSS_SCENARIOS = "same-readings-across-scenarios"
+REASON_SAME_POLICY = "same-policy-across-scenarios"
 
 #: La opción que cierra toda pregunta agrupada: que las lecturas enfrentadas
 #: sean la misma cosa dicha de dos maneras.
@@ -1773,6 +1841,14 @@ class Decision:
     reason: str
     question: str
     options: list[str]
+    #: `R-DIV-020`: una entrada por divergencia miembro, y por opción qué anota en cada miembro.
+    members: list[dict] = field(default_factory=list)
+    resolutions: list[dict] = field(default_factory=list)
+    #: `R-DIV-022`: lo que el historial dice de esta decisión.
+    status: str = STATUS_PENDING
+    previous: dict | None = None
+    fingerprint: str = ""
+    stale_reason: str | None = None
 
     def __post_init__(self) -> None:
         self.options = distinct_options(list(self.options))
@@ -1787,6 +1863,12 @@ class Decision:
             "reason": self.reason,
             "question": self.question,
             "options": list(self.options),
+            "members": [dict(member) for member in self.members],
+            "resolutions": [dict(resolution) for resolution in self.resolutions],
+            "status": self.status,
+            "previous": dict(self.previous) if self.previous else None,
+            "fingerprint": self.fingerprint,
+            "stale_reason": self.stale_reason,
         }
 
 
@@ -1837,6 +1919,122 @@ def readings_key(divergence: Divergence) -> frozenset[str]:
     return frozenset(normalize(reading_text(value)) for value in divergence.readings.values())
 
 
+FIGURE_MARK = "#"
+
+
+def looks_like_http_code(token: str) -> bool:
+    """Un token de tres cifras que empieza por 1–5: la forma de un código de estado."""
+    return len(token) == 3 and token[0] in "12345"
+
+
+def abstract_figures(text: object) -> str:
+    """La lectura con cada cifra sustituida por un marcador: lo que queda es la política.
+
+    Una tira de tokens numéricos seguidos («1 468 135 00», restos de una cifra
+    con separadores) es una sola cifra. Un token de tres dígitos aislado con
+    forma de código de estado se conserva: «responde 201» no es una cifra que
+    abstraer, es parte de la conducta.
+    """
+    words = normalize(text).split()
+    result: list[str] = []
+    index = 0
+    while index < len(words):
+        if not words[index].isdigit():
+            result.append(words[index])
+            index += 1
+            continue
+        run_end = index
+        while run_end < len(words) and words[run_end].isdigit():
+            run_end += 1
+        run = words[index:run_end]
+        if len(run) == 1 and looks_like_http_code(run[0]):
+            result.append(run[0])
+        else:
+            result.append(FIGURE_MARK)
+        index = run_end
+    return " ".join(result)
+
+
+def policy_key(divergence: Divergence) -> tuple:
+    """Por lector, su lectura abstraída: igual política aunque cambien las cifras.
+
+    Sólo `effect` y `side_effects` se abstraen (`R-DIV-019`); un código de estado
+    es literal siempre, porque 409 y 422 no son la misma política con otra cifra.
+    """
+    if divergence.field in (FIELD_EFFECT, FIELD_SIDE_EFFECTS):
+        return tuple(sorted((name, abstract_figures(reading_text(value))) for name, value in divergence.readings.items()))
+    return tuple(sorted((name, normalize(reading_text(value))) for name, value in divergence.readings.items()))
+
+
+def context_key(divergence: Divergence) -> tuple:
+    """El resto del escenario, por lector: código de estado y efectos colaterales normalizados."""
+    return tuple(sorted(divergence.context.items()))
+
+
+def member_of(index: int, divergence: Divergence) -> dict:
+    """La proyección de un miembro (`R-DIV-020`): su divergencia y su escenario, literales."""
+    return {
+        "divergence": index,
+        "scenario": divergence.scenario,
+        "field": divergence.field,
+        "requirement_id": divergence.requirement_id,
+        "input": divergence.input,
+        "hardness": divergence.hardness,
+        "readings": dict(divergence.readings),
+    }
+
+
+def option_reader(option: str, members: list[Divergence]) -> str | None:
+    """De qué lector viene una opción, o `None` si no recoge ninguna lectura.
+
+    Una opción recoge la lectura de un lector cuando contiene, normalizada, la
+    lectura que ese lector dio en algún miembro —el texto del efecto, el
+    código o su frase canónica—. Las opciones que no citan a nadie («dicen lo
+    mismo», «sobran de la lectura») no anotan nada.
+    """
+    haystack = normalize(option)
+    for divergence in members:
+        for name, value in divergence.readings.items():
+            text = normalize(reading_text(value))
+            if text and text in haystack:
+                return name
+            if divergence.field in (FIELD_STATUS_CODE, FIELD_STATUS_CODE_ABSENT) and value is not None:
+                if normalize(describe_status(str(value))) in haystack:
+                    return name
+    return None
+
+
+def resolutions_of(options: list[str], members: list[Divergence]) -> list[dict]:
+    """Por opción, qué anota en cada miembro: la lectura literal del lector, o nada."""
+    resolutions: list[dict] = []
+    for option in options:
+        reader = option_reader(option, members)
+        answers = [reading_text(member.readings.get(reader)) for member in members] if reader else []
+        resolutions.append({"option": option, "reader": reader, "answers": answers})
+    return resolutions
+
+
+def fingerprint_of(change_id: str, members: list[Divergence], fields: list[str], question: str, options: list[str]) -> str:
+    """La huella estable de una decisión (`R-DIV-022`).
+
+    Se calcula sobre lo que hace a la decisión ser la misma —change, requisitos,
+    escenarios, campos, pregunta, opciones y las lecturas literales de sus
+    miembros— y nunca sobre su `D-NNN`, que cambia en cuanto otra divergencia se
+    cuela delante.
+    """
+    material = {
+        "change": change_id,
+        "requirements": sorted({member.requirement_id or "" for member in members}),
+        "scenarios": [member.scenario for member in members],
+        "fields": list(fields),
+        "question": question,
+        "options": list(options),
+        "readings": [sorted((name, reading_text(value)) for name, value in member.readings.items()) for member in members],
+    }
+    digest = hashlib.sha256(json.dumps(material, ensure_ascii=False, sort_keys=True).encode("utf-8"))
+    return digest.hexdigest()[:32]
+
+
 def joined_scenarios(titles: list[str]) -> str:
     return join_es([f"«{title}»" for title in titles])
 
@@ -1871,15 +2069,18 @@ def two_field_options(effect: Divergence, side: Divergence) -> list[str]:
     return options
 
 
-def group_decisions(divergences: list[Divergence]) -> list[Decision]:
+def group_decisions(divergences: list[Divergence], change_id: str = "") -> list[Decision]:
     """Reparte las divergencias en decisiones raíz; cada índice cae en exactamente una.
 
-    Primero los dos campos del mismo escenario (`same-reading-two-fields`), luego
-    el mismo campo con el mismo conjunto de lecturas en escenarios distintos
-    (`same-readings-across-scenarios`) sobre lo que quedó libre, y el resto
-    `single`. Ningún grupo se funde con otro por transitividad: lo que ya está
-    en una decisión no entra en la siguiente. Los escenarios que sólo ve un
-    lector no se agrupan nunca.
+    Primero los dos campos del mismo escenario (`same-reading-two-fields`); luego,
+    sobre lo que quedó libre, el mismo campo con la misma política en escenarios
+    distintos y bajo el mismo requisito: si las lecturas literales coinciden es
+    `same-readings-across-scenarios`, y si sólo coinciden con las cifras
+    abstraídas es `same-policy-across-scenarios` (`R-DIV-019`), que sin
+    `requirement_id` exige además que el resto del escenario —código de estado y
+    efectos colaterales de cada lector— coincida. El resto queda `single`.
+    Ningún grupo se funde con otro por transitividad, y los escenarios que sólo
+    ve un lector no se agrupan nunca.
     """
     taken: set[int] = set()
     groups: list[tuple[str, list[int]]] = []
@@ -1895,15 +2096,36 @@ def group_decisions(divergences: list[Divergence]) -> list[Decision]:
                 groups.append((REASON_TWO_FIELDS, members))
                 taken.update(members)
 
-    buckets: dict[tuple[str, frozenset[str]], list[int]] = {}
+    def same_readings(members: list[int]) -> bool:
+        return len({readings_key(divergences[index]) for index in members}) == 1
+
+    buckets: dict[tuple, list[int]] = {}
     for index, divergence in enumerate(divergences):
         if index in taken or divergence.field == FIELD_MISSING_SCENARIO:
             continue
-        buckets.setdefault((divergence.field, readings_key(divergence)), []).append(index)
-    for members in buckets.values():
-        if len(members) > 1:
+        buckets.setdefault((divergence.field, divergence.requirement_id, policy_key(divergence)), []).append(index)
+    for (_field, requirement_id, _policy), members in buckets.items():
+        if len(members) < 2:
+            continue
+        if same_readings(members):
             groups.append((REASON_ACROSS_SCENARIOS, members))
             taken.update(members)
+            continue
+        # Misma política con cifras distintas. Sin requisito que las una, el resto
+        # del escenario tiene que coincidir para no fundir conductas sin relación.
+        if requirement_id is None:
+            by_context: dict[tuple, list[int]] = {}
+            for index in members:
+                by_context.setdefault(context_key(divergences[index]), []).append(index)
+            candidates = list(by_context.values())
+        else:
+            candidates = [members]
+        for candidate in candidates:
+            if len(candidate) < 2:
+                continue
+            reason = REASON_ACROSS_SCENARIOS if same_readings(candidate) else REASON_SAME_POLICY
+            groups.append((reason, candidate))
+            taken.update(candidate)
 
     for index in range(len(divergences)):
         if index not in taken:
@@ -1929,12 +2151,16 @@ def group_decisions(divergences: list[Divergence]) -> list[Decision]:
                 "para el efecto y para los efectos observables a la vez?"
             )
             options = two_field_options(effect, side)
-        elif reason == REASON_ACROSS_SCENARIOS:
+        elif reason in (REASON_ACROSS_SCENARIOS, REASON_SAME_POLICY):
             question = grouped_question(chosen, scenarios)
-            options = list(chosen[0].options) + [NO_REAL_DIVERGENCE]
+            # La opción de equivalencia de la pregunta miembro y la de la decisión son
+            # la misma salida; en la agrupada sólo va una.
+            options = [option for option in chosen[0].options if not denies_divergence({"answer": option})]
+            options.append(NO_REAL_DIVERGENCE)
         else:
             question = chosen[0].question
             options = list(chosen[0].options)
+        options = distinct_options(options)
         decisions.append(
             Decision(
                 id=f"D-{position:03d}",
@@ -1945,9 +2171,184 @@ def group_decisions(divergences: list[Divergence]) -> list[Decision]:
                 reason=reason,
                 question=question,
                 options=options,
+                members=[member_of(index, divergences[index]) for index in members],
+                resolutions=resolutions_of(options, chosen),
+                fingerprint=fingerprint_of(change_id, chosen, fields, question, options),
             )
         )
     return decisions
+
+
+# ---------------------------------------------------------------------------
+# El historial de decisiones (R-DIV-022)
+# ---------------------------------------------------------------------------
+
+
+def load_history(path: Path, explicit: bool) -> tuple[list[dict] | None, str | None]:
+    """Lee el historial de decisiones; devuelve (entradas, error).
+
+    Sin fichero no hay historial y no es error, salvo que se pidiera uno con
+    `--decisions`. Un fichero que existe y no se puede interpretar sí lo es: un
+    historial ilegible no se adivina, se reporta (código 2).
+    """
+    if not path.exists():
+        if explicit:
+            return None, f"«{path}»: no existe el historial de decisiones que pide --decisions."
+        return None, None
+    raw, error = read_json(path)
+    if error:
+        return None, f"«{path}»: el historial de decisiones no se ha podido leer: {error}"
+    if isinstance(raw, dict):
+        entries = raw.get("decisions")
+    else:
+        entries = raw
+    if not isinstance(entries, list) or not all(isinstance(entry, dict) for entry in entries):
+        return None, (
+            f"«{path}»: el historial de decisiones debe ser un objeto con la lista «decisions» "
+            "de entradas; no se puede reconciliar con él."
+        )
+    return entries, None
+
+
+def previous_of(entry: dict, migrated: bool = False) -> dict:
+    """Lo que el informe enseña de una respuesta anterior."""
+    return {
+        "at": entry.get("at"),
+        "decision": entry.get("decision"),
+        "resolution": entry.get("resolution"),
+        "chosen": entry.get("chosen"),
+        "answer": entry.get("answer"),
+        "migrated": migrated,
+    }
+
+
+def entry_covers(entry: dict, divergence: Divergence) -> bool:
+    """¿Habla la entrada de este miembro? Mismo escenario y, si lo trae, mismo campo."""
+    scenario = entry.get("scenario")
+    if scenario is not None and normalize(scenario) != normalize(divergence.scenario):
+        return False
+    entry_field = entry.get("field")
+    return entry_field is None or entry_field == divergence.field
+
+
+def latest_per_member(entries: list[tuple[int, dict]], members: list[Divergence]) -> dict[int, tuple[int, dict]]:
+    """Por miembro (posición), la entrada más reciente que lo cubre: la última de la lista."""
+    latest: dict[int, tuple[int, dict]] = {}
+    for position, divergence in enumerate(members):
+        for index, entry in entries:
+            if entry_covers(entry, divergence):
+                latest[position] = (index, entry)
+    return latest
+
+
+def denies_divergence(entry: dict) -> bool:
+    """¿Dio la respuesta las lecturas por equivalentes? Por su `resolution`, o por el texto elegido."""
+    if entry.get("resolution") == RESOLUTION_EQUIVALENT:
+        return True
+    answer = normalize(entry.get("answer"))
+    return bool(answer) and "no hay divergencia real" in answer
+
+
+def reconcile_by_fingerprint(decision: Decision, matches: list[tuple[int, dict]], members: list[Divergence]) -> None:
+    """Entradas con la huella de la decisión: la última de cada miembro decide."""
+    latest = latest_per_member(matches, members)
+    if not latest:
+        # Entradas con la huella pero sin escenario reconocible: valen para todos.
+        latest = {0: matches[-1]}
+    open_entries = [entry for _, entry in latest.values() if entry.get("resolution") in RESOLUTIONS_OPEN]
+    if open_entries:
+        decision.status = STATUS_PENDING
+        decision.previous = previous_of(open_entries[0])
+        return
+    unknown = [entry for _, entry in latest.values() if entry.get("resolution") not in RESOLUTIONS_CLOSING]
+    if unknown:
+        decision.status = STATUS_UNCLASSIFIED
+        decision.previous = previous_of(unknown[0])
+        return
+    newest = max(latest.values(), key=lambda pair: pair[0])[1]
+    decision.previous = previous_of(newest)
+    if decision.hardness == HARDNESS_HARD and any(denies_divergence(entry) for _, entry in latest.values()):
+        decision.status = STATUS_STALE
+        decision.stale_reason = (
+            "la respuesta anterior dio las lecturas por equivalentes, pero la divergencia dura sigue en "
+            "pie: la equivalencia no cerró una divergencia dura, así que se vuelve a preguntar."
+        )
+        return
+    decision.status = STATUS_ANSWERED
+
+
+def reconcile_legacy(decision: Decision, entries: list[tuple[int, dict]], members: list[Divergence]) -> None:
+    """Entradas sin huella (o con otra): casan por escenario y campo, y la pregunta decide.
+
+    Con la misma pregunta y las mismas opciones —las del miembro o las de la
+    decisión—, una opción elegida cuenta como respuesta migrada y una respuesta
+    escrita a mano queda sin clasificar. Con otra pregunta, otras opciones u
+    otra huella, la respuesta es obsoleta y se dice qué cambió.
+    """
+    latest = latest_per_member(entries, members)
+    if not latest:
+        decision.status = STATUS_PENDING
+        decision.previous = None
+        return
+    stale: list[tuple[dict, str]] = []
+    unclassified: list[dict] = []
+    answered: list[tuple[int, dict]] = []
+    for position, (index, entry) in latest.items():
+        member = members[position]
+        if entry.get("fingerprint"):
+            stale.append((entry, "las lecturas o la pregunta ya no son las que se contestaron: la huella de la decisión cambió."))
+            continue
+        same_question = entry.get("question") in (member.question, decision.question)
+        same_options = entry.get("options") in (list(member.options), list(decision.options))
+        if not same_question or not same_options:
+            what = []
+            if not same_question:
+                what.append("la pregunta cambió")
+            if not same_options:
+                what.append("las opciones de la pregunta ya no son las mismas")
+            stale.append((entry, " y ".join(what) + " desde la respuesta anterior."))
+            continue
+        if isinstance(entry.get("chosen"), int):
+            answered.append((index, entry))
+        else:
+            unclassified.append(entry)
+    if stale:
+        decision.status = STATUS_STALE
+        decision.previous = previous_of(stale[0][0], migrated=True)
+        decision.stale_reason = stale[0][1]
+        return
+    if unclassified:
+        decision.status = STATUS_UNCLASSIFIED
+        decision.previous = previous_of(unclassified[0], migrated=True)
+        return
+    newest = max(answered, key=lambda pair: pair[0])[1]
+    decision.previous = previous_of(newest, migrated=True)
+    if decision.hardness == HARDNESS_HARD and any(denies_divergence(entry) for _, entry in answered):
+        decision.status = STATUS_STALE
+        decision.stale_reason = (
+            "la respuesta anterior dio las lecturas por equivalentes, pero la divergencia dura sigue en "
+            "pie: la equivalencia no cerró una divergencia dura, así que se vuelve a preguntar."
+        )
+        return
+    decision.status = STATUS_ANSWERED
+
+
+def reconcile(analysis: Analysis, entries: list[dict]) -> None:
+    """Anota en cada decisión lo que el historial dice de ella. No toca el veredicto."""
+    for decision in analysis.decisions:
+        members = [analysis.divergences[index] for index in decision.divergences]
+        by_fingerprint = [
+            (index, entry) for index, entry in enumerate(entries) if entry.get("fingerprint") == decision.fingerprint
+        ]
+        if by_fingerprint:
+            reconcile_by_fingerprint(decision, by_fingerprint, members)
+            continue
+        related = [
+            (index, entry)
+            for index, entry in enumerate(entries)
+            if entry.get("scenario") is not None and any(entry_covers(entry, member) for member in members)
+        ]
+        reconcile_legacy(decision, related, members)
 
 
 def analyse(
@@ -1966,6 +2367,12 @@ def analyse(
     gaps: list[Gap] = []
     gap_questions: list[GapQuestion] = []
     for group in scenarios:
+        requirement_id = next((r.requirement_id for r in group.by_reader.values() if r.requirement_id), None)
+        input_value = next((r.input for r in group.by_reader.values() if r.input is not None), None)
+        context = {
+            name: (status_key(r.status_code), tuple(sorted(normalize(item) for item in r.side_effects)))
+            for name, r in group.by_reader.items()
+        }
         for candidate in (
             compare_missing(group, reader_names),
             compare_status_code(group, reader_names),
@@ -1973,12 +2380,16 @@ def analyse(
             compare_effect(group, reader_names, threshold),
         ):
             if candidate is not None:
+                candidate.requirement_id = requirement_id
+                candidate.input = input_value
+                candidate.context = context
                 divergences.append(candidate)
         scenario_gaps, gap_question = collect_gaps(group, reader_names)
         gaps.extend(scenario_gaps)
         if gap_question is not None:
             gap_questions.append(gap_question)
 
+    change_id = directory.resolve().parent.name
     return Analysis(
         directory=directory,
         threshold=threshold,
@@ -1990,6 +2401,8 @@ def analyse(
         attacks=attacks,
         advocate_status=advocate_status,
         errors=list(errors),
+        change_id=change_id,
+        decision_list=group_decisions(divergences, change_id),
     )
 
 
@@ -2030,6 +2443,9 @@ def build_payload(analysis: Analysis, verdict: Verdict) -> dict:
         "attacks": [dict(attack) for attack in analysis.attacks],
         "advocate": analysis.advocate_status,
         "decisions": [decision.to_dict() for decision in analysis.decisions],
+        "decisions_source": analysis.decisions_source,
+        "decisions_pending": len(analysis.pending_decisions),
+        "tool": tool_info(),
     }
     if analysis.errors:
         payload["errors"] = list(analysis.errors)
@@ -2043,6 +2459,66 @@ def render_question(scenario: str, detail: str, question: str, options: list[str
         lines.extend([detail, ""])
     lines.append(f"**{question}**")
     lines.extend(f"- ({option_letter(index)}) {option}" for index, option in enumerate(options))
+    lines.append("")
+    return lines
+
+
+def hardness_word(hardness: str) -> str:
+    return "dura" if hardness == HARDNESS_HARD else "blanda"
+
+
+def render_decision(decision: Decision, analysis: Analysis) -> list[str]:
+    """Bloque markdown de una decisión pendiente: su raíz, su matriz y su pregunta, una vez."""
+    members = [analysis.divergences[index] for index in decision.divergences]
+    lines = [f"### {decision.id} · {join_es(decision.scenarios)}", ""]
+    requirements = sorted({member.requirement_id for member in members if member.requirement_id})
+    summary = (
+        f"Razón `{decision.reason}` · {count_es(len(members), 'divergencia', 'divergencias')} en "
+        f"{join_es([f'`{field_name}`' for field_name in decision.fields])} · dureza {hardness_word(decision.hardness)}"
+    )
+    if requirements:
+        summary += f" · requisito {join_es(requirements)}"
+    lines.extend([summary + ".", ""])
+    previous = decision.previous or {}
+    if decision.status == STATUS_STALE:
+        lines.extend(
+            [
+                f"Respondida antes ({previous.get('at') or 'sin fecha'}): «{previous.get('answer') or ''}». "
+                f"**Obsoleta:** {decision.stale_reason} Se vuelve a preguntar enseñando la respuesta anterior.",
+                "",
+            ]
+        )
+    elif decision.status == STATUS_UNCLASSIFIED:
+        lines.extend(
+            [
+                f"Respuesta antigua sin clasificar ({previous.get('at') or 'sin fecha'}): "
+                f"«{previous.get('answer') or ''}». Confírmala o cámbiala: no se da por cerrada sola.",
+                "",
+            ]
+        )
+    elif previous:
+        lines.extend(
+            [
+                f"Contestada antes ({previous.get('at') or 'sin fecha'}, `{previous.get('resolution')}`): "
+                f"«{previous.get('answer') or ''}». Esa respuesta no cerró la decisión.",
+                "",
+            ]
+        )
+    if len(members) > 1 or any(member.input is not None for member in members):
+        header = ["Escenario", "Entrada"] + [reader_label(name) for name in analysis.reader_names] + ["Dureza"]
+        lines.append("| " + " | ".join(header) + " |")
+        lines.append("|" + "---|" * len(header))
+        for member in members:
+            cells = [member.scenario, f"`{member.input}`" if member.input is not None else "—"]
+            for name in analysis.reader_names:
+                cells.append(reading_text(member.readings.get(name)) or "—")
+            cells.append(hardness_word(member.hardness))
+            lines.append("| " + " | ".join(cell.replace("|", "\\|") for cell in cells) + " |")
+        lines.append("")
+    if members[0].detail:
+        lines.extend([members[0].detail, ""])
+    lines.append(f"**{decision.question}**")
+    lines.extend(f"- ({option_letter(index)}) {option}" for index, option in enumerate(decision.options))
     lines.append("")
     return lines
 
@@ -2153,6 +2629,8 @@ def render_markdown(analysis: Analysis, verdict: Verdict, color: bool = False) -
         f"- **Umbral de similitud de `effect`:** {analysis.threshold:.2f}",
         f"- **Modo estricto (`--strict`):** {'sí' if verdict.strict else 'no'}",
         f"- **Código de salida:** {verdict.exit_code}",
+        f"- **Herramienta:** Venoxia {tool_version()} (`{Path(__file__).name}`)",
+        f"- **Historial de decisiones:** {('`' + analysis.decisions_source + '`') if analysis.decisions_source else 'ninguno'}",
         "",
         "## Veredicto",
         "",
@@ -2181,57 +2659,61 @@ def render_markdown(analysis: Analysis, verdict: Verdict, color: bool = False) -
             ]
         )
 
-    grouped = analysis.grouped_decisions
-    if grouped:
-        lines.extend([f"## Decisiones agrupadas · {len(grouped)}", ""])
+    pending = analysis.pending_decisions
+    if pending:
+        lines.extend([f"## Decisiones pendientes · {len(pending)}", ""])
         lines.extend(
             [
-                "Varias divergencias de abajo nacen de la misma ambigüedad y se resuelven con una",
-                "sola respuesta. Contesta aquí una vez; la respuesta vale para todos los escenarios",
-                "que se listan, y si para alguno no vale, dilo y se pregunta aparte.",
+                "Cada decisión se pregunta una sola vez. Su respuesta vale para todos los escenarios de su",
+                "matriz; si para alguno no vale, dilo y se pregunta aparte. Las divergencias que la forman",
+                "están en «Evidencia por divergencia».",
                 "",
             ]
         )
-        for decision in grouped:
-            members = join_es([f"`{field}`" for field in decision.fields])
-            detail = (
-                f"{decision.id} · razón `{decision.reason}` · {count_es(len(decision.divergences), 'divergencia', 'divergencias')} "
-                f"en {members} · escenarios: {joined_scenarios(decision.scenarios)}."
-            )
-            lines.extend(
-                render_question(join_es(decision.scenarios), detail, decision.question, decision.options)
-            )
+        for decision in pending:
+            lines.extend(render_decision(decision, analysis))
 
-    if analysis.hard:
-        lines.extend([f"## Divergencias duras · {len(analysis.hard)}", ""])
+    answered = analysis.answered_decisions
+    if answered:
+        lines.extend([f"## Decisiones ya respondidas · {len(answered)}", ""])
         lines.extend(
             [
-                "Estas lecturas no pueden ser todas correctas a la vez. Responde cada pregunta con su",
-                "letra, corrige el delta con la respuesta y vuelve a ejecutar la divergencia.",
+                "El historial de decisiones ya las contesta; no se vuelven a preguntar. Si la respuesta no",
+                "llegó al delta, llévala: es lo que hace que la próxima ronda lea otra cosa.",
                 "",
             ]
         )
-        for divergence in analysis.hard:
-            lines.extend(
-                render_question(
-                    divergence.scenario, divergence.detail, divergence.question, divergence.options
-                )
+        for decision in answered:
+            previous = decision.previous or {}
+            when = previous.get("at") or "sin fecha"
+            answer = previous.get("answer") or ""
+            lines.append(
+                f"- **{decision.id}** · {joined_scenarios(decision.scenarios)} · respondida el {when} "
+                f"(`{previous.get('resolution') or 'migrada'}`): «{answer}»"
             )
+        lines.append("")
 
-    if analysis.soft:
-        lines.extend([f"## Divergencias blandas · {len(analysis.soft)}", ""])
+    if analysis.divergences:
+        lines.extend([f"## Evidencia por divergencia · {len(analysis.divergences)}", ""])
         lines.extend(
             [
-                "Puede que sólo sea vocabulario distinto, o puede que no. Confírmalo antes de implementar.",
+                "Cada desacuerdo que el motor encontró, con su dureza, su señal y su detalle. Aquí no hay",
+                "preguntas: cada uno pertenece a una decisión de arriba.",
                 "",
             ]
         )
-        for divergence in analysis.soft:
-            lines.extend(
-                render_question(
-                    divergence.scenario, divergence.detail, divergence.question, divergence.options
-                )
+        owner: dict[int, str] = {}
+        for decision in analysis.decisions:
+            for index in decision.divergences:
+                owner[index] = decision.id
+        for index, divergence in enumerate(analysis.divergences):
+            hardness = "dura" if divergence.hardness == HARDNESS_HARD else "blanda"
+            signal = f" · señal `{divergence.signal}`" if divergence.signal else ""
+            detail = f" · {divergence.detail}" if divergence.detail else ""
+            lines.append(
+                f"- **{owner.get(index, '')}** · «{divergence.scenario}» · `{divergence.field}` · {hardness}{signal}{detail}"
             )
+        lines.append("")
 
     if analysis.gap_questions:
         # El «· N» de las cuatro secciones cuenta lo mismo en todas: bloques debajo.
@@ -2334,6 +2816,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--json", action="store_true", help="emite el JSON estable en vez del informe markdown")
     parser.add_argument(
+        "--decisions",
+        metavar="FILE",
+        help=(
+            "historial de decisiones con el que reconciliar antes de preguntar "
+            f"(por defecto, el «{DECISIONS_FILENAME}» junto al directorio de lecturas)"
+        ),
+    )
+    parser.add_argument(
         "--threshold",
         type=float,
         default=DEFAULT_THRESHOLD,
@@ -2382,6 +2872,16 @@ def main(argv: list[str] | None = None) -> int:
         return EXIT_USAGE
 
     analysis = analyse(directory, readers, attacks, advocate_status, args.threshold, errors)
+
+    history_path = (
+        Path(args.decisions).expanduser() if args.decisions else directory.resolve().parent / DECISIONS_FILENAME
+    )
+    entries, history_error = load_history(history_path, explicit=bool(args.decisions))
+    if history_error:
+        analysis.errors.append(history_error)
+    elif entries is not None:
+        analysis.decisions_source = str(history_path)
+        reconcile(analysis, entries)
     # Un solo veredicto para los tres canales: el markdown, el JSON y el resumen de
     # `--out` lo reciben ya calculado y ninguno vuelve a decidir nada por su cuenta.
     verdict = build_verdict(analysis, args.strict)

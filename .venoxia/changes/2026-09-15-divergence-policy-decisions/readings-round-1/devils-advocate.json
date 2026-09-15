@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "Como R-DIV-018 deja `requirement_id` opcional y R-DIV-019 agrupa cuando las divergencias «comparten requirement_id —o ninguna lo trae—», una implementación literal funde en una sola decisión escenarios de requisitos sin relación (facturación y borrado de cuenta) en cuanto los lectores omiten el campo opcional; el usuario recibe una única pregunta con las opciones «lectura del lector A / del lector B / equivalentes», no puede responder distinto por miembro, y el texto elegido se escribe literalmente en el delta de un requisito sobre el que nunca se le preguntó.",
+    "requirement_id": "R-DIV-019",
+    "severity": "high"
+  },
+  {
+    "attack": "R-DIV-022 declara `answered` «cuando una entrada con la misma huella tiene resolution selected, equivalent o custom-resolved», sin exigir que sea la entrada más reciente: si el usuario reabre una decisión y la cierra con `changes-contract` o `needs-clarification`, la entrada anterior con `selected` sigue casando y la decisión sale `answered`, de modo que R-DIV-023 ya no la vuelve a plantear nunca y la respuesta que el usuario retiró queda como respuesta buena en el contrato.",
+    "requirement_id": "R-DIV-022",
+    "severity": "high"
+  },
+  {
+    "attack": "Elegir la opción «las lecturas dicen lo mismo» produce, por R-DIV-020, `answers` vacío (nada se escribe en el delta), por R-DIV-022 la decisión queda `answered` con huella calculada sobre unas lecturas que ya no cambiarán, y por R-DIV-022 el veredicto ignora el historial: el script sigue devolviendo `diverged` y código 1 en cada pasada mientras R-DIV-023 obliga a no volver a preguntar esa decisión, dejando el change atascado sin poder pasar a `validated` y sin ninguna pregunta visible que lo desbloquee salvo editar `decisions.json` a mano.",
+    "requirement_id": "R-DIV-022",
+    "severity": "medium"
+  }
+]

@@ -43,6 +43,8 @@ Un **array JSON** con **un objeto por escenario**, en el mismo orden en que apar
 [
   {
     "scenario": "Insufficient stock on one line",
+    "requirement_id": "R-STK-003",
+    "input": "2 unidades del artículo A-17 con 1 en stock",
     "effect": "rechaza el pedido y no reserva nada",
     "status_code": "409",
     "side_effects": [],
@@ -51,6 +53,8 @@ Un **array JSON** con **un objeto por escenario**, en el mismo orden en que apar
   },
   {
     "scenario": "Payment retried after expiry",
+    "requirement_id": "R-STK-004",
+    "input": null,
     "effect": "",
     "status_code": null,
     "side_effects": [],
@@ -65,6 +69,8 @@ Los campos, uno a uno:
 | Campo | Regla |
 |---|---|
 | `scenario` | El título **literal** del escenario, copiado carácter a carácter tras `#### Scenario:`. No lo traduzcas, no lo acortes, no lo reformules, no le arregles la mayúscula ni la errata. El emparejado con las demás lecturas depende de esta copia exacta. |
+| `requirement_id` | El identificador del requisito bajo el que está el escenario: el `R-XXX-NNN` del encabezado `### ` que lo precede, copiado tal cual. Es lo que permite al script agrupar los escenarios de un mismo requisito que comparten la misma política aunque cambien las cifras, y no fundirlos con los de otro. `null` sólo si el escenario no cuelga de ningún requisito identificable. |
+| `input` | El valor literal que el `WHEN` del escenario pone a prueba —la cifra, la cadena, el documento—, copiado con sus separadores y su puntuación (`"1.468.135,00"`). `null` si el `WHEN` no pone a prueba ningún valor concreto. Nunca lo normalices: la matriz del informe lo enseña tal cual para que quien decide vea de qué entrada habla cada fila. |
 | `effect` | El resultado observable, en **12 palabras o menos**, en español y en presente. Qué ve quien usa el sistema, no cómo se implementa. Vacío (`""`) sólo si el texto no permite afirmar ninguno. |
 | `status_code` | El código de estado como cadena (`"409"`) si el delta lo dice. `null` si no lo dice o si el escenario no devuelve ninguno. **Nunca lo deduzcas.** |
 | `side_effects` | Lista de efectos observables además de la respuesta: escrituras persistentes, eventos emitidos, correos, cambios de estado. Uno por elemento, corto y en español. Lista vacía si el texto no menciona ninguno. Sólo los que el texto menciona. |

@@ -132,12 +132,13 @@ class DivergeSkillRootDecisionsTest(unittest.TestCase):
         self.assertIn("la decisión raíz una sola vez", text)
         self.assertIn("los escenarios afectados", text)
 
-    def test_body_records_every_member_with_the_same_answer(self):
+    def test_body_records_every_member_with_its_own_answer(self):
         """@covers R-DIV-016"""
         text = _read_skill()
         self.assertIn("una entrada por divergencia miembro", text)
-        self.assertIn("el mismo `answer`", text)
+        self.assertIn("el `answer` que `resolutions` asigna a ese miembro", text)
         self.assertIn("`decision`", text)
+        self.assertNotIn("el mismo `answer`", text)
 
     def test_body_never_groups_on_its_own(self):
         """@covers R-DIV-016"""
@@ -164,6 +165,59 @@ class DivergeSkillActiveChangeTest(unittest.TestCase):
         text = _read_skill()
         self.assertIn("un change en `verified` no se examina sin su id", text)
         self.assertIn("nunca vuelve a `validated`", text)
+
+
+class DivergeSkillResolutionTest(unittest.TestCase):
+    """R-DIV-023 · cada respuesta se clasifica, sólo tres clases cierran, y el historial se reconcilia."""
+
+    def test_the_five_resolutions_are_named(self):
+        """@covers R-DIV-023"""
+        text = _read_skill()
+        for value in ("selected", "equivalent", "custom-resolved", "needs-clarification", "changes-contract"):
+            self.assertIn(f"`{value}`", text, f"skills/diverge/SKILL.md no nombra la resolución «{value}»")
+        for key in ("`decision`", "`fingerprint`", "`plugin_version`", "`resolution`"):
+            self.assertIn(key, text, f"skills/diverge/SKILL.md no nombra la clave {key}")
+
+    def test_only_three_resolutions_close(self):
+        """@covers R-DIV-023"""
+        self.assertIn(
+            "sólo `selected`, `equivalent` y `custom-resolved` cierran una decisión",
+            _read_skill(),
+        )
+
+    def test_a_clarification_gets_one_more_call(self):
+        """@covers R-DIV-023"""
+        text = _read_skill()
+        self.assertIn(
+            "ante `needs-clarification` se hace una llamada más con la misma pregunta y la información aportada",
+            text,
+        )
+        self.assertIn(
+            "si la aclaración es que la respuesta no vale para todos los miembros, la llamada siguiente se hace por miembro",
+            text,
+        )
+
+    def test_a_contract_change_is_routed_not_closed(self):
+        """@covers R-DIV-023"""
+        text = _read_skill()
+        self.assertIn("ante `changes-contract` se dice qué contradice", text)
+        self.assertIn("sin cerrar la decisión", text)
+        self.assertIn("/venoxia:specify", text)
+        self.assertIn("/venoxia:charter", text)
+
+    def test_answered_decisions_are_not_asked_again(self):
+        """@covers R-DIV-023"""
+        text = _read_skill()
+        self.assertIn("--decisions", text)
+        self.assertIn("las decisiones `answered` no se preguntan", text)
+        self.assertIn("las `stale` se vuelven a preguntar enseñando `previous`", text)
+        self.assertIn("en las `unclassified` se pide confirmar la respuesta antigua", text)
+
+    def test_the_skill_announces_the_running_version(self):
+        """@covers R-DIV-023"""
+        text = _read_skill()
+        self.assertIn("al empezar se anuncia la versión del plugin", text)
+        self.assertIn("${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json", text)
 
 
 if __name__ == "__main__":

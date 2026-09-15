@@ -1,0 +1,147 @@
+schema_version: "1.0"
+name: diverge-policy-decision
+description: >-
+  Tres escenarios del mismo requisito prueban tres notaciones de un importe en CLP, y
+  las dos lecturas prefabricadas describen en los tres la misma conducta con cifras
+  distintas. Son tres divergencias blandas y una sola decisión por política; y el
+  `decisions.json` de una versión anterior trae una respuesta escrita a mano («2
+  decimales») que no contesta la pregunta: el JSON tiene que agruparlas en una entrada
+  de `decisions` con razón `same-policy-across-scenarios`, tres miembros con sus cifras
+  literales, y marcar la decisión `unclassified` sin darla por cerrada.
+tags: [divergence, grouping, policy, history, must-detect]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Trabajas sobre un proyecto que usa Venoxia. Su raíz es el directorio `project/`, que
+    se te ha añadido a esta sesión como directorio de trabajo adicional; dentro tiene su
+    especificación en `.venoxia/`. Localízalo antes de nada si no lo tienes a la vista.
+
+    El change `2026-09-15-quote-amounts` ya tiene grabadas las lecturas independientes de
+    su delta en `.venoxia/changes/2026-09-15-quote-amounts/readings/`, y junto a ellas un
+    `decisions.json` de una pasada anterior. No lances lectores nuevos: usa esas lecturas
+    tal como están, y deja que el script encuentre el historial.
+
+    Compáralas entre sí y guarda la salida JSON íntegra del análisis de divergencia en
+    `divergence-result.json`, dentro de tu directorio de trabajo actual. Cópiala tal
+    cual: sin editarla, sin resumirla y sin reformatearla.
+
+    Termina con dos frases como mucho: cuántas decisiones distintas tendría que tomar el
+    usuario, y si la respuesta anterior («2 decimales») cierra alguna.
+  max_turns: 14
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Skill]
+runs: 2
+expected_outcome: >-
+  Tres divergencias blandas en `effect`, una sola entrada en `decisions` con razón
+  `same-policy-across-scenarios`, tres miembros con las cifras 1468135, 1468135 y 1500000
+  literales, y `status` `unclassified` con «2 decimales» en `previous.answer`;
+  `decisions_pending` vale 1 y el código de salida es 0.
+graders:
+  - type: tool_used
+    name: divergence-script-ran
+    tool: Bash
+    input_match: 'diff_readings\.py'
+    min: 1
+  - type: file_exists
+    name: divergence-result-written
+    path: divergence-result.json
+  - type: regex
+    name: soft-only-verdict
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"verdict":\s*"soft_only"'
+  - type: regex
+    name: three-soft-no-hard-no-gap
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"counts":\s*\{\s*"hard":\s*0,\s*"soft":\s*3,\s*"gaps":\s*0'
+    flags: "s"
+  - type: regex
+    name: grouped-by-policy
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"reason":\s*"same-policy-across-scenarios"'
+  - type: regex
+    name: only-one-decision
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"reason":\s*"single"'
+    match: not_contains
+  - type: regex
+    name: decision-lists-three-members
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"divergences":\s*\[\s*0,\s*1,\s*2\s*\]'
+    flags: "s"
+  - type: regex
+    name: figures-not-diluted
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '1500000'
+  - type: regex
+    name: input-kept-literal
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"input":\s*"\$ 1\.500\.000\.-"'
+  - type: regex
+    name: history-found
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"decisions_source":\s*"[^"]*decisions\.json"'
+  - type: regex
+    name: hand-written-answer-is-unclassified
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"status":\s*"unclassified"'
+  - type: regex
+    name: hand-written-answer-not-closed
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"decisions_pending":\s*1'
+  - type: regex
+    name: previous-answer-shown
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"answer":\s*"2 decimales"'
+  - type: regex
+    name: tool-version-present
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"tool":\s*\{\s*"name":\s*"venoxia",\s*"version":\s*"[^"]+",\s*"script":\s*"diff_readings\.py"'
+    flags: "s"
+  - type: llm
+    name: grouped-question-names-every-notation
+    focus:
+      source: file
+      path: divergence-result.json
+    criteria: >-
+      La clave `decisions` del JSON contiene exactamente una entrada, y su `question`
+      nombra los tres escenarios («Amount written with a comma decimal tail», «Amount
+      written with a dot decimal tail» y «Amount written in the Chilean closing-dash
+      notation») en una sola pregunta cerrada; cada miembro conserva su cifra literal
+      (1468135 o 1500000) en `readings`. No vale una pregunta por escenario ni una que
+      haya sustituido las cifras por un marcador.
+    weight: 0.5
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains

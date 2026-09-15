@@ -1,0 +1,7 @@
+[
+  {
+    "attack": "Cumpliendo el requisito al pie de la letra, «1.468.135,50» se registra como 1468135 y los cincuenta centavos desaparecen sin aviso: la cola decimal se descarta en vez de rechazarse cuando no es cero.",
+    "requirement_id": "R-CHK-011",
+    "severity": "medium"
+  }
+]

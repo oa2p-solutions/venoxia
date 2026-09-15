@@ -1,0 +1,1139 @@
+{
+  "version": 1,
+  "converged": false,
+  "verdict": "soft_only",
+  "strict": false,
+  "exit_code": 0,
+  "counts": {
+    "hard": 0,
+    "soft": 31,
+    "gaps": 0,
+    "scenarios": 44,
+    "readers": 2
+  },
+  "divergences": [
+    {
+      "scenario": "A reading without the new fields still parses",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "miembros de la decisión llevan requirement_id e input a null"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «A reading without the new fields still parses»?",
+      "options": [
+        "«miembros de la decisión llevan requirement_id e input a null»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The new fields reach the members",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el miembro de la decisión lleva los valores literales",
+        "reader-b": "el miembro conserva requirement_id e input literales"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The new fields reach the members» es la correcta?",
+      "options": [
+        "«el miembro de la decisión lleva los valores literales»",
+        "«el miembro conserva requirement_id e input literales»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The reader agent asks for both fields",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "los dos documentos nombran requirement_id e input",
+        "reader-b": "ambos ficheros nombran requirement_id e input como campos"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The reader agent asks for both fields» es la correcta?",
+      "options": [
+        "«los dos documentos nombran requirement_id e input»",
+        "«ambos ficheros nombran requirement_id e input como campos»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Three CLP notations are one decision",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "JSON trae una decisión con tres divergencias miembro y razón same-policy-across-scenarios"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «Three CLP notations are one decision»?",
+      "options": [
+        "«JSON trae una decisión con tres divergencias miembro y razón same-policy-across-scenarios»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The figures are never diluted",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "cada miembro conserva su lectura literal con cifras",
+        "reader-b": "el informe muestra cada cifra literal en su fila"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The figures are never diluted» es la correcta?",
+      "options": [
+        "«cada miembro conserva su lectura literal con cifras»",
+        "«el informe muestra cada cifra literal en su fila»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Without a requirement the rest of the scenario must match",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "quedan separados si side_effects difieren, juntos si comparten requirement_id",
+        "reader-b": "con side_effects distintos son dos decisiones, no una"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Without a requirement the rest of the scenario must match» es la correcta?",
+      "options": [
+        "«quedan separados si side_effects difieren, juntos si comparten requirement_id»",
+        "«con side_effects distintos son dos decisiones, no una»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A reader-backed option resolves every member literally",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "resolutions.answers se rellena por cada miembro"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «A reader-backed option resolves every member literally»?",
+      "options": [
+        "«resolutions.answers se rellena por cada miembro»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Each question appears once",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la pregunta de la decisión sale una sola vez",
+        "reader-b": "la pregunta aparece una sola vez en el informe"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Each question appears once» es la correcta?",
+      "options": [
+        "«la pregunta de la decisión sale una sola vez»",
+        "«la pregunta aparece una sola vez en el informe»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Members are evidence, not questions",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "evidencia lista dureza y detalle sin preguntas ni opciones",
+        "reader-b": "cada divergencia muestra dureza y detalle, sin opciones"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Members are evidence, not questions» es la correcta?",
+      "options": [
+        "«evidencia lista dureza y detalle sin preguntas ni opciones»",
+        "«cada divergencia muestra dureza y detalle, sin opciones»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The old sections are gone",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "el informe deja de emitir Divergencias duras, blandas y Decisiones agrupadas"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The old sections are gone»?",
+      "options": [
+        "«el informe deja de emitir Divergencias duras, blandas y Decisiones agrupadas»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Without a history every decision is pending",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "todas las decisiones salen pending sin fuente de historial",
+        "reader-b": "todas las decisiones salen pending, decisions_source es null"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Without a history every decision is pending» es la correcta?",
+      "options": [
+        "«todas las decisiones salen pending sin fuente de historial»",
+        "«todas las decisiones salen pending, decisions_source es null»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A matching resolved answer is answered",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se añade previous con at, answer y resolution"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «A matching resolved answer is answered»?",
+      "options": [
+        "«se añade previous con at, answer y resolution»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A matching resolved answer is answered",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la decisión sale answered y deja de contar como pendiente",
+        "reader-b": "sale answered con previous y no cuenta en pendientes"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A matching resolved answer is answered» es la correcta?",
+      "options": [
+        "«la decisión sale answered y deja de contar como pendiente»",
+        "«sale answered con previous y no cuenta en pendientes»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A clarification does not close",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se añade previous con la aclaración anterior"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «A clarification does not close»?",
+      "options": [
+        "«se añade previous con la aclaración anterior»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A clarification does not close",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la decisión sigue pending mostrando lo ya contestado",
+        "reader-b": "sigue pending y previous muestra lo contestado antes"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A clarification does not close» es la correcta?",
+      "options": [
+        "«la decisión sigue pending mostrando lo ya contestado»",
+        "«sigue pending y previous muestra lo contestado antes»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The latest entry with the fingerprint wins",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "previous refleja la entrada posterior, no la selected anterior"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The latest entry with the fingerprint wins»?",
+      "options": [
+        "«previous refleja la entrada posterior, no la selected anterior»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An equivalence that left the divergence hard is stale",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "se añade stale_reason explicando el motivo"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «An equivalence that left the divergence hard is stale»?",
+      "options": [
+        "«se añade stale_reason explicando el motivo»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A legacy chosen option is migrated",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la decisión sale answered marcando la migración",
+        "reader-b": "sale answered con previous.migrated en true"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A legacy chosen option is migrated» es la correcta?",
+      "options": [
+        "«la decisión sale answered marcando la migración»",
+        "«sale answered con previous.migrated en true»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A legacy hand-written answer is unclassified",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la decisión sale unclassified mostrando la respuesta antigua",
+        "reader-b": "sale unclassified mostrando previous.answer"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A legacy hand-written answer is unclassified» es la correcta?",
+      "options": [
+        "«la decisión sale unclassified mostrando la respuesta antigua»",
+        "«sale unclassified mostrando previous.answer»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Changed options make the earlier answer stale",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la decisión sale stale indicando qué cambió",
+        "reader-b": "sale stale y stale_reason dice qué opción cambió"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Changed options make the earlier answer stale» es la correcta?",
+      "options": [
+        "«la decisión sale stale indicando qué cambió»",
+        "«sale stale y stale_reason dice qué opción cambió»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Only three resolutions close",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el texto declara que sólo tres resoluciones cierran la decisión",
+        "reader-b": "declara que sólo selected, equivalent y custom-resolved cierran"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Only three resolutions close» es la correcta?",
+      "options": [
+        "«el texto declara que sólo tres resoluciones cierran la decisión»",
+        "«declara que sólo selected, equivalent y custom-resolved cierran»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A clarification gets one more call",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el texto declara una llamada extra con la misma pregunta",
+        "reader-b": "declara una llamada adicional con la misma pregunta"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A clarification gets one more call» es la correcta?",
+      "options": [
+        "«el texto declara una llamada extra con la misma pregunta»",
+        "«declara una llamada adicional con la misma pregunta»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An answer that does not fit every member is asked per member",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el texto declara preguntar por miembro con su propio answer",
+        "reader-b": "declara preguntar por miembro, cada uno con su answer"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «An answer that does not fit every member is asked per member» es la correcta?",
+      "options": [
+        "«el texto declara preguntar por miembro con su propio answer»",
+        "«declara preguntar por miembro, cada uno con su answer»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Answered decisions are not asked again",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el texto declara pasar el historial y no repreguntar lo answered",
+        "reader-b": "declara no repreguntar answered y mostrar previous en stale"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Answered decisions are not asked again» es la correcta?",
+      "options": [
+        "«el texto declara pasar el historial y no repreguntar lo answered»",
+        "«declara no repreguntar answered y mostrar previous en stale»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Every divergence belongs to exactly one decision",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "cada índice de divergences pertenece a una sola decisión",
+        "reader-b": "cada divergencia figura en exactamente una decisión"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Every divergence belongs to exactly one decision» es la correcta?",
+      "options": [
+        "«cada índice de divergences pertenece a una sola decisión»",
+        "«cada divergencia figura en exactamente una decisión»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The verdict does not move",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "counts y veredicto no cambian, decisions trae una entrada",
+        "reader-b": "counts, veredicto diverged y una sola decisión, sin cambios"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The verdict does not move» es la correcta?",
+      "options": [
+        "«counts y veredicto no cambian, decisions trae una entrada»",
+        "«counts, veredicto diverged y una sola decisión, sin cambios»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A grouped question names its scenarios and confronts the readings",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "options incluye la opción de que no hay divergencia real"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «A grouped question names its scenarios and confronts the readings»?",
+      "options": [
+        "«options incluye la opción de que no hay divergencia real»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A two-field option carries both fields of its reader",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la opción enlaza efecto y efectos colaterales del mismo lector",
+        "reader-b": "la opción combina efecto y efectos colaterales del lector"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A two-field option carries both fields of its reader» es la correcta?",
+      "options": [
+        "«la opción enlaza efecto y efectos colaterales del mismo lector»",
+        "«la opción combina efecto y efectos colaterales del lector»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The report lists every decision once",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el informe trae la decisión una vez con razón y escenarios",
+        "reader-b": "aparece una sola vez con su razón y escenarios"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The report lists every decision once» es la correcta?",
+      "options": [
+        "«el informe trae la decisión una vez con razón y escenarios»",
+        "«aparece una sola vez con su razón y escenarios»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "One decision per call",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el texto declara preguntar una decisión por llamada en orden",
+        "reader-b": "declara una decisión por llamada, en el orden del informe"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «One decision per call» es la correcta?",
+      "options": [
+        "«el texto declara preguntar una decisión por llamada en orden»",
+        "«declara una decisión por llamada, en el orden del informe»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Every member is recorded with its own answer",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el texto declara anotar decisions.json por miembro con su answer",
+        "reader-b": "declara anotar una entrada por miembro con su answer"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Every member is recorded with its own answer» es la correcta?",
+      "options": [
+        "«el texto declara anotar decisions.json por miembro con su answer»",
+        "«declara anotar una entrada por miembro con su answer»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    }
+  ],
+  "gaps": [],
+  "attacks": [
+    {
+      "attack": "R-DIV-016 y R-DIV-023 obligan a escribir una entrada por divergencia miembro y todas llevan la misma `fingerprint` de la decisión, mientras R-DIV-022 decide el `status` con «la entrada más reciente con esa huella —la última de la lista—»: si tras un `needs-clarification` se pregunta por miembro y uno se cierra con `custom-resolved` mientras otro queda en `changes-contract`, basta con que la entrada cerrada quede después en el fichero para que toda la decisión salga `answered`; la skill no vuelve a preguntar (R-DIV-023) y el miembro que contradecía el acta o el delta desaparece de la entrevista para siempre, sin que nadie lo remita a /venoxia:specify.",
+      "requirement_id": "R-DIV-022",
+      "severity": "high"
+    },
+    {
+      "attack": "R-DIV-023 sólo prohíbe preguntar las decisiones `answered` y para las `stale` exige «enseñar `previous`», sin exigir volver a preguntarlas: una skill que imprime la respuesta anterior y sigue adelante cumple la frase, de modo que una decisión que el propio script marcó obsoleta —porque la pregunta o las opciones cambiaron, o porque el `equivalent` anterior dejó viva una divergencia dura— nunca se re-plantea; con divergencias blandas el cambio se sella como `validated` arrastrando en el delta una respuesta a una pregunta que ya no existe, y sólo se arregla editando `decisions.json` a mano.",
+      "requirement_id": "R-DIV-023",
+      "severity": "medium"
+    }
+  ],
+  "advocate": "listed",
+  "decisions": [
+    {
+      "id": "D-001",
+      "scenarios": [
+        "A reading without the new fields still parses"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        0
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «A reading without the new fields still parses»?",
+      "options": [
+        "«miembros de la decisión llevan requirement_id e input a null»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ]
+    },
+    {
+      "id": "D-002",
+      "scenarios": [
+        "The new fields reach the members"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        1
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «The new fields reach the members» es la correcta?",
+      "options": [
+        "«el miembro de la decisión lleva los valores literales»",
+        "«el miembro conserva requirement_id e input literales»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-003",
+      "scenarios": [
+        "The reader agent asks for both fields"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        2
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «The reader agent asks for both fields» es la correcta?",
+      "options": [
+        "«los dos documentos nombran requirement_id e input»",
+        "«ambos ficheros nombran requirement_id e input como campos»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-004",
+      "scenarios": [
+        "Three CLP notations are one decision"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        3
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «Three CLP notations are one decision»?",
+      "options": [
+        "«JSON trae una decisión con tres divergencias miembro y razón same-policy-across-scenarios»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ]
+    },
+    {
+      "id": "D-005",
+      "scenarios": [
+        "The figures are never diluted"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        4
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «The figures are never diluted» es la correcta?",
+      "options": [
+        "«cada miembro conserva su lectura literal con cifras»",
+        "«el informe muestra cada cifra literal en su fila»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-006",
+      "scenarios": [
+        "Without a requirement the rest of the scenario must match"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        5
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «Without a requirement the rest of the scenario must match» es la correcta?",
+      "options": [
+        "«quedan separados si side_effects difieren, juntos si comparten requirement_id»",
+        "«con side_effects distintos son dos decisiones, no una»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-007",
+      "scenarios": [
+        "A reader-backed option resolves every member literally"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        6
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «A reader-backed option resolves every member literally»?",
+      "options": [
+        "«resolutions.answers se rellena por cada miembro»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ]
+    },
+    {
+      "id": "D-008",
+      "scenarios": [
+        "Each question appears once"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        7
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «Each question appears once» es la correcta?",
+      "options": [
+        "«la pregunta de la decisión sale una sola vez»",
+        "«la pregunta aparece una sola vez en el informe»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-009",
+      "scenarios": [
+        "Members are evidence, not questions"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        8
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «Members are evidence, not questions» es la correcta?",
+      "options": [
+        "«evidencia lista dureza y detalle sin preguntas ni opciones»",
+        "«cada divergencia muestra dureza y detalle, sin opciones»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-010",
+      "scenarios": [
+        "The old sections are gone"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        9
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «The old sections are gone»?",
+      "options": [
+        "«el informe deja de emitir Divergencias duras, blandas y Decisiones agrupadas»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ]
+    },
+    {
+      "id": "D-011",
+      "scenarios": [
+        "Without a history every decision is pending"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        10
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «Without a history every decision is pending» es la correcta?",
+      "options": [
+        "«todas las decisiones salen pending sin fuente de historial»",
+        "«todas las decisiones salen pending, decisions_source es null»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-012",
+      "scenarios": [
+        "A matching resolved answer is answered"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        11
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «A matching resolved answer is answered»?",
+      "options": [
+        "«se añade previous con at, answer y resolution»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ]
+    },
+    {
+      "id": "D-013",
+      "scenarios": [
+        "A matching resolved answer is answered"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        12
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «A matching resolved answer is answered» es la correcta?",
+      "options": [
+        "«la decisión sale answered y deja de contar como pendiente»",
+        "«sale answered con previous y no cuenta en pendientes»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-014",
+      "scenarios": [
+        "A clarification does not close"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        13
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «A clarification does not close»?",
+      "options": [
+        "«se añade previous con la aclaración anterior»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ]
+    },
+    {
+      "id": "D-015",
+      "scenarios": [
+        "A clarification does not close"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        14
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «A clarification does not close» es la correcta?",
+      "options": [
+        "«la decisión sigue pending mostrando lo ya contestado»",
+        "«sigue pending y previous muestra lo contestado antes»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-016",
+      "scenarios": [
+        "The latest entry with the fingerprint wins"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        15
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «The latest entry with the fingerprint wins»?",
+      "options": [
+        "«previous refleja la entrada posterior, no la selected anterior»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ]
+    },
+    {
+      "id": "D-017",
+      "scenarios": [
+        "An equivalence that left the divergence hard is stale"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        16
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «An equivalence that left the divergence hard is stale»?",
+      "options": [
+        "«se añade stale_reason explicando el motivo»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ]
+    },
+    {
+      "id": "D-018",
+      "scenarios": [
+        "A legacy chosen option is migrated"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        17
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «A legacy chosen option is migrated» es la correcta?",
+      "options": [
+        "«la decisión sale answered marcando la migración»",
+        "«sale answered con previous.migrated en true»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-019",
+      "scenarios": [
+        "A legacy hand-written answer is unclassified"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        18
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «A legacy hand-written answer is unclassified» es la correcta?",
+      "options": [
+        "«la decisión sale unclassified mostrando la respuesta antigua»",
+        "«sale unclassified mostrando previous.answer»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-020",
+      "scenarios": [
+        "Changed options make the earlier answer stale"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        19
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «Changed options make the earlier answer stale» es la correcta?",
+      "options": [
+        "«la decisión sale stale indicando qué cambió»",
+        "«sale stale y stale_reason dice qué opción cambió»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-021",
+      "scenarios": [
+        "Only three resolutions close"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        20
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «Only three resolutions close» es la correcta?",
+      "options": [
+        "«el texto declara que sólo tres resoluciones cierran la decisión»",
+        "«declara que sólo selected, equivalent y custom-resolved cierran»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-022",
+      "scenarios": [
+        "A clarification gets one more call"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        21
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «A clarification gets one more call» es la correcta?",
+      "options": [
+        "«el texto declara una llamada extra con la misma pregunta»",
+        "«declara una llamada adicional con la misma pregunta»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-023",
+      "scenarios": [
+        "An answer that does not fit every member is asked per member"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        22
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «An answer that does not fit every member is asked per member» es la correcta?",
+      "options": [
+        "«el texto declara preguntar por miembro con su propio answer»",
+        "«declara preguntar por miembro, cada uno con su answer»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-024",
+      "scenarios": [
+        "Answered decisions are not asked again"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        23
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «Answered decisions are not asked again» es la correcta?",
+      "options": [
+        "«el texto declara pasar el historial y no repreguntar lo answered»",
+        "«declara no repreguntar answered y mostrar previous en stale»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-025",
+      "scenarios": [
+        "Every divergence belongs to exactly one decision"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        24
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «Every divergence belongs to exactly one decision» es la correcta?",
+      "options": [
+        "«cada índice de divergences pertenece a una sola decisión»",
+        "«cada divergencia figura en exactamente una decisión»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-026",
+      "scenarios": [
+        "The verdict does not move"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        25
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «The verdict does not move» es la correcta?",
+      "options": [
+        "«counts y veredicto no cambian, decisions trae una entrada»",
+        "«counts, veredicto diverged y una sola decisión, sin cambios»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-027",
+      "scenarios": [
+        "A grouped question names its scenarios and confronts the readings"
+      ],
+      "fields": [
+        "side_effects"
+      ],
+      "divergences": [
+        26
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Qué efectos observables debe producir «A grouped question names its scenarios and confronts the readings»?",
+      "options": [
+        "«options incluye la opción de que no hay divergencia real»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ]
+    },
+    {
+      "id": "D-028",
+      "scenarios": [
+        "A two-field option carries both fields of its reader"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        27
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «A two-field option carries both fields of its reader» es la correcta?",
+      "options": [
+        "«la opción enlaza efecto y efectos colaterales del mismo lector»",
+        "«la opción combina efecto y efectos colaterales del lector»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-029",
+      "scenarios": [
+        "The report lists every decision once"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        28
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «The report lists every decision once» es la correcta?",
+      "options": [
+        "«el informe trae la decisión una vez con razón y escenarios»",
+        "«aparece una sola vez con su razón y escenarios»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-030",
+      "scenarios": [
+        "One decision per call"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        29
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «One decision per call» es la correcta?",
+      "options": [
+        "«el texto declara preguntar una decisión por llamada en orden»",
+        "«declara una decisión por llamada, en el orden del informe»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    },
+    {
+      "id": "D-031",
+      "scenarios": [
+        "Every member is recorded with its own answer"
+      ],
+      "fields": [
+        "effect"
+      ],
+      "divergences": [
+        30
+      ],
+      "hardness": "soft",
+      "reason": "single",
+      "question": "¿Cuál de estas lecturas del efecto de «Every member is recorded with its own answer» es la correcta?",
+      "options": [
+        "«el texto declara anotar decisions.json por miembro con su answer»",
+        "«declara anotar una entrada por miembro con su answer»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ]
+    }
+  ]
+}

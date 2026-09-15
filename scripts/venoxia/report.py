@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import sys
+from pathlib import Path
 
 from .model import (
     SEVERITY_ERROR,
@@ -30,6 +31,32 @@ from .model import (
 # Versión del esquema JSON. Sube sólo si cambia la forma del documento, nunca
 # por añadir un valor: hay consumidores que dependen de estas claves.
 SCHEMA_VERSION = 1
+
+#: Quién produjo el informe (`R-TEC-007`): la versión sale del manifiesto del
+#: plugin que acompaña a los scripts; si no se puede leer, `unknown`.
+TOOL_NAME = "venoxia"
+TOOL_UNKNOWN_VERSION = "unknown"
+MANIFEST_PATH = Path(__file__).resolve().parents[2] / ".claude-plugin" / "plugin.json"
+
+
+def tool_version() -> str:
+    """La versión del manifiesto del plugin, o `unknown` si no se puede leer."""
+    try:
+        manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return TOOL_UNKNOWN_VERSION
+    version = manifest.get("version") if isinstance(manifest, dict) else None
+    return version.strip() if isinstance(version, str) and version.strip() else TOOL_UNKNOWN_VERSION
+
+
+def tool_info(script: str) -> dict:
+    """La clave `tool` del JSON: nombre, versión y script que lo escribió."""
+    return {"name": TOOL_NAME, "version": tool_version(), "script": script}
+
+
+def tool_line(script: str) -> str:
+    """La línea con la que el informe de texto dice quién lo produjo."""
+    return f"Venoxia {tool_version()} · {script}"
 
 # Presupuesto de incertidumbre: como mucho el 30 % de los requisitos del ámbito
 # puede declarar «confidence: low». El límite se guarda también como fracción

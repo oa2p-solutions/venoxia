@@ -46,6 +46,7 @@ cambiado de verdad.
 | `ambiguous-partial-effect` | El requisito dice que el sistema «reserva lo que puede» | Divergencia **dura** en `side_effects` (pedido completo contra unidades con stock) y **blanda** en `effect` |
 | `oracle-red-then-green` | Change `validated` con dos requisitos: uno con marcador de fallo para el runner falso, otro que pasa tal cual | El oráculo distingue: `R-CHK-001` en `green`, `R-CHK-002` en `red`, `all_green: false` |
 | `diverge-root-decision` | Tres escenarios del mismo requisito dicen «se rechaza» sin fijar el código, y las lecturas los resuelven los tres como 409 y 422 | Tres divergencias **duras** en `status_code` y **una sola** entrada en `decisions`, con razón `same-readings-across-scenarios`, que nombra los tres escenarios |
+| `diverge-policy-decision` | Tres notaciones de un importe en CLP («1.468.135,00», «1.468.135.00», «$ 1.500.000.-») que las lecturas resuelven con la misma conducta y cifras distintas, más un `decisions.json` antiguo con una respuesta a mano («2 decimales») | Tres divergencias **blandas** en `effect` y **una sola** entrada en `decisions` con razón `same-policy-across-scenarios`, tres miembros con sus cifras e `input` literales, `status` `unclassified`, `decisions_pending: 1` y la clave `tool` |
 | `charter-explained` | Esqueleto vacío y un mensaje que ya cuenta propósito, usuario, apaño, primera capability, «Done when» y fuera de alcance | El acta se redacta antes de preguntar: ninguna pregunta por lo ya contado, una confirmación como mucho, linter en verde y las palabras del usuario en el acta |
 | `charter-vague-pain` | Esqueleto vacío y una molestia sin nombre, con el relato que el usuario soltaría si se le pregunta bien | La primera pregunta es la narrativa literal y la segunda la de qué eliminar primero; el acta sale con la jefa de cocina y el último pedido |
 | `charter-brownfield` | Paquete Python real (`pyproject.toml`, `pytest`, tres módulos, README) y el cambio que el usuario quiere hacer ahora | Capabilities reconstruidas del código, el cambio nuevo en la fila 1, ninguna pregunta por stack ni comando de pruebas, `venoxia.json` con `pytest` |
@@ -80,7 +81,10 @@ tomada del mensaje— y que guarde la última salida de `charter_lint.py` en
 - `tool_used` sobre `AskUserQuestion` con `max: 0`: la herramienta no se tocó.
 - `regex` sobre `charter-lint-result.json` (`"ok": true`) y sobre el acta (sin la marca
   `<!-- inferred -->`): el acta pasa el linter y no le queda ninguna inferencia sin
-  confirmar.
+  confirmar. Desde la 0.6.0 la skill deja además `.venoxia/charter-log.json` con cada
+  inferencia, pregunta y decisión propia y la versión del plugin que la hizo; los casos
+  no lo puntúan todavía (sin usuario simulado, todas sus inferencias quedarían
+  `pending`), y es el primer grader que conviene añadir cuando la eval pueda contestar.
 - `regex` sobre `interview-log.json`: en el modo de idea difusa, que las dos primeras
   preguntas sean las literales de la skill; en los de producto explicado y respuesta
   múltiple, que no haya ninguna `question` por una casilla que el mensaje ya rellenaba;
@@ -165,6 +169,7 @@ real. `clean-spec` pasa además en modo `--strict`.
 | `ambiguous-partial-effect` | `ok: true` | `converged: false` · hard 1 · soft 1 · gaps 0 |
 | `oracle-red-then-green` | no aplica (no se ejecuta `validate.py`) | no aplica (no se ejecuta `diff_readings.py`) |
 | `diverge-root-decision` | `ok: true` | `converged: false` · hard 3 · soft 0 · gaps 0 · 4 escenarios · `decisions` con 1 entrada de 3 miembros |
+| `diverge-policy-decision` | `ok: true` | `verdict: soft_only` · hard 0 · soft 3 · gaps 0 · 3 escenarios · `decisions` con 1 entrada `same-policy-across-scenarios` de 3 miembros · `status: unclassified` · `decisions_pending: 1` · salida 0 |
 | `charter-resume` | no aplica; su acta pasa `charter_lint.py --strict` con 0 errores y 0 avisos | no aplica |
 | `charter-*` (los otros cinco) | no aplica: el acta la escribe la eval | no aplica |
 

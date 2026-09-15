@@ -54,6 +54,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from venoxia import parser, report  # noqa: E402
+
+SCRIPT_NAME = Path(__file__).name
 from venoxia.model import (  # noqa: E402
     FILLER_REVISIT_RE,
     SEVERITY_ERROR,
@@ -2815,12 +2817,14 @@ def _absent(args: argparse.Namespace, root: Path, target: Target) -> int:
         empty = ValidationResult(strict=args.strict, root=str(root))
         print(
             report.render_json(
-                empty, extra={"adopted": target.adopted, "charter": None}
+                empty,
+                extra={"adopted": target.adopted, "charter": None, "tool": report.tool_info(SCRIPT_NAME)},
             )
         )
         print(message, file=sys.stderr)
     else:
         print(message)
+        print(report.tool_line(SCRIPT_NAME))
     return EXIT_OK
 
 
@@ -2852,11 +2856,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(
             report.render_json(
-                result, extra={"adopted": True, "charter": charter_payload(charter)}
+                result,
+                extra={"adopted": True, "charter": charter_payload(charter), "tool": report.tool_info(SCRIPT_NAME)},
             )
         )
     else:
         print(render_text(result, charter, no_color=args.no_color))
+        print(report.tool_line(SCRIPT_NAME))
 
     return EXIT_OK if result.ok else EXIT_FAILED
 

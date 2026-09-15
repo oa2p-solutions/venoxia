@@ -43,6 +43,7 @@ VALIDATE_CIFRAS = {
     "ambiguous-status-code": {"ok": True, "error": 0, "warning": 0, "requirements": 3, "low": 0},
     "ambiguous-partial-effect": {"ok": True, "error": 0, "warning": 0, "requirements": 3, "low": 0},
     "diverge-root-decision": {"ok": True, "error": 0, "warning": 0, "requirements": 3, "low": 0},
+    "diverge-policy-decision": {"ok": True, "error": 0, "warning": 0, "requirements": 3, "low": 0},
 }
 
 # Las cifras de `diff_readings.py --json`. Sólo los tres fixtures con
@@ -53,6 +54,7 @@ DIFF_READINGS_CIFRAS = {
     "ambiguous-status-code": {"converged": False, "hard": 1, "soft": 0, "gaps": 0},
     "ambiguous-partial-effect": {"converged": False, "hard": 1, "soft": 1, "gaps": 0},
     "diverge-root-decision": {"converged": False, "hard": 3, "soft": 0, "gaps": 0},
+    "diverge-policy-decision": {"converged": False, "hard": 0, "soft": 3, "gaps": 0},
 }
 
 

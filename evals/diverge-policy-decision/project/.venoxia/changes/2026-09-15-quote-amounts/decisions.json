@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "change": "2026-09-15-quote-amounts",
+  "decisions": [
+    {
+      "at": "2026-09-14T13:13:49Z",
+      "scenario": "Amount written with a comma decimal tail",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Amount written with a comma decimal tail» es la correcta?",
+      "options": [
+        "«registra el importe como 1468135 en CLP y lo acepta»",
+        "«responde 201, importe se registra como 1468135 en CLP»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": null,
+      "answer": "2 decimales"
+    }
+  ]
+}

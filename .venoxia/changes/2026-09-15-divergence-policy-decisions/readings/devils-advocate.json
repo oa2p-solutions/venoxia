@@ -1,0 +1,12 @@
+[
+  {
+    "attack": "Nada en el delta obliga a que la respuesta llegue al texto del delta, y una decisión cerrada como `custom-resolved` o `selected` en una sesión que no llegó a editarlo sale `answered` en la siguiente pasada: la skill no la pregunta (R-DIV-023), R-DIV-021 sólo lleva a «Decisiones pendientes» las decisiones no respondidas y R-DIV-022 impide que el historial mueva el código de salida, así que `diff_readings.py` devuelve 1 para siempre sin ninguna pregunta que contestar y el change no puede llegar nunca a `validated` salvo editando a mano `decisions.json`.",
+    "requirement_id": "R-DIV-023",
+    "severity": "medium"
+  },
+  {
+    "attack": "El THEN de «Without a requirement the rest of the scenario must match» dice literalmente que con el mismo `requirement_id` dos escenarios siguen siendo una sola decisión aunque un lector les dé `side_effects` distintos, y la matriz que R-DIV-021 obliga a enseñar sólo trae escenario, entrada, lectura del campo en disputa y dureza: el usuario cierra de una sola respuesta escenarios cuyos efectos colaterales divergen sin llegar a verlos en la pregunta.",
+    "requirement_id": "R-DIV-019",
+    "severity": "medium"
+  }
+]

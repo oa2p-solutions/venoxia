@@ -386,9 +386,16 @@ def reading(
     side_effects: Sequence[str] = (),
     unclear: bool = False,
     unclear_why: str | None = None,
+    requirement_id: str | None = None,
+    input: str | None = None,
 ) -> dict:
-    """Una lectura suelta de un lector, con la forma exacta del contrato §7."""
-    return {
+    """Una lectura suelta de un lector, con la forma exacta del contrato §7.
+
+    `requirement_id` e `input` son los dos campos opcionales de `R-DIV-018`: sólo
+    se escriben cuando se pasan, para que una lectura sin ellos siga teniendo la
+    forma antigua exacta.
+    """
+    entry = {
         "scenario": scenario,
         "effect": effect,
         "status_code": status_code,
@@ -396,6 +403,11 @@ def reading(
         "unclear": unclear,
         "unclear_why": unclear_why,
     }
+    if requirement_id is not None:
+        entry["requirement_id"] = requirement_id
+    if input is not None:
+        entry["input"] = input
+    return entry
 
 
 def default_readings() -> dict[str, list[dict]]:

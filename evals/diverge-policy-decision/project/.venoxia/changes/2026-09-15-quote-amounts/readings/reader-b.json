@@ -1,0 +1,38 @@
+[
+  {
+    "scenario": "Amount written with a comma decimal tail",
+    "requirement_id": "R-CHK-011",
+    "input": "1.468.135,00",
+    "effect": "responde 201, importe se registra como 1468135 en CLP",
+    "status_code": "201",
+    "side_effects": [
+      "el presupuesto entra en la comparación con ese importe"
+    ],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Amount written with a dot decimal tail",
+    "requirement_id": "R-CHK-011",
+    "input": "1.468.135.00",
+    "effect": "responde 201, importe se registra como 1468135 en CLP",
+    "status_code": "201",
+    "side_effects": [
+      "el presupuesto entra en la comparación con ese importe"
+    ],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Amount written in the Chilean closing-dash notation",
+    "requirement_id": "R-CHK-011",
+    "input": "$ 1.500.000.-",
+    "effect": "responde 201, importe se registra como 1500000 en CLP",
+    "status_code": "201",
+    "side_effects": [
+      "el presupuesto entra en la comparación con ese importe"
+    ],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

@@ -14,6 +14,11 @@ Todo se ejecuta por subproceso sobre un proyecto en un directorio temporal, salv
 @covers R-DIV-008
 @covers R-DIV-011
 @covers R-DIV-012
+@covers R-DIV-018
+@covers R-DIV-019
+@covers R-DIV-020
+@covers R-DIV-021
+@covers R-DIV-022
 """
 
 from __future__ import annotations
@@ -57,6 +62,27 @@ TOP_LEVEL_KEYS = [
     "attacks",
     "advocate",
     "decisions",
+    "decisions_source",
+    "decisions_pending",
+    "tool",
+]
+
+#: Las claves de una decisión, en el orden en que el script las escribe.
+DECISION_KEYS = [
+    "id",
+    "scenarios",
+    "fields",
+    "divergences",
+    "hardness",
+    "reason",
+    "question",
+    "options",
+    "members",
+    "resolutions",
+    "status",
+    "previous",
+    "fingerprint",
+    "stale_reason",
 ]
 
 #: Las subclaves exactas de `counts`.
@@ -213,8 +239,9 @@ def question_blocks(markdown: str) -> list[tuple[str, list[str]]]:
     blocks: list[tuple[str, list[str]]] = []
     current: tuple[str, list[str]] | None = None
     for line in markdown.splitlines():
-        if line.startswith("### Escenario: "):
-            current = (line[len("### Escenario: "):], [])
+        if line.startswith("### Escenario: ") or line.startswith("### D-"):
+            title = line[len("### Escenario: "):] if line.startswith("### Escenario: ") else line[4:]
+            current = (title, [])
             blocks.append(current)
         elif line.startswith("## "):
             current = None
@@ -227,9 +254,9 @@ def question_blocks(markdown: str) -> list[tuple[str, list[str]]]:
 def counted_sections(markdown: str) -> dict[str, tuple[int, int]]:
     """Las secciones «## Título · N» con (N anunciado, bloques que traen debajo).
 
-    Un bloque es una pregunta «### Escenario: …» si la sección las trae; si no, cada
-    punto de su lista. Las cuatro secciones con recuento deben contar lo mismo: lo
-    que hay debajo.
+    Un bloque es un encabezado «### …» —una pregunta de laguna o una decisión— si
+    la sección los trae; si no, cada punto de su lista. Todas las secciones con
+    recuento deben contar lo mismo: lo que hay debajo.
     """
     sections: dict[str, list[str]] = {}
     current: list[str] | None = None
@@ -245,7 +272,7 @@ def counted_sections(markdown: str) -> dict[str, tuple[int, int]]:
     counted: dict[str, tuple[int, int]] = {}
     for heading, body in sections.items():
         title, _, announced = heading.rpartition(" · ")
-        questions = [line for line in body if line.startswith("### Escenario: ")]
+        questions = [line for line in body if line.startswith("### ")]
         bullets = [line for line in body if line.startswith("- ")]
         counted[title] = (int(announced), len(questions) if questions else len(bullets))
     return counted
@@ -1064,7 +1091,7 @@ class TestClosedQuestions(DiffCase):
                 "b": [reading("Insufficient stock on one line", "rechaza", "422")],
             },
         )
-        self.assertIn("### Escenario: Insufficient stock on one line", run.stdout)
+        self.assertIn("### D-001 · Insufficient stock on one line", run.stdout)
         self.assertIn("**¿Qué código de estado", run.stdout)
         self.assertIn("- (A) 409", run.stdout)
         self.assertIn("- (B) 422", run.stdout)
@@ -1230,12 +1257,12 @@ class TestVerdictCoherence(DiffCase):
                 self.assertTrue(verdict, run.describe())
                 if expected_converged:
                     self.assertIn("**Las lecturas convergen.**", verdict, run.describe())
-                    self.assertNotIn("## Divergencias", run.stdout, run.describe())
+                    self.assertNotIn("## Decisiones pendientes", run.stdout, run.describe())
                     self.assertNotIn("## Lagunas", run.stdout, run.describe())
                 else:
                     self.assertNotIn("**Las lecturas convergen.**", verdict, run.describe())
                     self.assertTrue(
-                        "## Divergencias" in run.stdout or "## Lagunas" in run.stdout,
+                        "## Decisiones pendientes" in run.stdout or "## Lagunas" in run.stdout,
                         run.describe(),
                     )
 
@@ -1254,7 +1281,7 @@ class TestVerdictCoherence(DiffCase):
         self.assertNotIn("las lecturas convergen.", verdict, run.describe())
         self.assertIn("vocabulario", verdict, run.describe())
         self.assertIn("no hacen fallar", verdict, run.describe())
-        self.assertIn("## Divergencias blandas · 1", run.stdout, run.describe())
+        self.assertIn("## Decisiones pendientes · 1", run.stdout, run.describe())
 
     def test_a_scenario_with_a_soft_divergence_is_not_listed_as_converging(self):
         """«Escenarios que convergen» lista sólo los escenarios sin ningún desacuerdo."""
@@ -1494,9 +1521,9 @@ class TestChannelCoherence(DiffCase):
             sorted(sections),
             [
                 "Abogado del diablo",
-                "Divergencias blandas",
-                "Divergencias duras",
+                "Decisiones pendientes",
                 "Escenarios que convergen",
+                "Evidencia por divergencia",
                 "Lagunas declaradas",
             ],
             run.describe(),
@@ -2668,11 +2695,7 @@ class TestRootDecisions(DiffCase):
         members = [index for decision in payload["decisions"] for index in decision["divergences"]]
         self.assertEqual(sorted(members), list(range(len(payload["divergences"]))), run.describe())
         for decision in payload["decisions"]:
-            self.assertEqual(
-                list(decision.keys()),
-                ["id", "scenarios", "fields", "divergences", "hardness", "reason", "question", "options"],
-                run.describe(),
-            )
+            self.assertEqual(list(decision.keys()), DECISION_KEYS, run.describe())
 
     def test_the_verdict_does_not_move(self):
         """@covers R-DIV-015"""
@@ -2719,17 +2742,19 @@ class TestRootDecisions(DiffCase):
         )
         self.assertTrue(any("no hay divergencia real" in o for o in options), run.describe())
 
-    def test_the_report_lists_grouped_decisions(self):
+    def test_the_report_lists_every_decision_once(self):
         """@covers R-DIV-015"""
         run = self.diff(same_code_readings(), "--no-color")
         self.assertNoTraceback(run)
-        self.assertIn("## Decisiones agrupadas", run.stdout, run.describe())
-        self.assertIn("same-readings-across-scenarios", run.stdout, run.describe())
-        section = run.stdout.split("## Decisiones agrupadas", 1)[1].split("\n## ", 1)[0]
+        self.assertIn("## Decisiones pendientes · 1", run.stdout, run.describe())
+        self.assertNotIn("Decisiones agrupadas", run.stdout, run.describe())
+        section = run.stdout.split("## Decisiones pendientes", 1)[1].split("\n## ", 1)[0]
+        self.assertIn("same-readings-across-scenarios", section, run.describe())
         for title in SAME_CODE_SCENARIOS:
             self.assertIn(title, section, run.describe())
+        self.assertEqual(section.count("### D-001"), 1, run.describe())
 
-    def test_no_grouped_decision_no_section(self):
+    def test_a_single_decision_is_still_listed_once(self):
         """@covers R-DIV-015"""
         run = self.diff(
             {
@@ -2740,6 +2765,552 @@ class TestRootDecisions(DiffCase):
         )
         self.assertNoTraceback(run)
         self.assertNotIn("Decisiones agrupadas", run.stdout, run.describe())
+        self.assertIn("## Decisiones pendientes · 1", run.stdout, run.describe())
+
+
+# ---------------------------------------------------------------------------
+# Decisiones por política, informe único y reconciliación con el historial
+# ---------------------------------------------------------------------------
+
+
+CLP_SCENARIOS = (
+    ("Amount without subunit written with a comma decimal tail", "1.468.135,00", "1468135"),
+    ("Amount without subunit written with a dot decimal tail", "1.468.135.00", "1468135"),
+    ("Amount written in the Chilean closing-dash notation", "$ 1.500.000.-", "1500000"),
+)
+
+
+def clp_readings(requirement: str | None = "R-QEX-006", with_input: bool = True) -> dict:
+    """Los tres escenarios reales de Consolidar: misma política, cifras distintas.
+
+    El lector A describe la conducta sin el código; el B empieza por el código.
+    Con la 0.5.0 sólo se agrupaban los dos primeros, porque compartían la cifra.
+    """
+    def entry(title: str, value: str, figure: str, text: str) -> dict:
+        return reading(
+            title,
+            text.format(figure=figure),
+            "201",
+            ["el presupuesto entra en la comparación con ese importe"],
+            requirement_id=requirement,
+            input=value if with_input else None,
+        )
+
+    return {
+        "reader-a": [
+            entry(title, value, figure, "registra el importe como {figure} en CLP y lo acepta")
+            for title, value, figure in CLP_SCENARIOS
+        ],
+        "reader-b": [
+            entry(title, value, figure, "responde 201, importe se registra como {figure} en CLP")
+            for title, value, figure in CLP_SCENARIOS
+        ],
+    }
+
+
+def decisions_file(entries: list[dict], change: str = "d") -> str:
+    return json.dumps({"version": 1, "change": change, "decisions": entries}, ensure_ascii=False)
+
+
+class TestReadingFields(DiffCase):
+    """R-DIV-018 · `requirement_id` e `input` son opcionales y llegan a los miembros."""
+
+    def test_a_reading_without_the_new_fields_still_parses(self):
+        """@covers R-DIV-018"""
+        run = self.diff(same_code_readings(), "--json", "--no-color")
+        self.assertNoTraceback(run)
+        self.assertEqual(run.returncode, 1, run.describe())
+        member = run.json["decisions"][0]["members"][0]
+        self.assertIsNone(member["requirement_id"], run.describe())
+        self.assertIsNone(member["input"], run.describe())
+
+    def test_the_new_fields_reach_the_members(self):
+        """@covers R-DIV-018"""
+        run = self.diff(clp_readings(), "--json", "--no-color")
+        self.assertNoTraceback(run)
+        members = run.json["decisions"][0]["members"]
+        self.assertEqual([m["requirement_id"] for m in members], ["R-QEX-006"] * 3, run.describe())
+        self.assertEqual([m["input"] for m in members], [v for _, v, _ in CLP_SCENARIOS], run.describe())
+
+    def test_the_reader_agent_asks_for_both_fields(self):
+        """@covers R-DIV-018"""
+        agent = (REPO_ROOT / "agents" / "reader.md").read_text(encoding="utf-8")
+        skill = (REPO_ROOT / "skills" / "diverge" / "SKILL.md").read_text(encoding="utf-8")
+        for text, name in ((agent, "agents/reader.md"), (skill, "skills/diverge/SKILL.md")):
+            for field_name in ("requirement_id", "input"):
+                self.assertIn(f"`{field_name}`", text, f"{name} no nombra el campo «{field_name}»")
+
+
+class TestPolicyDecisions(DiffCase):
+    """R-DIV-019 · la misma política con cifras distintas es una decisión."""
+
+    def test_three_clp_notations_are_one_decision(self):
+        """@covers R-DIV-019"""
+        run = self.diff(clp_readings(), "--json", "--no-color")
+        self.assertNoTraceback(run)
+        decisions = run.json["decisions"]
+        self.assertEqual(len(decisions), 1, run.describe())
+        decision = decisions[0]
+        self.assertEqual(decision["reason"], "same-policy-across-scenarios", run.describe())
+        self.assertEqual(decision["scenarios"], [t for t, _, _ in CLP_SCENARIOS], run.describe())
+        self.assertEqual(sorted(decision["divergences"]), [0, 1, 2], run.describe())
+        self.assertEqual(decision["fields"], ["effect"], run.describe())
+
+    def test_the_figures_are_never_diluted(self):
+        """@covers R-DIV-019"""
+        run = self.diff(clp_readings(), "--json", "--no-color")
+        members = run.json["decisions"][0]["members"]
+        self.assertEqual(
+            [m["readings"]["reader-a"] for m in members],
+            [f"registra el importe como {f} en CLP y lo acepta" for _, _, f in CLP_SCENARIOS],
+            run.describe(),
+        )
+        report = self.diff(clp_readings(), "--no-color")
+        section = report.stdout.split("## Decisiones pendientes", 1)[1].split("\n## ", 1)[0]
+        for title, value, figure in CLP_SCENARIOS:
+            row = next((line for line in section.splitlines() if line.startswith("| ") and title in line), None)
+            self.assertIsNotNone(row, f"falta la fila de «{title}»\n{report.describe()}")
+            self.assertIn(value, row, report.describe())
+            self.assertIn(figure, row, report.describe())
+
+    def test_different_requirements_stay_apart(self):
+        """@covers R-DIV-019"""
+        readers = clp_readings()
+        for name in readers:
+            readers[name][2]["requirement_id"] = "R-QEX-007"
+        run = self.diff(readers, "--json", "--no-color")
+        decisions = run.json["decisions"]
+        self.assertEqual(len(decisions), 2, run.describe())
+        self.assertEqual(sorted(len(d["divergences"]) for d in decisions), [1, 2], run.describe())
+
+    def test_a_reader_who_changes_policy_breaks_the_group(self):
+        """@covers R-DIV-019"""
+        readers = clp_readings()
+        readers["reader-b"][1]["effect"] = "rechaza el documento por importe ilegible"
+        run = self.diff(readers, "--json", "--no-color")
+        decisions = run.json["decisions"]
+        self.assertEqual(len(decisions), 2, run.describe())
+        grouped = next(d for d in decisions if len(d["divergences"]) == 2)
+        self.assertEqual(grouped["reason"], "same-policy-across-scenarios", run.describe())
+        self.assertNotIn("Amount without subunit written with a dot decimal tail", grouped["scenarios"], run.describe())
+
+    def test_without_a_requirement_the_rest_of_the_scenario_must_match(self):
+        """@covers R-DIV-019"""
+        dot = "Amount without subunit written with a dot decimal tail"
+        readers = clp_readings(requirement=None)
+        readers["reader-b"][1]["side_effects"] = ["el presupuesto queda fuera de la comparación hasta revisarlo"]
+        run = self.diff(readers, "--json", "--no-color")
+        self.assertNoTraceback(run)
+        policy = [d for d in run.json["decisions"] if d["reason"] == "same-policy-across-scenarios"]
+        self.assertEqual(len(policy), 1, run.describe())
+        self.assertEqual(len(policy[0]["members"]), 2, run.describe())
+        self.assertNotIn(dot, policy[0]["scenarios"], run.describe())
+        # Con el mismo requirement_id en los dos, el requisito manda y el efecto sigue siendo una sola decisión.
+        readers = clp_readings()
+        readers["reader-b"][1]["side_effects"] = ["el presupuesto queda fuera de la comparación hasta revisarlo"]
+        run = self.diff(readers, "--json", "--no-color")
+        together = [d for d in run.json["decisions"] if d["reason"] == "same-policy-across-scenarios"]
+        self.assertEqual(len(together), 1, run.describe())
+        self.assertEqual(len(together[0]["members"]), 3, run.describe())
+        self.assertEqual(together[0]["fields"], ["effect"], run.describe())
+
+    def test_identical_readings_keep_their_old_reason(self):
+        """@covers R-DIV-019"""
+        run = self.diff(same_code_readings(), "--json", "--no-color")
+        self.assertEqual(run.json["decisions"][0]["reason"], "same-readings-across-scenarios", run.describe())
+
+    def test_status_codes_are_never_abstracted(self):
+        """@covers R-DIV-019"""
+        run = self.diff(
+            {
+                "reader-a": [
+                    reading("Insufficient stock on one line", "rechaza la peticion", "409"),
+                    reading("Unknown product", "rechaza la peticion", "404"),
+                ],
+                "reader-b": [
+                    reading("Insufficient stock on one line", "rechaza la peticion", "422"),
+                    reading("Unknown product", "rechaza la peticion", "410"),
+                ],
+            },
+            "--json",
+            "--no-color",
+        )
+        self.assertEqual(len(run.json["decisions"]), 2, run.describe())
+
+    def test_a_missing_scenario_is_never_grouped_by_policy(self):
+        """@covers R-DIV-019"""
+        run = self.diff(
+            {
+                "reader-a": [
+                    reading("Only A sees this", "registra 100 pesos", "200"),
+                    reading("Only A sees this too", "registra 200 pesos", "200"),
+                ],
+                "reader-b": [reading("Shared", "crea la reserva", "201")],
+            },
+            "--json",
+            "--no-color",
+        )
+        self.assertTrue(all(d["reason"] == "single" for d in run.json["decisions"]), run.describe())
+
+
+class TestDecisionResolutions(DiffCase):
+    """R-DIV-020 · cada opción dice qué anota en cada miembro."""
+
+    def test_a_reader_backed_option_resolves_every_member_literally(self):
+        """@covers R-DIV-020"""
+        run = self.diff(clp_readings(), "--json", "--no-color")
+        decision = run.json["decisions"][0]
+        self.assertEqual(len(decision["resolutions"]), len(decision["options"]), run.describe())
+        by_reader = {r["reader"]: r for r in decision["resolutions"] if r["reader"]}
+        self.assertEqual(set(by_reader), {"reader-a", "reader-b"}, run.describe())
+        self.assertEqual(
+            by_reader["reader-a"]["answers"],
+            [m["readings"]["reader-a"] for m in decision["members"]],
+            run.describe(),
+        )
+        for resolution, option in zip(decision["resolutions"], decision["options"]):
+            self.assertEqual(resolution["option"], option, run.describe())
+
+    def test_the_equivalent_option_resolves_nothing(self):
+        """@covers R-DIV-020"""
+        run = self.diff(clp_readings(), "--json", "--no-color")
+        decision = run.json["decisions"][0]
+        empty = [r for r in decision["resolutions"] if r["reader"] is None]
+        self.assertEqual(len(empty), 1, run.describe())
+        self.assertIn("no hay divergencia real", empty[0]["option"], run.describe())
+        self.assertEqual(empty[0]["answers"], [], run.describe())
+
+    def test_members_carry_their_hardness(self):
+        """@covers R-DIV-020"""
+        run = self.project.run(
+            DIFF_READINGS_PY, "--readings", str(PARTIAL_EFFECT_READINGS), "--json", "--no-color"
+        )
+        decision = run.json["decisions"][0]
+        hardness = sorted(m["hardness"] for m in decision["members"])
+        self.assertEqual(hardness, ["hard", "soft"], run.describe())
+        self.assertEqual(decision["hardness"], "hard", run.describe())
+        for member in decision["members"]:
+            self.assertEqual(
+                list(member.keys()),
+                ["divergence", "scenario", "field", "requirement_id", "input", "hardness", "readings"],
+                run.describe(),
+            )
+
+
+class TestSingleActionableReport(DiffCase):
+    """R-DIV-021 · una sección accionable y un apéndice de evidencia."""
+
+    def test_each_question_appears_once(self):
+        """@covers R-DIV-021"""
+        run = self.diff(clp_readings(), "--no-color")
+        question = self.diff(clp_readings(), "--json", "--no-color").json["decisions"][0]["question"]
+        self.assertEqual(run.stdout.count(question), 1, run.describe())
+
+    def test_members_are_evidence_not_questions(self):
+        """@covers R-DIV-021"""
+        run = self.diff(clp_readings(), "--no-color")
+        self.assertIn("## Evidencia por divergencia · 3", run.stdout, run.describe())
+        appendix = run.stdout.split("## Evidencia por divergencia", 1)[1].split("\n## ", 1)[0]
+        self.assertNotIn("- (A)", appendix, run.describe())
+        self.assertNotIn("¿", appendix, run.describe())
+        self.assertIn("blanda", appendix, run.describe())
+        self.assertIn("El lector A describe el efecto como", appendix, run.describe())
+
+    def test_the_old_sections_are_gone(self):
+        """@covers R-DIV-021"""
+        run = self.diff(rich_readings(), "--no-color")
+        for gone in ("## Divergencias duras", "## Divergencias blandas", "## Decisiones agrupadas"):
+            self.assertNotIn(gone, run.stdout, run.describe())
+        self.assertIn("## Decisiones pendientes · ", run.stdout, run.describe())
+        self.assertIn("## Evidencia por divergencia · ", run.stdout, run.describe())
+
+    def test_the_rest_of_the_report_does_not_move(self):
+        """@covers R-DIV-021"""
+        readers = rich_readings()
+        for name in readers:
+            readers[name].append(reading("Order listed", "lista los pedidos del comprador", "200"))
+        self.project.readings(
+            "resto",
+            readers,
+            devils_advocate=[{"attack": "Reserva sólo la primera línea.", "severity": "high"}],
+        )
+        run = self.project.diff("resto", "--no-color")
+        sections = counted_sections(run.stdout)
+        for title in ("Lagunas declaradas", "Abogado del diablo", "Escenarios que convergen", "Decisiones pendientes", "Evidencia por divergencia"):
+            self.assertIn(title, sections, run.describe())
+            announced, rendered = sections[title]
+            self.assertEqual(announced, rendered, f"«{title}»\n{run.describe()}")
+        payload = self.project.diff("resto", "--json", "--no-color").json
+        self.assertEqual(sections["Evidencia por divergencia"][0], len(payload["divergences"]), run.describe())
+        self.assertEqual(payload["verdict"], "diverged", run.describe())
+        self.assertEqual(run.returncode, 1, run.describe())
+
+
+class TestDecisionHistory(DiffCase):
+    """R-DIV-022 · el historial de decisiones se reconcilia antes de preguntar."""
+
+    def analysed(self, readers: dict, history: list[dict] | None, *args: str) -> CompletedRun:
+        self.project.readings("d", readers)
+        if history is not None:
+            self.project.write(".venoxia/changes/d/decisions.json", decisions_file(history))
+        run = self.project.diff("d", "--json", "--no-color", *args)
+        self.assertNoTraceback(run)
+        return run
+
+    def fingerprint_of(self, readers: dict) -> tuple[str, dict]:
+        run = self.analysed(readers, None)
+        decision = run.json["decisions"][0]
+        return decision["fingerprint"], decision
+
+    def test_without_a_history_every_decision_is_pending(self):
+        """@covers R-DIV-022"""
+        run = self.analysed(clp_readings(), None)
+        self.assertIsNone(run.json["decisions_source"], run.describe())
+        self.assertEqual(run.json["decisions_pending"], 1, run.describe())
+        decision = run.json["decisions"][0]
+        self.assertEqual(decision["status"], "pending", run.describe())
+        self.assertIsNone(decision["previous"], run.describe())
+        self.assertRegex(decision["fingerprint"], r"^[0-9a-f]{16,64}$", run.describe())
+
+    def test_the_fingerprint_does_not_depend_on_the_id(self):
+        """@covers R-DIV-022"""
+        alone, _ = self.fingerprint_of(clp_readings())
+        readers = clp_readings()
+        for name, extra in (("reader-a", "409"), ("reader-b", "422")):
+            readers[name].insert(0, reading("Aaa first scenario", "rechaza la peticion", extra))
+        run = self.analysed(readers, None)
+        moved = next(d for d in run.json["decisions"] if d["reason"] == "same-policy-across-scenarios")
+        self.assertNotEqual(moved["id"], "D-001", run.describe())
+        self.assertEqual(moved["fingerprint"], alone, run.describe())
+
+    def test_a_matching_resolved_answer_is_answered(self):
+        """@covers R-DIV-022"""
+        fingerprint, decision = self.fingerprint_of(clp_readings())
+        history = [
+            {
+                "at": "2026-09-14T13:20:58Z",
+                "decision": "D-009",
+                "fingerprint": fingerprint,
+                "resolution": "selected",
+                "scenario": member["scenario"],
+                "field": "effect",
+                "question": decision["question"],
+                "options": decision["options"],
+                "chosen": 0,
+                "answer": member["readings"]["reader-a"],
+            }
+            for member in decision["members"]
+        ]
+        run = self.analysed(clp_readings(), history)
+        self.assertTrue(run.json["decisions_source"].endswith("decisions.json"), run.describe())
+        answered = run.json["decisions"][0]
+        self.assertEqual(answered["status"], "answered", run.describe())
+        self.assertEqual(answered["previous"]["resolution"], "selected", run.describe())
+        self.assertEqual(answered["previous"]["at"], "2026-09-14T13:20:58Z", run.describe())
+        self.assertIn("answer", answered["previous"], run.describe())
+        self.assertEqual(run.json["decisions_pending"], 0, run.describe())
+
+    def test_a_clarification_does_not_close(self):
+        """@covers R-DIV-022"""
+        fingerprint, decision = self.fingerprint_of(clp_readings())
+        history = [
+            {
+                "at": "2026-09-14T13:13:49Z",
+                "decision": "D-001",
+                "fingerprint": fingerprint,
+                "resolution": "needs-clarification",
+                "scenario": decision["members"][0]["scenario"],
+                "field": "effect",
+                "question": decision["question"],
+                "options": decision["options"],
+                "chosen": None,
+                "answer": "Hay una moneda por defecto y debe estar seteada en el proyecto",
+            }
+        ]
+        run = self.analysed(clp_readings(), history)
+        pending = run.json["decisions"][0]
+        self.assertEqual(pending["status"], "pending", run.describe())
+        self.assertEqual(pending["previous"]["resolution"], "needs-clarification", run.describe())
+        self.assertIn("moneda por defecto", pending["previous"]["answer"], run.describe())
+        self.assertEqual(run.json["decisions_pending"], 1, run.describe())
+
+    def test_the_latest_entry_with_the_fingerprint_wins(self):
+        """@covers R-DIV-022"""
+        fingerprint, decision = self.fingerprint_of(clp_readings())
+        base = {
+            "decision": "D-001",
+            "fingerprint": fingerprint,
+            "scenario": decision["members"][0]["scenario"],
+            "field": "effect",
+            "question": decision["question"],
+            "options": decision["options"],
+        }
+        history = [
+            dict(base, at="2026-09-14T13:20:58Z", resolution="selected", chosen=0, answer=decision["options"][0]),
+            dict(base, at="2026-09-15T09:02:11Z", resolution="needs-clarification", chosen=None, answer="¿y si la moneda no es CLP?"),
+        ]
+        run = self.analysed(clp_readings(), history)
+        pending = run.json["decisions"][0]
+        self.assertEqual(pending["status"], "pending", run.describe())
+        self.assertEqual(pending["previous"]["at"], "2026-09-15T09:02:11Z", run.describe())
+        self.assertEqual(pending["previous"]["resolution"], "needs-clarification", run.describe())
+        self.assertEqual(run.json["decisions_pending"], 1, run.describe())
+
+    def test_a_member_left_open_keeps_the_decision_pending(self):
+        """@covers R-DIV-022"""
+        fingerprint, decision = self.fingerprint_of(clp_readings())
+        first, second, third = decision["members"]
+        base = {"decision": "D-001", "fingerprint": fingerprint, "field": "effect",
+                "question": decision["question"], "options": decision["options"]}
+        history = [
+            dict(base, at="2026-09-15T10:00:00Z", scenario=first["scenario"], resolution="changes-contract",
+                 chosen=None, answer="El acta dice que la moneda se confirma siempre con el comprador"),
+            dict(base, at="2026-09-15T10:01:00Z", scenario=second["scenario"], resolution="custom-resolved",
+                 chosen=None, answer="se registra 1468135 en CLP"),
+            dict(base, at="2026-09-15T10:02:00Z", scenario=third["scenario"], resolution="custom-resolved",
+                 chosen=None, answer="se registra 1500000 en CLP"),
+        ]
+        run = self.analysed(clp_readings(), history)
+        pending = run.json["decisions"][0]
+        self.assertEqual(pending["status"], "pending", run.describe())
+        self.assertEqual(pending["previous"]["resolution"], "changes-contract", run.describe())
+        self.assertEqual(run.json["decisions_pending"], 1, run.describe())
+
+    def test_an_equivalence_that_left_the_divergence_hard_is_stale(self):
+        """@covers R-DIV-022"""
+        fingerprint, decision = self.fingerprint_of(same_code_readings())
+        self.assertEqual(decision["hardness"], "hard")
+        history = [
+            {
+                "at": "2026-09-14T13:20:58Z",
+                "decision": "D-001",
+                "fingerprint": fingerprint,
+                "resolution": "equivalent",
+                "scenario": decision["members"][0]["scenario"],
+                "field": decision["members"][0]["field"],
+                "question": decision["question"],
+                "options": decision["options"],
+                "chosen": len(decision["options"]) - 1,
+                "answer": decision["options"][-1],
+            }
+        ]
+        run = self.analysed(same_code_readings(), history)
+        stale = run.json["decisions"][0]
+        self.assertEqual(stale["status"], "stale", run.describe())
+        self.assertIn("dura", stale["stale_reason"], run.describe())
+        self.assertEqual(stale["previous"]["resolution"], "equivalent", run.describe())
+        self.assertEqual(run.json["decisions_pending"], 1, run.describe())
+
+    def legacy_entries(self, decision: dict, chosen: int | None, answer: str) -> list[dict]:
+        """Entradas como las escribía la 0.4.0: por divergencia, sin `decision` ni huella."""
+        payload = self.analysed(clp_readings(), None).json
+        entries = []
+        for index in decision["divergences"]:
+            divergence = payload["divergences"][index]
+            entries.append(
+                {
+                    "at": "2026-09-14T13:20:58Z",
+                    "scenario": divergence["scenario"],
+                    "field": divergence["field"],
+                    "question": divergence["question"],
+                    "options": divergence["options"],
+                    "chosen": chosen,
+                    "answer": answer if chosen is None else divergence["options"][chosen],
+                }
+            )
+        return entries
+
+    def test_a_legacy_chosen_option_is_migrated(self):
+        """@covers R-DIV-022"""
+        _fingerprint, decision = self.fingerprint_of(clp_readings())
+        run = self.analysed(clp_readings(), self.legacy_entries(decision, 2, ""))
+        migrated = run.json["decisions"][0]
+        self.assertEqual(migrated["status"], "answered", run.describe())
+        self.assertTrue(migrated["previous"]["migrated"], run.describe())
+        self.assertEqual(migrated["previous"]["chosen"], 2, run.describe())
+
+    def test_a_legacy_hand_written_answer_is_unclassified(self):
+        """@covers R-DIV-022"""
+        _fingerprint, decision = self.fingerprint_of(clp_readings())
+        run = self.analysed(clp_readings(), self.legacy_entries(decision, None, "2 decimales"))
+        unclassified = run.json["decisions"][0]
+        self.assertEqual(unclassified["status"], "unclassified", run.describe())
+        self.assertEqual(unclassified["previous"]["answer"], "2 decimales", run.describe())
+        self.assertEqual(run.json["decisions_pending"], 1, run.describe())
+
+    def test_changed_options_make_the_earlier_answer_stale(self):
+        """@covers R-DIV-022"""
+        _fingerprint, decision = self.fingerprint_of(clp_readings())
+        entries = self.legacy_entries(decision, 0, "")
+        for entry in entries:
+            entry["options"] = ["«otra lectura que ya no existe»", entry["options"][1], entry["options"][2]]
+        run = self.analysed(clp_readings(), entries)
+        stale = run.json["decisions"][0]
+        self.assertEqual(stale["status"], "stale", run.describe())
+        self.assertIn("opciones", stale["stale_reason"], run.describe())
+        self.assertIsNotNone(stale["previous"], run.describe())
+        self.assertEqual(run.json["decisions_pending"], 1, run.describe())
+
+    def test_the_verdict_ignores_the_history(self):
+        """@covers R-DIV-022"""
+        fingerprint, decision = self.fingerprint_of(clp_readings())
+        baseline = self.analysed(clp_readings(), None).json
+        history = [
+            {
+                "at": "2026-09-14T13:20:58Z",
+                "fingerprint": fingerprint,
+                "resolution": "equivalent",
+                "scenario": decision["members"][0]["scenario"],
+                "field": "effect",
+                "question": decision["question"],
+                "options": decision["options"],
+                "chosen": 2,
+                "answer": decision["options"][2],
+            }
+        ]
+        run = self.analysed(clp_readings(), history)
+        self.assertEqual(run.json["decisions"][0]["status"], "answered", run.describe())
+        self.assertEqual(run.json["counts"], baseline["counts"], run.describe())
+        self.assertEqual(run.json["verdict"], baseline["verdict"], run.describe())
+        self.assertEqual(run.json["exit_code"], baseline["exit_code"], run.describe())
+        self.assertEqual(run.returncode, baseline["exit_code"], run.describe())
+        report = self.project.diff("d", "--no-color")
+        self.assertIn("## Decisiones ya respondidas · 1", report.stdout, report.describe())
+        self.assertNotIn("## Decisiones pendientes", report.stdout, report.describe())
+
+    def test_an_explicit_history_path_wins(self):
+        """@covers R-DIV-022"""
+        fingerprint, decision = self.fingerprint_of(clp_readings())
+        elsewhere = self.project.write(
+            "historial/otro.json",
+            decisions_file(
+                [
+                    {
+                        "at": "2026-09-14T13:20:58Z",
+                        "fingerprint": fingerprint,
+                        "resolution": "custom-resolved",
+                        "scenario": decision["members"][0]["scenario"],
+                        "field": "effect",
+                        "question": decision["question"],
+                        "options": decision["options"],
+                        "chosen": None,
+                        "answer": "el importe se registra entero en CLP y la subida responde 201",
+                    }
+                ]
+            ),
+        )
+        run = self.analysed(clp_readings(), None, "--decisions", str(elsewhere))
+        self.assertEqual(run.json["decisions"][0]["status"], "answered", run.describe())
+        self.assertTrue(run.json["decisions_source"].endswith("otro.json"), run.describe())
+
+    def test_an_unreadable_history_is_an_error_not_a_guess(self):
+        """@covers R-DIV-022"""
+        self.project.readings("d", clp_readings())
+        self.project.write(".venoxia/changes/d/decisions.json", "{no es json")
+        run = self.project.diff("d", "--json", "--no-color")
+        self.assertNoTraceback(run)
+        self.assertEqual(run.returncode, 2, run.describe())
+        self.assertIn("decisions.json", " ".join(run.json.get("errors", [])), run.describe())
 
 
 if __name__ == "__main__":
