@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "R-CHL-009 prohíbe plantear una pregunta salvo que la casilla esté en `missing` o `conflicting`, y una casilla `inferred` sólo pasa a `known` con la confirmación general del borrador: una implementación que, en los modos «producto ya explicado» o «proyecto existente», marca las nueve casillas como `inferred` a partir de lo leído cumple la letra y tiene prohibido preguntar nada; la entrevista adaptativa se reduce a un «¿apruebas el borrador?» y el acta —el contrato del que cuelgan capabilities y requisitos— queda inventada por el modelo y ratificada con un solo sí, sin que el usuario haya afirmado ni un solo hecho.",
+    "requirement_id": "R-CHL-009",
+    "severity": "high"
+  },
+  {
+    "attack": "R-CHL-010 obliga a «redactar el acta completa ... antes de la primera pregunta» sin decir dónde: escribirla en `.venoxia/charter.md` cumple, y a partir de ese instante el propio requisito («con `.venoxia/charter.md` en el disco el modo DEBE ser retomar un acta aunque haya código») fuerza a toda sesión posterior al modo retomar, que por R-CHL-015 sólo resume propósito, capability, estado y bloqueos; el usuario que interrumpe la primera entrevista vuelve y encuentra sus inferencias sin confirmar presentadas como estado establecido, sin camino de vuelta a la entrevista inicial.",
+    "requirement_id": "R-CHL-010",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-CHL-014 manda detectar el comando de pruebas en el repositorio, preguntar sólo ante ambigüedad y no ejecutarlo: un `\"test\": \"echo 'no test specified' && exit 1\"` de un `package.json` recién creado no es ambiguo, así que se adopta en silencio como `test_command` del proyecto; la salvaguarda que el propio requisito declara («el rojo del primer /venoxia:verify comprueba que prueba algo») no puede detectarlo, porque ese rojo es exactamente el rojo que el ciclo espera antes del código, y el oráculo de todos los changes queda cableado a un comando que no ejecuta ninguna prueba.",
+    "requirement_id": "R-CHL-014",
+    "severity": "medium"
+  },
+  {
+    "attack": "Como `C21` convierte en error cualquier línea que conserve `<!-- inferred -->`, la única forma de dejar el acta en verde tras la confirmación general es borrar las marcas, y ningún requisito obliga a registrar en ningún sitio qué líneas fueron inferidas: el acta aprobada queda indistinguible de una construida con afirmaciones del usuario, y se pierde de forma irrecuperable la distinción entre lo observado y lo supuesto que es la razón de ser del acta (justo lo que R-CHL-012 sí exige conservar para el caso de «todo está observado»).",
+    "requirement_id": "R-CHL-016",
+    "severity": "medium"
+  }
+]

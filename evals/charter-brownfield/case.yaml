@@ -1,0 +1,131 @@
+schema_version: "1.0"
+name: charter-brownfield
+description: >-
+  Proyecto existente: un paquete Python con `pyproject.toml`, `pytest`, tres módulos y un
+  README que explica qué hace. La entrevista tiene que reconstruir propósito, usuarios y
+  capabilities desde el repositorio, no preguntar por el stack ni por el comando de
+  pruebas, y preguntar sólo qué cambio quiere hacer ahora el usuario.
+tags: [charter, interview, existing-project]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Lo que sé de mi proyecto: ya existe, se llama `cotizador` y llevamos un año usándolo.
+    Está todo en el repositorio; léelo antes de preguntarme nada. Lo que quiero hacer
+    ahora es que, después de elegir proveedor, el pedido se mande solo a cada proveedor
+    por correo en vez de copiarlo a mano del CSV. Sabré que funciona cuando cada
+    proveedor reciba su correo con sus líneas sin que nadie de compras lo escriba.
+
+    Trabajas sobre un proyecto que quiere adoptar Venoxia. Su raíz es el directorio
+    `project/`, que se te ha añadido a esta sesión como directorio de trabajo adicional.
+    Localízalo antes de nada si no lo tienes a la vista.
+
+    Invoca la skill `/venoxia:charter` y sigue sus pasos. Una restricción de esta sesión:
+    **no hay nadie al otro lado**, así que `AskUserQuestion` no está disponible y no debes
+    llamarla ni una vez. Todo lo que yo sé está en este mensaje. Cada vez que la skill te
+    pida preguntarme algo, haz lo siguiente en vez de preguntar: busca la respuesta en lo
+    que te he contado; si está, úsala con mis palabras; si no está, no la inventes para el
+    acta —déjala como apuesta o fuera— y anótalo. Lleva un registro en
+    `interview-log.json`, dentro de tu directorio de trabajo actual (no dentro de
+    `project/`), como una lista JSON con una entrada por pregunta que habrías hecho, en
+    el orden en que la habrías hecho, con esta forma exacta:
+    `{"order": 1, "slot": "<casilla del mapa de cobertura o \"confirmation\">",
+    "kind": "question" | "confirmation", "question": "<la pregunta literal que habrías
+    hecho>", "answer": "<mi respuesta, tomada de este mensaje, o null si no la tengo>"}`.
+    Una confirmación del borrador es `kind: confirmation`; una pregunta por una casilla
+    que falta es `kind: question`.
+
+    Cuando el acta esté escrita y el linter haya pasado, guarda la salida JSON íntegra
+    de la última ejecución de `charter_lint.py` en `charter-lint-result.json`, también en
+    tu directorio de trabajo actual, sin editarla.
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+runs: 2
+expected_outcome: >-
+  El acta trae capabilities reconstruidas del código (importar, comparar, exportar) y la fila
+  1 es el envío del pedido por correo; el registro no contiene ninguna pregunta por el
+  stack, el lenguaje, el framework o el comando de pruebas, y `.venoxia/venoxia.json`
+  declara `pytest`.
+graders:
+  - type: tool_used
+    name: no-question-to-the-user
+    tool: AskUserQuestion
+    min: 0
+    max: 0
+  - type: file_exists
+    name: charter-written
+    path: project/.venoxia/charter.md
+  - type: file_exists
+    name: principles-written
+    path: project/.venoxia/principles.md
+  - type: file_exists
+    name: interview-log-written
+    path: interview-log.json
+  - type: file_exists
+    name: lint-result-written
+    path: charter-lint-result.json
+  - type: regex
+    name: charter-passes-the-linter
+    target:
+      source: file
+      path: charter-lint-result.json
+    pattern: '"ok":\s*true'
+  - type: regex
+    name: no-inference-mark-left
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '<!-- inferred -->'
+    match: not_contains
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only
+
+  - type: regex
+    name: no-question-about-the-stack
+    target:
+      source: file
+      path: interview-log.json
+    pattern: '(?i)"question":\s*"[^"]*(stack|lenguaje|framework|comando de pruebas|test command|pytest|python)'
+    match: not_contains
+  - type: regex
+    name: existing-capabilities-reconstructed
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '(?i)comparar'
+  - type: regex
+    name: the-new-change-is-priority-one
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '\|\s*1\s*\|[^\n]*(?i:correo)'
+  - type: file_exists
+    name: test-command-detected
+    path: project/.venoxia/venoxia.json
+  - type: regex
+    name: pytest-is-the-detected-command
+    target:
+      source: file
+      path: project/.venoxia/venoxia.json
+    pattern: 'pytest'
+  - type: llm
+    name: reads-the-repo-instead-of-asking
+    focus:
+      source: file
+      path: interview-log.json
+    criteria: >-
+      Las preguntas anotadas son sobre el cambio que el usuario quiere hacer ahora y, como
+      mucho, una confirmación de la lectura reconstruida del repositorio. No hay ninguna
+      pregunta por el propósito del proyecto, por quién lo usa, por el lenguaje, el
+      framework, el comando de pruebas ni por capabilities que el código ya demuestra
+      (importar, comparar, exportar).
+    weight: 0.5

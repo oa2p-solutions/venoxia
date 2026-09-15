@@ -1,0 +1,1363 @@
+{
+  "version": 1,
+  "change": "2026-09-15-charter-adaptive-interview",
+  "decisions": [
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "The nine slots are named",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The nine slots are named» es la correcta?",
+      "options": [
+        "«el SKILL.md nombra las nueve casillas del mapa»",
+        "«el skill nombra las nueve casillas de cobertura»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "Only a missing or conflicting slot is asked",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Only a missing or conflicting slot is asked» es la correcta?",
+      "options": [
+        "«declara que sólo se pregunta si falta o hay conflicto»",
+        "«el skill declara preguntar sólo si missing o conflicting»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "A correction invalidates only its dependants",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A correction invalidates only its dependants» es la correcta?",
+      "options": [
+        "«declara que la corrección invalida sólo sus dependientes»",
+        "«el skill declara invalidar sólo casillas dependientes»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "The modes are named",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The modes are named» es la correcta?",
+      "options": [
+        "«nombra los tres modos de entrada y retomar acta»",
+        "«el skill nombra los tres modos y el de retomar»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "The vague mode opens with the last real case",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The vague mode opens with the last real case» es la correcta?",
+      "options": [
+        "«contiene literalmente la pregunta sobre la última vez»",
+        "«el skill contiene literalmente la pregunta sobre el último caso»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "The reading is reconstructed from disk",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The reading is reconstructed from disk» es la correcta?",
+      "options": [
+        "«declara que reconstruye la lectura del repositorio y la presenta»",
+        "«el skill declara reconstruir la lectura desde el repositorio»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "One synthesis and one correction",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «One synthesis and one correction» es la correcta?",
+      "options": [
+        "«declara una síntesis de hechos y apuestas con una corrección»",
+        "«el skill declara una síntesis única con razón y una corrección»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "The per-section question is gone",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The per-section question is gone» es la correcta?",
+      "options": [
+        "«ya no repite la pregunta de observado o supuesto por sección»",
+        "«el skill declara no repetir la pregunta por sección»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "No bet is fabricated",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «No bet is fabricated» es la correcta?",
+      "options": [
+        "«declara que si todo es observado no inventa ninguna apuesta»",
+        "«el skill declara no escribir apuesta, conservar C20 y registrar la afirmación»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "The minimum is listed",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The minimum is listed» es la correcta?",
+      "options": [
+        "«enumera los elementos mínimos que exige el borrador»",
+        "«el skill enumera los elementos mínimos del acta»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "The draft is offered for approval",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The draft is offered for approval» es la correcta?",
+      "options": [
+        "«declara que al alcanzar el mínimo ofrece aprobar o profundizar»",
+        "«el skill declara presentar el borrador y preguntar si aprobarlo»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "Ambiguity is the only reason to ask",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Ambiguity is the only reason to ask» es la correcta?",
+      "options": [
+        "«declara que sólo pregunta ante ambigüedad que bloquea el paso»",
+        "«el skill declara preguntar sólo ante ambigüedad bloqueante»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "One question with three intentions",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «One question with three intentions» es la correcta?",
+      "options": [
+        "«declara una pregunta con tres opciones al retomar el acta»",
+        "«el skill declara una pregunta única con tres opciones»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "A marked line is an error",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «A marked line is an error»?",
+      "options": [
+        "«se registra un hallazgo C21»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. El único efecto del escenario es el hallazgo C21; el lector B lo repitió como efecto colateral. Un hecho por escenario."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "scenario": "A marked line is an error",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A marked line is an error» es la correcta?",
+      "options": [
+        "«marca la línea con inferencia sin confirmar como error C21»",
+        "«salta el hallazgo C21 como error sobre esa línea»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "kind": "attack",
+      "requirement_id": "R-CHL-010",
+      "attack": "modo proyecto existente frente a retomar con charter.md presente",
+      "answer": "Aceptado: el delta gana en R-CHL-010 la regla de que con .venoxia/charter.md en el disco el modo es retomar un acta aunque haya código, con su escenario.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "kind": "attack",
+      "requirement_id": "R-CHL-010",
+      "attack": "la marca de inferencia sin sintaxis fijada",
+      "answer": "Aceptado: R-CHL-010 fija la marca literal <!-- inferred -->, la misma que C21 busca, con su escenario.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "kind": "attack",
+      "requirement_id": "R-CHL-014",
+      "attack": "un comando de pruebas detectado que sale 0 sin probar nada",
+      "answer": "Aceptado como límite declarado: la skill charter no ejecuta comandos; R-CHL-014 gana el escenario de que la preparación no ejecuta el comando detectado y de que el rojo del primer /venoxia:verify es quien comprueba que prueba algo (V18 avisa del verde sin rojo).",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:17:45Z",
+      "kind": "attack",
+      "requirement_id": "R-CHL-009",
+      "attack": "inferir las nueve casillas y no preguntar nada",
+      "answer": "Aceptado: R-CHL-009 declara que una casilla inferred sólo pasa a known cuando el usuario la confirma y que la confirmación general del borrador se hace siempre: como mínimo hay una pregunta.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "The nine slots are named",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The nine slots are named» es la correcta?",
+      "options": [
+        "«el skill nombra las nueve casillas de cobertura»",
+        "«el texto nombra las nueve casillas del mapa de cobertura»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "The five states are named",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The five states are named» es la correcta?",
+      "options": [
+        "«el skill nombra los cinco estados posibles de una casilla»",
+        "«el texto nombra los cinco estados de una casilla»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "Only a missing or conflicting slot is asked",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Only a missing or conflicting slot is asked» es la correcta?",
+      "options": [
+        "«declara que sólo pregunta casillas en missing o conflicting»",
+        "«el texto declara que sólo se pregunta si falta o hay conflicto»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "The slot is named before the question",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The slot is named before the question» es la correcta?",
+      "options": [
+        "«declara que nombra la casilla antes de preguntarla»",
+        "«el texto declara que se nombra la casilla antes de preguntar»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "The inference mark is the literal comment",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The inference mark is the literal comment» es la correcta?",
+      "options": [
+        "«declara que la marca de inferencia es el comentario literal»",
+        "«el texto declara que la marca es el comentario inferred literal»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "Resuming wins over an existing project",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Resuming wins over an existing project» es la correcta?",
+      "options": [
+        "«declara que retomar el acta prevalece sobre proyecto existente»",
+        "«el texto declara que retomar gana al modo proyecto existente»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "The vague mode continues with what to remove first",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The vague mode continues with what to remove first» es la correcta?",
+      "options": [
+        "«contiene literalmente la pregunta sobre qué eliminaría primero»",
+        "«el texto contiene literal la pregunta sobre qué eliminar primero»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "One synthesis and one correction",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «One synthesis and one correction» es la correcta?",
+      "options": [
+        "«declara que presenta una síntesis única y pide una corrección»",
+        "«el texto declara una síntesis con razones y una sola corrección»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "No bet is fabricated",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «No bet is fabricated» es la correcta?",
+      "options": [
+        "«declara que si todo es observado no escribe apuestas y conserva C20»",
+        "«el texto declara que si todo es observado no se escribe ninguna apuesta»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "The minimum is listed",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The minimum is listed» es la correcta?",
+      "options": [
+        "«enumera el mínimo necesario para ofrecer cerrar el acta»",
+        "«el texto enumera los elementos mínimos del mapa de cobertura»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "Ambiguity is the only reason to ask",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Ambiguity is the only reason to ask» es la correcta?",
+      "options": [
+        "«declara que sólo pregunta ante ambigüedad que bloquea el paso siguiente»",
+        "«el texto declara que sólo se pregunta ante una ambigüedad bloqueante»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "The detected command is not trusted blindly",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The detected command is not trusted blindly» es la correcta?",
+      "options": [
+        "«declara que no ejecuta el comando detectado; verify lo comprueba»",
+        "«el texto declara que la preparación no ejecuta el comando detectado»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "One question with three intentions",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «One question with three intentions» es la correcta?",
+      "options": [
+        "«declara que pregunta continuar, revisar o resolver una apuesta»",
+        "«el texto declara una pregunta con tres opciones: continuar, revisar o resolver»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "A marked line is an error",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «A marked line is an error»?",
+      "options": [
+        "«mensaje dice que inferencia sin confirmar no es acuerdo»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. El único efecto del escenario es la propia declaración o el hallazgo; lo que un lector añadió como efecto colateral es la misma frase partida."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "A marked line is an error",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A marked line is an error» es la correcta?",
+      "options": [
+        "«salta el hallazgo C21 como error sobre esa línea»",
+        "«el linter marca la línea con el hallazgo C21 como error»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "Each marked line has its own finding",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Each marked line has its own finding» es la correcta?",
+      "options": [
+        "«salta un C21 independiente por cada línea marcada»",
+        "«el linter emite un hallazgo C21 por cada línea marcada»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "scenario": "A charter without marks is untouched",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A charter without marks is untouched» es la correcta?",
+      "options": [
+        "«no salta ningún hallazgo C21»",
+        "«el linter no emite ningún hallazgo C21»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "kind": "attack",
+      "requirement_id": "R-CHL-009",
+      "attack": "las nueve casillas inferred y un solo «¿apruebas?»",
+      "answer": "Aceptado: R-CHL-010 gana la regla de que el modo producto ya explicado exige purpose, primary_user y first_capability dichos por el usuario (en known), y de que un Done when nunca se infiere: o lo dijo el usuario o se pregunta.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "kind": "attack",
+      "requirement_id": "R-CHL-010",
+      "attack": "el borrador escrito en charter.md fuerza el modo retomar",
+      "answer": "Aceptado: R-CHL-010 declara que el borrador se enseña en la conversación y no se escribe en .venoxia/charter.md hasta la aprobación; si aun así llegara con marcas, C21 lo pone en rojo y el modo retomar lo enseña como bloqueo.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "kind": "attack",
+      "requirement_id": "R-CHL-014",
+      "attack": "el marcador de npm init como candidato único",
+      "answer": "Aceptado: R-CHL-014 declara que el marcador de npm init («no test specified») no cuenta como candidato.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:22:30Z",
+      "round": 2,
+      "kind": "attack",
+      "requirement_id": "R-CHL-016",
+      "attack": "borrar las marcas pierde qué fue inferido",
+      "answer": "Aceptado como límite declarado: una inferencia confirmada por el usuario es una afirmación suya; la distinción observado/supuesto del acta es la de ## Bets y la gobierna la síntesis de R-CHL-012, no quién redactó la línea. La entrega enumera qué casillas se confirmaron desde inferred; no se persiste nada más.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "scenario": "Only a missing or conflicting slot is asked",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Only a missing or conflicting slot is asked» es la correcta?",
+      "options": [
+        "«SKILL.md declara que sólo pregunta missing o conflicting»",
+        "«SKILL.md declara que sólo se pregunta si falta o hay conflicto»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "scenario": "Resuming wins over an existing project",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Resuming wins over an existing project» es la correcta?",
+      "options": [
+        "«SKILL.md declara que retomar gana sobre proyecto existente»",
+        "«SKILL.md declara que con charter.md en disco se retoma el acta»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "scenario": "The explained mode needs three slots said by the user",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The explained mode needs three slots said by the user» es la correcta?",
+      "options": [
+        "«SKILL.md declara que exige tres casillas dichas por usuario»",
+        "«SKILL.md declara que tres casillas las dice el usuario, no se infieren»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "scenario": "The per-section question is gone",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The per-section question is gone» es la correcta?",
+      "options": [
+        "«SKILL.md declara que no repite la pregunta por sección»",
+        "«SKILL.md declara que ya no pregunta lo has visto o supuesto por sección»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "scenario": "The minimum is listed",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The minimum is listed» es la correcta?",
+      "options": [
+        "«SKILL.md enumera el mínimo de casillas para cerrar»",
+        "«SKILL.md enumera los elementos mínimos del mapa de cobertura»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "scenario": "Preparation comes after writing the charter",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Preparation comes after writing the charter» es la correcta?",
+      "options": [
+        "«la sección de preparación aparece tras escribir el acta»",
+        "«la sección de preparación aparece después de la del acta y linter»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "scenario": "No generic list of conventions",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «No generic list of conventions» es la correcta?",
+      "options": [
+        "«SKILL.md declara que no presenta lista genérica de convenciones»",
+        "«SKILL.md declara que una convención se propone sólo si es relevante»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "scenario": "A marked line is an error",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «A marked line is an error»?",
+      "options": [
+        "«genera hallazgo C21 con mensaje sobre inferencia sin confirmar»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. El único efecto del escenario es la propia declaración o el hallazgo; lo que un lector añadió como efecto colateral es la misma frase partida."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "kind": "attack",
+      "requirement_id": "R-CHL-009",
+      "attack": "un solo sí convierte todo lo inferido en acuerdo y no queda registro",
+      "answer": "Aceptado como límite declarado, tras las dos correcciones de la ronda 2 (propósito, usuario y primera capability tienen que decirlos el usuario; el Done when nunca se infiere): lo que puede quedar en inferred son el no-alcance, la clasificación de evidencia y el desempate, y la confirmación general enseña esas líneas con su marca antes de pedir el sí. La entrega enumera qué casillas se confirmaron desde inferred; no se persiste otro registro.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "kind": "attack",
+      "requirement_id": "R-CHL-010",
+      "attack": "un charter.md vacío o plantilla bloquea en el modo retomar",
+      "answer": "Aceptado: R-CHL-015 gana el escenario de que un acta que no pasa el linter se enseña con sus bloqueos antes de la pregunta y de que empezar de cero sigue disponible como respuesta escrita.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "kind": "attack",
+      "requirement_id": "R-CHL-014",
+      "attack": "un comando detectado y obsoleto se adopta sin confirmar",
+      "answer": "Aceptado como límite declarado, igual que en la ronda 2: la skill no ejecuta comandos; el comando detectado se dice en la entrega y un comando que no prueba nada se descubre en el primer ciclo rojo→verde (V18 avisa del verde sin rojo; un rojo permanente no deja implementar).",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:26:38Z",
+      "round": 3,
+      "kind": "attack",
+      "requirement_id": "R-CHL-012",
+      "attack": "«dejar registrada la afirmación» sin decir dónde",
+      "answer": "Aceptado: R-CHL-012 gana el escenario de que la afirmación se registra como comentario bajo ## Bets del propio acta, con la fecha.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "Only a missing or conflicting slot is asked",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Only a missing or conflicting slot is asked» es la correcta?",
+      "options": [
+        "«declara que sólo se pregunta si la casilla está missing o conflicting»",
+        "«El SKILL.md declara que sólo se pregunta si falta o hay conflicto»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "An inferred slot needs the user's confirmation",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «An inferred slot needs the user's confirmation» es la correcta?",
+      "options": [
+        "«declara que inferred pasa a known sólo si el usuario confirma»",
+        "«El SKILL.md declara que inferred pasa a known sólo con confirmación»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The modes are named",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The modes are named» es la correcta?",
+      "options": [
+        "«nombra los tres modos de entrada y el de retomar acta»",
+        "«El SKILL.md nombra los tres modos y el de retomar»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The inference mark is the literal comment",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The inference mark is the literal comment» es la correcta?",
+      "options": [
+        "«declara que la marca de inferencia es <!-- inferred -->»",
+        "«El SKILL.md declara que la marca es <!-- inferred -->»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "Resuming wins over an existing project",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Resuming wins over an existing project» es la correcta?",
+      "options": [
+        "«declara que con charter.md en disco el modo es retomar»",
+        "«El SKILL.md declara que retomar el acta gana sobre proyecto existente»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The draft lives in the conversation until it is approved",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The draft lives in the conversation until it is approved» es la correcta?",
+      "options": [
+        "«declara que el borrador se enseña sin escribirse hasta aprobar»",
+        "«El SKILL.md declara que el borrador no se escribe hasta aprobarse»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The explained mode needs three slots said by the user",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The explained mode needs three slots said by the user» es la correcta?",
+      "options": [
+        "«declara que exige purpose, primary_user y first_capability del usuario»",
+        "«El SKILL.md declara que exige tres casillas dichas por el usuario»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The vague mode continues with what to remove first",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The vague mode continues with what to remove first» es la correcta?",
+      "options": [
+        "«contiene literalmente la pregunta de qué eliminaría primero»",
+        "«El SKILL.md contiene literalmente la pregunta por qué eliminar primero»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The fixed rounds are gone",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The fixed rounds are gone» es la correcta?",
+      "options": [
+        "«no contiene ningún encabezado que empiece por Tanda»",
+        "«El SKILL.md ya no contiene encabezados «### Tanda»»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The reading is reconstructed from disk",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The reading is reconstructed from disk» es la correcta?",
+      "options": [
+        "«declara que reconstruye propósito, usuarios y capabilities del repo»",
+        "«El SKILL.md declara que la lectura se reconstruye desde el repositorio»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "Priority is adoption order, said once",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Priority is adoption order, said once» es la correcta?",
+      "options": [
+        "«declara que la prioridad es orden de adopción, explicado una vez»",
+        "«El SKILL.md declara que la prioridad se explica una sola vez»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "One synthesis and one correction",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «One synthesis and one correction» es la correcta?",
+      "options": [
+        "«declara síntesis única de hechos y apuestas con una corrección»",
+        "«El SKILL.md declara una síntesis única con una corrección general»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The per-section question is gone",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The per-section question is gone» es la correcta?",
+      "options": [
+        "«no repite la pregunta de observado o supuesto por sección»",
+        "«El SKILL.md declara que ya no se pregunta por sección»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "No bet is fabricated",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «No bet is fabricated»?",
+      "options": [
+        "«se conserva el aviso C20» y «queda registrada la afirmación del usuario»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. El único efecto del escenario es la propia declaración o el hallazgo; lo que un lector añadió como efecto colateral es la misma frase partida."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "No bet is fabricated",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «No bet is fabricated» es la correcta?",
+      "options": [
+        "«declara que si todo es observado no se escribe ninguna apuesta»",
+        "«El SKILL.md declara que no se fabrica ninguna apuesta si todo es observado»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The claim is recorded inside the charter",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «The claim is recorded inside the charter»?",
+      "options": [
+        "«comentario añadido bajo ## Bets del acta»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. El único efecto del escenario es la propia declaración o el hallazgo; lo que un lector añadió como efecto colateral es la misma frase partida."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The claim is recorded inside the charter",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The claim is recorded inside the charter» es la correcta?",
+      "options": [
+        "«declara que la afirmación se registra como comentario con fecha»",
+        "«El SKILL.md declara que la afirmación se registra bajo ## Bets con fecha»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The minimum is listed",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The minimum is listed» es la correcta?",
+      "options": [
+        "«enumera el mínimo de casillas necesarias para cerrar el acta»",
+        "«El SKILL.md enumera los elementos mínimos para ofrecer el cierre»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The draft is offered for approval",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The draft is offered for approval» es la correcta?",
+      "options": [
+        "«declara que al llegar al mínimo se ofrece aprobar o profundizar»",
+        "«El SKILL.md declara que al llegar al mínimo se ofrece el borrador»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "Ambiguity is the only reason to ask",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Ambiguity is the only reason to ask» es la correcta?",
+      "options": [
+        "«declara que sólo pregunta ante ambigüedad que bloquea el paso»",
+        "«El SKILL.md declara que sólo una ambigüedad justifica preguntar en preparación»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "No generic list of conventions",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «No generic list of conventions» es la correcta?",
+      "options": [
+        "«declara que propone convenciones sólo si son relevantes»",
+        "«El SKILL.md declara que no se presenta una lista genérica de convenciones»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "The npm placeholder is not a candidate",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «The npm placeholder is not a candidate» es la correcta?",
+      "options": [
+        "«declara que el marcador no test specified no es candidato»",
+        "«El SKILL.md declara que el marcador de npm init no es candidato»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "One question with three intentions",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «One question with three intentions» es la correcta?",
+      "options": [
+        "«declara que pregunta continuar, revisar o resolver una apuesta»",
+        "«El SKILL.md declara una pregunta con tres opciones posibles»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "Never bet by bet first",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Never bet by bet first» es la correcta?",
+      "options": [
+        "«declara que no pregunta apuesta por apuesta antes de decidir»",
+        "«El SKILL.md declara que no se pregunta apuesta por apuesta primero»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "No mtime",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «No mtime» es la correcta?",
+      "options": [
+        "«no contiene la palabra mtime»",
+        "«El SKILL.md ya no contiene la palabra mtime»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "A charter that fails the linter is shown with its blockers",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A charter that fails the linter is shown with its blockers» es la correcta?",
+      "options": [
+        "«declara que un acta que falla el linter se muestra con bloqueos»",
+        "«El SKILL.md declara que un acta con bloqueos se enseña antes de preguntar»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "A marked line is an error",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «A marked line is an error»?",
+      "options": [
+        "«se genera un hallazgo C21»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. El único efecto del escenario es la propia declaración o el hallazgo; lo que un lector añadió como efecto colateral es la misma frase partida."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "A marked line is an error",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A marked line is an error» es la correcta?",
+      "options": [
+        "«salta C21 como error sobre la línea con la marca sin confirmar»",
+        "«El linter marca C21 como error sobre esa línea»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "Each marked line has its own finding",
+      "field": "side_effects",
+      "question": "¿Qué efectos observables debe producir «Each marked line has its own finding»?",
+      "options": [
+        "«se genera un hallazgo C21 por línea»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "chosen": 1,
+      "answer": "Ninguno de esos efectos pertenece al escenario: sobran de la lectura",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. El único efecto del escenario es la propia declaración o el hallazgo; lo que un lector añadió como efecto colateral es la misma frase partida."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "Each marked line has its own finding",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «Each marked line has its own finding» es la correcta?",
+      "options": [
+        "«salta un C21 distinto por cada línea marcada»",
+        "«El linter marca un C21 por cada línea marcada»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "scenario": "A charter without marks is untouched",
+      "field": "effect",
+      "question": "¿Cuál de estas lecturas del efecto de «A charter without marks is untouched» es la correcta?",
+      "options": [
+        "«no salta ningún hallazgo C21»",
+        "«El linter no genera ningún hallazgo C21»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "chosen": 2,
+      "answer": "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos. Las dos lecturas nombran la misma declaración de la skill con otras palabras; el delta no cambia."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "kind": "attack",
+      "requirement_id": "R-CHL-009",
+      "attack": "nueve casillas inferred y ninguna pregunta",
+      "answer": "Repetido de las rondas 2 y 3; ya cerrado: R-CHL-010 exige purpose, primary_user y first_capability dichos por el usuario y prohíbe inferir el Done when, y R-CHL-009 hace obligatoria la confirmación general. El abogado lee R-CHL-009 aislado de R-CHL-010.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "kind": "attack",
+      "requirement_id": "R-CHL-016",
+      "attack": "borrar las marcas al volcar el borrador aprobado",
+      "answer": "Repetido de la ronda 3; límite aceptado: la marca protege contra la inferencia sin confirmar, no contra la aprobada; una inferencia aprobada por el usuario es una afirmación suya. La entrega enumera qué casillas se confirmaron desde inferred.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "kind": "attack",
+      "requirement_id": "R-CHL-014",
+      "attack": "un único candidato malo o destructivo grabado sin confirmación",
+      "answer": "Repetido de las rondas 2 y 3 con el ángulo destructivo; límite aceptado: el usuario pidió expresamente no preguntar por el comando de pruebas cuando el disco lo declara, el comando detectado se enseña antes de escribirlo y en la entrega, y quien lo escribió en el manifiesto es quien lo ejecuta ya en su proyecto.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:30:43Z",
+      "round": 4,
+      "kind": "attack",
+      "requirement_id": "R-CHL-015",
+      "attack": "«empezar de cero» sobrescribe el acta sin aviso ni copia",
+      "answer": "Aceptado: R-CHL-015 gana el escenario de que antes de pisar el acta anterior se avisa de que la skill no guarda copias y se espera la confirmación explícita del usuario.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:37:03Z",
+      "round": 5,
+      "kind": "soft-batch",
+      "count": 43,
+      "scenarios": [
+        "A charter that fails the linter is shown with its blockers",
+        "A correction invalidates only its dependants",
+        "A marked line is an error",
+        "Ambiguity is the only reason to ask",
+        "An explained product is drafted first",
+        "An inferred slot needs the user's confirmation",
+        "Bets are grouped in one view",
+        "Disk facts are not asked",
+        "Inferences are marked in the draft",
+        "Never bet by bet first",
+        "No bet is fabricated",
+        "No generic list of conventions",
+        "No mtime",
+        "One answer refreshes the whole map",
+        "One question with three intentions",
+        "One synthesis and one correction",
+        "Only a missing or conflicting slot is asked",
+        "Priority is adoption order, said once",
+        "Resuming wins over an existing project",
+        "Starting over never overwrites without a warning",
+        "The claim is recorded inside the charter",
+        "The detected command is not trusted blindly",
+        "The draft is offered for approval",
+        "The draft lives in the conversation until it is approved",
+        "The explained mode needs three slots said by the user",
+        "The fixed rounds are gone",
+        "The generic table is gone",
+        "The inference mark is the literal comment",
+        "The minimum is listed",
+        "The next change is asked",
+        "The nine slots are named",
+        "The reading is reconstructed from disk",
+        "The slot is named before the question",
+        "The test command is detected before it is asked",
+        "The vague mode continues with what to remove first",
+        "The vague mode opens with the last real case"
+      ],
+      "answer": "Las 43 blandas de la ronda 5 son vocabulario: un lector describe la conducta de la skill y el otro lo que el fichero declara, sin ningún hecho distinto (status_code nulo en todas, mismas side_effects o vacías). Equivalentes; el delta no cambia.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:37:03Z",
+      "round": 5,
+      "kind": "attack",
+      "requirement_id": "R-CHL-009",
+      "attack": "nueve casillas inferred en proyecto existente y ninguna pregunta",
+      "answer": "Repetido de las rondas 1, 2 y 4; límite aceptado con matiz: en proyecto existente R-CHL-011 obliga a preguntar qué cambio quiere hacer ahora el usuario, así que first_capability y done_when son suyos, nunca inferidos; el resto se reconstruye del disco, se presenta con «¿corrijo algo de esta lectura?» y sólo con esa confirmación pasa a known.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:37:03Z",
+      "round": 5,
+      "kind": "attack",
+      "requirement_id": "R-CHL-009",
+      "attack": "el grafo de dependencias no está definido y «ninguna depende de otra» cumple la letra",
+      "answer": "Cerrado sin cambiar el delta: la skill fija el grafo (primary_user → current_workaround → first_capability → done_when; first_capability → out_of_scope y domain_decisions; evidence por casilla) y el test de R-CHL-009 exige la frase de invalidación; fijar el grafo en el requisito congelaría un detalle de la skill como contrato.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:37:03Z",
+      "round": 5,
+      "kind": "attack",
+      "requirement_id": "R-CHL-016",
+      "attack": "el acta aprobada se escribe sin marcas y C21 no salta nunca",
+      "answer": "Repetido de las rondas 2, 3 y 4; límite aceptado: C21 protege contra la inferencia sin confirmar que llega al disco, no contra la aprobada por el usuario, que es una afirmación suya; la entrega enumera qué casillas se confirmaron desde inferred.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:37:03Z",
+      "round": 5,
+      "kind": "attack",
+      "requirement_id": "R-CHL-011",
+      "attack": "no preguntar lo que el disco demuestra consagra bugs como intención",
+      "answer": "Límite aceptado: lo que se veda es preguntar el stack o el comando de pruebas, no la intención; la lectura reconstruida se presenta entera para corregirla («¿corrijo algo de esta lectura?») y el cambio que el usuario quiere hacer ahora es justo donde dice qué comportamiento actual no es el querido.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    }
+  ]
+}

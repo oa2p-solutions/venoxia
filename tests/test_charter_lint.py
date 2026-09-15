@@ -1435,6 +1435,46 @@ class TestRuleC20CharterWithoutBets(CharterCase):
 
 
 # ---------------------------------------------------------------------------
+# C21 · una inferencia sin confirmar dentro del acta (error)
+# ---------------------------------------------------------------------------
+
+#: La marca con la que /venoxia:charter señala en el borrador lo que dedujo y el
+#: usuario todavía no ha confirmado. Si llega al disco, el acta afirma un acuerdo
+#: que no existe.
+INFERRED_MARK = "<!-- inferred -->"
+
+
+class TestRuleC21UnconfirmedInference(CharterCase):
+    """C21 · el acta conserva una inferencia sin confirmar."""
+
+    # @covers R-CHL-016
+    def test_c21_rejects_a_line_that_keeps_the_inference_mark(self) -> None:
+        """Una viñeta de no-alcance deducida y no confirmada no es un acuerdo."""
+        findings = self.assert_only_error(
+            "C21",
+            charter(out_of_scope=f"- **Pagos y señales.** No se cobra nada en la v1. {INFERRED_MARK}"),
+        )
+        self.assertEqual(len(findings), 1)
+        self.assertIn("sin confirmar", findings[0]["message"])
+
+    # @covers R-CHL-016
+    def test_c21_reports_each_marked_line_on_its_own(self) -> None:
+        """Dos marcas en dos líneas distintas son dos hallazgos, cada uno en su línea."""
+        text = charter(
+            purpose=f"{DEFAULT_PURPOSE} {INFERRED_MARK}",
+            out_of_scope=f"- **App nativa.** La web basta para lo que promete el propósito. {INFERRED_MARK}",
+        )
+        findings = self.assert_only_error("C21", text)
+        self.assertEqual(len(findings), 2)
+        self.assertEqual(len({finding["line"] for finding in findings}), 2)
+
+    # @covers R-CHL-016
+    def test_c21_stays_quiet_without_marks(self) -> None:
+        """El acta canónica no lleva ninguna marca: C21 calla."""
+        self.assert_conforms(charter())
+
+
+# ---------------------------------------------------------------------------
 # C16 · el orden del acta y el orden real (aviso)
 # ---------------------------------------------------------------------------
 
@@ -1949,13 +1989,14 @@ class TestRuleRegistry(unittest.TestCase):
         "C18": "warning",
         "C19": "warning",
         "C20": "warning",
+        "C21": "error",
     }
 
     # @covers R-CHL-008
-    def test_the_twenty_rules_are_registered_in_order(self) -> None:
-        """Los códigos son C01…C20, sin saltos ni repetidos."""
+    def test_the_twenty_one_rules_are_registered_in_order(self) -> None:
+        """Los códigos son C01…C21, sin saltos ni repetidos."""
         codes = [rule.code for rule in charter_lint.RULES]
-        self.assertEqual(codes, [f"C{number:02d}" for number in range(1, 21)])
+        self.assertEqual(codes, [f"C{number:02d}" for number in range(1, 22)])
 
     def test_every_rule_declares_its_severity_and_its_function(self) -> None:
         """Cada regla trae la severidad del contrato, un resumen y una función."""

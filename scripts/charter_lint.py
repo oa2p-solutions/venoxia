@@ -4,7 +4,7 @@
 El acta (`.venoxia/charter.md`) es lo que existe **antes** de que exista un
 cambio que especificar: dice qué cambia en el mundo, para quién, qué se va a
 construir y en qué orden, qué queda fuera y qué se está suponiendo. Aquí viven
-las diecinueve reglas que la juzgan. Todas son deterministas: ninguna consulta a
+las veintiuna reglas que la juzgan. Todas son deterministas: ninguna consulta a
 un modelo, ninguna toca la red y sólo `C12` mira el calendario, para saber si
 una apuesta con fecha de revisión ya venció. Dos ejecuciones sobre la misma acta
 producen el mismo veredicto y el mismo JSON, byte a byte.
@@ -604,6 +604,7 @@ class Charter:
     table_header_ok: bool = False
     exclusions: list[Exclusion] = field(default_factory=list)
     bets: list[Bet] = field(default_factory=list)
+    inferred_lines: list[int] = field(default_factory=list)
     failure: Finding | None = None
 
     def has(self, name: str) -> bool:
@@ -761,7 +762,9 @@ def parse_charter(path: str | Path, root: str | Path = ".") -> Charter:
 
 def _fill_charter(charter: Charter, text: str) -> None:
     """Rellena el modelo del acta a partir de su texto."""
-    _collect_sections(charter, _readable_lines(text.splitlines()))
+    lines = text.splitlines()
+    _collect_sections(charter, _readable_lines(lines))
+    charter.inferred_lines = _inferred_lines(lines)
 
     purpose_section = charter.sections.get(SECTION_PURPOSE)
     if purpose_section is not None:
@@ -784,6 +787,28 @@ def _fill_charter(charter: Charter, text: str) -> None:
     bets_section = charter.sections.get(SECTION_BETS)
     if bets_section is not None:
         charter.bets = _parse_bets(bets_section)
+
+
+#: La marca con la que la entrevista señala, en el borrador, una línea que el
+#: modelo dedujo y el usuario todavía no ha confirmado. En el acta escrita no
+#: puede quedar ninguna: lo que llega al disco es lo acordado.
+INFERRED_MARK = "<!-- inferred -->"
+
+
+def _inferred_lines(lines: list[str]) -> list[int]:
+    """Números de línea que conservan la marca de inferencia, fuera de vallas.
+
+    Se mira el texto crudo y no el limpio: `_readable_lines` borra todos los
+    comentarios, y esta marca es un comentario a propósito, para que un acta
+    con ella siga siendo markdown legible. Dentro de una valla de código es
+    texto de ejemplo y no cuenta.
+    """
+    in_code = _code_fence_map(lines)
+    return [
+        index + 1
+        for index, line in enumerate(lines)
+        if not in_code[index] and INFERRED_MARK in line
+    ]
 
 
 def _collect_sections(charter: Charter, lines: list[str]) -> None:
@@ -1053,7 +1078,7 @@ def _finding(
 
 
 # ---------------------------------------------------------------------------
-# Las diecinueve reglas
+# Las veintiuna reglas
 # ---------------------------------------------------------------------------
 
 
@@ -2360,6 +2385,29 @@ def rule_c19(ctx: Context) -> list[Finding]:
     return findings
 
 
+def rule_c21(ctx: Context) -> list[Finding]:
+    """C21 · Una línea del acta conserva la marca de inferencia sin confirmar."""
+    return [
+        _finding(
+            ctx,
+            "C21",
+            SEVERITY_ERROR,
+            (
+                "La línea conserva la marca «<!-- inferred -->»: es una deducción del "
+                "modelo sin confirmar por quien encarga el proyecto, y el acta sólo "
+                "puede decir lo que se ha acordado."
+            ),
+            (
+                "Vuelve a la entrevista: confirma la línea con el usuario y quita la "
+                "marca, o corrígela con sus palabras. Ninguna línea marcada puede "
+                "quedarse en el acta escrita."
+            ),
+            line=number,
+        )
+        for number in ctx.charter.inferred_lines
+    ]
+
+
 RULES: list[Rule] = [
     Rule("C01", SEVERITY_ERROR, "Están las cinco secciones obligatorias", rule_c01),
     Rule("C02", SEVERITY_ERROR, "El propósito tiene entre una y tres frases", rule_c02),
@@ -2381,11 +2429,12 @@ RULES: list[Rule] = [
     Rule("C18", SEVERITY_WARNING, "Un «Done when» absoluto declara que es una apuesta", rule_c18),
     Rule("C19", SEVERITY_WARNING, "Lo que depende de un paso diferido lo dice", rule_c19),
     Rule("C20", SEVERITY_WARNING, "El acta declara al menos una apuesta", rule_c20),
+    Rule("C21", SEVERITY_ERROR, "Ninguna línea conserva la marca de inferencia sin confirmar", rule_c21),
 ]
 
 
 def run_rules(ctx: Context) -> list[Finding]:
-    """Aplica las diecinueve reglas en orden y devuelve todos sus hallazgos.
+    """Aplica las veintiuna reglas en orden y devuelve todos sus hallazgos.
 
     Una regla que se cayera no puede tumbar el linter entero: el fallo se
     convierte en un hallazgo con su código y el resto sigue. Es la misma defensa
@@ -2552,7 +2601,7 @@ def lint_charter(root: Path, path: Path, strict: bool = False) -> tuple[Validati
     """Lee el acta, aplica las reglas y devuelve el resultado y el modelo.
 
     Un acta que no se deja leer produce el `P01` del parser **y nada más**: las
-    diecinueve reglas hablan de lo que el acta dice, y de un fichero que no se ha
+    veintiuna reglas hablan de lo que el acta dice, y de un fichero que no se ha
     podido abrir no se puede decir que le falte la sección «## Purpose». Sería
     culpar al contenido de un problema del continente.
     """
@@ -2712,7 +2761,7 @@ def build_parser() -> argparse.ArgumentParser:
     cli = argparse.ArgumentParser(
         prog="charter_lint.py",
         description=(
-            "Comprueba el acta del proyecto contra las diecinueve reglas del contrato "
+            "Comprueba el acta del proyecto contra las veintiuna reglas del contrato "
             "del acta. Determinista: ninguna regla consulta a un modelo."
         ),
         epilog=(

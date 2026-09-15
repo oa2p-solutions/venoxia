@@ -1,0 +1,728 @@
+{
+  "version": 1,
+  "converged": false,
+  "verdict": "soft_only",
+  "strict": false,
+  "exit_code": 0,
+  "counts": {
+    "hard": 0,
+    "soft": 43,
+    "gaps": 0,
+    "scenarios": 46,
+    "readers": 2
+  },
+  "divergences": [
+    {
+      "scenario": "The nine slots are named",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la skill nombra las nueve casillas del mapa de cobertura",
+        "reader-b": "el fichero nombra las nueve casillas del mapa"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The nine slots are named» es la correcta?",
+      "options": [
+        "«la skill nombra las nueve casillas del mapa de cobertura»",
+        "«el fichero nombra las nueve casillas del mapa»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Only a missing or conflicting slot is asked",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la skill sólo pregunta si la casilla está missing o conflicting",
+        "reader-b": "el fichero declara que sólo se pregunta si falta o hay conflicto"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Only a missing or conflicting slot is asked» es la correcta?",
+      "options": [
+        "«la skill sólo pregunta si la casilla está missing o conflicting»",
+        "«el fichero declara que sólo se pregunta si falta o hay conflicto»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The slot is named before the question",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la skill nombra la casilla antes de preguntarla",
+        "reader-b": "el fichero declara que se nombra la casilla antes de preguntar"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The slot is named before the question» es la correcta?",
+      "options": [
+        "«la skill nombra la casilla antes de preguntarla»",
+        "«el fichero declara que se nombra la casilla antes de preguntar»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "One answer refreshes the whole map",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "re-evaluación del mapa de cobertura"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «One answer refreshes the whole map»?",
+      "options": [
+        "«re-evaluación del mapa de cobertura»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "One answer refreshes the whole map",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "tras cada respuesta se re-evalúa el mapa entero",
+        "reader-b": "el fichero declara que cada respuesta re-evalúa todo el mapa"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «One answer refreshes the whole map» es la correcta?",
+      "options": [
+        "«tras cada respuesta se re-evalúa el mapa entero»",
+        "«el fichero declara que cada respuesta re-evalúa todo el mapa»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A correction invalidates only its dependants",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "invalidación de casillas dependientes"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «A correction invalidates only its dependants»?",
+      "options": [
+        "«invalidación de casillas dependientes»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A correction invalidates only its dependants",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "una corrección invalida sólo las casillas dependientes",
+        "reader-b": "el fichero declara que una corrección invalida sólo sus dependientes"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A correction invalidates only its dependants» es la correcta?",
+      "options": [
+        "«una corrección invalida sólo las casillas dependientes»",
+        "«el fichero declara que una corrección invalida sólo sus dependientes»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An inferred slot needs the user's confirmation",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "confirmación general del borrador siempre se hace"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «An inferred slot needs the user's confirmation»?",
+      "options": [
+        "«confirmación general del borrador siempre se hace»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An inferred slot needs the user's confirmation",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "una casilla inferida pasa a known sólo si el usuario confirma",
+        "reader-b": "el fichero declara que inferred pasa a known sólo con confirmación"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «An inferred slot needs the user's confirmation» es la correcta?",
+      "options": [
+        "«una casilla inferida pasa a known sólo si el usuario confirma»",
+        "«el fichero declara que inferred pasa a known sólo con confirmación»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An explained product is drafted first",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "redacción del acta completa antes de la primera pregunta"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «An explained product is drafted first»?",
+      "options": [
+        "«redacción del acta completa antes de la primera pregunta»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "An explained product is drafted first",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "con producto explicado el acta se redacta antes de preguntar",
+        "reader-b": "el fichero declara que el acta se redacta antes de preguntar"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «An explained product is drafted first» es la correcta?",
+      "options": [
+        "«con producto explicado el acta se redacta antes de preguntar»",
+        "«el fichero declara que el acta se redacta antes de preguntar»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Inferences are marked in the draft",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "las inferencias quedan marcadas en el borrador",
+        "reader-b": "el fichero declara que las inferencias van marcadas en el borrador"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Inferences are marked in the draft» es la correcta?",
+      "options": [
+        "«las inferencias quedan marcadas en el borrador»",
+        "«el fichero declara que las inferencias van marcadas en el borrador»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The inference mark is the literal comment",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la marca de inferencia es el comentario literal indicado",
+        "reader-b": "el fichero declara que la marca es el comentario literal inferred"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The inference mark is the literal comment» es la correcta?",
+      "options": [
+        "«la marca de inferencia es el comentario literal indicado»",
+        "«el fichero declara que la marca es el comentario literal inferred»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Resuming wins over an existing project",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "con charter.md en disco el modo es retomar acta aunque haya código",
+        "reader-b": "el fichero declara que con charter.md en disco gana retomar"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Resuming wins over an existing project» es la correcta?",
+      "options": [
+        "«con charter.md en disco el modo es retomar acta aunque haya código»",
+        "«el fichero declara que con charter.md en disco gana retomar»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The draft lives in the conversation until it is approved",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "ninguna escritura en charter.md antes de la aprobación"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The draft lives in the conversation until it is approved»?",
+      "options": [
+        "«ninguna escritura en charter.md antes de la aprobación»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The draft lives in the conversation until it is approved",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el borrador se muestra en conversación y no se escribe hasta aprobar",
+        "reader-b": "el fichero declara que el borrador no se escribe hasta aprobarse"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The draft lives in the conversation until it is approved» es la correcta?",
+      "options": [
+        "«el borrador se muestra en conversación y no se escribe hasta aprobar»",
+        "«el fichero declara que el borrador no se escribe hasta aprobarse»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The explained mode needs three slots said by the user",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "exige purpose, primary_user y first_capability dichos por el usuario",
+        "reader-b": "el fichero declara que ese modo exige tres casillas dichas por el usuario"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The explained mode needs three slots said by the user» es la correcta?",
+      "options": [
+        "«exige purpose, primary_user y first_capability dichos por el usuario»",
+        "«el fichero declara que ese modo exige tres casillas dichas por el usuario»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The vague mode opens with the last real case",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el modo idea difusa abre con la pregunta literal indicada",
+        "reader-b": "el fichero contiene literalmente la pregunta por la última vez"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The vague mode opens with the last real case» es la correcta?",
+      "options": [
+        "«el modo idea difusa abre con la pregunta literal indicada»",
+        "«el fichero contiene literalmente la pregunta por la última vez»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The vague mode continues with what to remove first",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el modo idea difusa continúa con la pregunta literal indicada",
+        "reader-b": "el fichero contiene literalmente la pregunta sobre qué eliminar primero"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The vague mode continues with what to remove first» es la correcta?",
+      "options": [
+        "«el modo idea difusa continúa con la pregunta literal indicada»",
+        "«el fichero contiene literalmente la pregunta sobre qué eliminar primero»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The fixed rounds are gone",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "eliminación de los encabezados de tanda"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The fixed rounds are gone»?",
+      "options": [
+        "«eliminación de los encabezados de tanda»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The reading is reconstructed from disk",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "reconstrucción y presentación de la lectura desde disco"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The reading is reconstructed from disk»?",
+      "options": [
+        "«reconstrucción y presentación de la lectura desde disco»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The reading is reconstructed from disk",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "propósito, usuarios, capabilities y restricciones se leen del repositorio",
+        "reader-b": "el fichero declara que la lectura se reconstruye desde el repositorio"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The reading is reconstructed from disk» es la correcta?",
+      "options": [
+        "«propósito, usuarios, capabilities y restricciones se leen del repositorio»",
+        "«el fichero declara que la lectura se reconstruye desde el repositorio»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The next change is asked",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la skill pregunta qué cambio quiere hacer ahora el usuario",
+        "reader-b": "el fichero declara que se pregunta qué cambio quiere hacer ahora"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The next change is asked» es la correcta?",
+      "options": [
+        "«la skill pregunta qué cambio quiere hacer ahora el usuario»",
+        "«el fichero declara que se pregunta qué cambio quiere hacer ahora»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Disk facts are not asked",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "no pregunta por stack, comando de pruebas ni lo ya demostrado",
+        "reader-b": "el fichero declara que no se pregunta lo que el disco ya demuestra"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Disk facts are not asked» es la correcta?",
+      "options": [
+        "«no pregunta por stack, comando de pruebas ni lo ya demostrado»",
+        "«el fichero declara que no se pregunta lo que el disco ya demuestra»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Priority is adoption order, said once",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "explica una sola vez que la prioridad es orden de adopción",
+        "reader-b": "el fichero declara la prioridad como orden de adopción, dicha una vez"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Priority is adoption order, said once» es la correcta?",
+      "options": [
+        "«explica una sola vez que la prioridad es orden de adopción»",
+        "«el fichero declara la prioridad como orden de adopción, dicha una vez»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "One synthesis and one correction",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "presenta hechos y apuestas en una síntesis y pide una corrección",
+        "reader-b": "el fichero declara una síntesis única con una sola corrección general"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «One synthesis and one correction» es la correcta?",
+      "options": [
+        "«presenta hechos y apuestas en una síntesis y pide una corrección»",
+        "«el fichero declara una síntesis única con una sola corrección general»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "No bet is fabricated",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "si todo es observado no escribe ninguna apuesta y conserva C20",
+        "reader-b": "el fichero declara que no se escribe ninguna apuesta si todo es observado"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «No bet is fabricated» es la correcta?",
+      "options": [
+        "«si todo es observado no escribe ninguna apuesta y conserva C20»",
+        "«el fichero declara que no se escribe ninguna apuesta si todo es observado»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The claim is recorded inside the charter",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la afirmación queda registrada como comentario bajo Bets con fecha",
+        "reader-b": "el fichero declara que la afirmación se registra como comentario con fecha"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The claim is recorded inside the charter» es la correcta?",
+      "options": [
+        "«la afirmación queda registrada como comentario bajo Bets con fecha»",
+        "«el fichero declara que la afirmación se registra como comentario con fecha»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The minimum is listed",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "enumera los elementos mínimos exigidos para cerrar el acta",
+        "reader-b": "el fichero enumera los elementos mínimos del mapa de cobertura"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The minimum is listed» es la correcta?",
+      "options": [
+        "«enumera los elementos mínimos exigidos para cerrar el acta»",
+        "«el fichero enumera los elementos mínimos del mapa de cobertura»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The draft is offered for approval",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "al llegar al mínimo presenta el borrador y pregunta aprobar o profundizar",
+        "reader-b": "el fichero declara que se presenta el borrador y se pregunta aprobar o profundizar"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The draft is offered for approval» es la correcta?",
+      "options": [
+        "«al llegar al mínimo presenta el borrador y pregunta aprobar o profundizar»",
+        "«el fichero declara que se presenta el borrador y se pregunta aprobar o profundizar»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The test command is detected before it is asked",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "detección del comando de pruebas en el repositorio"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The test command is detected before it is asked»?",
+      "options": [
+        "«detección del comando de pruebas en el repositorio»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The test command is detected before it is asked",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "detecta el comando de pruebas en el repositorio antes de preguntar",
+        "reader-b": "el fichero declara que el comando se detecta antes de preguntarlo"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The test command is detected before it is asked» es la correcta?",
+      "options": [
+        "«detecta el comando de pruebas en el repositorio antes de preguntar»",
+        "«el fichero declara que el comando se detecta antes de preguntarlo»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Ambiguity is the only reason to ask",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "sólo pregunta ante ambigüedad que impida el siguiente paso",
+        "reader-b": "el fichero declara que sólo se pregunta ante ambigüedad bloqueante"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Ambiguity is the only reason to ask» es la correcta?",
+      "options": [
+        "«sólo pregunta ante ambigüedad que impida el siguiente paso»",
+        "«el fichero declara que sólo se pregunta ante ambigüedad bloqueante»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "No generic list of conventions",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "propone convención sólo si es relevante, sin lista genérica",
+        "reader-b": "el fichero declara que una convención se propone sólo si es relevante"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «No generic list of conventions» es la correcta?",
+      "options": [
+        "«propone convención sólo si es relevante, sin lista genérica»",
+        "«el fichero declara que una convención se propone sólo si es relevante»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The generic table is gone",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "eliminación de la fila de la tabla genérica"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «The generic table is gone»?",
+      "options": [
+        "«eliminación de la fila de la tabla genérica»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The detected command is not trusted blindly",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la preparación no ejecuta el comando detectado, lo verifica el primer verify",
+        "reader-b": "el fichero declara que la preparación no ejecuta el comando detectado"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The detected command is not trusted blindly» es la correcta?",
+      "options": [
+        "«la preparación no ejecuta el comando detectado, lo verifica el primer verify»",
+        "«el fichero declara que la preparación no ejecuta el comando detectado»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Bets are grouped in one view",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "las apuestas abiertas se agrupan en una sola vista",
+        "reader-b": "el fichero declara que las apuestas abiertas se agrupan en una vista"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Bets are grouped in one view» es la correcta?",
+      "options": [
+        "«las apuestas abiertas se agrupan en una sola vista»",
+        "«el fichero declara que las apuestas abiertas se agrupan en una vista»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "One question with three intentions",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "pregunta si continuar, revisar sección o resolver apuesta cumplida",
+        "reader-b": "el fichero declara una pregunta con tres opciones posibles"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «One question with three intentions» es la correcta?",
+      "options": [
+        "«pregunta si continuar, revisar sección o resolver apuesta cumplida»",
+        "«el fichero declara una pregunta con tres opciones posibles»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Never bet by bet first",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "no pregunta apuesta por apuesta antes de saber qué quiere el usuario",
+        "reader-b": "el fichero declara que no se pregunta apuesta por apuesta primero"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Never bet by bet first» es la correcta?",
+      "options": [
+        "«no pregunta apuesta por apuesta antes de saber qué quiere el usuario»",
+        "«el fichero declara que no se pregunta apuesta por apuesta primero»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "No mtime",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el fichero no usa mtime para inferir el objetivo de sesión",
+        "reader-b": "el fichero no contiene la palabra mtime"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «No mtime» es la correcta?",
+      "options": [
+        "«el fichero no usa mtime para inferir el objetivo de sesión»",
+        "«el fichero no contiene la palabra mtime»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A charter that fails the linter is shown with its blockers",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "muestra el acta con sus bloqueos antes de preguntar, con opción de empezar de cero",
+        "reader-b": "el fichero declara que un acta con bloqueos se enseña antes de preguntar"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A charter that fails the linter is shown with its blockers» es la correcta?",
+      "options": [
+        "«muestra el acta con sus bloqueos antes de preguntar, con opción de empezar de cero»",
+        "«el fichero declara que un acta con bloqueos se enseña antes de preguntar»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Starting over never overwrites without a warning",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "avisa que no guarda copias y espera confirmación antes de pisar el acta",
+        "reader-b": "el fichero declara que se avisa y se espera confirmación antes de pisar el acta"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Starting over never overwrites without a warning» es la correcta?",
+      "options": [
+        "«avisa que no guarda copias y espera confirmación antes de pisar el acta»",
+        "«el fichero declara que se avisa y se espera confirmación antes de pisar el acta»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A marked line is an error",
+      "field": "side_effects",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": [
+          "emisión de un finding C21 de tipo error"
+        ]
+      },
+      "question": "¿Qué efectos observables debe producir «A marked line is an error»?",
+      "options": [
+        "«emisión de un finding C21 de tipo error»",
+        "Ninguno de esos efectos pertenece al escenario: sobran de la lectura"
+      ],
+      "signal": null
+    }
+  ],
+  "gaps": [],
+  "attacks": [
+    {
+      "attack": "En el modo «proyecto existente» la skill reconstruye desde el repositorio el propósito, los usuarios, las capabilities y las restricciones, así que las nueve casillas quedan en `inferred` y ninguna en `missing`; como R-CHL-009 prohíbe plantear una pregunta cuya casilla no esté en `missing` o `conflicting`, una implementación literal no pregunta absolutamente nada y promueve las nueve casillas a `known` con la única confirmación general del borrador. El acta —raíz del contrato de la que cuelgan todas las capabilities y requisitos— queda certificada como acordada sin que el usuario haya aportado un solo hecho.",
+      "requirement_id": "R-CHL-009",
+      "severity": "high"
+    },
+    {
+      "attack": "«Ante una corrección DEBE invalidar sólo las casillas que dependen de la corregida» es un techo sin grafo de dependencias definido: declarar que ninguna casilla depende de otra cumple la frase al pie de la letra. El usuario corrige `purpose`, y `first_capability`, `done_when` y `out_of_scope` derivados del propósito anterior siguen en `known`, por lo que la misma regla prohíbe volver a preguntarlos: el acta se aprueba con una capability deducida de un propósito que el usuario ya rechazó.",
+      "requirement_id": "R-CHL-009",
+      "severity": "medium"
+    },
+    {
+      "attack": "C21 sólo dispara sobre una línea que «conserva» la marca literal `<!-- inferred -->`, y ningún requisito obliga a que el acta escrita en disco lleve esa marca; como la regla rechaza cualquier línea que la lleve, la implementación obediente escribe el acta aprobada ya sin marcas y C21 no salta nunca (el escenario «A charter without marks is untouched» sale en verde). El único control mecánico contra una inferencia sin confirmar queda vacío: una línea inventada por el modelo es indistinguible en disco de un acuerdo del usuario.",
+      "requirement_id": "R-CHL-016",
+      "severity": "medium"
+    },
+    {
+      "attack": "«No DEBE preguntar por un comportamiento que el disco ya demuestra» es una prohibición absoluta: con un repositorio heredado, la skill escribe en el acta como propósito, restricción o `Done when` lo que el código hace hoy —incluidos bugs y comportamientos obsoletos— y tiene vedado preguntar si eso es lo querido. El contrato del proyecto pasa a consagrar el comportamiento actual como intencionado, y los deltas posteriores se validarán contra él.",
+      "requirement_id": "R-CHL-011",
+      "severity": "medium"
+    }
+  ],
+  "advocate": "listed"
+}

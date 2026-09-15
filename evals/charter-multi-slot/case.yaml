@@ -1,0 +1,131 @@
+schema_version: "1.0"
+name: charter-multi-slot
+description: >-
+  Una sola respuesta rellena varias casillas a la vez: apaño actual, primera capability,
+  «Done when» y fuera de alcance vienen en el mismo párrafo. Tras esa respuesta el mapa se
+  re-evalúa entero y no se vuelve a preguntar por ninguna de ellas.
+tags: [charter, interview, coverage-map]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Lo que sé de mi proyecto:
+
+    Somos una cooperativa agrícola de treinta socios y queremos que los socios vean
+    cuánto han entregado y cuánto se les debe sin llamar a la oficina. Lo van a usar los
+    socios, que hoy llaman o pasan por la oficina, y la administrativa, que se lo mira en
+    su programa de contabilidad y se lo dice por teléfono; lo primero es que el socio vea
+    sus entregas del mes con kilos y precio, y lo sabré cuando un socio consulte sus
+    entregas desde el móvil y la administrativa reciba una llamada menos ese día; lo que
+    no quiero es que nadie pueda modificar nada ni que haya pagos por la aplicación.
+
+    Trabajas sobre un proyecto que quiere adoptar Venoxia. Su raíz es el directorio
+    `project/`, que se te ha añadido a esta sesión como directorio de trabajo adicional.
+    Localízalo antes de nada si no lo tienes a la vista.
+
+    Invoca la skill `/venoxia:charter` y sigue sus pasos. Una restricción de esta sesión:
+    **no hay nadie al otro lado**, así que `AskUserQuestion` no está disponible y no debes
+    llamarla ni una vez. Todo lo que yo sé está en este mensaje. Cada vez que la skill te
+    pida preguntarme algo, haz lo siguiente en vez de preguntar: busca la respuesta en lo
+    que te he contado; si está, úsala con mis palabras; si no está, no la inventes para el
+    acta —déjala como apuesta o fuera— y anótalo. Lleva un registro en
+    `interview-log.json`, dentro de tu directorio de trabajo actual (no dentro de
+    `project/`), como una lista JSON con una entrada por pregunta que habrías hecho, en
+    el orden en que la habrías hecho, con esta forma exacta:
+    `{"order": 1, "slot": "<casilla del mapa de cobertura o \"confirmation\">",
+    "kind": "question" | "confirmation", "question": "<la pregunta literal que habrías
+    hecho>", "answer": "<mi respuesta, tomada de este mensaje, o null si no la tengo>"}`.
+    Una confirmación del borrador es `kind: confirmation`; una pregunta por una casilla
+    que falta es `kind: question`.
+
+    Cuando el acta esté escrita y el linter haya pasado, guarda la salida JSON íntegra
+    de la última ejecución de `charter_lint.py` en `charter-lint-result.json`, también en
+    tu directorio de trabajo actual, sin editarla.
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+runs: 2
+expected_outcome: >-
+  El registro no contiene ninguna pregunta por `current_workaround`, `first_capability`,
+  `done_when` ni `out_of_scope`: la respuesta única ya las cubría y el mapa se re-evaluó
+  entero antes de la siguiente pregunta.
+graders:
+  - type: tool_used
+    name: no-question-to-the-user
+    tool: AskUserQuestion
+    min: 0
+    max: 0
+  - type: file_exists
+    name: charter-written
+    path: project/.venoxia/charter.md
+  - type: file_exists
+    name: principles-written
+    path: project/.venoxia/principles.md
+  - type: file_exists
+    name: interview-log-written
+    path: interview-log.json
+  - type: file_exists
+    name: lint-result-written
+    path: charter-lint-result.json
+  - type: regex
+    name: charter-passes-the-linter
+    target:
+      source: file
+      path: charter-lint-result.json
+    pattern: '"ok":\s*true'
+  - type: regex
+    name: no-inference-mark-left
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '<!-- inferred -->'
+    match: not_contains
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only
+
+  - type: regex
+    name: no-question-about-a-slot-the-answer-already-filled
+    target:
+      source: file
+      path: interview-log.json
+    pattern: '"slot":\s*"(current_workaround|first_capability|done_when|out_of_scope|purpose|primary_user)"[^}]*"kind":\s*"question"'
+    match: not_contains
+    flags: "s"
+  - type: regex
+    name: the-member-is-the-user
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '(?i)socio'
+  - type: regex
+    name: done-when-is-observable
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '(?i)móvil|llamada'
+  - type: regex
+    name: out-of-scope-has-the-two-exclusions
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '(?i)modificar|pagos'
+  - type: llm
+    name: one-answer-refreshes-the-whole-map
+    focus:
+      source: file
+      path: interview-log.json
+    criteria: >-
+      El registro demuestra que una sola respuesta rellenó varias casillas: no hay
+      ninguna pregunta por cómo lo hacen hoy, por la primera capability, por cuándo está
+      hecho ni por qué queda fuera, porque el párrafo del usuario ya lo decía. Si hay
+      preguntas, son por casillas que el párrafo no cubría (evidencia, apuestas,
+      decisiones de dominio) o una confirmación del borrador.
+    weight: 0.5

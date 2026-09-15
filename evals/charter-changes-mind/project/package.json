@@ -1,0 +1,14 @@
+{
+  "name": "pedidos-proveedores",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0",
+    "vitest": "^2.0.0"
+  }
+}

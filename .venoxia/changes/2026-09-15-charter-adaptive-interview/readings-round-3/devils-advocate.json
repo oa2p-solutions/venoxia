@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "R-CHL-009 hace pasar una casilla `inferred` a `known` con «la confirmación general del borrador», es decir un único sí a un acta completa: una implementación literal redacta con el modelo el propósito, el usuario principal, el no-alcance y las apuestas, las marca todas `<!-- inferred -->`, y con ese único sí las convierte en acuerdos y borra las marcas (C21 obliga a que ninguna sobreviva), de modo que el acta en disco no distingue lo que dijo el usuario de lo que inventó el modelo y no queda registro de ello en ninguna parte.",
+    "requirement_id": "R-CHL-009",
+    "severity": "high"
+  },
+  {
+    "attack": "R-CHL-010 obliga a que el modo sea «retomar un acta» por la sola existencia de `.venoxia/charter.md`, sin exigir que tenga contenido útil: con un fichero vacío o un esqueleto copiado, la skill entra en R-CHL-015 y sólo ofrece continuar con la siguiente capability, revisar una sección o resolver una apuesta, ninguna de las cuales escribe un acta desde cero, y el usuario queda bloqueado sin ninguna vía declarada para volver a los tres modos de entrada.",
+    "requirement_id": "R-CHL-010",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-CHL-014 manda detectar el comando de pruebas en el repositorio, prohíbe ejecutarlo en la preparación, sólo permite preguntar «ante una ambigüedad que impida ejecutar el paso siguiente» y excluye un único candidato falso (el marcador de `npm init`): una implementación literal escribe como oráculo del proyecto el primer comando que encuentre —un `make test` obsoleto o un script que sale 0 sin ejecutar nada— sin confirmarlo con el usuario, y todo el contrato de verificación pasa a apoyarse en un comando que no prueba nada.",
+    "requirement_id": "R-CHL-014",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-CHL-012 exige, cuando el usuario afirma que todo está observado, dejar `## Bets` sin apuestas y «dejar registrada la afirmación» sin decir dónde: una línea en la conversación cumple la frase, así que el acta en disco queda con cero apuestas y sin rastro ni de los supuestos que la propia síntesis había clasificado ni de quién decidió descartarlos, y el aviso C20 pasa a ser un ruido permanente sin explicación.",
+    "requirement_id": "R-CHL-012",
+    "severity": "medium"
+  }
+]

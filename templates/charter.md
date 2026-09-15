@@ -167,6 +167,12 @@ cuaderno que sólo entiende quien lo escribió.
        fila ordena o resume a partir de ese dato, cuando nadie lo rellene no fallará la
        fila que lo pide, saldrá en blanco la otra.
 
+     Si el acta la redactó la entrevista a partir de lo que ya le habías contado, las
+     líneas que dedujo sin que tú las dijeras llevan en el borrador una marca de
+     inferencia: la palabra «inferred» dentro de un comentario HTML, al final de la
+     línea. En el fichero no puede quedar ninguna: `C21` marca cada una como error.
+     Confirmarla la quita; corregirla la sustituye por tus palabras.
+
      El encabezado se queda aunque no tengas ninguna apuesta: las cinco secciones son
      obligatorias. Ahora bien, un acta con un `high` en la tabla y esta sección vacía es
      un acta que no ha mirado, y el linter lo dice. -->

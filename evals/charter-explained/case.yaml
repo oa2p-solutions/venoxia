@@ -1,0 +1,132 @@
+schema_version: "1.0"
+name: charter-explained
+description: >-
+  Producto ya explicado: el mensaje trae propósito, usuario, apaño actual, primera
+  capability, «Done when» y fuera de alcance. La entrevista tiene que redactar el acta
+  antes de preguntar nada, marcar en el borrador lo que dedujo y pedir una sola
+  confirmación, sin volver a preguntar lo que ya se dijo.
+tags: [charter, interview, explained-product]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Lo que sé de mi proyecto:
+
+    Llevo las compras de una cadena de seis restaurantes. Cada semana pido a cuatro
+    proveedores por WhatsApp y apunto lo pedido en una hoja de cálculo compartida; el
+    problema es que nadie sabe qué se pidió a quién hasta que llega la factura, y dos
+    veces al mes pagamos algo que no llegó. Los que sufren esto son los jefes de cocina,
+    que hacen el pedido, y yo, que lo cuadro con las facturas.
+
+    Lo primero que quiero es que el jefe de cocina haga el pedido desde el móvil eligiendo
+    productos de una lista y que ese pedido quede registrado con proveedor, fecha y
+    líneas. Sabré que funciona cuando un jefe de cocina haga un pedido real desde el móvil
+    y yo lo vea en la lista de pedidos sin preguntarle nada. No quiero pagos, ni
+    facturación, ni integración con el ERP de la central en esta primera versión.
+
+    Trabajas sobre un proyecto que quiere adoptar Venoxia. Su raíz es el directorio
+    `project/`, que se te ha añadido a esta sesión como directorio de trabajo adicional.
+    Localízalo antes de nada si no lo tienes a la vista.
+
+    Invoca la skill `/venoxia:charter` y sigue sus pasos. Una restricción de esta sesión:
+    **no hay nadie al otro lado**, así que `AskUserQuestion` no está disponible y no debes
+    llamarla ni una vez. Todo lo que yo sé está en este mensaje. Cada vez que la skill te
+    pida preguntarme algo, haz lo siguiente en vez de preguntar: busca la respuesta en lo
+    que te he contado; si está, úsala con mis palabras; si no está, no la inventes para el
+    acta —déjala como apuesta o fuera— y anótalo. Lleva un registro en
+    `interview-log.json`, dentro de tu directorio de trabajo actual (no dentro de
+    `project/`), como una lista JSON con una entrada por pregunta que habrías hecho, en
+    el orden en que la habrías hecho, con esta forma exacta:
+    `{"order": 1, "slot": "<casilla del mapa de cobertura o \"confirmation\">",
+    "kind": "question" | "confirmation", "question": "<la pregunta literal que habrías
+    hecho>", "answer": "<mi respuesta, tomada de este mensaje, o null si no la tengo>"}`.
+    Una confirmación del borrador es `kind: confirmation`; una pregunta por una casilla
+    que falta es `kind: question`.
+
+    Cuando el acta esté escrita y el linter haya pasado, guarda la salida JSON íntegra
+    de la última ejecución de `charter_lint.py` en `charter-lint-result.json`, también en
+    tu directorio de trabajo actual, sin editarla.
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+runs: 2
+expected_outcome: >-
+  El acta se escribe con las palabras del usuario; el registro de entrevista no contiene
+  ninguna pregunta por `purpose`, `primary_user`, `current_workaround`, `first_capability`
+  ni `done_when`, y la única llamada que habría hecho es la confirmación del borrador.
+graders:
+  - type: tool_used
+    name: no-question-to-the-user
+    tool: AskUserQuestion
+    min: 0
+    max: 0
+  - type: file_exists
+    name: charter-written
+    path: project/.venoxia/charter.md
+  - type: file_exists
+    name: principles-written
+    path: project/.venoxia/principles.md
+  - type: file_exists
+    name: interview-log-written
+    path: interview-log.json
+  - type: file_exists
+    name: lint-result-written
+    path: charter-lint-result.json
+  - type: regex
+    name: charter-passes-the-linter
+    target:
+      source: file
+      path: charter-lint-result.json
+    pattern: '"ok":\s*true'
+  - type: regex
+    name: no-inference-mark-left
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '<!-- inferred -->'
+    match: not_contains
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only
+
+  - type: regex
+    name: no-question-about-what-was-told
+    target:
+      source: file
+      path: interview-log.json
+    pattern: '"slot":\s*"(purpose|primary_user|current_workaround|first_capability|done_when)"[^}]*"kind":\s*"question"'
+    match: not_contains
+    flags: "s"
+  - type: regex
+    name: users-own-words-in-the-charter
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: 'hoja de cálculo'
+  - type: regex
+    name: out-of-scope-carries-the-user-list
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '(?i)pagos'
+  - type: llm
+    name: draft-first-then-one-confirmation
+    focus:
+      source: file
+      path: interview-log.json
+    criteria: >-
+      El registro muestra que la entrevista no preguntó por nada que el usuario ya había
+      contado (propósito, quién lo usa, cómo lo hace hoy, primera capability, cuándo está
+      hecho, qué queda fuera). Como mucho hay una entrada de tipo confirmation sobre el
+      borrador completo y, si hay preguntas de tipo question, son sobre casillas que el
+      mensaje del usuario de verdad no cubría (por ejemplo evidencia o decisiones de
+      dominio). Falla si aparece una pregunta por el propósito, el usuario o la primera
+      capability.
+    weight: 0.5

@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "Nada en el delta dice cuándo una casilla puede etiquetarse `inferred` en vez de `missing`, y las preguntas sólo se plantean sobre `missing` o `conflicting`: una skill que marca las nueve casillas como `inferred` a partir de la primera frase del usuario cumple el requisito y no formula ni una sola pregunta, produciendo un acta —propósito, usuario, `Done when`, no-alcance— escrita íntegramente por el modelo y presentada como el contrato del proyecto.",
+    "requirement_id": "R-CHL-009",
+    "severity": "high"
+  },
+  {
+    "attack": "La única comprobación sobre las inferencias es que el acta escrita no conserve la marca `<!-- inferred -->`, así que la vía más barata y plenamente conforme es borrar las marcas al volcar el borrador aprobado: el acta en disco no distingue ninguna línea inferida de una dicha por el usuario, C21 nunca puede saltar sobre un acta escrita por la skill y sólo castiga a quien anote a mano lo que supuso.",
+    "requirement_id": "R-CHL-016",
+    "severity": "medium"
+  },
+  {
+    "attack": "La preparación sólo puede preguntar «ante una ambigüedad que impida ejecutar el paso siguiente» y sólo excluye como candidato el marcador de `npm init`: con un único candidato en el manifiesto (`\"test\": \"exit 0\"`, un target de Make vacío, un script que borra la base de datos de desarrollo) la skill lo graba como `test_command` del oráculo sin confirmación del usuario y sin ejecutarlo, de modo que todos los requisitos salen verdes para siempre —o se ejecuta un comando destructivo en cada `/venoxia:verify`— sin que nadie lo haya aprobado.",
+    "requirement_id": "R-CHL-014",
+    "severity": "high"
+  },
+  {
+    "attack": "El requisito obliga a mantener «empezar de cero» como respuesta escrita al retomar, pero ninguna frase gobierna qué pasa con el acta existente: una implementación que, ante ese texto libre, sobrescribe `.venoxia/charter.md` en el acto cumple al pie de la letra y destruye sin confirmación ni copia el propósito, las apuestas y las decisiones acumuladas del proyecto.",
+    "requirement_id": "R-CHL-015",
+    "severity": "high"
+  }
+]

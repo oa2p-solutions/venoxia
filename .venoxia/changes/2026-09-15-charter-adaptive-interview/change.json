@@ -1,0 +1,9 @@
+{
+  "id": "2026-09-15-charter-adaptive-interview",
+  "state": "verified",
+  "via": "spec",
+  "capabilities": [
+    "charter-lint"
+  ],
+  "created": "2026-09-15T14:05:00Z"
+}

@@ -1,0 +1,137 @@
+schema_version: "1.0"
+name: charter-vague-pain
+description: >-
+  Idea difusa: el usuario sólo trae una molestia sin nombre. La primera pregunta tiene
+  que ser la narrativa literal («Cuéntame la última vez que ocurrió el problema…») y la
+  segunda la de qué eliminar primero y qué tendría que ver esa persona.
+tags: [charter, interview, vague-idea]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Lo que sé de mi proyecto: la verdad es que poco. Perdemos muchísimo tiempo con los
+    pedidos a los proveedores y quiero hacer «algo» con eso, pero no sé bien qué.
+
+    Como no puedes preguntarme, te dejo aquí lo que te contaría si me preguntas bien,
+    para que lo uses sólo cuando la pregunta lo pida:
+
+    La última vez fue el jueves pasado. Marta, la jefa de cocina del local de Chamberí,
+    quería pedir verdura para el fin de semana. Buscó en el WhatsApp del proveedor qué
+    había pedido la semana anterior, no lo encontró, llamó a la central para preguntar,
+    nadie lo sabía, y acabó pidiendo de memoria. Pidió el doble de tomate y se olvidó del
+    aceite. Donde más tiempo perdió fue buscando el pedido anterior: casi media hora
+    entre el chat y las llamadas. Lo que eliminaría primero es esa búsqueda: que el
+    pedido de la semana anterior esté delante cuando va a pedir. Marta consideraría que
+    funciona cuando abra el móvil y vea el último pedido a ese proveedor, con sus líneas,
+    y pueda repetirlo cambiando cantidades.
+
+    Trabajas sobre un proyecto que quiere adoptar Venoxia. Su raíz es el directorio
+    `project/`, que se te ha añadido a esta sesión como directorio de trabajo adicional.
+    Localízalo antes de nada si no lo tienes a la vista.
+
+    Invoca la skill `/venoxia:charter` y sigue sus pasos. Una restricción de esta sesión:
+    **no hay nadie al otro lado**, así que `AskUserQuestion` no está disponible y no debes
+    llamarla ni una vez. Todo lo que yo sé está en este mensaje. Cada vez que la skill te
+    pida preguntarme algo, haz lo siguiente en vez de preguntar: busca la respuesta en lo
+    que te he contado; si está, úsala con mis palabras; si no está, no la inventes para el
+    acta —déjala como apuesta o fuera— y anótalo. Lleva un registro en
+    `interview-log.json`, dentro de tu directorio de trabajo actual (no dentro de
+    `project/`), como una lista JSON con una entrada por pregunta que habrías hecho, en
+    el orden en que la habrías hecho, con esta forma exacta:
+    `{"order": 1, "slot": "<casilla del mapa de cobertura o \"confirmation\">",
+    "kind": "question" | "confirmation", "question": "<la pregunta literal que habrías
+    hecho>", "answer": "<mi respuesta, tomada de este mensaje, o null si no la tengo>"}`.
+    Una confirmación del borrador es `kind: confirmation`; una pregunta por una casilla
+    que falta es `kind: question`.
+
+    Cuando el acta esté escrita y el linter haya pasado, guarda la salida JSON íntegra
+    de la última ejecución de `charter_lint.py` en `charter-lint-result.json`, también en
+    tu directorio de trabajo actual, sin editarla.
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+runs: 2
+expected_outcome: >-
+  La primera entrada del registro es la pregunta narrativa literal, la segunda es la de qué
+  eliminar primero, y el acta sale con Marta o la jefa de cocina como usuaria principal y
+  una capability sobre repetir el último pedido.
+graders:
+  - type: tool_used
+    name: no-question-to-the-user
+    tool: AskUserQuestion
+    min: 0
+    max: 0
+  - type: file_exists
+    name: charter-written
+    path: project/.venoxia/charter.md
+  - type: file_exists
+    name: principles-written
+    path: project/.venoxia/principles.md
+  - type: file_exists
+    name: interview-log-written
+    path: interview-log.json
+  - type: file_exists
+    name: lint-result-written
+    path: charter-lint-result.json
+  - type: regex
+    name: charter-passes-the-linter
+    target:
+      source: file
+      path: charter-lint-result.json
+    pattern: '"ok":\s*true'
+  - type: regex
+    name: no-inference-mark-left
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '<!-- inferred -->'
+    match: not_contains
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only
+
+  - type: regex
+    name: first-question-is-the-narrative-one
+    target:
+      source: file
+      path: interview-log.json
+    pattern: '"order":\s*1,[^}]*Cuéntame la última vez que ocurrió el problema: quién estaba intentando hacer qué, qué pasos siguió y dónde perdió más tiempo o cometió errores'
+    flags: "s"
+  - type: regex
+    name: second-question-is-what-to-remove-first
+    target:
+      source: file
+      path: interview-log.json
+    pattern: '"order":\s*2,[^}]*Qué parte de ese proceso eliminarías primero y qué tendría que ver esa persona para considerar que ya funciona'
+    flags: "s"
+  - type: regex
+    name: the-cook-is-a-user
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '(?i)jefa de cocina|marta'
+  - type: regex
+    name: first-capability-is-the-last-order
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '(?i)último pedido|pedido anterior|repetir'
+  - type: llm
+    name: interview-starts-with-the-story
+    focus:
+      source: file
+      path: interview-log.json
+    criteria: >-
+      La entrevista empieza por la última vez que ocurrió el problema, no por «¿a qué
+      problema se dedica el proyecto?» ni por «¿quién lo va a usar?». Las dos primeras
+      preguntas son las literales del modo de idea difusa y las respuestas anotadas
+      salen del relato de Marta. Falla si la primera pregunta es abstracta o si se
+      pregunta por el stack o por el nombre del proyecto.
+    weight: 0.5

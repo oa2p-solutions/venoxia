@@ -1,0 +1,145 @@
+schema_version: "1.0"
+name: charter-changes-mind
+description: >-
+  El usuario explica el producto y a mitad se corrige: el usuario principal no es quien
+  dijo. La corrección tiene que invalidar sólo las casillas que dependen del usuario
+  (apaño, capability, «Done when») y conservar el propósito y el fuera de alcance.
+tags: [charter, interview, correction]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Lo que sé de mi proyecto:
+
+    Quiero que los seis restaurantes de la cadena dejen de pagar facturas de mercancía
+    que no llegó: ahora mismo nadie cruza lo pedido con lo recibido y lo pagamos dos veces
+    al mes. Quien lo va a usar es el jefe de cocina de cada local, que hoy pide por
+    WhatsApp; lo primero sería que haga el pedido desde una lista y quede registrado.
+
+    Espera, que lo estoy contando mal. El jefe de cocina va a seguir pidiendo por
+    WhatsApp, eso no lo vamos a cambiar ahora. Quien lo sufre y quien lo va a usar de
+    verdad soy yo, la responsable de compras de la central: hoy cuadro las facturas
+    contra los chats de WhatsApp de seis locales, a mano, en una hoja de cálculo. Lo
+    primero que necesito es registrar cada recepción de mercancía —qué llegó, de qué
+    proveedor, a qué local— para poder cruzarla con la factura. Sabré que funciona cuando
+    una factura de un proveedor se pueda comparar con lo recibido de ese proveedor en ese
+    local y salgan las líneas que no cuadran. Fuera quedan los pagos y cualquier cambio
+    en cómo piden los locales.
+
+    Trabajas sobre un proyecto que quiere adoptar Venoxia. Su raíz es el directorio
+    `project/`, que se te ha añadido a esta sesión como directorio de trabajo adicional.
+    Localízalo antes de nada si no lo tienes a la vista.
+
+    Invoca la skill `/venoxia:charter` y sigue sus pasos. Una restricción de esta sesión:
+    **no hay nadie al otro lado**, así que `AskUserQuestion` no está disponible y no debes
+    llamarla ni una vez. Todo lo que yo sé está en este mensaje. Cada vez que la skill te
+    pida preguntarme algo, haz lo siguiente en vez de preguntar: busca la respuesta en lo
+    que te he contado; si está, úsala con mis palabras; si no está, no la inventes para el
+    acta —déjala como apuesta o fuera— y anótalo. Lleva un registro en
+    `interview-log.json`, dentro de tu directorio de trabajo actual (no dentro de
+    `project/`), como una lista JSON con una entrada por pregunta que habrías hecho, en
+    el orden en que la habrías hecho, con esta forma exacta:
+    `{"order": 1, "slot": "<casilla del mapa de cobertura o \"confirmation\">",
+    "kind": "question" | "confirmation", "question": "<la pregunta literal que habrías
+    hecho>", "answer": "<mi respuesta, tomada de este mensaje, o null si no la tengo>"}`.
+    Una confirmación del borrador es `kind: confirmation`; una pregunta por una casilla
+    que falta es `kind: question`.
+
+    Cuando el acta esté escrita y el linter haya pasado, guarda la salida JSON íntegra
+    de la última ejecución de `charter_lint.py` en `charter-lint-result.json`, también en
+    tu directorio de trabajo actual, sin editarla.
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+runs: 2
+expected_outcome: >-
+  El acta tiene a la responsable de compras como usuaria principal y la capability 1 sobre
+  registrar recepciones y cruzarlas con la factura; conserva el propósito (no pagar lo que
+  no llegó) y el fuera de alcance (pagos, cómo piden los locales); no aparece el jefe de
+  cocina como usuario principal ni «pedir desde una lista» como capability 1.
+graders:
+  - type: tool_used
+    name: no-question-to-the-user
+    tool: AskUserQuestion
+    min: 0
+    max: 0
+  - type: file_exists
+    name: charter-written
+    path: project/.venoxia/charter.md
+  - type: file_exists
+    name: principles-written
+    path: project/.venoxia/principles.md
+  - type: file_exists
+    name: interview-log-written
+    path: interview-log.json
+  - type: file_exists
+    name: lint-result-written
+    path: charter-lint-result.json
+  - type: regex
+    name: charter-passes-the-linter
+    target:
+      source: file
+      path: charter-lint-result.json
+    pattern: '"ok":\s*true'
+  - type: regex
+    name: no-inference-mark-left
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '<!-- inferred -->'
+    match: not_contains
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only
+
+  - type: regex
+    name: the-buyer-is-the-user
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '(?i)responsable de compras|compras'
+  - type: regex
+    name: priority-one-is-the-reception
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '\|\s*1\s*\|[^\n]*(?i:recepci|recibid|factura)'
+  - type: regex
+    name: the-abandoned-capability-is-not-priority-one
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '\|\s*1\s*\|[^\n]*(?i:lista de productos|pedido desde una lista)'
+    match: not_contains
+  - type: regex
+    name: purpose-survives-the-correction
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '(?i)no lleg'
+  - type: regex
+    name: out-of-scope-survives-the-correction
+    target:
+      source: file
+      path: project/.venoxia/charter.md
+    pattern: '(?i)pagos'
+  - type: llm
+    name: correction-invalidates-only-dependants
+    focus:
+      source: file
+      path: project/.venoxia/charter.md
+    criteria: >-
+      El acta refleja la versión corregida: la usuaria principal es la responsable de
+      compras, su «hoy» es cuadrar facturas contra chats en una hoja de cálculo, y la
+      capability de prioridad 1 es registrar recepciones para cruzarlas con la factura. El
+      propósito (dejar de pagar mercancía que no llegó) y el fuera de alcance (pagos, cómo
+      piden los locales) se mantienen. El jefe de cocina puede aparecer como contexto pero
+      no como usuario principal, y «hacer el pedido desde una lista» no es una capability.
+    weight: 0.5

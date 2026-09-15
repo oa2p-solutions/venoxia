@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "R-CHL-010 obliga a «redactar el acta completa» antes de la primera pregunta con un proyecto existente, y nada ordena ese modo frente al de retomar acta de R-CHL-015: una implementación que, ante un repositorio que ya tiene código y `.venoxia/charter.md`, clasifica «proyecto existente» y reescribe el acta entera desde el disco cumple la frase y destruye las apuestas ya acordadas con su `revisit` y su `fatal`, que nadie puede reconstruir.",
+    "requirement_id": "R-CHL-010",
+    "severity": "high"
+  },
+  {
+    "attack": "R-CHL-010 exige «inferencias marcadas» sin fijar la sintaxis de la marca, mientras que C21 (R-CHL-016) sólo salta ante el literal `<!-- inferred -->`: una implementación que marque las inferencias como «(inferido)» en la prosa cumple los dos escenarios y anula por completo la única red que impide que una inferencia sin confirmar quede en el acta como acuerdo y pase el linter en verde.",
+    "requirement_id": "R-CHL-010",
+    "severity": "high"
+  },
+  {
+    "attack": "R-CHL-014 manda detectar el comando de pruebas en el repositorio y preguntar «sólo ante una ambigüedad que impida ejecutar el paso siguiente»: una implementación que toma el primer candidato del manifiesto (por ejemplo un `npm test` que sale 0 sin ejecutar nada) y lo escribe en `venoxia.json` sin ejecutarlo ni confirmarlo cumple la frase —no hay ambigüedad, hay un único candidato— y deja todos los veredictos del oráculo apoyados en un comando que no prueba nada.",
+    "requirement_id": "R-CHL-014",
+    "severity": "high"
+  },
+  {
+    "attack": "R-CHL-009 prohíbe plantear una pregunta cuando la casilla no está en `missing` o `conflicting`, y nada acota con qué evidencia se puede declarar una casilla `inferred`: una implementación que infiera las nueve casillas de las primeras frases del usuario no formula ni una sola pregunta y produce un acta íntegramente inventada; la entrevista adaptativa se convierte en ninguna entrevista.",
+    "requirement_id": "R-CHL-009",
+    "severity": "medium"
+  }
+]

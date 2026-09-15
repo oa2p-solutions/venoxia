@@ -1,0 +1,12 @@
+[project]
+name = "cotizador"
+version = "0.3.1"
+description = "Compara los presupuestos que mandan los proveedores y elige el más barato por línea."
+requires-python = ">=3.12"
+dependencies = ["openpyxl>=3.1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
