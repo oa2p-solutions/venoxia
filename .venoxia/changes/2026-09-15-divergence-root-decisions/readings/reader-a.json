@@ -1,0 +1,162 @@
+[
+  {
+    "scenario": "The partial reservation fixture is one decision",
+    "effect": "el JSON agrupa las dos divergencias en una sola decisión",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Disjoint distinguishing tokens stay apart",
+    "effect": "cada divergencia queda como decisión separada, razón single",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A shared particle groups nothing",
+    "effect": "las divergencias no se agrupan por compartir sólo una partícula vacía",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The same two status codes in three scenarios",
+    "effect": "una decisión agrupa las tres divergencias de código de estado",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Different code pairs stay apart",
+    "effect": "quedan dos decisiones separadas, cada una con un miembro",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A missing scenario is never grouped",
+    "effect": "la divergencia del escenario visto por un solo lector queda sola",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A two-field decision is not chained across scenarios",
+    "effect": "el segundo escenario forma una decisión distinta, sin mezclar miembros",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Every divergence belongs to exactly one decision",
+    "effect": "cada índice de divergences aparece en una sola decisión",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The verdict does not move",
+    "effect": "counts y el veredicto diverged no cambian, decisions trae una entrada",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A grouped question names its scenarios and confronts the readings",
+    "effect": "la pregunta nombra los escenarios y enfrenta las lecturas con opción de no divergencia",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A two-field option carries both fields of its reader",
+    "effect": "la opción de cada lector une su efecto y sus efectos colaterales",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The report lists grouped decisions",
+    "effect": "el informe añade la sección Decisiones agrupadas con razón y escenarios",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "No grouped decision, no section",
+    "effect": "el informe omite la sección Decisiones agrupadas",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "One decision per call",
+    "effect": "el SKILL.md declara preguntar una decisión por llamada, en orden del informe",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The root decision is explained once",
+    "effect": "el SKILL.md declara explicar la decisión raíz una vez y listar escenarios",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Every member is recorded",
+    "effect": "el SKILL.md declara anotar en decisions.json una entrada por miembro",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The skill never groups on its own",
+    "effect": "el SKILL.md declara que la agrupación la hace el script, no la skill",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "Several active changes are asked about",
+    "effect": "el SKILL.md declara preguntar cuál change examinar con los ids como opciones",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "The date of the files decides nothing",
+    "effect": "el SKILL.md declara no elegir el change por la fecha de sus ficheros",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  },
+  {
+    "scenario": "A verified change is never taken by default",
+    "effect": "el SKILL.md declara no examinar un change verified sin id ni revertirlo a validated",
+    "status_code": null,
+    "side_effects": [],
+    "unclear": false,
+    "unclear_why": null
+  }
+]

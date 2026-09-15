@@ -1,6 +1,6 @@
 # Evals de Venoxia
 
-Seis casos que responden a una sola pregunta: **¿el sistema falla cuando debe y calla
+Trece casos que responden a una sola pregunta: **¿el sistema falla cuando debe y calla
 cuando debe?** No miden si el modelo escribe bonito. Cada caso monta un proyecto de
 juguete completo bajo `<caso>/project/`, pide capturar la salida JSON de la herramienta
 determinista que corresponda, y puntúa **el contenido de ese JSON**, no la prosa de la
@@ -16,7 +16,7 @@ claude plugin eval venoxia --ablation with-without \
 
 El `--allow-tools` no es opcional: `Bash` y `Write` son herramientas con verja y sin ese
 permiso de operador ningún caso puede ejecutar `validate.py` ni escribir el JSON que se
-puntúa. Sin él los seis casos fallan por falta de permisos, no por regresión.
+puntúa. Sin él los casos fallan por falta de permisos, no por regresión.
 
 Variantes útiles:
 
@@ -45,6 +45,13 @@ cambiado de verdad.
 | `ambiguous-status-code` | El escenario dice que la petición «se rechaza» sin fijar el código | Divergencia **dura** en `status_code`: 409 contra 422, con pregunta cerrada |
 | `ambiguous-partial-effect` | El requisito dice que el sistema «reserva lo que puede» | Divergencia **dura** en `side_effects` (pedido completo contra unidades con stock) y **blanda** en `effect` |
 | `oracle-red-then-green` | Change `validated` con dos requisitos: uno con marcador de fallo para el runner falso, otro que pasa tal cual | El oráculo distingue: `R-CHK-001` en `green`, `R-CHK-002` en `red`, `all_green: false` |
+| `diverge-root-decision` | Tres escenarios del mismo requisito dicen «se rechaza» sin fijar el código, y las lecturas los resuelven los tres como 409 y 422 | Tres divergencias **duras** en `status_code` y **una sola** entrada en `decisions`, con razón `same-readings-across-scenarios`, que nombra los tres escenarios |
+| `charter-explained` | Esqueleto vacío y un mensaje que ya cuenta propósito, usuario, apaño, primera capability, «Done when» y fuera de alcance | El acta se redacta antes de preguntar: ninguna pregunta por lo ya contado, una confirmación como mucho, linter en verde y las palabras del usuario en el acta |
+| `charter-vague-pain` | Esqueleto vacío y una molestia sin nombre, con el relato que el usuario soltaría si se le pregunta bien | La primera pregunta es la narrativa literal y la segunda la de qué eliminar primero; el acta sale con la jefa de cocina y el último pedido |
+| `charter-brownfield` | Paquete Python real (`pyproject.toml`, `pytest`, tres módulos, README) y el cambio que el usuario quiere hacer ahora | Capabilities reconstruidas del código, el cambio nuevo en la fila 1, ninguna pregunta por stack ni comando de pruebas, `venoxia.json` con `pytest` |
+| `charter-changes-mind` | El usuario explica el producto y a mitad corrige quién lo usa | El acta refleja la corrección (usuaria, apaño, capability 1) y conserva propósito y fuera de alcance |
+| `charter-multi-slot` | Un solo párrafo que rellena apaño, capability, «Done when» y fuera de alcance a la vez | Ninguna pregunta por una casilla que el párrafo ya rellenó |
+| `charter-resume` | Acta existente con dos capabilities y dos apuestas, y un usuario que quiere continuar | Una sola pregunta con tres intenciones, ninguna por apuesta, el acta intacta y el `/venoxia:specify` de la siguiente capability en la entrega |
 
 ### `clean-spec` es el caso que más importa
 
@@ -58,6 +65,35 @@ introduzca ruido — una regla nueva demasiado celosa, un umbral de similitud ma
 Sus cifras exactas son parte del contrato del caso: 4 requisitos, 0 en `low`,
 `findings: []`. Si al añadir una regla estas cifras cambian, hay que decidir a
 conciencia si cambia el fixture o si la regla nueva está mal.
+
+## Los casos de la entrevista del acta
+
+Los seis casos `charter-*` miden la **entrevista** de `/venoxia:charter`, y ahí `claude
+plugin eval` tiene un límite conocido: no simula a un usuario que contesta, así que
+`AskUserQuestion` no puede usarse. El protocolo lo declara en vez de esquivarlo: el
+mensaje trae todo lo que el usuario sabe, prohíbe la herramienta, y pide al modelo que
+anote en `interview-log.json` cada pregunta que **habría hecho** —con su casilla del mapa
+de cobertura, su tipo (`question` o `confirmation`), su texto literal y la respuesta
+tomada del mensaje— y que guarde la última salida de `charter_lint.py` en
+`charter-lint-result.json`. Los graders puntúan esos dos ficheros y el acta escrita:
+
+- `tool_used` sobre `AskUserQuestion` con `max: 0`: la herramienta no se tocó.
+- `regex` sobre `charter-lint-result.json` (`"ok": true`) y sobre el acta (sin la marca
+  `<!-- inferred -->`): el acta pasa el linter y no le queda ninguna inferencia sin
+  confirmar.
+- `regex` sobre `interview-log.json`: en el modo de idea difusa, que las dos primeras
+  preguntas sean las literales de la skill; en los de producto explicado y respuesta
+  múltiple, que no haya ninguna `question` por una casilla que el mensaje ya rellenaba;
+  en el de proyecto existente, ninguna pregunta por el stack ni el comando de pruebas;
+  en el de retomar, una sola pregunta con las tres intenciones y ninguna por apuesta.
+- `regex` sobre el acta: las palabras del usuario, la fila 1 correcta, el fuera de
+  alcance que dictó.
+- Un `llm` por caso, con peso `0.5`, para lo que la expresión regular no sabe juzgar:
+  que el orden de la entrevista sea el del modo.
+
+Lo que estos casos **no** miden, y conviene decirlo: cómo reacciona la entrevista a una
+respuesta que llega a medias o cambia de tema, porque en la eval las respuestas están
+escritas de antemano. Eso sólo lo mide el dogfooding sobre un proyecto real.
 
 ## Por qué los graders no puntúan la prosa
 
@@ -78,9 +114,10 @@ expresiones regulares sobre ese fichero:
 - Un `regex` con `not_contains` sobre `Traceback (most recent call last)` en la traza
   comprueba que ningún script vomita una excepción cruda de Python.
 
-Solo hay dos graders de LLM en toda la batería, uno en cada caso de ambigüedad, con peso
-`0.5`, y sirven para algo que una expresión regular no sabe juzgar: que la pregunta
-generada sea **cerrada y enfrente las dos lecturas**, en vez de un «¿hay algo ambiguo
+Solo hay tres graders de LLM en toda la batería, uno en cada caso de ambigüedad y uno en
+el de agrupación, con peso `0.5`, y sirven para algo que una expresión regular no sabe
+juzgar: que la pregunta generada sea **cerrada y enfrente las dos lecturas** —o, en la
+agrupada, que nombre los tres escenarios en una sola—, en vez de un «¿hay algo ambiguo
 aquí?». Son complemento, nunca criterio principal.
 
 El grader `venoxia-skill-fired` lleva `arm: with-only`: bajo `--ablation with-without` no
@@ -108,7 +145,7 @@ graders y debe hundirse: sin Venoxia no hay `V06`, ni `V11`, ni aritmética de d
     └── test/<capability>/<oráculo>.spec.ts    los ficheros que citan los `verifies:`
 ```
 
-Las lecturas de los tres casos que las usan vienen **prefabricadas**. No se despachan
+Las lecturas de los cuatro casos que las usan vienen **prefabricadas**. No se despachan
 lectores en la eval: si la comparación dependiera de lo que dos agentes contesten ese día,
 el caso mediría el humor del modelo y no la aritmética de `diff_readings.py`. Los ficheros
 de test existen de verdad y llevan su `@covers`, porque V07 y V08 los buscan en disco.
@@ -127,13 +164,16 @@ real. `clean-spec` pasa además en modo `--strict`.
 | `ambiguous-status-code` | `ok: true` (la ambigüedad es invisible al validador, y eso es la tesis) | `converged: false` · hard 1 · soft 0 · gaps 0 |
 | `ambiguous-partial-effect` | `ok: true` | `converged: false` · hard 1 · soft 1 · gaps 0 |
 | `oracle-red-then-green` | no aplica (no se ejecuta `validate.py`) | no aplica (no se ejecuta `diff_readings.py`) |
+| `diverge-root-decision` | `ok: true` | `converged: false` · hard 3 · soft 0 · gaps 0 · 4 escenarios · `decisions` con 1 entrada de 3 miembros |
+| `charter-resume` | no aplica; su acta pasa `charter_lint.py --strict` con 0 errores y 0 avisos | no aplica |
+| `charter-*` (los otros cinco) | no aplica: el acta la escribe la eval | no aplica |
 
 Que los dos casos de ambigüedad pasen el validador no es un descuido: es el argumento
 entero del motor de divergencia. Una especificación puede cumplir las dieciocho reglas y
 seguir admitiendo dos lecturas incompatibles. El validador comprueba la forma; la
 divergencia comprueba el significado.
 
-Ninguno de los cinco primeros fixtures trae `oracle.json`: esos changes se quedan en
+Ninguno de los fixtures que pasan por `validate.py` trae `oracle.json`: esos changes se quedan en
 `draft`, sin oráculo grabado, así que `V17` (que sólo mira changes en `verified`) y `V18`
 (que sólo mira changes con `oracle.json`) no se evalúan sobre ninguno de los cinco y las
 cifras de la tabla de arriba no cambian por su llegada.

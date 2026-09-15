@@ -117,5 +117,54 @@ class DivergeSkillDecisionsTest(unittest.TestCase):
         self.assertIn("sin borrar las anteriores", _read_skill())
 
 
+class DivergeSkillRootDecisionsTest(unittest.TestCase):
+    """R-DIV-016 · una decisión por llamada, con la raíz explicada una vez y cada miembro anotado."""
+
+    def test_body_asks_one_decision_per_call_in_report_order_verbatim(self):
+        """@covers R-DIV-016"""
+        text = _read_skill()
+        for phrase in ("una decisión por llamada", "en el orden del informe", "literales"):
+            self.assertIn(phrase, text, f"skills/diverge/SKILL.md no declara «{phrase}»")
+
+    def test_body_explains_the_root_decision_once_and_lists_the_scenarios(self):
+        """@covers R-DIV-016"""
+        text = _read_skill()
+        self.assertIn("la decisión raíz una sola vez", text)
+        self.assertIn("los escenarios afectados", text)
+
+    def test_body_records_every_member_with_the_same_answer(self):
+        """@covers R-DIV-016"""
+        text = _read_skill()
+        self.assertIn("una entrada por divergencia miembro", text)
+        self.assertIn("el mismo `answer`", text)
+        self.assertIn("`decision`", text)
+
+    def test_body_never_groups_on_its_own(self):
+        """@covers R-DIV-016"""
+        text = _read_skill()
+        self.assertIn("la skill no agrupa preguntas por su cuenta", text)
+        self.assertIn("la agrupación la hace el script", text)
+
+
+class DivergeSkillActiveChangeTest(unittest.TestCase):
+    """R-DIV-017 · con varios changes activos se pregunta cuál, nunca se adivina por fecha."""
+
+    def test_body_asks_which_change_when_several_are_active(self):
+        """@covers R-DIV-017"""
+        text = _read_skill()
+        self.assertIn("más de un change", text)
+        self.assertIn("con los ids como opciones", text)
+
+    def test_body_does_not_pick_the_most_recent_change_json(self):
+        """@covers R-DIV-017"""
+        self.assertNotIn("`change.json` más reciente", _read_skill())
+
+    def test_body_never_takes_a_verified_change_by_default(self):
+        """@covers R-DIV-017"""
+        text = _read_skill()
+        self.assertIn("un change en `verified` no se examina sin su id", text)
+        self.assertIn("nunca vuelve a `validated`", text)
+
+
 if __name__ == "__main__":
     unittest.main()

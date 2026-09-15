@@ -1,0 +1,17 @@
+[
+  {
+    "attack": "R-DIV-013 agrupa en cuanto los tokens distintivos «comparten al menos uno» y sólo excluye palabras vacías: dos divergencias sin relación (efecto «el pedido se crea» vs «el pedido se rechaza» y side_effects «se notifica al dueño del pedido» vs «no se notifica a nadie») comparten el token de contenido «pedido» y se funden en una sola decisión; el usuario contesta una pregunta y R-DIV-016 obliga a anotar ese mismo `answer` como decisión de las dos divergencias, con lo que el delta recoge una decisión que el usuario nunca tomó sobre el segundo campo.",
+    "requirement_id": "R-DIV-013",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-DIV-014 obliga («DEBE agruparlas») a fundir en una sola decisión todas las divergencias del mismo campo que enfrentan el mismo par de lecturas, sin tope de miembros y sin ninguna vía para que el usuario responda distinto en un escenario concreto: el par «200» vs «409» repetido en doce escenarios (crear, borrar, reintentar) se contesta una vez y esa respuesta se escribe literal como decisión de los doce, incluidos aquellos en los que la respuesta correcta era la contraria.",
+    "requirement_id": "R-DIV-014",
+    "severity": "medium"
+  },
+  {
+    "attack": "R-DIV-017 permite examinar un change en `verified` cuando su id viene en `$ARGUMENTS` y a la vez prohíbe que vuelva a `validated`: la entrevista escribe las respuestas en el delta y deja el change declarándose `verified` con un texto que ningún run del oráculo respalda, de modo que `gate.py` y `/venoxia:close` lo dan por verificado y se publica como contrato verificado un delta que nadie ha vuelto a ejecutar.",
+    "requirement_id": "R-DIV-017",
+    "severity": "high"
+  }
+]

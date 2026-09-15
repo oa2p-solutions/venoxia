@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "change": "2026-09-15-divergence-root-decisions",
+  "decisions": [
+    {
+      "at": "2026-09-15T14:51:20Z",
+      "round": 1,
+      "kind": "soft-batch",
+      "count": 21,
+      "scenarios": [
+        "A grouped question names its scenarios and confronts the readings",
+        "A missing scenario is never grouped",
+        "Different code pairs stay apart",
+        "Disjoint distinguishing tokens stay apart",
+        "Every divergence belongs to exactly one decision",
+        "Every member is recorded",
+        "One decision per call",
+        "Several active changes are asked about",
+        "The date of the files decides nothing",
+        "The partial reservation fixture is one decision",
+        "The root decision is explained once",
+        "The same two status codes in three scenarios",
+        "The skill never groups on its own",
+        "The verdict does not move"
+      ],
+      "answer": "Las 21 blandas de la ronda 1 son vocabulario: un lector reparte la lectura entre effect y side_effects y el otro la escribe entera en effect; ningún hecho distinto, status_code nulo en todos. Equivalentes.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:51:20Z",
+      "round": 1,
+      "kind": "attack",
+      "requirement_id": "R-DIV-013",
+      "attack": "«tokens de contenido» sin lista de exclusión agrupa por una partícula como «no»",
+      "answer": "Aceptado: R-DIV-013 pasa a decir que los tokens de contenido son los mismos que compara effect —sin palabras vacías ni conjugación— y gana el escenario de que una partícula compartida no agrupa.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:51:20Z",
+      "round": 1,
+      "kind": "attack",
+      "requirement_id": "R-DIV-015",
+      "attack": "las opciones de una decisión agrupada sólo cubren el primer miembro",
+      "answer": "Aceptado: R-DIV-015 pasa a exigir que en una decisión de dos campos la opción de cada lector enlace su efecto y sus efectos colaterales, para que el answer anotado en el miembro side_effects sea una lectura que alguien propuso.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:51:20Z",
+      "round": 1,
+      "kind": "attack",
+      "requirement_id": "R-DIV-014",
+      "attack": "sin precedencia entre R-DIV-013 y R-DIV-014 se fusionan grupos por transitividad",
+      "answer": "Aceptado: R-DIV-014 pasa a actuar sólo sobre las divergencias que R-DIV-013 no agrupó y a prohibir la fusión transitiva de grupos que no comparten lecturas.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:51:20Z",
+      "round": 1,
+      "kind": "attack",
+      "requirement_id": "R-DIV-017",
+      "attack": "con un único change no archivado en verified la skill lo toma y lo devuelve a validated",
+      "answer": "Aceptado: R-DIV-017 gana el escenario de que un change en verified no se examina sin id explícito y nunca vuelve a validated.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:54:00Z",
+      "round": 2,
+      "kind": "soft-batch",
+      "count": 12,
+      "scenarios": [
+        "A missing scenario is never grouped",
+        "A shared particle groups nothing",
+        "A two-field option carries both fields of its reader",
+        "Different code pairs stay apart",
+        "Disjoint distinguishing tokens stay apart",
+        "Every member is recorded",
+        "No grouped decision, no section",
+        "One decision per call",
+        "The date of the files decides nothing",
+        "The same two status codes in three scenarios",
+        "The skill never groups on its own",
+        "The verdict does not move"
+      ],
+      "answer": "Las blandas de la ronda 2 son vocabulario («el JSON agrupa» frente a «una decisión agrupa»); ningún hecho distinto, status_code nulo en todos. Equivalentes; el delta no cambia.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:54:00Z",
+      "round": 2,
+      "kind": "attack",
+      "requirement_id": "R-DIV-013",
+      "attack": "«pedido» compartido agrupa dos divergencias sin relación",
+      "answer": "Cerrado sin cambiar el delta: el ataque lee «token distintivo» como «token de contenido». Un token que aparece en las lecturas de los dos lectores («pedido» en «se crea» y en «se rechaza») no es distintivo de ninguno, así que no cuenta; sólo agrupan los tokens que ese lector tiene y el otro no. Es exactamente lo que dice R-DIV-013 y lo que comprueba el test de la partícula compartida.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:54:00Z",
+      "round": 2,
+      "kind": "attack",
+      "requirement_id": "R-DIV-014",
+      "attack": "sin tope de miembros ni vía para contestar distinto en un escenario",
+      "answer": "Límite aceptado con remedio en la skill, no en el delta: la pregunta agrupada lista los escenarios afectados antes de la llamada, y la skill dice que si la respuesta no vale para todos, el usuario lo escribe y se vuelve a preguntar por los escenarios que exceptúe, uno por llamada, anotando cada uno con su propio answer.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    },
+    {
+      "at": "2026-09-15T14:54:00Z",
+      "round": 2,
+      "kind": "attack",
+      "requirement_id": "R-DIV-017",
+      "attack": "examinar un change verified por id deja un delta cambiado bajo un estado que el oráculo no respalda",
+      "answer": "Cerrado: la premisa es falsa —diverge no edita deltas (R-DIV-009)— y la skill va más lejos de lo que el requisito exige: con un change en verified, venga o no su id, dice que ya está verificado y no lo examina; lo que cambie de comportamiento es un change nuevo por /venoxia:specify. V17 audita además que el disco respalde verified.",
+      "decided_by": "claude",
+      "note": "Decidido por Claude bajo la instrucción del usuario del 2026-09-11: ninguna pregunta salvo permisos."
+    }
+  ]
+}

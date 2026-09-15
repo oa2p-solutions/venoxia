@@ -29,7 +29,7 @@ import sys
 import unittest
 from pathlib import Path
 
-from tests.venoxia_fixtures import DIFF_READINGS_PY, REPO_ROOT, VALIDATE_PY
+from tests.venoxia_fixtures import CHARTER_LINT_PY, DIFF_READINGS_PY, REPO_ROOT, VALIDATE_PY
 
 EVALS_DIR = REPO_ROOT / "evals"
 RUN_TIMEOUT = 30
@@ -42,6 +42,7 @@ VALIDATE_CIFRAS = {
     "budget-exceeded": {"ok": False, "error": 1, "warning": 0, "requirements": 5, "low": 2},
     "ambiguous-status-code": {"ok": True, "error": 0, "warning": 0, "requirements": 3, "low": 0},
     "ambiguous-partial-effect": {"ok": True, "error": 0, "warning": 0, "requirements": 3, "low": 0},
+    "diverge-root-decision": {"ok": True, "error": 0, "warning": 0, "requirements": 3, "low": 0},
 }
 
 # Las cifras de `diff_readings.py --json`. Sólo los tres fixtures con
@@ -51,6 +52,7 @@ DIFF_READINGS_CIFRAS = {
     "clean-spec": {"converged": True, "hard": 0, "soft": 0, "gaps": 0},
     "ambiguous-status-code": {"converged": False, "hard": 1, "soft": 0, "gaps": 0},
     "ambiguous-partial-effect": {"converged": False, "hard": 1, "soft": 1, "gaps": 0},
+    "diverge-root-decision": {"converged": False, "hard": 3, "soft": 0, "gaps": 0},
 }
 
 
@@ -129,7 +131,7 @@ class EvalFixturesValidateTest(unittest.TestCase):
 
 
 class EvalFixturesDiffReadingsTest(unittest.TestCase):
-    """`diff_readings.py --json` sobre los tres fixtures que traen `readings/`."""
+    """`diff_readings.py --json` sobre los cuatro fixtures que traen `readings/`."""
 
     def test_each_case_matches_its_documented_figures(self):
         for case, expected in DIFF_READINGS_CIFRAS.items():
@@ -150,6 +152,35 @@ class EvalFixturesDiffReadingsTest(unittest.TestCase):
                 self.assertEqual(
                     payload.get("counts", {}).get("gaps"), expected["gaps"], payload
                 )
+
+
+class EvalFixturesCharterTest(unittest.TestCase):
+    """El acta del fixture de retomar pasa el linter en estricto: es lo que la eval da por sentado."""
+
+    def test_charter_resume_fixture_passes_strict_lint(self):
+        payload = _run_json(
+            CHARTER_LINT_PY,
+            "--root",
+            str(EVALS_DIR / "charter-resume" / "project"),
+            "--json",
+            "--no-color",
+            "--strict",
+        )
+        self.assertTrue(payload.get("ok"), payload)
+        self.assertEqual(payload.get("counts", {}).get("error"), 0, payload)
+        self.assertEqual(payload.get("counts", {}).get("warning"), 0, payload)
+
+    def test_every_charter_case_forbids_ask_user_question(self):
+        """Cada `charter-*/case.yaml` lleva el grader que prohíbe AskUserQuestion."""
+        cases = sorted(EVALS_DIR.glob("charter-*/case.yaml"))
+        self.assertEqual(len(cases), 6, cases)
+        for case in cases:
+            text = case.read_text(encoding="utf-8")
+            with self.subTest(case=case.parent.name):
+                self.assertIn("tool: AskUserQuestion", text)
+                self.assertIn("max: 0", text)
+                self.assertIn("charter-lint-result.json", text)
+                self.assertIn("interview-log.json", text)
 
 
 if __name__ == "__main__":

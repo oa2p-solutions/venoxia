@@ -56,6 +56,7 @@ TOP_LEVEL_KEYS = [
     "gaps",
     "attacks",
     "advocate",
+    "decisions",
 ]
 
 #: Las subclaves exactas de `counts`.
@@ -2473,6 +2474,272 @@ class TestScopeClasses(DiffCase):
         hard = self._hard_side_effects(run)
         self.assertEqual(len(hard), 1, run.describe())
         self.assertEqual(hard[0]["signal"], "scope", run.describe())
+
+
+# ---------------------------------------------------------------------------
+# Decisiones raíz: varias divergencias que se resuelven con una sola respuesta
+# ---------------------------------------------------------------------------
+
+
+#: El fixture de evals que trae la misma ambigüedad escrita en dos campos del
+#: mismo escenario: «pedido completo» contra «unidades con stock», en `effect`
+#: y en `side_effects` a la vez.
+PARTIAL_EFFECT_READINGS = (
+    REPO_ROOT
+    / "evals"
+    / "ambiguous-partial-effect"
+    / "project"
+    / ".venoxia"
+    / "changes"
+    / "2026-08-31-partial-reservation"
+    / "readings"
+)
+
+#: Tres escenarios que heredan la misma decisión: ¿409 o 422?
+SAME_CODE_SCENARIOS = ("Insufficient stock on one line", "Reserved by another cart", "Line already reserved")
+
+
+def same_code_readings() -> dict:
+    """Dos lectores que discrepan del mismo par de códigos en tres escenarios."""
+    return {
+        "reader-a": [reading(title, "rechaza la peticion", "409") for title in SAME_CODE_SCENARIOS],
+        "reader-b": [reading(title, "rechaza la peticion", "422") for title in SAME_CODE_SCENARIOS],
+    }
+
+
+class TestRootDecisions(DiffCase):
+    """R-DIV-013/014/015 · el motor agrupa las divergencias que nacen de la misma decisión."""
+
+    def decisions_of(self, readers: dict) -> tuple[dict, CompletedRun]:
+        run = self.diff(readers, "--json", "--no-color")
+        self.assertNoTraceback(run)
+        return run.json, run
+
+    def test_the_partial_reservation_fixture_is_one_decision(self):
+        """@covers R-DIV-013"""
+        self.assertTrue(PARTIAL_EFFECT_READINGS.is_dir(), f"falta el fixture «{PARTIAL_EFFECT_READINGS}»")
+        run = self.project.run(
+            DIFF_READINGS_PY, "--readings", str(PARTIAL_EFFECT_READINGS), "--json", "--no-color"
+        )
+        decisions = run.json["decisions"]
+        self.assertEqual(len(decisions), 1, run.describe())
+        decision = decisions[0]
+        self.assertEqual(decision["reason"], "same-reading-two-fields", run.describe())
+        self.assertEqual(sorted(decision["fields"]), ["effect", "side_effects"], run.describe())
+        self.assertEqual(len(decision["divergences"]), 2, run.describe())
+        self.assertEqual(decision["scenarios"], ["One line short of stock"], run.describe())
+        self.assertEqual(decision["hardness"], "hard", run.describe())
+
+    def test_disjoint_distinguishing_tokens_stay_apart(self):
+        """@covers R-DIV-013"""
+        payload, run = self.decisions_of(
+            {
+                "reader-a": [
+                    reading(
+                        "Order confirmed",
+                        "envia el correo de confirmacion al cliente",
+                        "200",
+                        ["descuenta una unidad del almacen"],
+                    )
+                ],
+                "reader-b": [
+                    reading(
+                        "Order confirmed",
+                        "registra el pedido en el historial del cliente",
+                        "200",
+                        ["bloquea la tarjeta del comprador"],
+                    )
+                ],
+            }
+        )
+        fields = sorted(d["field"] for d in payload["divergences"])
+        self.assertEqual(fields, ["effect", "side_effects"], run.describe())
+        self.assertEqual(len(payload["decisions"]), 2, run.describe())
+        self.assertEqual({d["reason"] for d in payload["decisions"]}, {"single"}, run.describe())
+
+    def test_a_shared_particle_groups_nothing(self):
+        """@covers R-DIV-013"""
+        payload, run = self.decisions_of(
+            {
+                "reader-a": [
+                    reading(
+                        "Payment declined",
+                        "no reserva nada del pedido",
+                        "402",
+                        ["no envia el correo de confirmacion"],
+                    )
+                ],
+                "reader-b": [
+                    reading(
+                        "Payment declined",
+                        "libera las unidades retenidas",
+                        "402",
+                        ["registra el intento fallido en el historial"],
+                    )
+                ],
+            }
+        )
+        fields = sorted(d["field"] for d in payload["divergences"])
+        self.assertEqual(fields, ["effect", "side_effects"], run.describe())
+        self.assertEqual({d["reason"] for d in payload["decisions"]}, {"single"}, run.describe())
+
+    def test_a_two_field_decision_is_not_chained_across_scenarios(self):
+        """@covers R-DIV-014"""
+        pair_a = ("reserva total del pedido", ["reserva creada para el pedido completo"])
+        pair_b = (
+            "reserva parcial de las unidades con stock",
+            ["reserva creada solo para las unidades con stock"],
+        )
+        payload, run = self.decisions_of(
+            {
+                "reader-a": [
+                    reading("One line short of stock", pair_a[0], "200", pair_a[1]),
+                    reading("Two lines short of stock", pair_a[0], "200", pair_a[1]),
+                ],
+                "reader-b": [
+                    reading("One line short of stock", pair_b[0], "200", pair_b[1]),
+                    reading("Two lines short of stock", pair_b[0], "200", pair_b[1]),
+                ],
+            }
+        )
+        self.assertEqual(len(payload["divergences"]), 4, run.describe())
+        decisions = payload["decisions"]
+        self.assertEqual(len(decisions), 2, run.describe())
+        for decision in decisions:
+            self.assertEqual(decision["reason"], "same-reading-two-fields", run.describe())
+            self.assertEqual(len(decision["scenarios"]), 1, run.describe())
+            self.assertEqual(len(decision["divergences"]), 2, run.describe())
+
+    def test_the_same_two_status_codes_in_three_scenarios_are_one_decision(self):
+        """@covers R-DIV-014"""
+        payload, run = self.decisions_of(same_code_readings())
+        self.assertEqual(payload["counts"]["hard"], 3, run.describe())
+        decisions = payload["decisions"]
+        self.assertEqual(len(decisions), 1, run.describe())
+        decision = decisions[0]
+        self.assertEqual(decision["reason"], "same-readings-across-scenarios", run.describe())
+        self.assertEqual(decision["scenarios"], list(SAME_CODE_SCENARIOS), run.describe())
+        self.assertEqual(sorted(decision["divergences"]), [0, 1, 2], run.describe())
+        self.assertEqual(decision["fields"], ["status_code"], run.describe())
+        self.assertEqual(decision["hardness"], "hard", run.describe())
+
+    def test_different_code_pairs_stay_apart(self):
+        """@covers R-DIV-014"""
+        payload, run = self.decisions_of(
+            {
+                "reader-a": [
+                    reading("Insufficient stock on one line", "rechaza la peticion", "409"),
+                    reading("Unknown product", "rechaza la peticion", "404"),
+                ],
+                "reader-b": [
+                    reading("Insufficient stock on one line", "rechaza la peticion", "422"),
+                    reading("Unknown product", "rechaza la peticion", "410"),
+                ],
+            }
+        )
+        decisions = payload["decisions"]
+        self.assertEqual(len(decisions), 2, run.describe())
+        for decision in decisions:
+            self.assertEqual(len(decision["divergences"]), 1, run.describe())
+            self.assertEqual(decision["reason"], "single", run.describe())
+
+    def test_a_missing_scenario_is_never_grouped(self):
+        """@covers R-DIV-014"""
+        payload, run = self.decisions_of(
+            {
+                "reader-a": [
+                    reading("Shared scenario", "crea la reserva", "201"),
+                    reading("Only A sees this", "vuelve a reservar", "200"),
+                    reading("Only A sees this too", "vuelve a reservar", "200"),
+                ],
+                "reader-b": [reading("Shared scenario", "crea la reserva", "201")],
+            }
+        )
+        fields = [d["field"] for d in payload["divergences"]]
+        self.assertEqual(fields, ["missing_scenario", "missing_scenario"], run.describe())
+        decisions = payload["decisions"]
+        self.assertEqual(len(decisions), 2, run.describe())
+        self.assertEqual({d["reason"] for d in decisions}, {"single"}, run.describe())
+
+    def test_every_divergence_belongs_to_exactly_one_decision(self):
+        """@covers R-DIV-015"""
+        payload, run = self.decisions_of(rich_readings())
+        self.assertTrue(payload["divergences"], run.describe())
+        members = [index for decision in payload["decisions"] for index in decision["divergences"]]
+        self.assertEqual(sorted(members), list(range(len(payload["divergences"]))), run.describe())
+        for decision in payload["decisions"]:
+            self.assertEqual(
+                list(decision.keys()),
+                ["id", "scenarios", "fields", "divergences", "hardness", "reason", "question", "options"],
+                run.describe(),
+            )
+
+    def test_the_verdict_does_not_move(self):
+        """@covers R-DIV-015"""
+        run = self.project.run(
+            DIFF_READINGS_PY, "--readings", str(PARTIAL_EFFECT_READINGS), "--json", "--no-color"
+        )
+        self.assertEqual(run.json["counts"]["hard"], 1, run.describe())
+        self.assertEqual(run.json["counts"]["soft"], 1, run.describe())
+        self.assertEqual(run.json["verdict"], "diverged", run.describe())
+        self.assertEqual(run.json["exit_code"], 1, run.describe())
+        self.assertEqual(run.returncode, 1, run.describe())
+        self.assertEqual(len(run.json["decisions"]), 1, run.describe())
+
+    def test_a_grouped_question_names_its_scenarios_and_confronts_the_readings(self):
+        """@covers R-DIV-015"""
+        payload, run = self.decisions_of(same_code_readings())
+        decision = payload["decisions"][0]
+        for title in SAME_CODE_SCENARIOS:
+            self.assertIn(title, decision["question"], run.describe())
+        joined = " ".join(decision["options"])
+        self.assertIn("409", joined, run.describe())
+        self.assertIn("422", joined, run.describe())
+        self.assertTrue(
+            any("no hay divergencia real" in option for option in decision["options"]),
+            run.describe(),
+        )
+        self.assertEqual(len(decision["options"]), len(set(decision["options"])), run.describe())
+
+    def test_a_two_field_option_carries_both_fields_of_its_reader(self):
+        """@covers R-DIV-015"""
+        run = self.project.run(
+            DIFF_READINGS_PY, "--readings", str(PARTIAL_EFFECT_READINGS), "--json", "--no-color"
+        )
+        decision = run.json["decisions"][0]
+        self.assertEqual(decision["reason"], "same-reading-two-fields", run.describe())
+        options = decision["options"]
+        self.assertTrue(
+            any("reserva total del pedido" in o and "pedido completo" in o for o in options),
+            run.describe(),
+        )
+        self.assertTrue(
+            any("unidades con stock" in o and "solo para las unidades" in o for o in options),
+            run.describe(),
+        )
+        self.assertTrue(any("no hay divergencia real" in o for o in options), run.describe())
+
+    def test_the_report_lists_grouped_decisions(self):
+        """@covers R-DIV-015"""
+        run = self.diff(same_code_readings(), "--no-color")
+        self.assertNoTraceback(run)
+        self.assertIn("## Decisiones agrupadas", run.stdout, run.describe())
+        self.assertIn("same-readings-across-scenarios", run.stdout, run.describe())
+        section = run.stdout.split("## Decisiones agrupadas", 1)[1].split("\n## ", 1)[0]
+        for title in SAME_CODE_SCENARIOS:
+            self.assertIn(title, section, run.describe())
+
+    def test_no_grouped_decision_no_section(self):
+        """@covers R-DIV-015"""
+        run = self.diff(
+            {
+                "reader-a": [reading("Insufficient stock on one line", "rechaza la peticion", "409")],
+                "reader-b": [reading("Insufficient stock on one line", "rechaza la peticion", "422")],
+            },
+            "--no-color",
+        )
+        self.assertNoTraceback(run)
+        self.assertNotIn("Decisiones agrupadas", run.stdout, run.describe())
 
 
 if __name__ == "__main__":

@@ -749,6 +749,16 @@ class Analysis:
         return [d for d in self.divergences if d.hardness == HARDNESS_HARD]
 
     @property
+    def decisions(self) -> list["Decision"]:
+        """Las divergencias repartidas por decisión raíz (`R-DIV-013`…`015`)."""
+        return group_decisions(self.divergences)
+
+    @property
+    def grouped_decisions(self) -> list["Decision"]:
+        """Sólo las decisiones con más de un miembro: las que ahorran preguntas."""
+        return [decision for decision in self.decisions if len(decision.divergences) > 1]
+
+    @property
     def soft(self) -> list[Divergence]:
         return [d for d in self.divergences if d.hardness == HARDNESS_SOFT]
 
@@ -1735,6 +1745,211 @@ def collect_gaps(group: ScenarioGroup, reader_names: list[str]) -> tuple[list[Ga
     return gaps, question
 
 
+REASON_SINGLE = "single"
+REASON_TWO_FIELDS = "same-reading-two-fields"
+REASON_ACROSS_SCENARIOS = "same-readings-across-scenarios"
+
+#: La opción que cierra toda pregunta agrupada: que las lecturas enfrentadas
+#: sean la misma cosa dicha de dos maneras.
+NO_REAL_DIVERGENCE = "Las lecturas dicen lo mismo con otras palabras, no hay divergencia real"
+
+
+@dataclass
+class Decision:
+    """Una decisión raíz: las divergencias que se resuelven con la misma respuesta.
+
+    El informe enseñaba la misma ambigüedad varias veces —una por escenario que
+    la hereda, o una por campo en el que los lectores la escribieron— y la
+    entrevista la preguntaba otras tantas. Aquí se agrupan con dos criterios de
+    conjuntos, sin constantes nuevas y sin opinar sobre el significado; lo que
+    no cae en ninguno queda como decisión de un solo miembro (`single`).
+    """
+
+    id: str
+    scenarios: list[str]
+    fields: list[str]
+    divergences: list[int]
+    hardness: str
+    reason: str
+    question: str
+    options: list[str]
+
+    def __post_init__(self) -> None:
+        self.options = distinct_options(list(self.options))
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "scenarios": list(self.scenarios),
+            "fields": list(self.fields),
+            "divergences": list(self.divergences),
+            "hardness": self.hardness,
+            "reason": self.reason,
+            "question": self.question,
+            "options": list(self.options),
+        }
+
+
+def reading_text(value: object) -> str:
+    """Una lectura como texto único, venga como cadena, lista o nada."""
+    if value is None:
+        return ""
+    if isinstance(value, list):
+        return " ".join(str(item) for item in value)
+    return str(value)
+
+
+def distinctive_tokens(readings: dict[str, object]) -> dict[str, set[str]]:
+    """Por lector, los tokens de contenido que sólo tiene él en ese campo.
+
+    Se cuentan como los compara `effect` —sin palabras vacías ni conjugación—,
+    así que una negación o un artículo compartidos no distinguen a nadie.
+    """
+    tokens = {name: content_tokens(reading_text(value)) for name, value in readings.items()}
+    result: dict[str, set[str]] = {}
+    for name, mine in tokens.items():
+        others: set[str] = set()
+        for other, theirs in tokens.items():
+            if other != name:
+                others |= theirs
+        result[name] = mine - others
+    return result
+
+
+def same_reading_two_fields(effect: Divergence, side: Divergence) -> bool:
+    """¿Escriben los lectores la misma lectura en `effect` y en `side_effects`?
+
+    Sí cuando, en cada lector presente en las dos divergencias, los tokens
+    distintivos de sus dos lecturas comparten al menos uno. Un lector sin
+    lectura en una de las dos no vota; sin ningún lector que vote, no hay
+    agrupación.
+    """
+    effect_tokens = distinctive_tokens(effect.readings)
+    side_tokens = distinctive_tokens(side.readings)
+    common = [name for name in effect_tokens if name in side_tokens]
+    if not common:
+        return False
+    return all(effect_tokens[name] & side_tokens[name] for name in common)
+
+
+def readings_key(divergence: Divergence) -> frozenset[str]:
+    """El conjunto de lecturas normalizadas que la divergencia enfrenta."""
+    return frozenset(normalize(reading_text(value)) for value in divergence.readings.values())
+
+
+def joined_scenarios(titles: list[str]) -> str:
+    return join_es([f"«{title}»" for title in titles])
+
+
+def grouped_question(members: list[Divergence], scenarios: list[str]) -> str:
+    """La pregunta del primer miembro, con todos los escenarios en el sitio del suyo."""
+    first = members[0]
+    marker = f"«{first.scenario}»"
+    if marker in first.question:
+        return first.question.replace(marker, joined_scenarios(scenarios), 1)
+    return f"{first.question} (en {joined_scenarios(scenarios)})"
+
+
+def two_field_options(effect: Divergence, side: Divergence) -> list[str]:
+    """Una opción por lector que enlaza su efecto y sus efectos colaterales.
+
+    El texto elegido se anota para los dos miembros, así que tiene que describir
+    las dos cosas: una opción que sólo dijera el efecto dejaría en el miembro
+    `side_effects` una lectura que nadie propuso.
+    """
+    options: list[str] = []
+    for name, value in effect.readings.items():
+        effect_text = reading_text(value)
+        side_text = reading_text(side.readings.get(name))
+        if not effect_text and not side_text:
+            continue
+        if side_text:
+            options.append(f"«{effect_text}», con «{side_text}» ({reader_label(name)})")
+        else:
+            options.append(f"«{effect_text}» ({reader_label(name)})")
+    options.append(NO_REAL_DIVERGENCE)
+    return options
+
+
+def group_decisions(divergences: list[Divergence]) -> list[Decision]:
+    """Reparte las divergencias en decisiones raíz; cada índice cae en exactamente una.
+
+    Primero los dos campos del mismo escenario (`same-reading-two-fields`), luego
+    el mismo campo con el mismo conjunto de lecturas en escenarios distintos
+    (`same-readings-across-scenarios`) sobre lo que quedó libre, y el resto
+    `single`. Ningún grupo se funde con otro por transitividad: lo que ya está
+    en una decisión no entra en la siguiente. Los escenarios que sólo ve un
+    lector no se agrupan nunca.
+    """
+    taken: set[int] = set()
+    groups: list[tuple[str, list[int]]] = []
+
+    by_scenario: dict[str, dict[str, int]] = {}
+    for index, divergence in enumerate(divergences):
+        by_scenario.setdefault(normalize(divergence.scenario), {})[divergence.field] = index
+    for fields in by_scenario.values():
+        if FIELD_EFFECT in fields and FIELD_SIDE_EFFECTS in fields:
+            effect_index, side_index = fields[FIELD_EFFECT], fields[FIELD_SIDE_EFFECTS]
+            if same_reading_two_fields(divergences[effect_index], divergences[side_index]):
+                members = sorted((effect_index, side_index))
+                groups.append((REASON_TWO_FIELDS, members))
+                taken.update(members)
+
+    buckets: dict[tuple[str, frozenset[str]], list[int]] = {}
+    for index, divergence in enumerate(divergences):
+        if index in taken or divergence.field == FIELD_MISSING_SCENARIO:
+            continue
+        buckets.setdefault((divergence.field, readings_key(divergence)), []).append(index)
+    for members in buckets.values():
+        if len(members) > 1:
+            groups.append((REASON_ACROSS_SCENARIOS, members))
+            taken.update(members)
+
+    for index in range(len(divergences)):
+        if index not in taken:
+            groups.append((REASON_SINGLE, [index]))
+
+    groups.sort(key=lambda group: group[1][0])
+    decisions: list[Decision] = []
+    for position, (reason, members) in enumerate(groups, start=1):
+        chosen = [divergences[index] for index in members]
+        scenarios: list[str] = []
+        fields: list[str] = []
+        for divergence in chosen:
+            if divergence.scenario not in scenarios:
+                scenarios.append(divergence.scenario)
+            if divergence.field not in fields:
+                fields.append(divergence.field)
+        hardness = HARDNESS_HARD if any(d.hardness == HARDNESS_HARD for d in chosen) else HARDNESS_SOFT
+        if reason == REASON_TWO_FIELDS:
+            effect = next(d for d in chosen if d.field == FIELD_EFFECT)
+            side = next(d for d in chosen if d.field == FIELD_SIDE_EFFECTS)
+            question = (
+                f"¿Cuál de estas lecturas de «{effect.scenario}» es la correcta, "
+                "para el efecto y para los efectos observables a la vez?"
+            )
+            options = two_field_options(effect, side)
+        elif reason == REASON_ACROSS_SCENARIOS:
+            question = grouped_question(chosen, scenarios)
+            options = list(chosen[0].options) + [NO_REAL_DIVERGENCE]
+        else:
+            question = chosen[0].question
+            options = list(chosen[0].options)
+        decisions.append(
+            Decision(
+                id=f"D-{position:03d}",
+                scenarios=scenarios,
+                fields=fields,
+                divergences=members,
+                hardness=hardness,
+                reason=reason,
+                question=question,
+                options=options,
+            )
+        )
+    return decisions
+
+
 def analyse(
     directory: Path,
     readers: list[ReaderFile],
@@ -1795,11 +2010,13 @@ def decide_exit_code(analysis: Analysis, strict: bool) -> int:
 def build_payload(analysis: Analysis, verdict: Verdict) -> dict:
     """Construye el JSON estable versión 1 del contrato.
 
-    Sobre el ejemplo de §7 añade cuatro claves, todas para que el canal máquina
+    Sobre el ejemplo de §7 añade cinco claves, todas para que el canal máquina
     pueda decir lo mismo que el canal prosa: `verdict` (cuál de los seis
     veredictos), `strict` (el modo de **esta** invocación), `exit_code` (el código
-    con el que sale el proceso, calculado por la misma función que lo devuelve) y
-    `advocate` (si el abogado del diablo faltaba, estaba vacío o no se pudo leer).
+    con el que sale el proceso, calculado por la misma función que lo devuelve),
+    `advocate` (si el abogado del diablo faltaba, estaba vacío o no se pudo leer)
+    y `decisions` (las divergencias repartidas por decisión raíz; `divergences`,
+    `counts` y el código de salida no se mueven por ella).
     """
     payload: dict = {
         "version": SCHEMA_VERSION,
@@ -1812,6 +2029,7 @@ def build_payload(analysis: Analysis, verdict: Verdict) -> dict:
         "gaps": [gap.to_dict() for gap in analysis.gaps],
         "attacks": [dict(attack) for attack in analysis.attacks],
         "advocate": analysis.advocate_status,
+        "decisions": [decision.to_dict() for decision in analysis.decisions],
     }
     if analysis.errors:
         payload["errors"] = list(analysis.errors)
@@ -1962,6 +2180,27 @@ def render_markdown(analysis: Analysis, verdict: Verdict, color: bool = False) -
                 "",
             ]
         )
+
+    grouped = analysis.grouped_decisions
+    if grouped:
+        lines.extend([f"## Decisiones agrupadas · {len(grouped)}", ""])
+        lines.extend(
+            [
+                "Varias divergencias de abajo nacen de la misma ambigüedad y se resuelven con una",
+                "sola respuesta. Contesta aquí una vez; la respuesta vale para todos los escenarios",
+                "que se listan, y si para alguno no vale, dilo y se pregunta aparte.",
+                "",
+            ]
+        )
+        for decision in grouped:
+            members = join_es([f"`{field}`" for field in decision.fields])
+            detail = (
+                f"{decision.id} · razón `{decision.reason}` · {count_es(len(decision.divergences), 'divergencia', 'divergencias')} "
+                f"en {members} · escenarios: {joined_scenarios(decision.scenarios)}."
+            )
+            lines.extend(
+                render_question(join_es(decision.scenarios), detail, decision.question, decision.options)
+            )
 
     if analysis.hard:
         lines.extend([f"## Divergencias duras · {len(analysis.hard)}", ""])

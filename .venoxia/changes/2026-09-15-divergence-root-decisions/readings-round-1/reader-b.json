@@ -1,0 +1,18 @@
+[
+  {"scenario": "The partial reservation fixture is one decision", "effect": "el JSON agrupa efecto y side_effects en una sola decisión", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "Disjoint distinguishing tokens stay apart", "effect": "cada divergencia queda como decisión separada con razón single", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The same two status codes in three scenarios", "effect": "una sola decisión agrupa tres escenarios y tres divergencias", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "Different code pairs stay apart", "effect": "dos decisiones distintas, cada una con un solo miembro", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "A missing scenario is never grouped", "effect": "la divergencia del escenario visto por un solo lector queda sola, razón single", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "Every divergence belongs to exactly one decision", "effect": "cada índice de divergences aparece en exactamente una entrada de decisions", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The verdict does not move", "effect": "counts y veredicto diverged no cambian; decisions trae una entrada", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "A grouped question names its scenarios and confronts the readings", "effect": "la pregunta nombra los escenarios y ofrece las lecturas más la opción sin divergencia", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The report lists grouped decisions", "effect": "el informe markdown muestra la sección Decisiones agrupadas con razón y escenarios", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "No grouped decision, no section", "effect": "el informe markdown omite la sección Decisiones agrupadas", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "One decision per call", "effect": "el texto de la skill declara una decisión por llamada en el orden del informe", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The root decision is explained once", "effect": "el texto declara que la decisión raíz se explica una vez antes de la llamada", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "Every member is recorded", "effect": "el texto declara que decisions.json anota una entrada por miembro con mismo answer", "status_code": null, "side_effects": ["escritura en decisions.json (según lo declarado en la skill)"], "unclear": false, "unclear_why": null},
+  {"scenario": "The skill never groups on its own", "effect": "el texto declara que la skill no agrupa preguntas, el script sí", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "Several active changes are asked about", "effect": "el texto declara que se pregunta cuál change con los ids como opciones", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null},
+  {"scenario": "The date of the files decides nothing", "effect": "el texto no elige el change por el change.json más reciente", "status_code": null, "side_effects": [], "unclear": false, "unclear_why": null}
+]

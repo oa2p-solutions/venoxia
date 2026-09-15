@@ -1,0 +1,7 @@
+[
+  {
+    "attack": "Cumpliendo el requisito al pie de la letra, un cliente puede confirmar el pago cada catorce minutos y mantener el stock de un pedido reservado para siempre sin llegar a pagarlo nunca.",
+    "requirement_id": "R-CHK-010",
+    "severity": "high"
+  }
+]

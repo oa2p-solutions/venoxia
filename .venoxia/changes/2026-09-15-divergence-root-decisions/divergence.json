@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "converged": false,
+  "verdict": "soft_only",
+  "strict": false,
+  "exit_code": 0,
+  "counts": {
+    "hard": 0,
+    "soft": 12,
+    "gaps": 0,
+    "scenarios": 20,
+    "readers": 2
+  },
+  "divergences": [
+    {
+      "scenario": "Disjoint distinguishing tokens stay apart",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "cada divergencia queda como decisión separada, razón single",
+        "reader-b": "el JSON trae dos decisiones separadas con razón single"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Disjoint distinguishing tokens stay apart» es la correcta?",
+      "options": [
+        "«cada divergencia queda como decisión separada, razón single»",
+        "«el JSON trae dos decisiones separadas con razón single»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A shared particle groups nothing",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "las divergencias no se agrupan por compartir sólo una partícula vacía",
+        "reader-b": "cada divergencia queda como decisión propia, razón single"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A shared particle groups nothing» es la correcta?",
+      "options": [
+        "«las divergencias no se agrupan por compartir sólo una partícula vacía»",
+        "«cada divergencia queda como decisión propia, razón single»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The same two status codes in three scenarios",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "una decisión agrupa las tres divergencias de código de estado",
+        "reader-b": "una sola decisión agrupa los tres escenarios como miembros"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The same two status codes in three scenarios» es la correcta?",
+      "options": [
+        "«una decisión agrupa las tres divergencias de código de estado»",
+        "«una sola decisión agrupa los tres escenarios como miembros»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Different code pairs stay apart",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "quedan dos decisiones separadas, cada una con un miembro",
+        "reader-b": "el JSON trae dos decisiones, cada una con un solo miembro"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Different code pairs stay apart» es la correcta?",
+      "options": [
+        "«quedan dos decisiones separadas, cada una con un miembro»",
+        "«el JSON trae dos decisiones, cada una con un solo miembro»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A missing scenario is never grouped",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la divergencia del escenario visto por un solo lector queda sola",
+        "reader-b": "la divergencia del escenario ausente queda sola, razón single"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A missing scenario is never grouped» es la correcta?",
+      "options": [
+        "«la divergencia del escenario visto por un solo lector queda sola»",
+        "«la divergencia del escenario ausente queda sola, razón single»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The verdict does not move",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "counts y el veredicto diverged no cambian, decisions trae una entrada",
+        "reader-b": "counts, veredicto diverged y decisions con una entrada quedan igual"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The verdict does not move» es la correcta?",
+      "options": [
+        "«counts y el veredicto diverged no cambian, decisions trae una entrada»",
+        "«counts, veredicto diverged y decisions con una entrada quedan igual»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "A two-field option carries both fields of its reader",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "la opción de cada lector une su efecto y sus efectos colaterales",
+        "reader-b": "cada opción enlaza el efecto y los efectos colaterales del mismo lector"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «A two-field option carries both fields of its reader» es la correcta?",
+      "options": [
+        "«la opción de cada lector une su efecto y sus efectos colaterales»",
+        "«cada opción enlaza el efecto y los efectos colaterales del mismo lector»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "No grouped decision, no section",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el informe omite la sección Decisiones agrupadas",
+        "reader-b": "el informe no incluye la sección Decisiones agrupadas"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «No grouped decision, no section» es la correcta?",
+      "options": [
+        "«el informe omite la sección Decisiones agrupadas»",
+        "«el informe no incluye la sección Decisiones agrupadas»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "One decision per call",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara preguntar una decisión por llamada, en orden del informe",
+        "reader-b": "el cuerpo de la skill declara una decisión por llamada, orden y textos literales"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «One decision per call» es la correcta?",
+      "options": [
+        "«el SKILL.md declara preguntar una decisión por llamada, en orden del informe»",
+        "«el cuerpo de la skill declara una decisión por llamada, orden y textos literales»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "Every member is recorded",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara anotar en decisions.json una entrada por miembro",
+        "reader-b": "el cuerpo de la skill declara anotar una entrada por miembro con mismo answer y clave decision"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «Every member is recorded» es la correcta?",
+      "options": [
+        "«el SKILL.md declara anotar en decisions.json una entrada por miembro»",
+        "«el cuerpo de la skill declara anotar una entrada por miembro con mismo answer y clave decision»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The skill never groups on its own",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara que la agrupación la hace el script, no la skill",
+        "reader-b": "el cuerpo de la skill declara que no agrupa y que el script decide"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The skill never groups on its own» es la correcta?",
+      "options": [
+        "«el SKILL.md declara que la agrupación la hace el script, no la skill»",
+        "«el cuerpo de la skill declara que no agrupa y que el script decide»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    },
+    {
+      "scenario": "The date of the files decides nothing",
+      "field": "effect",
+      "hardness": "soft",
+      "readings": {
+        "reader-a": "el SKILL.md declara no elegir el change por la fecha de sus ficheros",
+        "reader-b": "el cuerpo de la skill no elige el change por fecha del change.json"
+      },
+      "question": "¿Cuál de estas lecturas del efecto de «The date of the files decides nothing» es la correcta?",
+      "options": [
+        "«el SKILL.md declara no elegir el change por la fecha de sus ficheros»",
+        "«el cuerpo de la skill no elige el change por fecha del change.json»",
+        "Ambas lecturas describen lo mismo con otras palabras, no hay divergencia real"
+      ],
+      "signal": null
+    }
+  ],
+  "gaps": [],
+  "attacks": [
+    {
+      "attack": "R-DIV-017 permite examinar un change en `verified` cuando su id viene en `$ARGUMENTS` y a la vez prohíbe que vuelva a `validated`: la entrevista escribe las respuestas en el delta y deja el change declarándose `verified` con un texto que ningún run del oráculo respalda, de modo que `gate.py` y `/venoxia:close` lo dan por verificado y se publica como contrato verificado un delta que nadie ha vuelto a ejecutar.",
+      "requirement_id": "R-DIV-017",
+      "severity": "high"
+    },
+    {
+      "attack": "R-DIV-013 agrupa en cuanto los tokens distintivos «comparten al menos uno» y sólo excluye palabras vacías: dos divergencias sin relación (efecto «el pedido se crea» vs «el pedido se rechaza» y side_effects «se notifica al dueño del pedido» vs «no se notifica a nadie») comparten el token de contenido «pedido» y se funden en una sola decisión; el usuario contesta una pregunta y R-DIV-016 obliga a anotar ese mismo `answer` como decisión de las dos divergencias, con lo que el delta recoge una decisión que el usuario nunca tomó sobre el segundo campo.",
+      "requirement_id": "R-DIV-013",
+      "severity": "medium"
+    },
+    {
+      "attack": "R-DIV-014 obliga («DEBE agruparlas») a fundir en una sola decisión todas las divergencias del mismo campo que enfrentan el mismo par de lecturas, sin tope de miembros y sin ninguna vía para que el usuario responda distinto en un escenario concreto: el par «200» vs «409» repetido en doce escenarios (crear, borrar, reintentar) se contesta una vez y esa respuesta se escribe literal como decisión de los doce, incluidos aquellos en los que la respuesta correcta era la contraria.",
+      "requirement_id": "R-DIV-014",
+      "severity": "medium"
+    }
+  ],
+  "advocate": "listed"
+}

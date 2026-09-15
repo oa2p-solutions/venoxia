@@ -1,0 +1,138 @@
+schema_version: "1.0"
+name: diverge-root-decision
+description: >-
+  Tres escenarios del mismo requisito dicen que la petición «se rechaza» sin fijar con qué
+  respuesta, y las dos lecturas prefabricadas los resuelven los tres como 409 y como 422.
+  Son tres divergencias duras y una sola decisión: el JSON tiene que agruparlas en una
+  entrada de `decisions` con los tres escenarios, sin mover el recuento ni el veredicto.
+tags: [divergence, ambiguity, grouping, must-detect]
+context:
+  add_dirs: ["./project"]
+execution:
+  prompt: |
+    Trabajas sobre un proyecto que usa Venoxia. Su raíz es el directorio `project/`, que
+    se te ha añadido a esta sesión como directorio de trabajo adicional; dentro tiene su
+    especificación en `.venoxia/`. Localízalo antes de nada si no lo tienes a la vista.
+
+    El change `2026-08-31-stock-reservation` ya tiene grabadas las lecturas
+    independientes de su delta en
+    `.venoxia/changes/2026-08-31-stock-reservation/readings/`. No lances lectores nuevos:
+    usa esas lecturas tal como están.
+
+    Compáralas entre sí y guarda la salida JSON íntegra del análisis de divergencia en
+    `divergence-result.json`, dentro de tu directorio de trabajo actual. Cópiala tal
+    cual: sin editarla, sin resumirla y sin reformatearla.
+
+    Que el análisis termine con un código de salida distinto de cero no es un fallo de la
+    herramienta: es justo el resultado que se te pide capturar.
+
+    Termina con dos frases como mucho: cuántas decisiones distintas tendría que tomar el
+    usuario para resolver todas las divergencias, y cuál es la primera.
+  max_turns: 14
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Skill]
+runs: 2
+expected_outcome: >-
+  El análisis no converge: tres divergencias duras en `status_code`, una por escenario, y
+  una sola entrada en `decisions` con razón `same-readings-across-scenarios` que nombra los
+  tres escenarios y enfrenta 409 con 422.
+graders:
+  - type: tool_used
+    name: divergence-script-ran
+    tool: Bash
+    input_match: 'diff_readings\.py'
+    min: 1
+  - type: file_exists
+    name: divergence-result-written
+    path: divergence-result.json
+  - type: regex
+    name: readings-do-not-converge
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"converged":\s*false'
+  - type: regex
+    name: three-hard-no-soft-no-gap
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"counts":\s*\{\s*"hard":\s*3,\s*"soft":\s*0,\s*"gaps":\s*0'
+    flags: "s"
+  - type: regex
+    name: decisions-key-present
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"decisions":\s*\['
+  - type: regex
+    name: grouped-across-scenarios
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"reason":\s*"same-readings-across-scenarios"'
+  - type: regex
+    name: only-one-decision
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"reason":\s*"single"'
+    match: not_contains
+  - type: regex
+    name: decision-lists-three-members
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '"divergences":\s*\[\s*0,\s*1,\s*2\s*\]'
+    flags: "s"
+  - type: regex
+    name: first-scenario-named
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: 'Insufficient stock on one line'
+  - type: regex
+    name: second-scenario-named
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: 'Product discontinued on one line'
+  - type: regex
+    name: third-scenario-named
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: 'Line quantity above the reservable limit'
+  - type: regex
+    name: reading-409-confronted
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '409'
+  - type: regex
+    name: reading-422-confronted
+    target:
+      source: file
+      path: divergence-result.json
+    pattern: '422'
+  - type: regex
+    name: no-python-traceback
+    target: trace
+    pattern: 'Traceback \(most recent call last\)'
+    match: not_contains
+  - type: llm
+    name: grouped-question-names-every-scenario
+    focus:
+      source: file
+      path: divergence-result.json
+    criteria: >-
+      La clave `decisions` del JSON contiene exactamente una entrada, y su `question`
+      nombra los tres escenarios («Insufficient stock on one line», «Product discontinued
+      on one line» y «Line quantity above the reservable limit») en una sola pregunta
+      cerrada cuyas opciones enfrentan 409 y 422. No vale una pregunta por escenario ni
+      una pregunta abierta.
+    weight: 0.5
+  - type: tool_used
+    name: venoxia-skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only

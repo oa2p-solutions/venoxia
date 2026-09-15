@@ -24,7 +24,7 @@ Convenciones fijas de todo el repo. Las verificables son requisitos de la capabi
 ## Comandos
 
 ```bash
-# Suite completa (886 tests, ~40 s). unittest de la stdlib, sin -t .
+# Suite completa (más de mil tests, ~45 s). unittest de la stdlib, sin -t .
 python3 -m unittest discover -s tests -q
 
 # Un fichero, una clase, un test. El import cualificado tests.venoxia_fixtures exige lanzarlo desde la raíz.
@@ -68,8 +68,8 @@ No hay linter ni formateador configurado (el núcleo es pequeño y las convencio
 | Script | Qué decide | Sobre qué |
 |---|---|---|
 | `scripts/validate.py` | reglas `V01`–`V19` sobre requisitos (incluye `V17`/`V18`, que leen `oracle.json` sin ejecutar nada, y `V19`, que lee `venoxia.json`) | `.venoxia/capabilities/*/spec.md` y `.venoxia/changes/<id>/delta/*.md` |
-| `scripts/charter_lint.py` | 19 reglas `C01`–`C19` sobre el acta | `.venoxia/charter.md` (y lee `principles.md` para C17, `capabilities/` para C16) |
-| `scripts/diff_readings.py` | divergencia entre lecturas aisladas | `.venoxia/changes/<id>/readings/reader-*.json` + `devils-advocate.json` |
+| `scripts/charter_lint.py` | 21 reglas `C01`–`C21` sobre el acta (`C21` rechaza toda línea con la marca `<!-- inferred -->`) | `.venoxia/charter.md` (y lee `principles.md` para C17, `capabilities/` para C16) |
+| `scripts/diff_readings.py` | divergencia entre lecturas aisladas, y las agrupa por decisión raíz en la clave `decisions` del JSON (`same-reading-two-fields`, `same-readings-across-scenarios`, `single`) sin mover `counts` ni el código de salida | `.venoxia/changes/<id>/readings/reader-*.json` + `devils-advocate.json` |
 | `scripts/guardian.py` | allow/deny de una edición | payload del hook por stdin; sólo lee `change.json` y `delta/` |
 | `scripts/oracle.py` | ejecuta `verifies:` por requisito y atribuye `green`/`red`/`missing`/`timeout`; con `--record` deja el historial en `changes/<id>/oracle.json` | el `delta/*.md` de un change y el `test_command` de `.venoxia/venoxia.json`, o el runner con nombre (`runners.<name>`) que el requisito elija con `runner:`; un runner con nombre puede no llevar `{files}` y corre tal cual |
 | `scripts/gate.py` | la puerta para un proyecto consumidor: acta y validador en estricto, y el oráculo de cada change en `verified`, con un veredicto único. **Fail-closed** (lo contrario del guardián) y ejecuta **sus propios** scripts, nunca los de la raíz inspeccionada | un proyecto entero, por `--root` |
@@ -114,7 +114,7 @@ guardian          → permite Edit/Write de código cuando hay change validated 
                     no escribe ningún fichero ni estado; el mensaje nunca menciona a Claude ni lleva Co-Authored-By
 ```
 
-Reglas duras del flujo: `specify` nunca escribe `validated` ni `verified`; `diverge` es la única que escribe `validated`; `verify` es la única que escribe `verified`; ninguna skill toca código de producción salvo `implement`, que sólo escribe código (nunca `.venoxia/` ni los tests de `verifies:`) y nunca graba; `close` es la única que ejecuta git, sólo sobre un change `verified`, sólo tras `gate.py` en `0` y tras un sí explícito por `AskUserQuestion`, nunca con `--no-verify`/`--force`/`--amend`/`-c`, y su mensaje de commit no lleva `Co-Authored-By` ni menciona a Claude (instrucción del usuario, 2026-09-11); `readings/` se guarda **crudo**, sin arreglar, y la skill no tiene voto sobre si dos lecturas «dicen lo mismo». `diverge` plantea las preguntas del informe como entrevista (`AskUserQuestion`, una por llamada, opciones literales del script) y anota cada respuesta tal cual en `changes/<id>/decisions.json`; el texto elegido va al delta sin reformular. Una divergencia dura de `side_effects` nombra la señal que la hizo dura (`signal`: `polarity`, `scope`, `numeric`, `empty-repertoire`), que es como se cuentan los falsos positivos del motor sobre prosa real. Los agentes `reader` y `devils-advocate` reciben **sólo la ruta del delta**, deliberadamente sin el contexto de la conversación. `guardian.py` sigue abriendo la puerta al código en `validated`, no en `verified`: escribir el código es justo lo que convierte el rojo del oráculo en verde.
+Reglas duras del flujo: `specify` nunca escribe `validated` ni `verified`; `diverge` es la única que escribe `validated`; `verify` es la única que escribe `verified`; ninguna skill toca código de producción salvo `implement`, que sólo escribe código (nunca `.venoxia/` ni los tests de `verifies:`) y nunca graba; `close` es la única que ejecuta git, sólo sobre un change `verified`, sólo tras `gate.py` en `0` y tras un sí explícito por `AskUserQuestion`, nunca con `--no-verify`/`--force`/`--amend`/`-c`, y su mensaje de commit no lleva `Co-Authored-By` ni menciona a Claude (instrucción del usuario, 2026-09-11); `readings/` se guarda **crudo**, sin arreglar, y la skill no tiene voto sobre si dos lecturas «dicen lo mismo». `diverge` plantea las preguntas del informe como entrevista (`AskUserQuestion`, una decisión por llamada, opciones literales del script, la raíz explicada una vez y los escenarios afectados a la vista) y anota cada respuesta tal cual en `changes/<id>/decisions.json`, una entrada por divergencia miembro con el mismo `answer` y la clave `decision`; el texto elegido va al delta sin reformular. Con varios changes activos y sin id pregunta cuál, y nunca toma un change `verified` por defecto. Una divergencia dura de `side_effects` nombra la señal que la hizo dura (`signal`: `polarity`, `scope`, `numeric`, `empty-repertoire`), que es como se cuentan los falsos positivos del motor sobre prosa real. Los agentes `reader` y `devils-advocate` reciben **sólo la ruta del delta**, deliberadamente sin el contexto de la conversación. `guardian.py` sigue abriendo la puerta al código en `validated`, no en `verified`: escribir el código es justo lo que convierte el rojo del oráculo en verde.
 
 ### Tests
 
@@ -130,7 +130,8 @@ Cuando la variable de entorno `VENOXIA_TRACE_DIR` está definida, `Project.run` 
 
 ## Al cambiar cosas
 
-- **Regla nueva en validate.py o charter_lint.py:** añadirla a `RULES`, un test positivo y uno negativo, la fila en la tabla del README y en la tabla de remedios de `skills/validate/SKILL.md`, y comprobar que los cinco fixtures de evals siguen dando sus cifras.
+- **Regla nueva en validate.py o charter_lint.py:** añadirla a `RULES`, un test positivo y uno negativo, la fila en la tabla del README y en la tabla de remedios de `skills/validate/SKILL.md`, y comprobar que los fixtures de evals siguen dando sus cifras (`tests/test_eval_fixtures.py`). Ojo con `charter_lint.py`: el parseo borra los comentarios HTML antes de armar las secciones, así que una regla que mire un comentario (como `C21` y su marca `<!-- inferred -->`) lee el texto crudo en `_fill_charter`, y la marca literal no puede aparecer en `templates/charter.md` ni en ningún acta de fixture.
+- **Texto de una skill:** `tests/test_charter_skill.py` y `tests/test_diverge_skill.py` exigen frases literales del cuerpo de `skills/charter/SKILL.md` y `skills/diverge/SKILL.md` (una por escenario del delta que las trajo); al reescribir un párrafo hay que conservarlas o cambiar antes la spec.
 - **Texto de una skill o plantilla:** los ejemplos de markdown del README y de `templates/` tienen que pasar por los linters como ficheros reales (el README ya coló una vez un `SHALL` que V14 marca).
 - **Cambio de formato del requisito o del acta:** tocar `parser.py`/`charter_lint.py`, las plantillas de `templates/`, el ejemplo del README y las skills a la vez; el formato está descrito en tres sitios y los tres tienen que coincidir.
 - `TODO.md` es el plan de construcción por fases y recoge las «correcciones sobre el diseño» tomadas por el camino; el diseño completo vive en un artifact enlazado al principio de ese fichero.

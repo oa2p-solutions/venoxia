@@ -26,7 +26,9 @@ Tu trabajo aquí es de logística, no de criterio: montar el panel en condicione
 
 ## Paso 1 · Localizar el change y sus deltas
 
-Si `$ARGUMENTS` trae un id, ese. Si no, el change de `.venoxia/changes/*/change.json` con `state` distinto de `archived` y `change.json` más reciente; di cuál has elegido antes de seguir.
+Si `$ARGUMENTS` trae un id, ese. Si no, mira los `.venoxia/changes/*/change.json` con `state` distinto de `archived`: con uno solo, ese, y di cuál es antes de seguir; con **más de un change** no archivado, pregunta cuál examinar con `AskUserQuestion`, **con los ids como opciones** y su estado en la descripción. La fecha de los ficheros no decide nada: el que se modificó hace un minuto no es necesariamente el que el usuario tiene en la cabeza.
+
+Y **un change en `verified` no se examina sin su id**, y tampoco con él: ya está verificado, y esta skill **nunca vuelve a `validated`** un estado que el oráculo respalda. Dilo y para; si el comportamiento tiene que cambiar, el camino es un change nuevo por `/venoxia:specify`.
 
 Los deltas son `.venoxia/changes/<id>/delta/*.md`. Si no hay ninguno, no hay nada que leer: dilo y para, el camino es `/venoxia:specify` primero.
 
@@ -121,9 +123,11 @@ El script compara la prosa sin palabras vacías y sin conjugación, así que la 
 
 **Un `0` no es un certificado de convergencia.** El código de salida dice si la ejecución falla; `converged` dice si las lecturas coinciden, y con divergencias blandas valen cero y falso a la vez. El informe trae los dos: el titular del veredicto y el recuento. Repítelos como están en vez de deducir uno del otro.
 
-Si necesitas la salida en máquina, `--json` emite el mismo veredicto con las claves `version`, `converged`, `verdict` (uno de `converged`, `soft_only`, `diverged`, `errors`, `too_few_readers`, `no_scenarios`), `strict`, `exit_code`, `counts`, `divergences`, `gaps`, `attacks`, `advocate` (`absent`, `empty`, `listed` o `unreadable`) y, cuando hubo problemas de lectura, `errors`.
+Si necesitas la salida en máquina, `--json` emite el mismo veredicto con las claves `version`, `converged`, `verdict` (uno de `converged`, `soft_only`, `diverged`, `errors`, `too_few_readers`, `no_scenarios`), `strict`, `exit_code`, `counts`, `divergences`, `gaps`, `attacks`, `advocate` (`absent`, `empty`, `listed` o `unreadable`), `decisions` y, cuando hubo problemas de lectura, `errors`.
 
-Y **no resumas ni reinterpretes el informe.** Las preguntas cerradas que escribe el script llevan las dos lecturas enfrentadas y sus opciones; se presentan al usuario con su texto, su orden y sus opciones tal como el script las emitió. No las agrupes, no las priorices, no contestes ninguna por tu cuenta y no añadas «esta probablemente sea menor»: la que te parece menor es la que nadie preguntará y la que aparecerá en producción.
+**`decisions` es la unidad de la entrevista.** El script agrupa las divergencias que nacen de la misma ambigüedad —la misma lectura escrita en `effect` y en `side_effects` del mismo escenario (`same-reading-two-fields`), o el mismo par de lecturas repetido en varios escenarios (`same-readings-across-scenarios`)— y deja el resto como decisiones de un solo miembro (`single`). Cada decisión trae su `id`, sus `scenarios`, sus `fields`, los índices de sus `divergences`, su `hardness`, su `reason`, y una `question` con sus `options`. El informe markdown enseña las que agrupan más de una en «Decisiones agrupadas», encima de las divergencias. Y **la skill no agrupa preguntas por su cuenta**: si dos preguntas te parecen la misma y el script las trae separadas, se plantean separadas; **la agrupación la hace el script**, con criterios de conjuntos, para que no dependa del criterio de un modelo.
+
+Y **no resumas ni reinterpretes el informe.** Las preguntas cerradas que escribe el script llevan las dos lecturas enfrentadas y sus opciones; se presentan al usuario con su texto, su orden y sus opciones tal como el script las emitió. No las agrupes por tu cuenta, no las priorices, no contestes ninguna y no añadas «esta probablemente sea menor»: la que te parece menor es la que nadie preguntará y la que aparecerá en producción.
 
 Lo que sí haces: decir dónde está el informe (`.venoxia/changes/<id>/divergence.md`), dar el recuento del script, y luego plantear las preguntas como entrevista, que es el paso siguiente.
 
@@ -131,16 +135,18 @@ Cuando una divergencia es dura, el informe dice **por qué señal** lo es —su 
 
 Los ataques del abogado del diablo aparecen en el informe pero **no** cuentan para el código de salida. Un ataque de severidad `high` con el script en `0` merece que lo pongas delante del usuario igualmente, señalado como lo que es: no bloquea el estado, pero es la clase de cosa que se descubre tarde.
 
-## Paso 4b · La entrevista: una pregunta por llamada
+## Paso 4b · La entrevista: una decisión por llamada
 
-Las preguntas del informe —las de `divergences` y las de `gap_questions`, en el JSON— se plantean al usuario con `AskUserQuestion`, **una pregunta por llamada**, en el orden del informe, y se paran cuando el usuario lo pida. Contestarlas en bloque es lo que este paso viene a evitar: las últimas de una lista larga se contestan sin mirar, y la que se contesta sin mirar es la ambigüedad que llega al código.
+Las preguntas del informe —las entradas de `decisions` y las de `gap_questions`, en el JSON— se plantean al usuario con `AskUserQuestion`, **una decisión por llamada**, en el orden del informe, y se paran cuando el usuario lo pida. Una decisión de un solo miembro es una pregunta por llamada, como siempre; una agrupada es una sola llamada para todos sus escenarios. Contestarlas en bloque es lo que este paso viene a evitar: las últimas de una lista larga se contestan sin mirar, y la que se contesta sin mirar es la ambigüedad que llega al código. Y preguntar la misma cuatro veces produce lo mismo por el otro lado: la cuarta se contesta sin mirar.
 
 Cómo se monta cada llamada:
 
-- **La pregunta y las opciones son las del script, literales.** El texto de `question` va como pregunta; cada entrada de `options` va como una opción, con su texto tal cual, en su orden. No se agrupan preguntas de escenarios distintos en una llamada, no se reordenan por importancia y no se reescriben las opciones para que suenen mejor: el usuario tiene que elegir entre lo que los lectores leyeron, no entre tu resumen de lo que leyeron.
+- **La pregunta y las opciones son las del script, literales.** El texto de `question` va como pregunta; cada entrada de `options` va como una opción, con su texto tal cual, en su orden. No se reordenan por importancia y no se reescriben las opciones para que suenen mejor: el usuario tiene que elegir entre lo que los lectores leyeron, no entre tu resumen de lo que leyeron.
+- **Antes de la llamada, en el mensaje, se explica la decisión raíz una sola vez y se listan los escenarios afectados**: el `detail` del informe —el párrafo que explica el desacuerdo y, en las duras, la señal que la hizo dura— y, en una decisión agrupada, su `reason` y la lista de escenarios que van a recibir la misma respuesta. Así la pregunta no llega sin contexto y el usuario sabe para cuántos sitios está decidiendo.
 - **La descripción de cada opción sólo dice dos cosas**: de qué lector viene esa lectura (lo dice el propio informe) y qué tendría que decir el delta si se elige («el escenario pasaría a decir esto en su `THEN`»; «el delta tendría que decirlo explícitamente»; «las dos lecturas se dan por equivalentes y el delta no cambia»). Nada de recomendaciones, nada de «probablemente», nada de ventajas que el informe no diga: la skill no tiene voto sobre las lecturas, tampoco disfrazado de descripción.
-- **El encabezado** es el título del escenario, recortado si hace falta, y el detalle del informe —el párrafo que explica el desacuerdo y, en las duras, la señal que lo hizo duro— se muestra antes de la llamada, en el mensaje, para que la pregunta no llegue sin contexto.
+- **El encabezado** es el título del escenario, recortado si hace falta; en una decisión agrupada, el primero de la lista y cuántos más.
 - Con dos lectores ninguna pregunta del script pasa de cuatro opciones, que es lo que admite la herramienta. Con tres lectores alguna podría pasar; si ocurre, plantéala en el mensaje con todas sus opciones y pide la letra, y dilo como límite conocido.
+- **Si la respuesta no vale para todos los escenarios de una decisión agrupada**, el usuario lo escribe —«en el de borrar, 404»— y se anota lo que escribió; después se pregunta aparte por cada escenario que exceptuó, uno por llamada, con la pregunta de su divergencia miembro, y cada uno queda con su propio `answer`.
 
 ## Paso 4c · Anotar cada respuesta tal cual
 
@@ -150,6 +156,7 @@ Cada respuesta se **añade** a `.venoxia/changes/<id>/decisions.json` en cuanto 
 {"version": 1, "change": "<id>",
  "decisions": [
    {"at": "2026-09-07T18:40:00Z",
+    "decision": "D-001",
     "scenario": "<título literal del escenario>",
     "field": "side_effects",
     "question": "<texto literal de la pregunta>",
@@ -159,10 +166,11 @@ Cada respuesta se **añade** a `.venoxia/changes/<id>/decisions.json` en cuanto 
  ]}
 ```
 
-- `scenario`, `question` y `options` se copian del informe; `chosen` es el índice de la opción elegida, o `null` si el usuario escribió su propia respuesta; `answer` es el texto que va a ir al delta.
+- `scenario`, `question` y `options` se copian del informe; `chosen` es el índice de la opción elegida, o `null` si el usuario escribió su propia respuesta; `answer` es el texto que va a ir al delta; `decision` es el `id` de la decisión del script a la que pertenece la entrada.
+- **Una decisión agrupada se anota como una entrada por divergencia miembro, con el mismo `answer`** y la misma clave `decision`, una por escenario y campo: quien lleve las respuestas al delta va escenario a escenario y tiene que encontrar la suya sin deducirla de otra. La trazabilidad es por divergencia; la pregunta fue por decisión.
 - **Una respuesta escrita a mano se anota con las palabras del usuario**, no con las tuyas mejoradas. Ese texto es el dato; tu reformulación es una interpretación que nadie ha aprobado.
 - Si el fichero ya existe de una pasada anterior, se le añaden las entradas nuevas sin borrar las anteriores; cada entrada lleva su `at`, y ante dos entradas con el mismo `scenario` y la misma `question` vale la más reciente. Así una segunda divergencia sobre el delta corregido no pierde lo que ya se decidió, y tampoco lo confunde con lo nuevo.
-- Si el usuario para la entrevista a medias, el fichero conserva lo contestado hasta ahí y la entrega dice cuántas preguntas quedan.
+- Si el usuario para la entrevista a medias, el fichero conserva lo contestado hasta ahí y la entrega dice cuántas decisiones quedan.
 
 ## Paso 5 · El estado sólo cambia si pasan los dos
 
